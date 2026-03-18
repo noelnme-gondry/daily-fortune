@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오늘의 운세 — Daily Fortune</title>
+  <meta name="description" content="매일 타로 카드와 사주팔자로 오늘의 운세를 확인하세요. Daily tarot fortune and Korean Saju reading.">
+  <meta name="theme-color" content="#0a0a1a">
+  <meta property="og:title" content="오늘의 운세 — Daily Fortune">
+  <meta property="og:description" content="매일 타로 카드와 사주팔자로 오늘의 운세를 확인하세요.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+</head>
+<body>
+  <!-- Background Effects -->
+  <div class="bg-effects">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+  </div>
+  <div class="particles"></div>
+
+  <!-- App -->
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <span class="header-emoji">🔮</span>
+      <h1>오늘의 운세</h1>
+      <p class="header-sub">Daily Fortune · Tarot · 사주</p>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav" role="tablist">
+      <button class="tab-btn" data-tab="attendance" role="tab" id="tab-attendance">
+        <span class="tab-emoji">📅</span>
+        <span>출석</span>
+      </button>
+      <button class="tab-btn active" data-tab="fortune" role="tab" id="tab-fortune">
+        <span class="tab-emoji">🃏</span>
+        <span>타로 운세</span>
+      </button>
+      <button class="tab-btn" data-tab="saju" role="tab" id="tab-saju">
+        <span class="tab-emoji">✨</span>
+        <span>사주</span>
+      </button>
+    </nav>
+
+    <!-- Tab Panels -->
+    <main>
+      <section class="tab-panel" id="attendancePanel" role="tabpanel" aria-labelledby="tab-attendance"></section>
+      <section class="tab-panel active" id="fortunePanel" role="tabpanel" aria-labelledby="tab-fortune"></section>
+      <section class="tab-panel" id="sajuPanel" role="tabpanel" aria-labelledby="tab-saju"></section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>🔮 Daily Fortune — $0 maintenance, 100% client-side</p>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
