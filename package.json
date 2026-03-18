@@ -7,9 +7,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server.js"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "korean-lunar-calendar": "^0.3.6",
     "lunar-javascript": "^1.7.7"
   },
