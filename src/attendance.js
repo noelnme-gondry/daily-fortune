@@ -37,6 +37,12 @@ function calculateStreak() {
   let streak = 0;
   const d = new Date();
 
+  // If today is not attended yet, we should start counting the streak from yesterday.
+  const todayKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  if (!localStorage.getItem(STORAGE_PREFIX + todayKey)) {
+    d.setDate(d.getDate() - 1);
+  }
+
   while (true) {
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     if (localStorage.getItem(STORAGE_PREFIX + key)) {

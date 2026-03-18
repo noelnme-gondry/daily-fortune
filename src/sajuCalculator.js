@@ -148,14 +148,20 @@ export function sajuCalculator(year, month, day, hour = 12) {
   const lacking = sortedElements.filter(([, count]) => count === 0).map(([el]) => el);
 
   // ── Lunar date info ──
+  const lunarMonthRaw = lunar.getMonth();
+  const isLeapMonth = lunarMonthRaw < 0;
+  const lunarMonthAbs = Math.abs(lunarMonthRaw);
+  const monthPrefixKo = isLeapMonth ? '윤' : '';
+  const monthPrefixEn = isLeapMonth ? 'Leap ' : '';
+
   const lunarDate = {
     year: lunar.getYear(),
-    month: lunar.getMonth(),
+    month: lunarMonthAbs,
     day: lunar.getDay(),
     yearInGanZhi: yearGanZhi,
-    isLeapMonth: lunar.getMonth() !== lunar.getMonth(), // simplified
-    displayKo: `${lunar.getYear()}년 ${lunar.getMonth()}월 ${lunar.getDay()}일 (음력)`,
-    displayEn: `Lunar: ${lunar.getYear()}-${lunar.getMonth()}-${lunar.getDay()}`,
+    isLeapMonth: isLeapMonth,
+    displayKo: `${lunar.getYear()}년 ${monthPrefixKo}${lunarMonthAbs}월 ${lunar.getDay()}일 (음력)`,
+    displayEn: `Lunar: ${lunar.getYear()}-${monthPrefixEn}${lunarMonthAbs}-${lunar.getDay()}`,
   };
 
   // ── Day Master (일간 / 日干) — the core of the person's chart ──
