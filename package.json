@@ -10,7 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "korean-lunar-calendar": "^0.3.6"
+    "korean-lunar-calendar": "^0.3.6",
+    "lunar-javascript": "^1.7.7"
   },
   "devDependencies": {
     "vite": "^6.3.5"

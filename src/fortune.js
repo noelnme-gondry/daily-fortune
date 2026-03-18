@@ -1,16 +1,27 @@
 // ── Fortune Module ─────────────────────────────────────────────
-// Date-seeded tarot card randomizer
+// Date-seeded tarot card randomizer with categorized fortunes
 
 let tarotData = null;
+let categoryData = null;
 
 /**
- * Load tarot database from static JSON
+ * Load tarot database (Major Arcana) from static JSON
  */
 async function loadTarotData() {
   if (tarotData) return tarotData;
   const res = await fetch('/tarot_db.json');
   tarotData = await res.json();
   return tarotData;
+}
+
+/**
+ * Load categorized fortune database (Love, Wealth, Career)
+ */
+async function loadCategoryData() {
+  if (categoryData) return categoryData;
+  const res = await fetch('/data/tarot_db.json');
+  categoryData = await res.json();
+  return categoryData;
 }
 
 /**
@@ -40,31 +51,37 @@ function dateSeed() {
 }
 
 /**
- * Get today's deterministic fortune card + message
+ * Get today's deterministic fortune card + category fortunes
  */
 export async function getDailyFortune() {
-  const data = await loadTarotData();
+  const [tarot, categories] = await Promise.all([loadTarotData(), loadCategoryData()]);
   const seed = dateSeed();
-  const rng = seededRandom(seed);
 
-  const cardIndex = Math.floor(rng * data.majorArcana.length);
-  const msgIndex = Math.floor(seededRandom(seed + 1) * data.fortuneMessages.length);
+  const cardIndex = Math.floor(seededRandom(seed) * tarot.majorArcana.length);
+  const msgIndex = Math.floor(seededRandom(seed + 1) * tarot.fortuneMessages.length);
   const isReversed = seededRandom(seed + 2) > 0.7;
 
+  // Pick one fortune from each category (deterministic per day)
+  const loveFortune = categories.love[Math.floor(seededRandom(seed + 10) * categories.love.length)];
+  const wealthFortune = categories.wealth[Math.floor(seededRandom(seed + 20) * categories.wealth.length)];
+  const careerFortune = categories.career[Math.floor(seededRandom(seed + 30) * categories.career.length)];
+
   return {
-    card: data.majorArcana[cardIndex],
-    message: data.fortuneMessages[msgIndex],
+    card: tarot.majorArcana[cardIndex],
+    message: tarot.fortuneMessages[msgIndex],
     isReversed,
+    categories: { love: loveFortune, wealth: wealthFortune, career: careerFortune },
     date: new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }),
   };
 }
 
 /**
- * Render fortune card into container with flip animation
+ * Render fortune card + category readings into container
  */
 export async function renderFortune(container) {
   const fortune = await getDailyFortune();
   const card = fortune.card;
+  const { love, wealth, career } = fortune.categories;
 
   container.innerHTML = `
     <div class="fortune-date">${fortune.date}의 운세</div>
@@ -92,6 +109,37 @@ export async function renderFortune(container) {
         </div>
       </div>
     </div>
+
+    <div class="category-fortunes">
+      <div class="category-card love">
+        <div class="category-header">
+          <span class="category-icon">💕</span>
+          <span class="category-title">연애운 (Love)</span>
+          <span class="category-level level-${love.level}">${love.level}</span>
+        </div>
+        <p class="category-text">${love.emoji} ${love.text}</p>
+        <p class="category-text-en">${love.textEn}</p>
+      </div>
+      <div class="category-card wealth">
+        <div class="category-header">
+          <span class="category-icon">💰</span>
+          <span class="category-title">재물운 (Wealth)</span>
+          <span class="category-level level-${wealth.level}">${wealth.level}</span>
+        </div>
+        <p class="category-text">${wealth.emoji} ${wealth.text}</p>
+        <p class="category-text-en">${wealth.textEn}</p>
+      </div>
+      <div class="category-card career">
+        <div class="category-header">
+          <span class="category-icon">💼</span>
+          <span class="category-title">직장운 (Career)</span>
+          <span class="category-level level-${career.level}">${career.level}</span>
+        </div>
+        <p class="category-text">${career.emoji} ${career.text}</p>
+        <p class="category-text-en">${career.textEn}</p>
+      </div>
+    </div>
+
     <div class="fortune-message">
       <div class="fortune-cookie">🥠</div>
       <p>${fortune.message}</p>
