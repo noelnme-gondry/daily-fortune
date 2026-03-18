@@ -108,8 +108,7 @@ function renderSajuResult(result) {
       </div>
     </div>
     <div class="saju-interpretation">
-      <h3>✨ 해석</h3>
-      <p>${interpretation.replace(/\n/g, '<br>')}</p>
+      <div class="saju-interpretation-content">${interpretation}</div>
     </div>
   `;
 

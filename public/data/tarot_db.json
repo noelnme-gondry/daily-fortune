@@ -1,74 +1,848 @@
 {
-  "meta": {
-    "version": "2.0.0",
-    "description": "Fortune database for Daily Fortune — Love, Wealth, Career categories",
-    "entriesPerCategory": 20,
-    "totalEntries": 60
-  },
   "love": [
-    { "id": "L01", "text": "새로운 인연이 예상치 못한 곳에서 찾아옵니다.", "textEn": "A new connection will find you in an unexpected place.", "emoji": "💕", "level": "great" },
-    { "id": "L02", "text": "오늘 만나는 사람에게 진심을 전하세요.", "textEn": "Share your true feelings with someone you meet today.", "emoji": "💌", "level": "good" },
-    { "id": "L03", "text": "오래된 관계가 새롭게 꽃필 때입니다.", "textEn": "An old relationship is about to bloom anew.", "emoji": "🌸", "level": "great" },
-    { "id": "L04", "text": "작은 오해가 있지만 대화로 풀어갈 수 있습니다.", "textEn": "A small misunderstanding exists, but can be resolved through conversation.", "emoji": "🗣️", "level": "neutral" },
-    { "id": "L05", "text": "사랑하는 사람에게 감사의 마음을 표현하면 좋습니다.", "textEn": "Express gratitude to someone you love today.", "emoji": "🙏", "level": "good" },
-    { "id": "L06", "text": "혼자만의 시간이 필요한 날일 수 있습니다.", "textEn": "Today might be a day you need some alone time.", "emoji": "🧘", "level": "neutral" },
-    { "id": "L07", "text": "진심 어린 한마디가 관계를 한층 깊게 합니다.", "textEn": "A sincere word will deepen your relationship.", "emoji": "💎", "level": "good" },
-    { "id": "L08", "text": "과거의 상처를 내려놓을 때 새로운 사랑이 옵니다.", "textEn": "New love comes when you let go of past wounds.", "emoji": "🦋", "level": "great" },
-    { "id": "L09", "text": "가까운 친구가 당신의 연애에 좋은 조언을 줍니다.", "textEn": "A close friend will offer good advice about your love life.", "emoji": "🤝", "level": "good" },
-    { "id": "L10", "text": "오늘은 고백에 좋은 날입니다. 용기를 내세요.", "textEn": "Today is a good day for confession. Be brave.", "emoji": "💗", "level": "great" },
-    { "id": "L11", "text": "상대방의 입장에서 한번 생각해보세요.", "textEn": "Try to see things from the other person's perspective.", "emoji": "🪞", "level": "neutral" },
-    { "id": "L12", "text": "함께하는 작은 일상이 큰 행복이 됩니다.", "textEn": "Small everyday moments together become great happiness.", "emoji": "☕", "level": "good" },
-    { "id": "L13", "text": "사랑은 기다림 속에서 영글어갑니다.", "textEn": "Love ripens through patience and waiting.", "emoji": "🕰️", "level": "neutral" },
-    { "id": "L14", "text": "마음을 열면 운명적인 만남이 기다리고 있습니다.", "textEn": "A fateful encounter awaits if you open your heart.", "emoji": "✨", "level": "great" },
-    { "id": "L15", "text": "서로의 다름을 인정하면 관계가 더 단단해집니다.", "textEn": "Accepting each other's differences strengthens the bond.", "emoji": "🌈", "level": "good" },
-    { "id": "L16", "text": "연인과의 여행이 좋은 추억을 만들어줍니다.", "textEn": "A trip with your partner will create wonderful memories.", "emoji": "✈️", "level": "great" },
-    { "id": "L17", "text": "오늘은 감정을 조절하는 것이 중요합니다.", "textEn": "Today, managing your emotions is important.", "emoji": "🧠", "level": "caution" },
-    { "id": "L18", "text": "당신의 매력이 빛나는 날입니다.", "textEn": "Your charm shines brightly today.", "emoji": "🌟", "level": "great" },
-    { "id": "L19", "text": "질투나 의심보다는 신뢰를 선택하세요.", "textEn": "Choose trust over jealousy or suspicion.", "emoji": "🤲", "level": "caution" },
-    { "id": "L20", "text": "사랑은 주는 것에서 시작됩니다.", "textEn": "Love begins with giving.", "emoji": "🎁", "level": "good" }
+    {
+      "id": "love-1",
+      "level": "good",
+      "emoji": "💘",
+      "title": "매력이 빛나는 날",
+      "summary": "서로의 진심을 확인하고 신뢰를 쌓아가는 하루가 될 것입니다.",
+      "detailed_interpretation": "주변 사람들의 시선이 당신에게 집중되며, 평소보다 훨씬 더 매력적인 오라를 뿜어내고 있습니다. 불필요한 오해가 생길 수 있으니, 대화할 때는 상대방의 말에 귀 기울이고 부드러운 어조를 유지하는 것이 좋습니다. 오늘은 혼자만의 시간을 갖기보다는 외부 모임이나 약속에 적극적으로 참여하여 긍정적인 에너지를 발산해보세요.",
+      "actionable_advice": "외모에 작은 변화를 주어 자신감을 높여보세요. 긍정적인 태도가 좋은 인연을 끌어당기는 가장 확실한 방법입니다.",
+      "lucky_elements": {
+        "color": "회색",
+        "number": 9,
+        "item": "명함지갑"
+      }
+    },
+    {
+      "id": "love-2",
+      "level": "good",
+      "emoji": "💑",
+      "title": "소통이 필요한 날",
+      "summary": "오늘은 당신의 매력이 유난히 빛을 발하는 날입니다.",
+      "detailed_interpretation": "주변 사람들의 시선이 당신에게 집중되며, 평소보다 훨씬 더 매력적인 오라를 뿜어내고 있습니다. 감성을 표현하는 데 주저하지 마세요. 당신의 따뜻한 말 한마디가 상대방의 마음을 깊게 움직일 수 있는 에너지가 충만합니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "외모에 작은 변화를 주어 자신감을 높여보세요. 긍정적인 태도가 좋은 인연을 끌어당기는 가장 확실한 방법입니다.",
+      "lucky_elements": {
+        "color": "네이비",
+        "number": 21,
+        "item": "거울"
+      }
+    },
+    {
+      "id": "love-3",
+      "level": "neutral",
+      "emoji": "💌",
+      "title": "로맨틱한 하루",
+      "summary": "오늘은 당신의 매력이 유난히 빛을 발하는 날입니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 감성을 표현하는 데 주저하지 마세요. 당신의 따뜻한 말 한마디가 상대방의 마음을 깊게 움직일 수 있는 에너지가 충만합니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "외모에 작은 변화를 주어 자신감을 높여보세요. 긍정적인 태도가 좋은 인연을 끌어당기는 가장 확실한 방법입니다.",
+      "lucky_elements": {
+        "color": "베이지",
+        "number": 5,
+        "item": "책"
+      }
+    },
+    {
+      "id": "love-4",
+      "level": "neutral",
+      "emoji": "💘",
+      "title": "진심이 통하는 시간",
+      "summary": "새로운 인연이 다가올 수 있는 긍정적인 기운이 있습니다.",
+      "detailed_interpretation": "현재의 관계에서 약간의 권태로움이 있었다면, 오늘을 기점으로 새로운 활력을 되찾게 될 것입니다. 감성을 표현하는 데 주저하지 마세요. 당신의 따뜻한 말 한마디가 상대방의 마음을 깊게 움직일 수 있는 에너지가 충만합니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "자신의 감정을 숨기지 말고 솔직하게 표현해 보세요. 상대를 배려하되, 당신의 마음을 먼저 돌보는 것도 잊지 마세요.",
+      "lucky_elements": {
+        "color": "갈색",
+        "number": 12,
+        "item": "아메리카노"
+      }
+    },
+    {
+      "id": "love-5",
+      "level": "good",
+      "emoji": "💖",
+      "title": "관계의 재발견",
+      "summary": "새로운 인연이 다가올 수 있는 긍정적인 기운이 있습니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 불필요한 오해가 생길 수 있으니, 대화할 때는 상대방의 말에 귀 기울이고 부드러운 어조를 유지하는 것이 좋습니다. 오늘은 혼자만의 시간을 갖기보다는 외부 모임이나 약속에 적극적으로 참여하여 긍정적인 에너지를 발산해보세요.",
+      "actionable_advice": "오늘은 먼저 연락을 취해보는 것도 조은 선택입니다. 너무 서두르지 말고 상대의 반응을 살피며 천천히 다가가세요.",
+      "lucky_elements": {
+        "color": "검정",
+        "number": 2,
+        "item": "머그컵"
+      }
+    },
+    {
+      "id": "love-6",
+      "level": "neutral",
+      "emoji": "💘",
+      "title": "새로운 설렘의 시작",
+      "summary": "오늘은 당신의 매력이 유난히 빛을 발하는 날입니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 감성을 표현하는 데 주저하지 마세요. 당신의 따뜻한 말 한마디가 상대방의 마음을 깊게 움직일 수 있는 에너지가 충만합니다. 만약 짝사랑 중이라면, 오늘이 조심스럽게 마음을 넌지시 표현해볼 수 있는 절호의 기회가 될지도 모릅니다.",
+      "actionable_advice": "자신의 감정을 숨기지 말고 솔직하게 표현해 보세요. 상대를 배려하되, 당신의 마음을 먼저 돌보는 것도 잊지 마세요.",
+      "lucky_elements": {
+        "color": "네이비",
+        "number": 6,
+        "item": "만년필"
+      }
+    },
+    {
+      "id": "love-7",
+      "level": "good",
+      "emoji": "💌",
+      "title": "진심이 통하는 시간",
+      "summary": "사랑하는 사람과의 관계가 한층 더 깊어지는 시기입니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 불필요한 오해가 생길 수 있으니, 대화할 때는 상대방의 말에 귀 기울이고 부드러운 어조를 유지하는 것이 좋습니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "오늘은 먼저 연락을 취해보는 것도 조은 선택입니다. 너무 서두르지 말고 상대의 반응을 살피며 천천히 다가가세요.",
+      "lucky_elements": {
+        "color": "파랑",
+        "number": 7,
+        "item": "지갑"
+      }
+    },
+    {
+      "id": "love-8",
+      "level": "great",
+      "emoji": "💕",
+      "title": "소통이 필요한 날",
+      "summary": "오늘은 당신의 매력이 유난히 빛을 발하는 날입니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 감성을 표현하는 데 주저하지 마세요. 당신의 따뜻한 말 한마디가 상대방의 마음을 깊게 움직일 수 있는 에너지가 충만합니다. 만약 짝사랑 중이라면, 오늘이 조심스럽게 마음을 넌지시 표현해볼 수 있는 절호의 기회가 될지도 모릅니다.",
+      "actionable_advice": "외모에 작은 변화를 주어 자신감을 높여보세요. 긍정적인 태도가 좋은 인연을 끌어당기는 가장 확실한 방법입니다.",
+      "lucky_elements": {
+        "color": "주황",
+        "number": 8,
+        "item": "만년필"
+      }
+    },
+    {
+      "id": "love-9",
+      "level": "caution",
+      "emoji": "💑",
+      "title": "소통이 필요한 날",
+      "summary": "사랑하는 사람과의 관계가 한층 더 깊어지는 시기입니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 불필요한 오해가 생길 수 있으니, 대화할 때는 상대방의 말에 귀 기울이고 부드러운 어조를 유지하는 것이 좋습니다. 오늘은 혼자만의 시간을 갖기보다는 외부 모임이나 약속에 적극적으로 참여하여 긍정적인 에너지를 발산해보세요.",
+      "actionable_advice": "오늘은 먼저 연락을 취해보는 것도 조은 선택입니다. 너무 서두르지 말고 상대의 반응을 살피며 천천히 다가가세요.",
+      "lucky_elements": {
+        "color": "보라",
+        "number": 21,
+        "item": "만년필"
+      }
+    },
+    {
+      "id": "love-10",
+      "level": "good",
+      "emoji": "💕",
+      "title": "과거의 인연",
+      "summary": "오늘은 당신의 매력이 유난히 빛을 발하는 날입니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 자신의 감정에 솔직해지는 것이 가장 중요한 열쇠입니다. 복잡한 밀당보다는 직설적이고 진정성 있는 태도가 훨씬 더 좋은 결과를 가져옵니다. 오늘은 혼자만의 시간을 갖기보다는 외부 모임이나 약속에 적극적으로 참여하여 긍정적인 에너지를 발산해보세요.",
+      "actionable_advice": "외모에 작은 변화를 주어 자신감을 높여보세요. 긍정적인 태도가 좋은 인연을 끌어당기는 가장 확실한 방법입니다.",
+      "lucky_elements": {
+        "color": "흰색",
+        "number": 9,
+        "item": "목걸이"
+      }
+    },
+    {
+      "id": "love-11",
+      "level": "caution",
+      "emoji": "💘",
+      "title": "진심이 통하는 시간",
+      "summary": "예상치 못한 곳에서 설레는 만남이 기다리고 있습니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 자신의 감정에 솔직해지는 것이 가장 중요한 열쇠입니다. 복잡한 밀당보다는 직설적이고 진정성 있는 태도가 훨씬 더 좋은 결과를 가져옵니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "자신의 감정을 숨기지 말고 솔직하게 표현해 보세요. 상대를 배려하되, 당신의 마음을 먼저 돌보는 것도 잊지 마세요.",
+      "lucky_elements": {
+        "color": "주황",
+        "number": 21,
+        "item": "시계"
+      }
+    },
+    {
+      "id": "love-12",
+      "level": "caution",
+      "emoji": "💖",
+      "title": "로맨틱한 하루",
+      "summary": "예상치 못한 곳에서 설레는 만남이 기다리고 있습니다.",
+      "detailed_interpretation": "현재의 관계에서 약간의 권태로움이 있었다면, 오늘을 기점으로 새로운 활력을 되찾게 될 것입니다. 불필요한 오해가 생길 수 있으니, 대화할 때는 상대방의 말에 귀 기울이고 부드러운 어조를 유지하는 것이 좋습니다. 만약 짝사랑 중이라면, 오늘이 조심스럽게 마음을 넌지시 표현해볼 수 있는 절호의 기회가 될지도 모릅니다.",
+      "actionable_advice": "오늘은 먼저 연락을 취해보는 것도 조은 선택입니다. 너무 서두르지 말고 상대의 반응을 살피며 천천히 다가가세요.",
+      "lucky_elements": {
+        "color": "초록",
+        "number": 22,
+        "item": "지갑"
+      }
+    },
+    {
+      "id": "love-13",
+      "level": "caution",
+      "emoji": "💘",
+      "title": "로맨틱한 하루",
+      "summary": "오늘은 당신의 매력이 유난히 빛을 발하는 날입니다.",
+      "detailed_interpretation": "주변 사람들의 시선이 당신에게 집중되며, 평소보다 훨씬 더 매력적인 오라를 뿜어내고 있습니다. 불필요한 오해가 생길 수 있으니, 대화할 때는 상대방의 말에 귀 기울이고 부드러운 어조를 유지하는 것이 좋습니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "외모에 작은 변화를 주어 자신감을 높여보세요. 긍정적인 태도가 좋은 인연을 끌어당기는 가장 확실한 방법입니다.",
+      "lucky_elements": {
+        "color": "빨강",
+        "number": 12,
+        "item": "명함지갑"
+      }
+    },
+    {
+      "id": "love-14",
+      "level": "good",
+      "emoji": "💑",
+      "title": "진심이 통하는 시간",
+      "summary": "오늘은 당신의 매력이 유난히 빛을 발하는 날입니다.",
+      "detailed_interpretation": "주변 사람들의 시선이 당신에게 집중되며, 평소보다 훨씬 더 매력적인 오라를 뿜어내고 있습니다. 불필요한 오해가 생길 수 있으니, 대화할 때는 상대방의 말에 귀 기울이고 부드러운 어조를 유지하는 것이 좋습니다. 만약 짝사랑 중이라면, 오늘이 조심스럽게 마음을 넌지시 표현해볼 수 있는 절호의 기회가 될지도 모릅니다.",
+      "actionable_advice": "자신의 감정을 숨기지 말고 솔직하게 표현해 보세요. 상대를 배려하되, 당신의 마음을 먼저 돌보는 것도 잊지 마세요.",
+      "lucky_elements": {
+        "color": "금색",
+        "number": 12,
+        "item": "향수"
+      }
+    },
+    {
+      "id": "love-15",
+      "level": "good",
+      "emoji": "💑",
+      "title": "로맨틱한 하루",
+      "summary": "사랑하는 사람과의 관계가 한층 더 깊어지는 시기입니다.",
+      "detailed_interpretation": "주변 사람들의 시선이 당신에게 집중되며, 평소보다 훨씬 더 매력적인 오라를 뿜어내고 있습니다. 자신의 감정에 솔직해지는 것이 가장 중요한 열쇠입니다. 복잡한 밀당보다는 직설적이고 진정성 있는 태도가 훨씬 더 좋은 결과를 가져옵니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "외모에 작은 변화를 주어 자신감을 높여보세요. 긍정적인 태도가 좋은 인연을 끌어당기는 가장 확실한 방법입니다.",
+      "lucky_elements": {
+        "color": "주황",
+        "number": 6,
+        "item": "지갑"
+      }
+    },
+    {
+      "id": "love-16",
+      "level": "good",
+      "emoji": "💕",
+      "title": "매력이 빛나는 날",
+      "summary": "예상치 못한 곳에서 설레는 만남이 기다리고 있습니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 자신의 감정에 솔직해지는 것이 가장 중요한 열쇠입니다. 복잡한 밀당보다는 직설적이고 진정성 있는 태도가 훨씬 더 좋은 결과를 가져옵니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "자신의 감정을 숨기지 말고 솔직하게 표현해 보세요. 상대를 배려하되, 당신의 마음을 먼저 돌보는 것도 잊지 마세요.",
+      "lucky_elements": {
+        "color": "분홍",
+        "number": 22,
+        "item": "명함지갑"
+      }
+    },
+    {
+      "id": "love-17",
+      "level": "great",
+      "emoji": "💖",
+      "title": "서로를 알아가는 시간",
+      "summary": "오늘은 당신의 매력이 유난히 빛을 발하는 날입니다.",
+      "detailed_interpretation": "현재의 관계에서 약간의 권태로움이 있었다면, 오늘을 기점으로 새로운 활력을 되찾게 될 것입니다. 감성을 표현하는 데 주저하지 마세요. 당신의 따뜻한 말 한마디가 상대방의 마음을 깊게 움직일 수 있는 에너지가 충만합니다. 오늘은 혼자만의 시간을 갖기보다는 외부 모임이나 약속에 적극적으로 참여하여 긍정적인 에너지를 발산해보세요.",
+      "actionable_advice": "오늘은 먼저 연락을 취해보는 것도 조은 선택입니다. 너무 서두르지 말고 상대의 반응을 살피며 천천히 다가가세요.",
+      "lucky_elements": {
+        "color": "은색",
+        "number": 7,
+        "item": "우산"
+      }
+    },
+    {
+      "id": "love-18",
+      "level": "good",
+      "emoji": "💕",
+      "title": "진심이 통하는 시간",
+      "summary": "오늘은 당신의 매력이 유난히 빛을 발하는 날입니다.",
+      "detailed_interpretation": "현재의 관계에서 약간의 권태로움이 있었다면, 오늘을 기점으로 새로운 활력을 되찾게 될 것입니다. 불필요한 오해가 생길 수 있으니, 대화할 때는 상대방의 말에 귀 기울이고 부드러운 어조를 유지하는 것이 좋습니다. 만약 짝사랑 중이라면, 오늘이 조심스럽게 마음을 넌지시 표현해볼 수 있는 절호의 기회가 될지도 모릅니다.",
+      "actionable_advice": "오늘은 먼저 연락을 취해보는 것도 조은 선택입니다. 너무 서두르지 말고 상대의 반응을 살피며 천천히 다가가세요.",
+      "lucky_elements": {
+        "color": "주황",
+        "number": 2,
+        "item": "다이어리"
+      }
+    },
+    {
+      "id": "love-19",
+      "level": "neutral",
+      "emoji": "💕",
+      "title": "과거의 인연",
+      "summary": "서로의 진심을 확인하고 신뢰를 쌓아가는 하루가 될 것입니다.",
+      "detailed_interpretation": "지금껏 주목하지 않았던 주변 인물이 갑자기 특별한 존재로 다가올 수 있는 시기입니다. 감성을 표현하는 데 주저하지 마세요. 당신의 따뜻한 말 한마디가 상대방의 마음을 깊게 움직일 수 있는 에너지가 충만합니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "오늘은 먼저 연락을 취해보는 것도 조은 선택입니다. 너무 서두르지 말고 상대의 반응을 살피며 천천히 다가가세요.",
+      "lucky_elements": {
+        "color": "은색",
+        "number": 6,
+        "item": "다이어리"
+      }
+    },
+    {
+      "id": "love-20",
+      "level": "good",
+      "emoji": "💌",
+      "title": "새로운 설렘의 시작",
+      "summary": "새로운 인연이 다가올 수 있는 긍정적인 기운이 있습니다.",
+      "detailed_interpretation": "주변 사람들의 시선이 당신에게 집중되며, 평소보다 훨씬 더 매력적인 오라를 뿜어내고 있습니다. 자신의 감정에 솔직해지는 것이 가장 중요한 열쇠입니다. 복잡한 밀당보다는 직설적이고 진정성 있는 태도가 훨씬 더 좋은 결과를 가져옵니다. 저녁 시간이 될수록 애정운의 기운이 더욱 강해지며, 낭만적인 분위기 속에서 뜻깊은 시간을 보낼 수 있습니다.",
+      "actionable_advice": "자신의 감정을 숨기지 말고 솔직하게 표현해 보세요. 상대를 배려하되, 당신의 마음을 먼저 돌보는 것도 잊지 마세요.",
+      "lucky_elements": {
+        "color": "주황",
+        "number": 7,
+        "item": "명함지갑"
+      }
+    }
   ],
   "wealth": [
-    { "id": "W01", "text": "예상치 못한 수입이 들어올 수 있습니다.", "textEn": "An unexpected income may come your way.", "emoji": "💰", "level": "great" },
-    { "id": "W02", "text": "지출을 줄이고 저축에 집중하면 좋은 날입니다.", "textEn": "A good day to cut expenses and focus on saving.", "emoji": "🏦", "level": "neutral" },
-    { "id": "W03", "text": "투자에 대한 좋은 정보를 얻을 수 있습니다.", "textEn": "You may receive good investment information.", "emoji": "📊", "level": "good" },
-    { "id": "W04", "text": "큰 소비는 잠시 미루는 것이 현명합니다.", "textEn": "It's wise to postpone large purchases for now.", "emoji": "⏸️", "level": "caution" },
-    { "id": "W05", "text": "부업이나 새로운 수입원을 찾아보세요.", "textEn": "Look into side jobs or new income sources.", "emoji": "🔍", "level": "good" },
-    { "id": "W06", "text": "금전적인 도움이 필요한 친구에게 조언을 줄 수 있습니다.", "textEn": "You can offer financial advice to a friend in need.", "emoji": "🤝", "level": "neutral" },
-    { "id": "W07", "text": "재물운이 상승하는 기운이 있습니다.", "textEn": "There's a rising energy in your financial fortune.", "emoji": "📈", "level": "great" },
-    { "id": "W08", "text": "충동 구매를 피하면 한 달이 편해집니다.", "textEn": "Avoiding impulse purchases will ease your month.", "emoji": "🛑", "level": "caution" },
-    { "id": "W09", "text": "오래 기다린 보상이 드디어 찾아옵니다.", "textEn": "A long-awaited reward finally arrives.", "emoji": "🏆", "level": "great" },
-    { "id": "W10", "text": "금전 관련 서류는 꼼꼼히 확인하세요.", "textEn": "Carefully review any financial documents.", "emoji": "📝", "level": "caution" },
-    { "id": "W11", "text": "나눔이 더 큰 풍요로 돌아옵니다.", "textEn": "Sharing returns as greater abundance.", "emoji": "🎁", "level": "good" },
-    { "id": "W12", "text": "재정 계획을 새로 세우기 좋은 날입니다.", "textEn": "A good day to create a new financial plan.", "emoji": "📋", "level": "good" },
-    { "id": "W13", "text": "작은 금액이라도 꾸준히 모으면 큰 힘이 됩니다.", "textEn": "Even small savings build great strength over time.", "emoji": "🪙", "level": "neutral" },
-    { "id": "W14", "text": "비즈니스 파트너십에 좋은 기운이 있습니다.", "textEn": "There's positive energy for business partnerships.", "emoji": "🤝", "level": "great" },
-    { "id": "W15", "text": "돈보다 가치 있는 경험에 투자하세요.", "textEn": "Invest in experiences more valuable than money.", "emoji": "🌍", "level": "good" },
-    { "id": "W16", "text": "금전적인 스트레스를 내려놓으면 오히려 길이 열립니다.", "textEn": "Letting go of financial stress actually opens new paths.", "emoji": "🧘", "level": "neutral" },
-    { "id": "W17", "text": "새로운 프로젝트가 수익으로 이어질 수 있습니다.", "textEn": "A new project could lead to profit.", "emoji": "💡", "level": "great" },
-    { "id": "W18", "text": "신중한 판단이 재정적 안정을 가져옵니다.", "textEn": "Careful judgment brings financial stability.", "emoji": "⚖️", "level": "good" },
-    { "id": "W19", "text": "불필요한 구독 서비스를 정리해보세요.", "textEn": "Consider cleaning up unnecessary subscription services.", "emoji": "✂️", "level": "neutral" },
-    { "id": "W20", "text": "풍요함은 감사하는 마음에서 시작됩니다.", "textEn": "Abundance begins with a grateful heart.", "emoji": "🙏", "level": "good" }
+    {
+      "id": "wealth-1",
+      "level": "neutral",
+      "emoji": "💎",
+      "title": "안정기에 접어든 자산",
+      "summary": "새로운 재물 증식의 기회가 찾아올 수 있으니 주변의 정보에 귀 기울이세요.",
+      "detailed_interpretation": "오늘 당신의 재물운은 태양이 높이 뜬 것처럼 밝고 환합니다. 막혔던 자금줄이 풀리거나 기대 이상의 수입이 생길 수 있습니다. 투자나 금융 관련 결정을 내리기 전에 전문가의 조언이나 객관적인 데이터를 꼼꼼히 살펴보는 것이 큰 이익으로 이어질 수 있습니다. 재물은 물과 같아서 고여있기보다는 잘 순환하게 만드는 것이 중요합니다. 가치 있는 곳에 적절히 소비하세요.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "노랑",
+        "number": 21,
+        "item": "열쇠고리"
+      }
+    },
+    {
+      "id": "wealth-2",
+      "level": "good",
+      "emoji": "💰",
+      "title": "신중한 투자가 필요한 시기",
+      "summary": "그동안 뿌려둔 노력의 씨앗이 마침내 금전적인 보상으로 돌아오는 시기입니다.",
+      "detailed_interpretation": "오늘은 돈이 나가는 것보다 들어오는 에너지가 큽니다. 다만 눈먼 돈을 좇기보다는 정당한 댓가를 바라는 것이 좋습니다. 평소 관심을 두고 있던 분야에서 좋은 투자 기회가 발견될 수 있습니다. 하지만 너무 큰 욕심을 부리기보다는 분산 투자가 안전합니다. 주변 사람들에게 가볍게 베푸는 밥 한 끼나 커피 한 잔이 나중에 더 큰 금전적 행운으로 돌아올 수 있는 날입니다.",
+      "actionable_advice": "주변의 달콤한 투자 권유에 쉽게 흔들리지 마세요. 본인이 완전히 이해하지 못하는 곳에는 돈을 넣지 않는 것이 철칙입니다.",
+      "lucky_elements": {
+        "color": "초록",
+        "number": 2,
+        "item": "책"
+      }
+    },
+    {
+      "id": "wealth-3",
+      "level": "neutral",
+      "emoji": "💸",
+      "title": "안정기에 접어든 자산",
+      "summary": "새로운 재물 증식의 기회가 찾아올 수 있으니 주변의 정보에 귀 기울이세요.",
+      "detailed_interpretation": "오늘 당신의 재물운은 태양이 높이 뜬 것처럼 밝고 환합니다. 막혔던 자금줄이 풀리거나 기대 이상의 수입이 생길 수 있습니다. 갑작스러운 지출이나 유혹이 생길 수 있으니, 꼭 필요한 소비인지 세 번 이상 고민하고 지갑을 여는 지혜가 필요합니다. 저축이나 적금 등 장기적인 관점에서의 금전 계획을 세우기에 아주 좋은 시기이며, 지금의 계획이 훗날 큰 버팀목이 될 것입니다.",
+      "actionable_advice": "가계부나 자산 관리 앱을 열어 현재의 지출 패턴을 점검해 보세요. 불필요한 고정 지출을 줄이는 것이 당장의 수익보다 중요합니다.",
+      "lucky_elements": {
+        "color": "주황",
+        "number": 1,
+        "item": "다이어리"
+      }
+    },
+    {
+      "id": "wealth-4",
+      "level": "great",
+      "emoji": "📈",
+      "title": "노력이 결실을 맺는 날",
+      "summary": "충동적인 지출을 자제하고 현재의 자산을 안정적으로 지키는 것이 중요한 하루입니다.",
+      "detailed_interpretation": "오늘은 돈이 나가는 것보다 들어오는 에너지가 큽니다. 다만 눈먼 돈을 좇기보다는 정당한 댓가를 바라는 것이 좋습니다. 갑작스러운 지출이나 유혹이 생길 수 있으니, 꼭 필요한 소비인지 세 번 이상 고민하고 지갑을 여는 지혜가 필요합니다. 재물은 물과 같아서 고여있기보다는 잘 순환하게 만드는 것이 중요합니다. 가치 있는 곳에 적절히 소비하세요.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "금색",
+        "number": 12,
+        "item": "우산"
+      }
+    },
+    {
+      "id": "wealth-5",
+      "level": "good",
+      "emoji": "🪙",
+      "title": "안정기에 접어든 자산",
+      "summary": "금전적인 흐름이 매우 긍정적이며, 예상치 못한 이익이 발생할 수 있습니다.",
+      "detailed_interpretation": "오늘 당신의 재물운은 태양이 높이 뜬 것처럼 밝고 환합니다. 막혔던 자금줄이 풀리거나 기대 이상의 수입이 생길 수 있습니다. 평소 관심을 두고 있던 분야에서 좋은 투자 기회가 발견될 수 있습니다. 하지만 너무 큰 욕심을 부리기보다는 분산 투자가 안전합니다. 저축이나 적금 등 장기적인 관점에서의 금전 계획을 세우기에 아주 좋은 시기이며, 지금의 계획이 훗날 큰 버팀목이 될 것입니다.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "흰색",
+        "number": 4,
+        "item": "은반지"
+      }
+    },
+    {
+      "id": "wealth-6",
+      "level": "good",
+      "emoji": "📈",
+      "title": "지출 관리가 필요한 하루",
+      "summary": "충동적인 지출을 자제하고 현재의 자산을 안정적으로 지키는 것이 중요한 하루입니다.",
+      "detailed_interpretation": "현재 가지고 있는 자산의 가치가 상승하거나, 뜻밖의 보너스나 용돈을 받게 될 확률이 높은 날입니다. 평소 관심을 두고 있던 분야에서 좋은 투자 기회가 발견될 수 있습니다. 하지만 너무 큰 욕심을 부리기보다는 분산 투자가 안전합니다. 주변 사람들에게 가볍게 베푸는 밥 한 끼나 커피 한 잔이 나중에 더 큰 금전적 행운으로 돌아올 수 있는 날입니다.",
+      "actionable_advice": "가계부나 자산 관리 앱을 열어 현재의 지출 패턴을 점검해 보세요. 불필요한 고정 지출을 줄이는 것이 당장의 수익보다 중요합니다.",
+      "lucky_elements": {
+        "color": "흰색",
+        "number": 22,
+        "item": "다이어리"
+      }
+    },
+    {
+      "id": "wealth-7",
+      "level": "good",
+      "emoji": "💎",
+      "title": "신중한 투자가 필요한 시기",
+      "summary": "재물운이 상승 곡선을 타고 있어, 작은 투자로도 쏠쏠한 재미를 볼 수 있는 날입니다.",
+      "detailed_interpretation": "현재 가지고 있는 자산의 가치가 상승하거나, 뜻밖의 보너스나 용돈을 받게 될 확률이 높은 날입니다. 평소 관심을 두고 있던 분야에서 좋은 투자 기회가 발견될 수 있습니다. 하지만 너무 큰 욕심을 부리기보다는 분산 투자가 안전합니다. 재물은 물과 같아서 고여있기보다는 잘 순환하게 만드는 것이 중요합니다. 가치 있는 곳에 적절히 소비하세요.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "갈색",
+        "number": 9,
+        "item": "시계"
+      }
+    },
+    {
+      "id": "wealth-8",
+      "level": "good",
+      "emoji": "📈",
+      "title": "신중한 투자가 필요한 시기",
+      "summary": "재물운이 상승 곡선을 타고 있어, 작은 투자로도 쏠쏠한 재미를 볼 수 있는 날입니다.",
+      "detailed_interpretation": "오늘 당신의 재물운은 태양이 높이 뜬 것처럼 밝고 환합니다. 막혔던 자금줄이 풀리거나 기대 이상의 수입이 생길 수 있습니다. 투자나 금융 관련 결정을 내리기 전에 전문가의 조언이나 객관적인 데이터를 꼼꼼히 살펴보는 것이 큰 이익으로 이어질 수 있습니다. 재물은 물과 같아서 고여있기보다는 잘 순환하게 만드는 것이 중요합니다. 가치 있는 곳에 적절히 소비하세요.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "분홍",
+        "number": 12,
+        "item": "향초"
+      }
+    },
+    {
+      "id": "wealth-9",
+      "level": "neutral",
+      "emoji": "📈",
+      "title": "지혜로운 소비의 날",
+      "summary": "충동적인 지출을 자제하고 현재의 자산을 안정적으로 지키는 것이 중요한 하루입니다.",
+      "detailed_interpretation": "현재 가지고 있는 자산의 가치가 상승하거나, 뜻밖의 보너스나 용돈을 받게 될 확률이 높은 날입니다. 갑작스러운 지출이나 유혹이 생길 수 있으니, 꼭 필요한 소비인지 세 번 이상 고민하고 지갑을 여는 지혜가 필요합니다. 주변 사람들에게 가볍게 베푸는 밥 한 끼나 커피 한 잔이 나중에 더 큰 금전적 행운으로 돌아올 수 있는 날입니다.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "갈색",
+        "number": 2,
+        "item": "열쇠고리"
+      }
+    },
+    {
+      "id": "wealth-10",
+      "level": "good",
+      "emoji": "🪙",
+      "title": "풍요로운 재물운",
+      "summary": "충동적인 지출을 자제하고 현재의 자산을 안정적으로 지키는 것이 중요한 하루입니다.",
+      "detailed_interpretation": "현재 가지고 있는 자산의 가치가 상승하거나, 뜻밖의 보너스나 용돈을 받게 될 확률이 높은 날입니다. 갑작스러운 지출이나 유혹이 생길 수 있으니, 꼭 필요한 소비인지 세 번 이상 고민하고 지갑을 여는 지혜가 필요합니다. 재물은 물과 같아서 고여있기보다는 잘 순환하게 만드는 것이 중요합니다. 가치 있는 곳에 적절히 소비하세요.",
+      "actionable_advice": "가계부나 자산 관리 앱을 열어 현재의 지출 패턴을 점검해 보세요. 불필요한 고정 지출을 줄이는 것이 당장의 수익보다 중요합니다.",
+      "lucky_elements": {
+        "color": "갈색",
+        "number": 8,
+        "item": "시계"
+      }
+    },
+    {
+      "id": "wealth-11",
+      "level": "good",
+      "emoji": "💰",
+      "title": "금전적 여유가 생기는 날",
+      "summary": "재물운이 상승 곡선을 타고 있어, 작은 투자로도 쏠쏠한 재미를 볼 수 있는 날입니다.",
+      "detailed_interpretation": "오늘은 돈이 나가는 것보다 들어오는 에너지가 큽니다. 다만 눈먼 돈을 좇기보다는 정당한 댓가를 바라는 것이 좋습니다. 갑작스러운 지출이나 유혹이 생길 수 있으니, 꼭 필요한 소비인지 세 번 이상 고민하고 지갑을 여는 지혜가 필요합니다. 주변 사람들에게 가볍게 베푸는 밥 한 끼나 커피 한 잔이 나중에 더 큰 금전적 행운으로 돌아올 수 있는 날입니다.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "금색",
+        "number": 5,
+        "item": "명함지갑"
+      }
+    },
+    {
+      "id": "wealth-12",
+      "level": "good",
+      "emoji": "💰",
+      "title": "풍요로운 재물운",
+      "summary": "새로운 재물 증식의 기회가 찾아올 수 있으니 주변의 정보에 귀 기울이세요.",
+      "detailed_interpretation": "현재 가지고 있는 자산의 가치가 상승하거나, 뜻밖의 보너스나 용돈을 받게 될 확률이 높은 날입니다. 평소 관심을 두고 있던 분야에서 좋은 투자 기회가 발견될 수 있습니다. 하지만 너무 큰 욕심을 부리기보다는 분산 투자가 안전합니다. 주변 사람들에게 가볍게 베푸는 밥 한 끼나 커피 한 잔이 나중에 더 큰 금전적 행운으로 돌아올 수 있는 날입니다.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "주황",
+        "number": 33,
+        "item": "은반지"
+      }
+    },
+    {
+      "id": "wealth-13",
+      "level": "good",
+      "emoji": "🪙",
+      "title": "예상치 못한 횡재수",
+      "summary": "충동적인 지출을 자제하고 현재의 자산을 안정적으로 지키는 것이 중요한 하루입니다.",
+      "detailed_interpretation": "오늘은 돈이 나가는 것보다 들어오는 에너지가 큽니다. 다만 눈먼 돈을 좇기보다는 정당한 댓가를 바라는 것이 좋습니다. 투자나 금융 관련 결정을 내리기 전에 전문가의 조언이나 객관적인 데이터를 꼼꼼히 살펴보는 것이 큰 이익으로 이어질 수 있습니다. 저축이나 적금 등 장기적인 관점에서의 금전 계획을 세우기에 아주 좋은 시기이며, 지금의 계획이 훗날 큰 버팀목이 될 것입니다.",
+      "actionable_advice": "가계부나 자산 관리 앱을 열어 현재의 지출 패턴을 점검해 보세요. 불필요한 고정 지출을 줄이는 것이 당장의 수익보다 중요합니다.",
+      "lucky_elements": {
+        "color": "파랑",
+        "number": 8,
+        "item": "명함지갑"
+      }
+    },
+    {
+      "id": "wealth-14",
+      "level": "caution",
+      "emoji": "💸",
+      "title": "새로운 수입원의 발견",
+      "summary": "금전적인 흐름이 매우 긍정적이며, 예상치 못한 이익이 발생할 수 있습니다.",
+      "detailed_interpretation": "오늘은 돈이 나가는 것보다 들어오는 에너지가 큽니다. 다만 눈먼 돈을 좇기보다는 정당한 댓가를 바라는 것이 좋습니다. 갑작스러운 지출이나 유혹이 생길 수 있으니, 꼭 필요한 소비인지 세 번 이상 고민하고 지갑을 여는 지혜가 필요합니다. 주변 사람들에게 가볍게 베푸는 밥 한 끼나 커피 한 잔이 나중에 더 큰 금전적 행운으로 돌아올 수 있는 날입니다.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "빨강",
+        "number": 12,
+        "item": "만년필"
+      }
+    },
+    {
+      "id": "wealth-15",
+      "level": "good",
+      "emoji": "📈",
+      "title": "안정기에 접어든 자산",
+      "summary": "그동안 뿌려둔 노력의 씨앗이 마침내 금전적인 보상으로 돌아오는 시기입니다.",
+      "detailed_interpretation": "현재 가지고 있는 자산의 가치가 상승하거나, 뜻밖의 보너스나 용돈을 받게 될 확률이 높은 날입니다. 투자나 금융 관련 결정을 내리기 전에 전문가의 조언이나 객관적인 데이터를 꼼꼼히 살펴보는 것이 큰 이익으로 이어질 수 있습니다. 저축이나 적금 등 장기적인 관점에서의 금전 계획을 세우기에 아주 좋은 시기이며, 지금의 계획이 훗날 큰 버팀목이 될 것입니다.",
+      "actionable_advice": "가계부나 자산 관리 앱을 열어 현재의 지출 패턴을 점검해 보세요. 불필요한 고정 지출을 줄이는 것이 당장의 수익보다 중요합니다.",
+      "lucky_elements": {
+        "color": "갈색",
+        "number": 7,
+        "item": "우산"
+      }
+    },
+    {
+      "id": "wealth-16",
+      "level": "good",
+      "emoji": "💸",
+      "title": "안정기에 접어든 자산",
+      "summary": "그동안 뿌려둔 노력의 씨앗이 마침내 금전적인 보상으로 돌아오는 시기입니다.",
+      "detailed_interpretation": "현재 가지고 있는 자산의 가치가 상승하거나, 뜻밖의 보너스나 용돈을 받게 될 확률이 높은 날입니다. 투자나 금융 관련 결정을 내리기 전에 전문가의 조언이나 객관적인 데이터를 꼼꼼히 살펴보는 것이 큰 이익으로 이어질 수 있습니다. 저축이나 적금 등 장기적인 관점에서의 금전 계획을 세우기에 아주 좋은 시기이며, 지금의 계획이 훗날 큰 버팀목이 될 것입니다.",
+      "actionable_advice": "주변의 달콤한 투자 권유에 쉽게 흔들리지 마세요. 본인이 완전히 이해하지 못하는 곳에는 돈을 넣지 않는 것이 철칙입니다.",
+      "lucky_elements": {
+        "color": "검정",
+        "number": 21,
+        "item": "시계"
+      }
+    },
+    {
+      "id": "wealth-17",
+      "level": "neutral",
+      "emoji": "🪙",
+      "title": "풍요로운 재물운",
+      "summary": "그동안 뿌려둔 노력의 씨앗이 마침내 금전적인 보상으로 돌아오는 시기입니다.",
+      "detailed_interpretation": "오늘 당신의 재물운은 태양이 높이 뜬 것처럼 밝고 환합니다. 막혔던 자금줄이 풀리거나 기대 이상의 수입이 생길 수 있습니다. 평소 관심을 두고 있던 분야에서 좋은 투자 기회가 발견될 수 있습니다. 하지만 너무 큰 욕심을 부리기보다는 분산 투자가 안전합니다. 저축이나 적금 등 장기적인 관점에서의 금전 계획을 세우기에 아주 좋은 시기이며, 지금의 계획이 훗날 큰 버팀목이 될 것입니다.",
+      "actionable_advice": "주변의 달콤한 투자 권유에 쉽게 흔들리지 마세요. 본인이 완전히 이해하지 못하는 곳에는 돈을 넣지 않는 것이 철칙입니다.",
+      "lucky_elements": {
+        "color": "분홍",
+        "number": 1,
+        "item": "열쇠고리"
+      }
+    },
+    {
+      "id": "wealth-18",
+      "level": "good",
+      "emoji": "🪙",
+      "title": "재물의 흐름이 원활한 날",
+      "summary": "새로운 재물 증식의 기회가 찾아올 수 있으니 주변의 정보에 귀 기울이세요.",
+      "detailed_interpretation": "오늘은 돈이 나가는 것보다 들어오는 에너지가 큽니다. 다만 눈먼 돈을 좇기보다는 정당한 댓가를 바라는 것이 좋습니다. 평소 관심을 두고 있던 분야에서 좋은 투자 기회가 발견될 수 있습니다. 하지만 너무 큰 욕심을 부리기보다는 분산 투자가 안전합니다. 주변 사람들에게 가볍게 베푸는 밥 한 끼나 커피 한 잔이 나중에 더 큰 금전적 행운으로 돌아올 수 있는 날입니다.",
+      "actionable_advice": "가계부나 자산 관리 앱을 열어 현재의 지출 패턴을 점검해 보세요. 불필요한 고정 지출을 줄이는 것이 당장의 수익보다 중요합니다.",
+      "lucky_elements": {
+        "color": "파랑",
+        "number": 17,
+        "item": "거울"
+      }
+    },
+    {
+      "id": "wealth-19",
+      "level": "neutral",
+      "emoji": "📈",
+      "title": "지혜로운 소비의 날",
+      "summary": "그동안 뿌려둔 노력의 씨앗이 마침내 금전적인 보상으로 돌아오는 시기입니다.",
+      "detailed_interpretation": "오늘은 돈이 나가는 것보다 들어오는 에너지가 큽니다. 다만 눈먼 돈을 좇기보다는 정당한 댓가를 바라는 것이 좋습니다. 투자나 금융 관련 결정을 내리기 전에 전문가의 조언이나 객관적인 데이터를 꼼꼼히 살펴보는 것이 큰 이익으로 이어질 수 있습니다. 저축이나 적금 등 장기적인 관점에서의 금전 계획을 세우기에 아주 좋은 시기이며, 지금의 계획이 훗날 큰 버팀목이 될 것입니다.",
+      "actionable_advice": "주변의 달콤한 투자 권유에 쉽게 흔들리지 마세요. 본인이 완전히 이해하지 못하는 곳에는 돈을 넣지 않는 것이 철칙입니다.",
+      "lucky_elements": {
+        "color": "네이비",
+        "number": 22,
+        "item": "이어폰"
+      }
+    },
+    {
+      "id": "wealth-20",
+      "level": "neutral",
+      "emoji": "💰",
+      "title": "지혜로운 소비의 날",
+      "summary": "충동적인 지출을 자제하고 현재의 자산을 안정적으로 지키는 것이 중요한 하루입니다.",
+      "detailed_interpretation": "오늘 당신의 재물운은 태양이 높이 뜬 것처럼 밝고 환합니다. 막혔던 자금줄이 풀리거나 기대 이상의 수입이 생길 수 있습니다. 투자나 금융 관련 결정을 내리기 전에 전문가의 조언이나 객관적인 데이터를 꼼꼼히 살펴보는 것이 큰 이익으로 이어질 수 있습니다. 재물은 물과 같아서 고여있기보다는 잘 순환하게 만드는 것이 중요합니다. 가치 있는 곳에 적절히 소비하세요.",
+      "actionable_advice": "오늘 들어온 돈이 있다면 모두 쓰지 말고 최소 10%는 무조건 저축 계좌로 옮겨두는 습관을 들이세요.",
+      "lucky_elements": {
+        "color": "은색",
+        "number": 7,
+        "item": "이어폰"
+      }
+    }
   ],
   "career": [
-    { "id": "C01", "text": "오늘 직장에서 좋은 소식이 있을 수 있습니다.", "textEn": "Good news may come at work today.", "emoji": "📰", "level": "great" },
-    { "id": "C02", "text": "새로운 프로젝트에 자원하면 성장의 기회가 됩니다.", "textEn": "Volunteering for a new project brings growth opportunities.", "emoji": "🚀", "level": "good" },
-    { "id": "C03", "text": "동료와의 협업이 빛을 발하는 날입니다.", "textEn": "Collaboration with colleagues shines today.", "emoji": "🤝", "level": "good" },
-    { "id": "C04", "text": "상사에게 당신의 아이디어를 적극 제안해보세요.", "textEn": "Actively propose your ideas to your supervisor.", "emoji": "💡", "level": "great" },
-    { "id": "C05", "text": "업무 우선순위를 재정비하면 효율이 올라갑니다.", "textEn": "Reorganizing work priorities will boost efficiency.", "emoji": "📊", "level": "neutral" },
-    { "id": "C06", "text": "이직이나 전직을 고려한다면 오늘 정보를 모아보세요.", "textEn": "If considering a job change, gather information today.", "emoji": "🔍", "level": "good" },
-    { "id": "C07", "text": "꾸준한 노력이 인정받는 순간이 다가옵니다.", "textEn": "The moment your steady effort gets recognized is approaching.", "emoji": "🏅", "level": "great" },
-    { "id": "C08", "text": "업무상 실수가 있더라도 빠른 대처가 중요합니다.", "textEn": "Even if mistakes happen at work, quick response matters.", "emoji": "⚡", "level": "caution" },
-    { "id": "C09", "text": "네트워킹에 좋은 날입니다. 명함을 준비하세요.", "textEn": "A good day for networking. Have your business cards ready.", "emoji": "📇", "level": "good" },
-    { "id": "C10", "text": "자기계발에 투자한 시간이 결실을 맺기 시작합니다.", "textEn": "Time invested in self-improvement begins to bear fruit.", "emoji": "🌱", "level": "great" },
-    { "id": "C11", "text": "회의에서 적극적으로 발언하면 좋은 결과가 있습니다.", "textEn": "Speaking up actively in meetings will yield good results.", "emoji": "🎤", "level": "good" },
-    { "id": "C12", "text": "오늘은 중요한 결정을 하루 미루는 것이 좋습니다.", "textEn": "Today it's better to postpone important decisions by a day.", "emoji": "📅", "level": "caution" },
-    { "id": "C13", "text": "멘토의 조언이 커리어에 큰 도움이 됩니다.", "textEn": "A mentor's advice will greatly help your career.", "emoji": "🎓", "level": "good" },
-    { "id": "C14", "text": "새로운 기술을 배우면 커리어가 한 단계 올라갑니다.", "textEn": "Learning a new skill elevates your career to the next level.", "emoji": "📚", "level": "great" },
-    { "id": "C15", "text": "팀워크를 통해 혼자서는 불가능한 성과를 냅니다.", "textEn": "Through teamwork, you achieve what's impossible alone.", "emoji": "👥", "level": "good" },
-    { "id": "C16", "text": "직장 내 갈등은 차분하게 해결하면 됩니다.", "textEn": "Workplace conflicts can be resolved calmly.", "emoji": "🕊️", "level": "neutral" },
-    { "id": "C17", "text": "승진이나 포상의 기운이 강합니다.", "textEn": "The energy for promotion or awards is strong.", "emoji": "⬆️", "level": "great" },
-    { "id": "C18", "text": "워라밸을 위해 오늘은 정시 퇴근하세요.", "textEn": "For work-life balance, leave on time today.", "emoji": "🏠", "level": "neutral" },
-    { "id": "C19", "text": "창의적인 아이디어가 떠오르는 날입니다.", "textEn": "Creative ideas will flow today.", "emoji": "🎨", "level": "great" },
-    { "id": "C20", "text": "포기하지 마세요. 성공은 문 앞에 와 있습니다.", "textEn": "Don't give up. Success is right at your door.", "emoji": "🚪", "level": "good" }
+    {
+      "id": "career-1",
+      "level": "neutral",
+      "emoji": "💻",
+      "title": "빛나는 리더십",
+      "summary": "어려웠던 업무나 프로젝트가 실마리를 찾고 순조롭게 풀려가는 긍정적인 하루입니다.",
+      "detailed_interpretation": "현재 직장이나 일터에서 당신의 역할이 매우 중요해지고 있습니다. 상사나 클라이언트가 당신의 업무 처리 능력을 긍정적으로 평가하고 있습니다. 오늘은 묵묵히 일하기보다는 자신의 의견을 당당하게 피력하는 것이 유리합니다. 당신의 아이디어가 채택될 확률이 평소보다 훨씬 높습니다. 미래를 위해 새로운 스킬을 배우거나 네트워킹을 넓히기에 아주 좋은 타이밍입니다. 우연한 만남이 커리어에 귀인이 될 수 있습니다.",
+      "actionable_advice": "오늘 하루의 우선순위를 명확히 설정하고 가장 중요한 일부터 처리하세요. 시간 관리가 성패를 좌우합니다.",
+      "lucky_elements": {
+        "color": "분홍",
+        "number": 17,
+        "item": "향초"
+      }
+    },
+    {
+      "id": "career-2",
+      "level": "good",
+      "emoji": "💻",
+      "title": "업무 효율이 극대화되는 날",
+      "summary": "새로운 직무 제안이나 커리어를 한 단계 도약시킬 수 있는 의미 있는 기회가 찾아옵니다.",
+      "detailed_interpretation": "오늘은 평소보다 머리가 맑고 직관력이 뛰어나, 복잡한 문제의 핵심을 단번에 파악하고 해결책을 제시할 수 있습니다. 주변 동료들과의 의사소통이 어느 때보다 활발해지며, 협업을 통해 혼자서는 해낼 수 없었던 큰 성과를 거두게 될 것입니다. 사소한 실수가 생길 수 있지만 즉시 바로잡을 수 있는 여유가 있으니, 너무 완벽함에 얽매이지 말고 일의 진척에 집중하세요.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "베이지",
+        "number": 1,
+        "item": "열쇠고리"
+      }
+    },
+    {
+      "id": "career-3",
+      "level": "neutral",
+      "emoji": "🎯",
+      "title": "책임감이 중요해지는 시기",
+      "summary": "당신의 프로페셔널한 능력과 헌신이 마침내 두각을 나타내며 주변의 인정을 받습니다.",
+      "detailed_interpretation": "지금까지 정체되어 있던 업무의 흐름에 마침내 활력이 돕니다. 막혔던 보고나 결재가 시원하게 통과될 가능성이 높습니다. 주변 동료들과의 의사소통이 어느 때보다 활발해지며, 협업을 통해 혼자서는 해낼 수 없었던 큰 성과를 거두게 될 것입니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "잠시 하던 일을 멈추고 현업에서 한 걸음 물러서서 거시적인 커리어 목표를 점검해 보는 시간을 가지세요.",
+      "lucky_elements": {
+        "color": "네이비",
+        "number": 3,
+        "item": "다이어리"
+      }
+    },
+    {
+      "id": "career-4",
+      "level": "neutral",
+      "emoji": "🎯",
+      "title": "새로운 도전의 기회",
+      "summary": "팀워크가 빛을 발하며 동료들과의 완벽한 호흡으로 훌륭한 결과물을 만들어낼 수 있습니다.",
+      "detailed_interpretation": "현재 직장이나 일터에서 당신의 역할이 매우 중요해지고 있습니다. 상사나 클라이언트가 당신의 업무 처리 능력을 긍정적으로 평가하고 있습니다. 주변 동료들과의 의사소통이 어느 때보다 활발해지며, 협업을 통해 혼자서는 해낼 수 없었던 큰 성과를 거두게 될 것입니다. 미래를 위해 새로운 스킬을 배우거나 네트워킹을 넓히기에 아주 좋은 타이밍입니다. 우연한 만남이 커리어에 귀인이 될 수 있습니다.",
+      "actionable_advice": "오늘 하루의 우선순위를 명확히 설정하고 가장 중요한 일부터 처리하세요. 시간 관리가 성패를 좌우합니다.",
+      "lucky_elements": {
+        "color": "파랑",
+        "number": 4,
+        "item": "이어폰"
+      }
+    },
+    {
+      "id": "career-5",
+      "level": "neutral",
+      "emoji": "💻",
+      "title": "순조로운 협업의 날",
+      "summary": "당신의 프로페셔널한 능력과 헌신이 마침내 두각을 나타내며 주변의 인정을 받습니다.",
+      "detailed_interpretation": "지금까지 정체되어 있던 업무의 흐름에 마침내 활력이 돕니다. 막혔던 보고나 결재가 시원하게 통과될 가능성이 높습니다. 주변 동료들과의 의사소통이 어느 때보다 활발해지며, 협업을 통해 혼자서는 해낼 수 없었던 큰 성과를 거두게 될 것입니다. 미래를 위해 새로운 스킬을 배우거나 네트워킹을 넓히기에 아주 좋은 타이밍입니다. 우연한 만남이 커리어에 귀인이 될 수 있습니다.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "흰색",
+        "number": 21,
+        "item": "스카프"
+      }
+    },
+    {
+      "id": "career-6",
+      "level": "good",
+      "emoji": "🎯",
+      "title": "창의적인 아이디어가 샘솟는 날",
+      "summary": "팀워크가 빛을 발하며 동료들과의 완벽한 호흡으로 훌륭한 결과물을 만들어낼 수 있습니다.",
+      "detailed_interpretation": "지금까지 정체되어 있던 업무의 흐름에 마침내 활력이 돕니다. 막혔던 보고나 결재가 시원하게 통과될 가능성이 높습니다. 주변 동료들과의 의사소통이 어느 때보다 활발해지며, 협업을 통해 혼자서는 해낼 수 없었던 큰 성과를 거두게 될 것입니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "갈색",
+        "number": 4,
+        "item": "향수"
+      }
+    },
+    {
+      "id": "career-7",
+      "level": "great",
+      "emoji": "📈",
+      "title": "창의적인 아이디어가 샘솟는 날",
+      "summary": "어려웠던 업무나 프로젝트가 실마리를 찾고 순조롭게 풀려가는 긍정적인 하루입니다.",
+      "detailed_interpretation": "오늘은 평소보다 머리가 맑고 직관력이 뛰어나, 복잡한 문제의 핵심을 단번에 파악하고 해결책을 제시할 수 있습니다. 과도한 업무량으로 인해 약간의 스트레스가 있을 수 있으나, 이를 훌륭하게 극복해내면서 스스로의 역량을 한 차원 높이게 됩니다. 사소한 실수가 생길 수 있지만 즉시 바로잡을 수 있는 여유가 있으니, 너무 완벽함에 얽매이지 말고 일의 진척에 집중하세요.",
+      "actionable_advice": "오늘 하루의 우선순위를 명확히 설정하고 가장 중요한 일부터 처리하세요. 시간 관리가 성패를 좌우합니다.",
+      "lucky_elements": {
+        "color": "네이비",
+        "number": 4,
+        "item": "손수건"
+      }
+    },
+    {
+      "id": "career-8",
+      "level": "neutral",
+      "emoji": "💻",
+      "title": "업무 효율이 극대화되는 날",
+      "summary": "팀워크가 빛을 발하며 동료들과의 완벽한 호흡으로 훌륭한 결과물을 만들어낼 수 있습니다.",
+      "detailed_interpretation": "현재 직장이나 일터에서 당신의 역할이 매우 중요해지고 있습니다. 상사나 클라이언트가 당신의 업무 처리 능력을 긍정적으로 평가하고 있습니다. 오늘은 묵묵히 일하기보다는 자신의 의견을 당당하게 피력하는 것이 유리합니다. 당신의 아이디어가 채택될 확률이 평소보다 훨씬 높습니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "잠시 하던 일을 멈추고 현업에서 한 걸음 물러서서 거시적인 커리어 목표를 점검해 보는 시간을 가지세요.",
+      "lucky_elements": {
+        "color": "보라",
+        "number": 22,
+        "item": "거울"
+      }
+    },
+    {
+      "id": "career-9",
+      "level": "caution",
+      "emoji": "💼",
+      "title": "새로운 도전의 기회",
+      "summary": "당신의 프로페셔널한 능력과 헌신이 마침내 두각을 나타내며 주변의 인정을 받습니다.",
+      "detailed_interpretation": "오늘은 평소보다 머리가 맑고 직관력이 뛰어나, 복잡한 문제의 핵심을 단번에 파악하고 해결책을 제시할 수 있습니다. 주변 동료들과의 의사소통이 어느 때보다 활발해지며, 협업을 통해 혼자서는 해낼 수 없었던 큰 성과를 거두게 될 것입니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "오늘 하루의 우선순위를 명확히 설정하고 가장 중요한 일부터 처리하세요. 시간 관리가 성패를 좌우합니다.",
+      "lucky_elements": {
+        "color": "금색",
+        "number": 3,
+        "item": "거울"
+      }
+    },
+    {
+      "id": "career-10",
+      "level": "neutral",
+      "emoji": "🚀",
+      "title": "중요한 프로젝트의 성공",
+      "summary": "어려웠던 업무나 프로젝트가 실마리를 찾고 순조롭게 풀려가는 긍정적인 하루입니다.",
+      "detailed_interpretation": "오늘은 평소보다 머리가 맑고 직관력이 뛰어나, 복잡한 문제의 핵심을 단번에 파악하고 해결책을 제시할 수 있습니다. 주변 동료들과의 의사소통이 어느 때보다 활발해지며, 협업을 통해 혼자서는 해낼 수 없었던 큰 성과를 거두게 될 것입니다. 미래를 위해 새로운 스킬을 배우거나 네트워킹을 넓히기에 아주 좋은 타이밍입니다. 우연한 만남이 커리어에 귀인이 될 수 있습니다.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "노랑",
+        "number": 22,
+        "item": "지갑"
+      }
+    },
+    {
+      "id": "career-11",
+      "level": "good",
+      "emoji": "💼",
+      "title": "빛나는 리더십",
+      "summary": "집중력이 상승하고 번뜩이는 아이디어가 많아져 당면한 과제를 효율적으로 처리하게 됩니다.",
+      "detailed_interpretation": "현재 직장이나 일터에서 당신의 역할이 매우 중요해지고 있습니다. 상사나 클라이언트가 당신의 업무 처리 능력을 긍정적으로 평가하고 있습니다. 과도한 업무량으로 인해 약간의 스트레스가 있을 수 있으나, 이를 훌륭하게 극복해내면서 스스로의 역량을 한 차원 높이게 됩니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "노랑",
+        "number": 6,
+        "item": "머그컵"
+      }
+    },
+    {
+      "id": "career-12",
+      "level": "good",
+      "emoji": "🚀",
+      "title": "중요한 프로젝트의 성공",
+      "summary": "새로운 직무 제안이나 커리어를 한 단계 도약시킬 수 있는 의미 있는 기회가 찾아옵니다.",
+      "detailed_interpretation": "오늘은 평소보다 머리가 맑고 직관력이 뛰어나, 복잡한 문제의 핵심을 단번에 파악하고 해결책을 제시할 수 있습니다. 과도한 업무량으로 인해 약간의 스트레스가 있을 수 있으나, 이를 훌륭하게 극복해내면서 스스로의 역량을 한 차원 높이게 됩니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "잠시 하던 일을 멈추고 현업에서 한 걸음 물러서서 거시적인 커리어 목표를 점검해 보는 시간을 가지세요.",
+      "lucky_elements": {
+        "color": "은색",
+        "number": 11,
+        "item": "은반지"
+      }
+    },
+    {
+      "id": "career-13",
+      "level": "good",
+      "emoji": "💼",
+      "title": "새로운 도전의 기회",
+      "summary": "새로운 직무 제안이나 커리어를 한 단계 도약시킬 수 있는 의미 있는 기회가 찾아옵니다.",
+      "detailed_interpretation": "현재 직장이나 일터에서 당신의 역할이 매우 중요해지고 있습니다. 상사나 클라이언트가 당신의 업무 처리 능력을 긍정적으로 평가하고 있습니다. 오늘은 묵묵히 일하기보다는 자신의 의견을 당당하게 피력하는 것이 유리합니다. 당신의 아이디어가 채택될 확률이 평소보다 훨씬 높습니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "검정",
+        "number": 33,
+        "item": "머그컵"
+      }
+    },
+    {
+      "id": "career-14",
+      "level": "great",
+      "emoji": "🚀",
+      "title": "빛나는 리더십",
+      "summary": "집중력이 상승하고 번뜩이는 아이디어가 많아져 당면한 과제를 효율적으로 처리하게 됩니다.",
+      "detailed_interpretation": "현재 직장이나 일터에서 당신의 역할이 매우 중요해지고 있습니다. 상사나 클라이언트가 당신의 업무 처리 능력을 긍정적으로 평가하고 있습니다. 과도한 업무량으로 인해 약간의 스트레스가 있을 수 있으나, 이를 훌륭하게 극복해내면서 스스로의 역량을 한 차원 높이게 됩니다. 사소한 실수가 생길 수 있지만 즉시 바로잡을 수 있는 여유가 있으니, 너무 완벽함에 얽매이지 말고 일의 진척에 집중하세요.",
+      "actionable_advice": "오늘 하루의 우선순위를 명확히 설정하고 가장 중요한 일부터 처리하세요. 시간 관리가 성패를 좌우합니다.",
+      "lucky_elements": {
+        "color": "초록",
+        "number": 2,
+        "item": "텀블러"
+      }
+    },
+    {
+      "id": "career-15",
+      "level": "neutral",
+      "emoji": "📈",
+      "title": "성취감이 가득한 하루",
+      "summary": "새로운 직무 제안이나 커리어를 한 단계 도약시킬 수 있는 의미 있는 기회가 찾아옵니다.",
+      "detailed_interpretation": "현재 직장이나 일터에서 당신의 역할이 매우 중요해지고 있습니다. 상사나 클라이언트가 당신의 업무 처리 능력을 긍정적으로 평가하고 있습니다. 과도한 업무량으로 인해 약간의 스트레스가 있을 수 있으나, 이를 훌륭하게 극복해내면서 스스로의 역량을 한 차원 높이게 됩니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "초록",
+        "number": 3,
+        "item": "은반지"
+      }
+    },
+    {
+      "id": "career-16",
+      "level": "neutral",
+      "emoji": "💼",
+      "title": "책임감이 중요해지는 시기",
+      "summary": "당신의 프로페셔널한 능력과 헌신이 마침내 두각을 나타내며 주변의 인정을 받습니다.",
+      "detailed_interpretation": "오늘은 평소보다 머리가 맑고 직관력이 뛰어나, 복잡한 문제의 핵심을 단번에 파악하고 해결책을 제시할 수 있습니다. 과도한 업무량으로 인해 약간의 스트레스가 있을 수 있으나, 이를 훌륭하게 극복해내면서 스스로의 역량을 한 차원 높이게 됩니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "노랑",
+        "number": 21,
+        "item": "책"
+      }
+    },
+    {
+      "id": "career-17",
+      "level": "caution",
+      "emoji": "📈",
+      "title": "창의적인 아이디어가 샘솟는 날",
+      "summary": "집중력이 상승하고 번뜩이는 아이디어가 많아져 당면한 과제를 효율적으로 처리하게 됩니다.",
+      "detailed_interpretation": "오늘은 평소보다 머리가 맑고 직관력이 뛰어나, 복잡한 문제의 핵심을 단번에 파악하고 해결책을 제시할 수 있습니다. 과도한 업무량으로 인해 약간의 스트레스가 있을 수 있으나, 이를 훌륭하게 극복해내면서 스스로의 역량을 한 차원 높이게 됩니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "갈색",
+        "number": 3,
+        "item": "은반지"
+      }
+    },
+    {
+      "id": "career-18",
+      "level": "good",
+      "emoji": "📈",
+      "title": "인정받는 업무 능력",
+      "summary": "당신의 프로페셔널한 능력과 헌신이 마침내 두각을 나타내며 주변의 인정을 받습니다.",
+      "detailed_interpretation": "지금까지 정체되어 있던 업무의 흐름에 마침내 활력이 돕니다. 막혔던 보고나 결재가 시원하게 통과될 가능성이 높습니다. 주변 동료들과의 의사소통이 어느 때보다 활발해지며, 협업을 통해 혼자서는 해낼 수 없었던 큰 성과를 거두게 될 것입니다. 사소한 실수가 생길 수 있지만 즉시 바로잡을 수 있는 여유가 있으니, 너무 완벽함에 얽매이지 말고 일의 진척에 집중하세요.",
+      "actionable_advice": "동료의 좋은 의견이나 성과에 칭찬을 아끼지 마세요. 긍정적인 직장 분위기 조성이 당신의 업무 효율도 크게 높여줍니다.",
+      "lucky_elements": {
+        "color": "흰색",
+        "number": 33,
+        "item": "목걸이"
+      }
+    },
+    {
+      "id": "career-19",
+      "level": "neutral",
+      "emoji": "📈",
+      "title": "빛나는 리더십",
+      "summary": "집중력이 상승하고 번뜩이는 아이디어가 많아져 당면한 과제를 효율적으로 처리하게 됩니다.",
+      "detailed_interpretation": "지금까지 정체되어 있던 업무의 흐름에 마침내 활력이 돕니다. 막혔던 보고나 결재가 시원하게 통과될 가능성이 높습니다. 과도한 업무량으로 인해 약간의 스트레스가 있을 수 있으나, 이를 훌륭하게 극복해내면서 스스로의 역량을 한 차원 높이게 됩니다. 사소한 실수가 생길 수 있지만 즉시 바로잡을 수 있는 여유가 있으니, 너무 완벽함에 얽매이지 말고 일의 진척에 집중하세요.",
+      "actionable_advice": "오늘 하루의 우선순위를 명확히 설정하고 가장 중요한 일부터 처리하세요. 시간 관리가 성패를 좌우합니다.",
+      "lucky_elements": {
+        "color": "금색",
+        "number": 6,
+        "item": "명함지갑"
+      }
+    },
+    {
+      "id": "career-20",
+      "level": "good",
+      "emoji": "💼",
+      "title": "빛나는 리더십",
+      "summary": "새로운 직무 제안이나 커리어를 한 단계 도약시킬 수 있는 의미 있는 기회가 찾아옵니다.",
+      "detailed_interpretation": "지금까지 정체되어 있던 업무의 흐름에 마침내 활력이 돕니다. 막혔던 보고나 결재가 시원하게 통과될 가능성이 높습니다. 오늘은 묵묵히 일하기보다는 자신의 의견을 당당하게 피력하는 것이 유리합니다. 당신의 아이디어가 채택될 확률이 평소보다 훨씬 높습니다. 이직이나 취업을 준비 중이라면, 오늘 제출하는 이력서나 진행되는 면접에서 매우 긍정적인 피드백을 받을 수 있는 운세입니다.",
+      "actionable_advice": "잠시 하던 일을 멈추고 현업에서 한 걸음 물러서서 거시적인 커리어 목표를 점검해 보는 시간을 가지세요.",
+      "lucky_elements": {
+        "color": "노랑",
+        "number": 21,
+        "item": "머그컵"
+      }
+    }
   ]
 }

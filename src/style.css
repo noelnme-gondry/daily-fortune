@@ -973,6 +973,107 @@ body {
   line-height: 1.5;
 }
 
+/* ── Rich Fortune & Saju UI ────────────────────────────────────── */
+.category-heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 14px 0 8px;
+  background: linear-gradient(90deg, #f8fafc, #cbd5e1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.category-summary {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.category-detail {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+.category-advice {
+  font-size: 13px;
+  background: rgba(139, 92, 246, 0.1);
+  border-left: 2px solid var(--accent-violet);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 0 4px 4px 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.category-lucky {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px;
+  border-radius: var(--radius-md);
+  text-align: center;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.category-lucky span {
+  display: inline-block;
+  margin: 2px;
+}
+.category-lucky strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.saju-reading-title {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+  background: linear-gradient(90deg, #ffd700, #ff8c00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.saju-reading-section {
+  margin-bottom: 22px;
+}
+
+.saju-reading-subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.saju-interpretation-content p {
+  font-size: 14px !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.75 !important;
+  margin-bottom: 0 !important;
+}
+
+.saju-lacking-alert {
+  background: rgba(236, 72, 153, 0.08);
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-top: 16px;
+}
+
+
 /* ── Footer ────────────────────────────────────────────────────── */
 .footer {
   text-align: center;

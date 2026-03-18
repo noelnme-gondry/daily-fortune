@@ -117,8 +117,17 @@ export async function renderFortune(container) {
           <span class="category-title">연애운 (Love)</span>
           <span class="category-level level-${love.level}">${love.level}</span>
         </div>
-        <p class="category-text">${love.emoji} ${love.text}</p>
-        <p class="category-text-en">${love.textEn}</p>
+        <h4 class="category-heading">${love.emoji} ${love.title}</h4>
+        <p class="category-summary"><strong>${love.summary}</strong></p>
+        <p class="category-detail">${love.detailed_interpretation}</p>
+        <div class="category-advice">
+          <strong>💡 조언:</strong> ${love.actionable_advice}
+        </div>
+        <div class="category-lucky">
+          <span>🎨 색상: <strong>${love.lucky_elements.color}</strong></span> | 
+          <span>🔢 숫자: <strong>${love.lucky_elements.number}</strong></span> | 
+          <span>🛍️ 아이템: <strong>${love.lucky_elements.item}</strong></span>
+        </div>
       </div>
       <div class="category-card wealth">
         <div class="category-header">
@@ -126,8 +135,17 @@ export async function renderFortune(container) {
           <span class="category-title">재물운 (Wealth)</span>
           <span class="category-level level-${wealth.level}">${wealth.level}</span>
         </div>
-        <p class="category-text">${wealth.emoji} ${wealth.text}</p>
-        <p class="category-text-en">${wealth.textEn}</p>
+        <h4 class="category-heading">${wealth.emoji} ${wealth.title}</h4>
+        <p class="category-summary"><strong>${wealth.summary}</strong></p>
+        <p class="category-detail">${wealth.detailed_interpretation}</p>
+        <div class="category-advice">
+          <strong>💡 조언:</strong> ${wealth.actionable_advice}
+        </div>
+        <div class="category-lucky">
+          <span>🎨 색상: <strong>${wealth.lucky_elements.color}</strong></span> | 
+          <span>🔢 숫자: <strong>${wealth.lucky_elements.number}</strong></span> | 
+          <span>🛍️ 아이템: <strong>${wealth.lucky_elements.item}</strong></span>
+        </div>
       </div>
       <div class="category-card career">
         <div class="category-header">
@@ -135,8 +153,17 @@ export async function renderFortune(container) {
           <span class="category-title">직장운 (Career)</span>
           <span class="category-level level-${career.level}">${career.level}</span>
         </div>
-        <p class="category-text">${career.emoji} ${career.text}</p>
-        <p class="category-text-en">${career.textEn}</p>
+        <h4 class="category-heading">${career.emoji} ${career.title}</h4>
+        <p class="category-summary"><strong>${career.summary}</strong></p>
+        <p class="category-detail">${career.detailed_interpretation}</p>
+        <div class="category-advice">
+          <strong>💡 조언:</strong> ${career.actionable_advice}
+        </div>
+        <div class="category-lucky">
+          <span>🎨 색상: <strong>${career.lucky_elements.color}</strong></span> | 
+          <span>🔢 숫자: <strong>${career.lucky_elements.number}</strong></span> | 
+          <span>🛍️ 아이템: <strong>${career.lucky_elements.item}</strong></span>
+        </div>
       </div>
     </div>
 
