@@ -11,7 +11,7 @@ export async function renderTomorrow(container) {
       <p style="color: #bbb; font-size: 0.9rem;">${fortune.date} 미리보기</p>
     </div>
     
-    <div class="fortune-card-wrapper">
+    <div class="fortune-card-wrapper" style="margin-bottom: 2rem;">
       <div class="fortune-card" id="tomorrowCard">
         <div class="card-inner">
           <div class="card-front">
@@ -32,6 +32,66 @@ export async function renderTomorrow(container) {
             <div class="card-description">${card.descriptionKo}</div>
             <div class="card-advice">💡 ${card.advice}</div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 심층 분석 영역 (내일의 운세에서도 타로운세 탭처럼 상세하게 보여줌) -->
+    <div class="category-fortunes" style="margin-top: 1.5rem;">
+      <div class="category-card love">
+        <div class="category-header">
+          <span class="category-icon">💕</span>
+          <span class="category-title">내일의 연애운 (Love)</span>
+          <span class="category-level level-${love.level}">${love.level}</span>
+        </div>
+        <h4 class="category-heading">${love.emoji} ${love.title}</h4>
+        <p class="category-summary"><strong>${love.summary}</strong></p>
+        <p class="category-detail">${love.detailed_interpretation}</p>
+        <div class="category-advice">
+          <strong>💡 내일을 위한 조언:</strong> ${love.actionable_advice}
+        </div>
+        <div class="category-lucky">
+          <span>🎨 색상: <strong>${love.lucky_elements.color}</strong></span> | 
+          <span>🔢 숫자: <strong>${love.lucky_elements.number}</strong></span> | 
+          <span>🛍️ 아이템: <strong>${love.lucky_elements.item}</strong></span>
+        </div>
+      </div>
+      
+      <div class="category-card wealth">
+        <div class="category-header">
+          <span class="category-icon">💰</span>
+          <span class="category-title">내일의 재물운 (Wealth)</span>
+          <span class="category-level level-${wealth.level}">${wealth.level}</span>
+        </div>
+        <h4 class="category-heading">${wealth.emoji} ${wealth.title}</h4>
+        <p class="category-summary"><strong>${wealth.summary}</strong></p>
+        <p class="category-detail">${wealth.detailed_interpretation}</p>
+        <div class="category-advice">
+          <strong>💡 내일을 위한 조언:</strong> ${wealth.actionable_advice}
+        </div>
+        <div class="category-lucky">
+          <span>🎨 색상: <strong>${wealth.lucky_elements.color}</strong></span> | 
+          <span>🔢 숫자: <strong>${wealth.lucky_elements.number}</strong></span> | 
+          <span>🛍️ 아이템: <strong>${wealth.lucky_elements.item}</strong></span>
+        </div>
+      </div>
+
+      <div class="category-card career">
+        <div class="category-header">
+          <span class="category-icon">💼</span>
+          <span class="category-title">내일의 직장운 (Career)</span>
+          <span class="category-level level-${career.level}">${career.level}</span>
+        </div>
+        <h4 class="category-heading">${career.emoji} ${career.title}</h4>
+        <p class="category-summary"><strong>${career.summary}</strong></p>
+        <p class="category-detail">${career.detailed_interpretation}</p>
+        <div class="category-advice">
+          <strong>💡 내일을 위한 조언:</strong> ${career.actionable_advice}
+        </div>
+        <div class="category-lucky">
+          <span>🎨 색상: <strong>${career.lucky_elements.color}</strong></span> | 
+          <span>🔢 숫자: <strong>${career.lucky_elements.number}</strong></span> | 
+          <span>🛍️ 아이템: <strong>${career.lucky_elements.item}</strong></span>
         </div>
       </div>
     </div>

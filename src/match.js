@@ -54,21 +54,49 @@ export function renderMatch(container) {
     let title, desc;
     if (score >= 95) {
       title = "천생연분! 하늘이 맺어준 완벽한 짝 ✨";
-      desc = "서로의 부족한 점을 채워주는 완벽한 균형을 이루고 있습니다. 함께일 때 더 큰 시너지가 나는 운명적인 관계네요.";
+      desc = `
+        <div style="font-size: 0.95rem; text-align: left; padding: 0.5rem;">
+          <h4 style="color: #f9d877; margin-top: 0; margin-bottom: 0.8rem;">[AI 심층 이름 궁합 분석 결과]</h4>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">종합 파동 에너지:</strong> 두 분의 이름에서 흘러나오는 주파수 대역이 완벽하게 일치합니다. 마치 오랜 기간 맞춰온 톱니바퀴처럼 서로의 부족한 점을 자연스럽게 채워주는 완벽한 균형을 이루고 있습니다.</p>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">성향 및 소통:</strong> 한 사람이 아이디어를 내면 다른 한 사람이 실행에 옮기는 긍정적인 시너지가 엄청납니다. 말하지 않아도 눈빛만으로 서로의 기분을 알아채는 소울메이트 수준의 교감이 가능합니다.</p>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">관계 발전 조언:</strong> 함께일 때 발휘되는 에너지가 크기 때문에, 공동의 목표(여행, 취미, 스터디 등)를 세우면 더욱 돈독해집니다. 이 특별한 인연을 소중히 여기며 평생의 동반자 또는 최고의 파트너로 발전시켜 보세요.</p>
+        </div>
+      `;
     } else if (score >= 80) {
       title = "기분 좋은 찰떡궁합 💕";
-      desc = "비슷한 가치관을 공유하며, 대화가 잘 통하는 좋은 인연입니다. 약간의 이해심만 더하면 평생 갈 반쪽이 될 수 있어요.";
+      desc = `
+        <div style="font-size: 0.95rem; text-align: left; padding: 0.5rem;">
+          <h4 style="color: #f9d877; margin-top: 0; margin-bottom: 0.8rem;">[AI 심층 이름 궁합 분석 결과]</h4>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">종합 파동 에너지:</strong> 성향 기저에 흐르는 에너지가 매우 비슷하여, 서로 강하게 끌어당기는 자력을 지니고 있습니다. 만난 지 얼마 되지 않았더라도 묘한 친근감과 편안함을 느꼈을 확률이 높습니다.</p>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">성향 및 소통:</strong> 비슷한 가치관을 공유하며, 유머 코드가 잘 맞아 대화가 끊이지 않는 좋은 인연입니다. 하지만 가끔 두 사람 모두 고집을 부릴 때 양보의 타이밍을 놓칠 수 있으니 주의가 필요합니다.</p>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">관계 발전 조언:</strong> 가끔은 익숙함에 속아 소중함을 잃지 않도록 작은 서프라이즈나 새로운 데이트 코스로 환기시켜 주세요. 약간의 이해심과 배려만 꾸준히 유지된다면 흔들림 없이 평생 갈 인연으로 성장할 것입니다.</p>
+        </div>
+      `;
     } else if (score >= 60) {
-      title = "서서히 맞춰가는 현실적인 인연 🤝";
-      desc = "서로 다른 매력에 끌렸지만 그만큼 맞춰가야 할 부분도 있습니다. 대화를 통해 서로를 알아가는 과정이 중요해요.";
+      title = "서로 맞춰가는 긍정적 현실 인연 🤝";
+      desc = `
+        <div style="font-size: 0.95rem; text-align: left; padding: 0.5rem;">
+          <h4 style="color: #f9d877; margin-top: 0; margin-bottom: 0.8rem;">[AI 심층 이름 궁합 분석 결과]</h4>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">종합 파동 에너지:</strong> 음양의 조화 측면에서 서로 완전히 다른 빛을 띠고 있어 처음에는 이끌림이 덜할 수 있으나, 서로의 차이점 자체가 큰 매력으로 작용하는 현실적이고 단단한 인연입니다.</p>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">성향 및 소통:</strong> 세상을 바라보는 관점이나 일을 처리하는 방식이 달라 종종 의견 충돌이 발생할 수 있습니다. 하지만 이는 틀린 것이 아니라 '다름'일 뿐이며, 이를 수용했을 때 당신의 시야가 두 배로 넓어지는 경험을 하게 됩니다.</p>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">관계 발전 조언:</strong> 상대방을 나의 틀에 맞추려고 하기보다는, 있는 그대로 존중하는 연습이 절대적으로 필요합니다. 대화를 통해 서서히 맞춰가는 과정을 거친다면 어떤 위기에도 무너지지 않는 성숙한 관계로 발전할 수 있습니다.</p>
+        </div>
+      `;
     } else {
-      title = "노력이 필요한 아슬아슬한 관계 🧩";
-      desc = "자석의 같은 극처럼 자꾸 부딪힐 수 있습니다. 하지만 다름을 인정하고 배려한다면 오히려 특별한 사이가 될 수 있습니다.";
+      title = "노력과 이해가 필요한 아슬아슬한 인연 🧩";
+      desc = `
+        <div style="font-size: 0.95rem; text-align: left; padding: 0.5rem;">
+          <h4 style="color: #f9d877; margin-top: 0; margin-bottom: 0.8rem;">[AI 심층 이름 궁합 분석 결과]</h4>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">종합 파동 에너지:</strong> 두 이름의 오행 에너지 대립이 다소 강하게 나타납니다. 자석의 같은 극처럼 자꾸 밀어내거나 엇나가는 상황이 발생할 수 있어, 각별한 이해와 노력이 요구되는 척박하지만 특별한 파동입니다.</p>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">성향 및 소통:</strong> 같은 사건을 겪어도 느끼는 감정과 반응이 판이하게 다릅니다. 이로 인해 사소한 오해가 큰 다툼으로 번지기 쉬우며, 감정적인 대화보다는 이성적이고 차분하게 소통하려는 의도적인 노력이 필요합니다.</p>
+          <p style="margin-bottom: 1rem;"><strong style="color: #ff8fa3;">관계 발전 조언:</strong> 궁합 점수는 절대적인 미래가 아닌 성향 분석일 뿐입니다. 서로가 완전히 다르다는 점을 깔끔하게 인정하고, 상대의 부족함을 채워주는 '방패' 역할을 자처한다면 그 어떤 관계보다 드라마틱하고 견고한 사이로 거듭날 수 있습니다.</p>
+        </div>
+      `;
     }
 
     container.querySelector('#matchScore').innerText = score + "점";
     container.querySelector('#matchTitle').innerText = title;
-    container.querySelector('#matchDesc').innerText = desc;
+    container.querySelector('#matchDesc').innerHTML = desc; // LLM 스타일 HTML 출력을 위해 innerHTML 적용
     container.querySelector('#matchResult').style.display = 'block';
 
     // Update global state for kakao share
