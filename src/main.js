@@ -13,6 +13,16 @@ let activeTab = 'fortune';
  * Initialize the application
  */
 function init() {
+  // Initialize Kakao SDK
+  if (window.Kakao && !Kakao.isInitialized()) {
+    try {
+      Kakao.init(import.meta.env.VITE_KAKAO_JS_KEY);
+      console.log('Kakao SDK initialized');
+    } catch (err) {
+      console.error('Kakao SDK init failed:', err);
+    }
+  }
+
   renderTabs();
   switchTab(activeTab);
   addParticles();

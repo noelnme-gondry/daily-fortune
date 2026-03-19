@@ -111,72 +111,80 @@ export async function renderFortune(container) {
       </div>
     </div>
 
-    <div class="category-fortunes">
-      <div class="category-card love">
-        <div class="category-header">
-          <span class="category-icon">💕</span>
-          <span class="category-title">연애운 (Love)</span>
-          <span class="category-level level-${love.level}">${love.level}</span>
+    <div id="fortuneResults" style="display: none;">
+      <div class="category-fortunes">
+        <div class="category-card love">
+          <div class="category-header">
+            <span class="category-icon">💕</span>
+            <span class="category-title">연애운 (Love)</span>
+            <span class="category-level level-${love.level}">${love.level}</span>
+          </div>
+          <h4 class="category-heading">${love.emoji} ${love.title}</h4>
+          <p class="category-summary"><strong>${love.summary}</strong></p>
+          <p class="category-detail">${love.detailed_interpretation}</p>
+          <div class="category-advice">
+            <strong>💡 조언:</strong> ${love.actionable_advice}
+          </div>
+          <div class="category-lucky">
+            <span>🎨 색상: <strong>${love.lucky_elements.color}</strong></span> | 
+            <span>🔢 숫자: <strong>${love.lucky_elements.number}</strong></span> | 
+            <span>🛍️ 아이템: <strong>${love.lucky_elements.item}</strong></span>
+          </div>
         </div>
-        <h4 class="category-heading">${love.emoji} ${love.title}</h4>
-        <p class="category-summary"><strong>${love.summary}</strong></p>
-        <p class="category-detail">${love.detailed_interpretation}</p>
-        <div class="category-advice">
-          <strong>💡 조언:</strong> ${love.actionable_advice}
+        <div class="category-card wealth">
+          <div class="category-header">
+            <span class="category-icon">💰</span>
+            <span class="category-title">재물운 (Wealth)</span>
+            <span class="category-level level-${wealth.level}">${wealth.level}</span>
+          </div>
+          <h4 class="category-heading">${wealth.emoji} ${wealth.title}</h4>
+          <p class="category-summary"><strong>${wealth.summary}</strong></p>
+          <p class="category-detail">${wealth.detailed_interpretation}</p>
+          <div class="category-advice">
+            <strong>💡 조언:</strong> ${wealth.actionable_advice}
+          </div>
+          <div class="category-lucky">
+            <span>🎨 색상: <strong>${wealth.lucky_elements.color}</strong></span> | 
+            <span>🔢 숫자: <strong>${wealth.lucky_elements.number}</strong></span> | 
+            <span>🛍️ 아이템: <strong>${wealth.lucky_elements.item}</strong></span>
+          </div>
         </div>
-        <div class="category-lucky">
-          <span>🎨 색상: <strong>${love.lucky_elements.color}</strong></span> | 
-          <span>🔢 숫자: <strong>${love.lucky_elements.number}</strong></span> | 
-          <span>🛍️ 아이템: <strong>${love.lucky_elements.item}</strong></span>
+        <div class="category-card career">
+          <div class="category-header">
+            <span class="category-icon">💼</span>
+            <span class="category-title">직장운 (Career)</span>
+            <span class="category-level level-${career.level}">${career.level}</span>
+          </div>
+          <h4 class="category-heading">${career.emoji} ${career.title}</h4>
+          <p class="category-summary"><strong>${career.summary}</strong></p>
+          <p class="category-detail">${career.detailed_interpretation}</p>
+          <div class="category-advice">
+            <strong>💡 조언:</strong> ${career.actionable_advice}
+          </div>
+          <div class="category-lucky">
+            <span>🎨 색상: <strong>${career.lucky_elements.color}</strong></span> | 
+            <span>🔢 숫자: <strong>${career.lucky_elements.number}</strong></span> | 
+            <span>🛍️ 아이템: <strong>${career.lucky_elements.item}</strong></span>
+          </div>
         </div>
       </div>
-      <div class="category-card wealth">
-        <div class="category-header">
-          <span class="category-icon">💰</span>
-          <span class="category-title">재물운 (Wealth)</span>
-          <span class="category-level level-${wealth.level}">${wealth.level}</span>
-        </div>
-        <h4 class="category-heading">${wealth.emoji} ${wealth.title}</h4>
-        <p class="category-summary"><strong>${wealth.summary}</strong></p>
-        <p class="category-detail">${wealth.detailed_interpretation}</p>
-        <div class="category-advice">
-          <strong>💡 조언:</strong> ${wealth.actionable_advice}
-        </div>
-        <div class="category-lucky">
-          <span>🎨 색상: <strong>${wealth.lucky_elements.color}</strong></span> | 
-          <span>🔢 숫자: <strong>${wealth.lucky_elements.number}</strong></span> | 
-          <span>🛍️ 아이템: <strong>${wealth.lucky_elements.item}</strong></span>
-        </div>
-      </div>
-      <div class="category-card career">
-        <div class="category-header">
-          <span class="category-icon">💼</span>
-          <span class="category-title">직장운 (Career)</span>
-          <span class="category-level level-${career.level}">${career.level}</span>
-        </div>
-        <h4 class="category-heading">${career.emoji} ${career.title}</h4>
-        <p class="category-summary"><strong>${career.summary}</strong></p>
-        <p class="category-detail">${career.detailed_interpretation}</p>
-        <div class="category-advice">
-          <strong>💡 조언:</strong> ${career.actionable_advice}
-        </div>
-        <div class="category-lucky">
-          <span>🎨 색상: <strong>${career.lucky_elements.color}</strong></span> | 
-          <span>🔢 숫자: <strong>${career.lucky_elements.number}</strong></span> | 
-          <span>🛍️ 아이템: <strong>${career.lucky_elements.item}</strong></span>
-        </div>
-      </div>
-    </div>
 
-    <div class="fortune-message">
-      <div class="fortune-cookie">🥠</div>
-      <p>${fortune.message}</p>
+      <div class="fortune-message">
+        <div class="fortune-cookie">🥠</div>
+        <p>${fortune.message}</p>
+      </div>
     </div>
   `;
 
-  // Add flip interaction
+  // Add flip interaction and reveal results
   const cardEl = container.querySelector('#fortuneCard');
   cardEl.addEventListener('click', () => {
-    cardEl.classList.toggle('flipped');
+    if (!cardEl.classList.contains('flipped')) {
+      cardEl.classList.add('flipped');
+      setTimeout(() => {
+        container.querySelector('#fortuneResults').style.display = 'block';
+        container.querySelector('#fortuneResults').style.animation = 'fadeIn 0.8s ease-out';
+      }, 500);
+    }
   });
 }

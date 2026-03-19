@@ -36,89 +36,98 @@ export async function renderTomorrow(container) {
       </div>
     </div>
 
-    <!-- 심층 분석 영역 (내일의 운세에서도 타로운세 탭처럼 상세하게 보여줌) -->
-    <div class="category-fortunes" style="margin-top: 1.5rem;">
-      <div class="category-card love">
-        <div class="category-header">
-          <span class="category-icon">💕</span>
-          <span class="category-title">내일의 연애운 (Love)</span>
-          <span class="category-level level-${love.level}">${love.level}</span>
+    <!-- 하단 결과 영역 (초기엔 숨김) -->
+    <div id="tomorrowResults" style="display: none;">
+      <!-- 심층 분석 영역 (내일의 운세에서도 타로운세 탭처럼 상세하게 보여줌) -->
+      <div class="category-fortunes" style="margin-top: 1.5rem;">
+        <div class="category-card love">
+          <div class="category-header">
+            <span class="category-icon">💕</span>
+            <span class="category-title">내일의 연애운 (Love)</span>
+            <span class="category-level level-${love.level}">${love.level}</span>
+          </div>
+          <h4 class="category-heading">${love.emoji} ${love.title}</h4>
+          <p class="category-summary"><strong>${love.summary}</strong></p>
+          <p class="category-detail">${love.detailed_interpretation}</p>
+          <div class="category-advice">
+            <strong>💡 내일을 위한 조언:</strong> ${love.actionable_advice}
+          </div>
+          <div class="category-lucky">
+            <span>🎨 색상: <strong>${love.lucky_elements.color}</strong></span> | 
+            <span>🔢 숫자: <strong>${love.lucky_elements.number}</strong></span> | 
+            <span>🛍️ 아이템: <strong>${love.lucky_elements.item}</strong></span>
+          </div>
         </div>
-        <h4 class="category-heading">${love.emoji} ${love.title}</h4>
-        <p class="category-summary"><strong>${love.summary}</strong></p>
-        <p class="category-detail">${love.detailed_interpretation}</p>
-        <div class="category-advice">
-          <strong>💡 내일을 위한 조언:</strong> ${love.actionable_advice}
+        
+        <div class="category-card wealth">
+          <div class="category-header">
+            <span class="category-icon">💰</span>
+            <span class="category-title">내일의 재물운 (Wealth)</span>
+            <span class="category-level level-${wealth.level}">${wealth.level}</span>
+          </div>
+          <h4 class="category-heading">${wealth.emoji} ${wealth.title}</h4>
+          <p class="category-summary"><strong>${wealth.summary}</strong></p>
+          <p class="category-detail">${wealth.detailed_interpretation}</p>
+          <div class="category-advice">
+            <strong>💡 내일을 위한 조언:</strong> ${wealth.actionable_advice}
+          </div>
+          <div class="category-lucky">
+            <span>🎨 색상: <strong>${wealth.lucky_elements.color}</strong></span> | 
+            <span>🔢 숫자: <strong>${wealth.lucky_elements.number}</strong></span> | 
+            <span>🛍️ 아이템: <strong>${wealth.lucky_elements.item}</strong></span>
+          </div>
         </div>
-        <div class="category-lucky">
-          <span>🎨 색상: <strong>${love.lucky_elements.color}</strong></span> | 
-          <span>🔢 숫자: <strong>${love.lucky_elements.number}</strong></span> | 
-          <span>🛍️ 아이템: <strong>${love.lucky_elements.item}</strong></span>
-        </div>
-      </div>
-      
-      <div class="category-card wealth">
-        <div class="category-header">
-          <span class="category-icon">💰</span>
-          <span class="category-title">내일의 재물운 (Wealth)</span>
-          <span class="category-level level-${wealth.level}">${wealth.level}</span>
-        </div>
-        <h4 class="category-heading">${wealth.emoji} ${wealth.title}</h4>
-        <p class="category-summary"><strong>${wealth.summary}</strong></p>
-        <p class="category-detail">${wealth.detailed_interpretation}</p>
-        <div class="category-advice">
-          <strong>💡 내일을 위한 조언:</strong> ${wealth.actionable_advice}
-        </div>
-        <div class="category-lucky">
-          <span>🎨 색상: <strong>${wealth.lucky_elements.color}</strong></span> | 
-          <span>🔢 숫자: <strong>${wealth.lucky_elements.number}</strong></span> | 
-          <span>🛍️ 아이템: <strong>${wealth.lucky_elements.item}</strong></span>
+
+        <div class="category-card career">
+          <div class="category-header">
+            <span class="category-icon">💼</span>
+            <span class="category-title">내일의 직장운 (Career)</span>
+            <span class="category-level level-${career.level}">${career.level}</span>
+          </div>
+          <h4 class="category-heading">${career.emoji} ${career.title}</h4>
+          <p class="category-summary"><strong>${career.summary}</strong></p>
+          <p class="category-detail">${career.detailed_interpretation}</p>
+          <div class="category-advice">
+            <strong>💡 내일을 위한 조언:</strong> ${career.actionable_advice}
+          </div>
+          <div class="category-lucky">
+            <span>🎨 색상: <strong>${career.lucky_elements.color}</strong></span> | 
+            <span>🔢 숫자: <strong>${career.lucky_elements.number}</strong></span> | 
+            <span>🛍️ 아이템: <strong>${career.lucky_elements.item}</strong></span>
+          </div>
         </div>
       </div>
 
-      <div class="category-card career">
-        <div class="category-header">
-          <span class="category-icon">💼</span>
-          <span class="category-title">내일의 직장운 (Career)</span>
-          <span class="category-level level-${career.level}">${career.level}</span>
-        </div>
-        <h4 class="category-heading">${career.emoji} ${career.title}</h4>
-        <p class="category-summary"><strong>${career.summary}</strong></p>
-        <p class="category-detail">${career.detailed_interpretation}</p>
-        <div class="category-advice">
-          <strong>💡 내일을 위한 조언:</strong> ${career.actionable_advice}
-        </div>
-        <div class="category-lucky">
-          <span>🎨 색상: <strong>${career.lucky_elements.color}</strong></span> | 
-          <span>🔢 숫자: <strong>${career.lucky_elements.number}</strong></span> | 
-          <span>🛍️ 아이템: <strong>${career.lucky_elements.item}</strong></span>
-        </div>
+      <!-- Coupang Partners Native Ad -->
+      <div class="coupang-ad-native" style="margin-top: 2rem; padding: 1.5rem; border-radius: 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+        <h3 style="margin-top:0; font-size:1.1rem; color: #f9d877; margin-bottom: 0.5rem;">🍀 내일의 행운을 끌어올릴 추천 아이템</h3>
+        <p style="font-size:0.95rem; color: #ddd; margin-bottom: 1.2rem; line-height: 1.5;">내일은 ${fortune.isReversed ? '마음을 차분하게 가라앉히는 게' : '적극적인 에너지를 발산하는 게'} 좋을 것 같네요.<br/>당신의 기운을 북돋아줄 맞춤 아이템을 확인해보세요!</p>
+        <a href="https://link.coupang.com/a/mockup_link" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding: 0.8rem 1.5rem; background: #f9d877; color: #0a0a1a; text-decoration: none; border-radius: 50px; font-weight: bold; transition: all 0.2s; box-shadow: 0 4px 12px rgba(249,216,119,0.3);">행운 아이템 구경하기 (쿠팡)</a>
+        <div style="font-size: 0.7rem; color: #666; margin-top: 1rem;">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>
       </div>
-    </div>
 
-    <!-- Coupang Partners Native Ad -->
-    <div class="coupang-ad-native" style="margin-top: 2rem; padding: 1.5rem; border-radius: 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
-      <h3 style="margin-top:0; font-size:1.1rem; color: #f9d877; margin-bottom: 0.5rem;">🍀 내일의 행운을 끌어올릴 추천 아이템</h3>
-      <p style="font-size:0.95rem; color: #ddd; margin-bottom: 1.2rem; line-height: 1.5;">내일은 ${fortune.isReversed ? '마음을 차분하게 가라앉히는 게' : '적극적인 에너지를 발산하는 게'} 좋을 것 같네요.<br/>당신의 기운을 북돋아줄 맞춤 아이템을 확인해보세요!</p>
-      <a href="https://link.coupang.com/a/mockup_link" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding: 0.8rem 1.5rem; background: #f9d877; color: #0a0a1a; text-decoration: none; border-radius: 50px; font-weight: bold; transition: all 0.2s; box-shadow: 0 4px 12px rgba(249,216,119,0.3);">행운 아이템 구경하기 (쿠팡)</a>
-      <div style="font-size: 0.7rem; color: #666; margin-top: 1rem;">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>
-    </div>
-
-    <!-- Kakao Share Button -->
-    <div class="kakao-share-container" style="margin-top: 1.5rem; margin-bottom: 2rem; text-align: center;">
-      <button id="btnKakaoShareTomorrow" style="background: #FEE500; color: #000; padding: 0.8rem 1.5rem; border: none; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; max-width: 300px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 3c-5.52 0-10 3.51-10 7.84 0 2.8 1.83 5.26 4.67 6.6l-.99 3.6c-.1.35.31.62.61.42l4.28-2.81c.46.06.94.09 1.43.09 5.52 0 10-3.51 10-7.84S17.52 3 12 3z"/>
-        </svg>
-        카카오톡으로 공유하기
-      </button>
+      <!-- Kakao Share Button -->
+      <div class="kakao-share-container" style="margin-top: 1.5rem; margin-bottom: 2rem; text-align: center;">
+        <button id="btnKakaoShareTomorrow" style="background: #FEE500; color: #000; padding: 0.8rem 1.5rem; border: none; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; max-width: 300px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3c-5.52 0-10 3.51-10 7.84 0 2.8 1.83 5.26 4.67 6.6l-.99 3.6c-.1.35.31.62.61.42l4.28-2.81c.46.06.94.09 1.43.09 5.52 0 10-3.51 10-7.84S17.52 3 12 3z"/>
+          </svg>
+          카카오톡으로 공유하기
+        </button>
+      </div>
     </div>
   `;
 
-  // Flip interaction
+  // Flip interaction and reveal results
   const cardEl = container.querySelector('#tomorrowCard');
   cardEl.addEventListener('click', () => {
-    cardEl.classList.toggle('flipped');
+    if (!cardEl.classList.contains('flipped')) {
+      cardEl.classList.add('flipped');
+      setTimeout(() => {
+        container.querySelector('#tomorrowResults').style.display = 'block';
+        container.querySelector('#tomorrowResults').style.animation = 'fadeIn 0.8s ease-out';
+      }, 500);
+    }
   });
 
   // Kakao Share interaction
