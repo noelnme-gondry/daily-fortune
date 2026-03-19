@@ -38,8 +38,9 @@ function seededRandom(seed) {
 /**
  * Generate a numeric seed from today's date string
  */
-function dateSeed() {
+function dateSeed(offsetDays = 0) {
   const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
   const dateStr = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
   let hash = 0;
   for (let i = 0; i < dateStr.length; i++) {
@@ -53,9 +54,9 @@ function dateSeed() {
 /**
  * Get today's deterministic fortune card + category fortunes
  */
-export async function getDailyFortune() {
+export async function getDailyFortune(offsetDays = 0) {
   const [tarot, categories] = await Promise.all([loadTarotData(), loadCategoryData()]);
-  const seed = dateSeed();
+  const seed = dateSeed(offsetDays);
 
   const cardIndex = Math.floor(seededRandom(seed) * tarot.majorArcana.length);
   const msgIndex = Math.floor(seededRandom(seed + 1) * tarot.fortuneMessages.length);
@@ -71,7 +72,7 @@ export async function getDailyFortune() {
     message: tarot.fortuneMessages[msgIndex],
     isReversed,
     categories: { love: loveFortune, wealth: wealthFortune, career: careerFortune },
-    date: new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }),
+    date: (() => { const d = new Date(); d.setDate(d.getDate() + offsetDays); return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }); })(),
   };
 }
 

@@ -2,9 +2,11 @@
 import { renderCalendar } from './attendance.js';
 import { renderFortune } from './fortune.js';
 import { renderSaju } from './saju.js';
+import { renderTomorrow } from './tomorrow.js';
+import { renderMatch } from './match.js';
 import './style.css';
 
-const TABS = ['attendance', 'fortune', 'saju'];
+const TABS = ['attendance', 'fortune', 'tomorrow', 'saju', 'match'];
 let activeTab = 'fortune';
 
 /**
@@ -59,8 +61,14 @@ function switchTab(tab) {
     case 'fortune':
       renderFortune(panel);
       break;
+    case 'tomorrow':
+      renderTomorrow(panel);
+      break;
     case 'saju':
       renderSaju(panel);
+      break;
+    case 'match':
+      renderMatch(panel);
       break;
   }
 }

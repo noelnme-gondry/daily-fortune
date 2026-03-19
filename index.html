@@ -40,9 +40,17 @@
         <span class="tab-emoji">🃏</span>
         <span>타로 운세</span>
       </button>
+      <button class="tab-btn" data-tab="tomorrow" role="tab" id="tab-tomorrow">
+        <span class="tab-emoji">🍀</span>
+        <span>내일 운세</span>
+      </button>
       <button class="tab-btn" data-tab="saju" role="tab" id="tab-saju">
         <span class="tab-emoji">✨</span>
         <span>사주</span>
+      </button>
+      <button class="tab-btn" data-tab="match" role="tab" id="tab-match">
+        <span class="tab-emoji">💕</span>
+        <span>이름 궁합</span>
       </button>
     </nav>
 
@@ -50,7 +58,9 @@
     <main>
       <section class="tab-panel" id="attendancePanel" role="tabpanel" aria-labelledby="tab-attendance"></section>
       <section class="tab-panel active" id="fortunePanel" role="tabpanel" aria-labelledby="tab-fortune"></section>
+      <section class="tab-panel" id="tomorrowPanel" role="tabpanel" aria-labelledby="tab-tomorrow"></section>
       <section class="tab-panel" id="sajuPanel" role="tabpanel" aria-labelledby="tab-saju"></section>
+      <section class="tab-panel" id="matchPanel" role="tabpanel" aria-labelledby="tab-match"></section>
     </main>
 
     <!-- Footer -->
@@ -59,6 +69,14 @@
     </footer>
   </div>
 
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCmbV6AUnR+N/9m6xXkX0m3F8/o2F5xOMgK2m5P+J1L/1B0aO4eXGv2iC7S+3Yk" crossorigin="anonymous"></script>
+  <script>
+    if (!window.Kakao) {
+      console.warn("Kakao SDK load failed");
+    } else if (!window.Kakao.isInitialized()) {
+      window.Kakao.init('cbf679eacee1467cccbc2db536411516');
+    }
+  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
