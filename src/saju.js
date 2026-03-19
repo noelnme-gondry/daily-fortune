@@ -110,7 +110,49 @@ function renderSajuResult(result) {
     <div class="saju-interpretation">
       <div class="saju-interpretation-content">${interpretation}</div>
     </div>
+    
+    <!-- Kakao Share Button -->
+    <div class="kakao-share-container" style="margin-top: 2rem; text-align: center;">
+      <button id="btnKakaoShareSaju" style="background: #FEE500; color: #000; padding: 0.8rem 1.5rem; border: none; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; max-width: 300px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3c-5.52 0-10 3.51-10 7.84 0 2.8 1.83 5.26 4.67 6.6l-.99 3.6c-.1.35.31.62.61.42l4.28-2.81c.46.06.94.09 1.43.09 5.52 0 10-3.51 10-7.84S17.52 3 12 3z"/>
+        </svg>
+        카카오톡으로 내 사주 공유하기
+      </button>
+    </div>
   `;
+
+  // Attach Kakao share event
+  const btnKakaoSaju = resultEl.querySelector('#btnKakaoShareSaju');
+  if (btnKakaoSaju) {
+    btnKakaoSaju.addEventListener('click', () => {
+      if (window.Kakao && window.Kakao.isInitialized()) {
+        window.Kakao.Share.sendDefault({
+          objectType: 'feed',
+          content: {
+            title: '소름 돋게 정확한 나의 사주팔자 결과 ✨',
+            description: '당신의 타고난 기운과 오행 분석을 확인해보세요. 나는 어떤 운명을 타고 났을까?',
+            imageUrl: 'https://daily-fortune.example.com/og-image.png',
+            link: {
+              mobileWebUrl: window.location.href,
+              webUrl: window.location.href,
+            },
+          },
+          buttons: [
+            {
+              title: '결과 확인하기',
+              link: {
+                mobileWebUrl: window.location.href,
+                webUrl: window.location.href,
+              },
+            }
+          ],
+        });
+      } else {
+        alert('카카오톡 공유 기능을 불러오지 못했습니다. 카카오 SDK 초기화 상태를 확인해주세요.');
+      }
+    });
+  }
 
   resultEl.classList.add('show');
 }

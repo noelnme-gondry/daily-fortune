@@ -74,7 +74,7 @@
     if (!window.Kakao) {
       console.warn("Kakao SDK load failed");
     } else if (!window.Kakao.isInitialized()) {
-      window.Kakao.init('cbf679eacee1467cccbc2db536411516');
+      window.Kakao.init('%VITE_KAKAO_JS_KEY%');
     }
   </script>
   <script type="module" src="/src/main.js"></script>
