@@ -1,4 +1,4 @@
-// 입력값 보관(이 기기의 localStorage)과 공유 링크(# 뒤 파라미터) 변환
+// 입력값 보관(이 기기의 localStorage). 생년월일시는 공유 링크에 담지 않는다.
 const KEY = { a: 'ohaeng:profile', b: 'ohaeng:partner' };
 
 export const SAMPLE = {
@@ -16,34 +16,4 @@ function valid(p) {
   return p && (p.gender === 'M' || p.gender === 'F') && Number.isInteger(p.y) && Number.isInteger(p.m) && Number.isInteger(p.d);
 }
 
-// #y=1993&m=1&d=28&t=0340&g=F&c=s&n=이름 (상대는 y2·m2… 접미사)
-export function toHash(a, b) {
-  const q = new URLSearchParams();
-  const put = (p, sfx) => {
-    q.set(`y${sfx}`, p.y); q.set(`m${sfx}`, p.m); q.set(`d${sfx}`, p.d);
-    q.set(`t${sfx}`, p.noTime ? 'x' : p.time.replace(':', ''));
-    q.set(`g${sfx}`, p.gender); q.set(`c${sfx}`, p.calendar === 'lunar' ? (p.leap ? 'll' : 'l') : 's');
-    if (p.name) q.set(`n${sfx}`, p.name);
-  };
-  put(a, '');
-  if (b) put(b, '2');
-  return `#${q.toString()}`;
-}
-export function fromHash(hash) {
-  if (!hash || hash.length < 3) return {};
-  const q = new URLSearchParams(hash.slice(1));
-  const get = (sfx) => {
-    if (!q.get(`y${sfx}`)) return null;
-    const t = q.get(`t${sfx}`) || 'x';
-    const c = q.get(`c${sfx}`) || 's';
-    const p = {
-      name: (q.get(`n${sfx}`) || '').slice(0, 12), gender: q.get(`g${sfx}`) === 'F' ? 'F' : 'M',
-      calendar: c === 's' ? 'solar' : 'lunar', leap: c === 'll',
-      y: parseInt(q.get(`y${sfx}`), 10), m: parseInt(q.get(`m${sfx}`), 10), d: parseInt(q.get(`d${sfx}`), 10),
-      time: /^\d{4}$/.test(t) ? `${t.slice(0, 2)}:${t.slice(2)}` : '12:00', noTime: !/^\d{4}$/.test(t),
-    };
-    return valid(p) ? p : null;
-  };
-  return { a: get(''), b: get('2') };
-}
 export const toEngine = (p) => ({ name: p.name, gender: p.gender, calendar: p.calendar, leap: p.leap, y: p.y, m: p.m, d: p.d, time: p.noTime ? null : p.time });

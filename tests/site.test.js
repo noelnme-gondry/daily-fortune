@@ -67,3 +67,32 @@ test('없는 경로는 null이고 404 페이지는 noindex', () => {
   assert.equal(site.render('/nope/'), null);
   assert.ok(site.notFound().includes('noindex'));
 });
+
+test('광고·GA·공유·정보 아이콘', () => {
+  process.env.GA_MEASUREMENT_ID = 'G-ABC123';
+  process.env.ADSENSE_SLOT_INLINE = '1234567890';
+  const s2 = createSite({ site: SITE, assets: { css: '/a.css', js: '/a.js' }, now: Date.UTC(2026, 9, 14, 3) });
+  const html = s2.render('/today/');
+  assert.ok(html.includes('googletagmanager.com/gtag/js?id=G-ABC123'));
+  assert.ok(html.includes('page_location:u.origin+u.pathname'), 'GA에 # 뒤와 쿼리를 보내지 않는다');
+  assert.ok(html.includes('data-ad-slot="1234567890"'));
+  assert.ok(html.includes('adsbygoogle.js?client=ca-pub-3073450406371629'));
+  assert.ok(html.includes('data-share-page'));
+  assert.ok(html.includes('class="info"'));
+  assert.equal(s2.adsTxt(), 'google.com, pub-3073450406371629, DIRECT, f08c47fec0942fa0\n');
+  const share = s2.renderShare(new URLSearchParams({ k: 'rank', n: '서윤', s: '67.1', r: '95445', w: '1', t: 'B' }));
+  assert.ok(share.includes('noindex'));
+  assert.ok(!share.includes('adsbygoogle.js'), '공유 카드에는 광고를 넣지 않는다');
+  assert.ok(share.includes(`<link rel="canonical" href="${SITE}/saju-ranking/">`));
+  assert.ok(share.includes('page_title:"공유 카드'), 'GA 페이지 제목에 이름을 보내지 않는다');
+  process.env.ADSENSE_CLIENT = 'off';
+  const s3 = createSite({ site: SITE, assets: { css: '/a.css', js: '/a.js' } });
+  assert.ok(!s3.render('/today/').includes('adsbygoogle'));
+  assert.equal(s3.adsTxt(), '');
+  delete process.env.GA_MEASUREMENT_ID; delete process.env.ADSENSE_SLOT_INLINE; delete process.env.ADSENSE_CLIENT;
+});
+
+test('새 페이지: 인생 캐릭터·사주 랭킹·60일주 랭킹', () => {
+  for (const p of ['/life-story/', '/saju-ranking/', '/saju/ilju-ranking/']) assert.ok(site.has(p), p);
+  assert.ok(site.render('/saju/ilju-ranking/').includes('정해일주'));
+});

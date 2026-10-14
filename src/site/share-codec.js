@@ -1,0 +1,27 @@
+// 공유 카드 주소 만들기·읽기. 생년월일시는 담지 않고 결과 요약(점수·제목·이름)만 담는다.
+import { ADJ } from '../content/story.js';
+import { TG } from '../engine/core.js';
+
+export const ADJ_FLAT = [...ADJ.high, ...ADJ.good, ...ADJ.mid, ...ADJ.low];
+// 공유 캐릭터 코드: "형용사번호-십신번호" (예: 3-2 = 빛나는 풍요의 음유시인)
+export const storyCode = (adj, tg) => `${ADJ_FLAT.indexOf(adj)}-${TG.indexOf(tg)}`;
+export const SHARE_KINDS = {
+  today: { tool: '/today/', label: '오늘의 운세' },
+  tomorrow: { tool: '/tomorrow/', label: '내일의 운세' },
+  week: { tool: '/week/', label: '이번 주 운세' },
+  month: { tool: '/month/', label: '이달의 운세' },
+  year: { tool: '/year/', label: '신년운세' },
+  life: { tool: '/lifetime/', label: '평생 운세' },
+  compat: { tool: '/compatibility/', label: '사주 궁합' },
+  story: { tool: '/life-story/', label: '사주로 본 내 인생' },
+  rank: { tool: '/saju-ranking/', label: '사주 랭킹' },
+  manse: { tool: '/manseryeok/', label: '만세력' },
+};
+const NAME_RE = /[^가-힣a-zA-Z0-9 ]/g;
+export const cleanName = (s) => String(s || '').replace(NAME_RE, '').trim().slice(0, 10);
+
+export function shareUrl(origin, data) {
+  const q = new URLSearchParams();
+  for (const [k, v] of Object.entries(data)) if (v !== undefined && v !== null && v !== '') q.set(k, String(v));
+  return `${origin}/share/?${q.toString()}`;
+}

@@ -30,9 +30,22 @@ export function buildChart(input) {
   const ecA = solA.getLunar().getEightChar(); ecA.setSect(1);
   const ecB = solB.getLunar().getEightChar(); ecB.setSect(1);
   const pillars = { year: gz(ecA.getYear()), month: gz(ecA.getMonth()), day: gz(ecB.getDay()), hour: hasTime ? gz(ecB.getTime()) : null };
+  const gender = input.gender === 'F' ? 'F' : 'M';
+  const a = analyze(pillars, gender);
+  // 대운 (표시 나이는 만 나이 기준)
+  const yun = ecA.getYun(gender === 'M' ? 1 : 0);
+  const daeun = yun.getDaYun().slice(1, 10).map((d) => ({ startYear: d.getStartYear(), age: d.getStartYear() - birth.y, ...gz(d.getGanZhi()) }));
+
+  return {
+    ...a, input, birth, hasTime, dst, name: (input.name || '').trim(),
+    lunarText: lunarText(birth, true), daeun,
+  };
+}
+
+// 네 기둥(또는 세 기둥)만으로 하는 분석. 날짜 라이브러리를 쓰지 않아 전체 사주 집계(랭킹)에도 쓴다.
+export function analyze(pillars, gender = 'M') {
   const positions = ['year', 'month', 'day', 'hour'].filter((p) => pillars[p]);
   const dm = pillars.day.s;
-  const gender = input.gender === 'F' ? 'F' : 'M';
 
   // 오행 개수(겉글자)·가중치(지장간)·십신 그룹 가중치·일간을 돕는 힘
   const counts = [0, 0, 0, 0, 0];
@@ -109,10 +122,6 @@ export function buildChart(input) {
   if (GWEGANG.includes(pillarH(pillars.day))) natalSS.push(['괴강살', 'day']);
   if (BAEKHO.includes(pillarH(pillars.day))) natalSS.push(['백호살', 'day']);
 
-  // 대운 (표시 나이는 만 나이 기준)
-  const yun = ecA.getYun(gender === 'M' ? 1 : 0);
-  const daeun = yun.getDaYun().slice(1, 10).map((d) => ({ startYear: d.getStartYear(), age: d.getStartYear() - birth.y, ...gz(d.getGanZhi()) }));
-
   const cols = positions.map((pos) => {
     const p = pillars[pos];
     return {
@@ -130,10 +139,8 @@ export function buildChart(input) {
   }
   const key = `${positions.map((p) => pillarH(pillars[p])).join('')}|${gender}`;
   return {
-    input, key, birth, hasTime, gender, dst, name: (input.name || '').trim(),
-    lunarText: lunarText(birth, true),
-    pillars, positions, dm, cols, counts, weights, groupW, ratio, strengthLabel, strong,
-    fav, roles, ss, natalSS, daeun, tenGodCount,
+    key, gender, pillars, positions, dm, cols, counts, weights, groupW, ratio, strengthLabel, strong,
+    fav, roles, ss, natalSS, tenGodCount,
   };
 }
 

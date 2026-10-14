@@ -8,6 +8,8 @@ import {
 } from '../../engine/index.js';
 import { esc, faqBlock, faqLd, factTable, elSpan } from '../util.js';
 import { hero } from './tools.js';
+import { adSlot } from '../layout.js';
+import RANK from '../../content/rank-table.js';
 
 const article = (ctx, page, extra = {}) => ({
   '@type': 'Article', headline: page.h1 || page.title, description: page.description, inLanguage: 'ko-KR',
@@ -17,7 +19,7 @@ const article = (ctx, page, extra = {}) => ({
 function articlePage(ctx, p) {
   const page = { ogType: 'article', modified: ctx.buildDate, section: '/saju/', ...p };
   page.ld = [article(ctx, page, p.about ? { about: p.about } : {}), faqLd(p.faq), ...(p.ld || [])];
-  page.body = `<article class="article">${hero(p.h1, p.lead, p.eyebrow)}${p.content}${faqBlock(p.faq)}${p.after || ''}<p class="updated">최종 업데이트 ${ctx.buildDate} · ${esc('오행 운세 편집팀')} · <a href="/about/">계산 방법</a></p></article>`;
+  page.body = `<article class="article">${hero(p.h1, p.lead, p.eyebrow)}${p.content}${adSlot(ctx, 'inline')}${faqBlock(p.faq)}${p.after || ''}<p class="updated">최종 업데이트 ${ctx.buildDate} · ${esc('오행 운세 편집팀')} · <a href="/about/">계산 방법</a></p></article>`;
   return page;
 }
 const tool = (href, text) => `<p class="cta"><a class="btn" href="${href}">${esc(text)}</a></p>`;
@@ -342,5 +344,40 @@ export function guide(ctx) {
     content: `<ol class="steps">${GUIDE_STEPS.map((s) => `<li><h2>${esc(s.title)}</h2><p>${esc(s.text)}</p></li>`).join('')}</ol>${tool('/manseryeok/', '만세력으로 내 원국 세우기')}`,
     ld: [{ '@type': 'HowTo', name: '사주 보는 법', inLanguage: 'ko-KR', step: GUIDE_STEPS.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, name: s.title, text: s.text })) }],
     faq: [{ q: '사주를 혼자 공부할 수 있나요?', a: '오행·십신·합충의 기본 규칙만 익히면 원국의 큰 그림은 혼자서도 읽을 수 있습니다. 오행 운세의 만세력과 사주 백과로 내 원국을 보며 하나씩 대입해 보세요.' }],
+  });
+}
+
+/* ── 60일주 랭킹 ───────────────────────────── */
+export function iljuRanking(ctx) {
+  const rows = RANK.ilju.map((x, n) => ({ n, p: sexagenary(n), mean: x.mean })).sort((a, b) => b.mean - a.mean || a.n - b.n);
+  const avg = RANK.four.avgTotal;
+  const top = rows.slice(0, 3), bottom = rows.slice(-3);
+  const why = (r) => {
+    const p = r.p, hz = pillarH(p), out = [];
+    if (GWIIN[p.s].includes(p.b)) out.push('일지에 천을귀인');
+    if (MUNCHANG[p.s] === p.b) out.push('일지에 문창귀인');
+    if (GWEGANG.includes(hz)) out.push('괴강의 리더십');
+    if (YANGIN[p.s] === p.b) out.push('양인의 날카로움');
+    if (BAEKHO.includes(hz)) out.push('백호의 강한 기운');
+    if (STEM_EL[p.s] === BR_EL[p.b]) out.push('간여지동(한 오행에 치우침)');
+    const rel = elRel(STEM_EL[p.s], BR_EL[p.b]);
+    if (rel === 4) out.push('지지가 일간을 생함');
+    if (rel === 3) out.push('지지가 일간을 극함');
+    return out.join(' · ') || '두드러진 특징 없음';
+  };
+  const faq = [
+    { q: '가장 좋은 일주는 무엇인가요?', a: `모든 사주를 같은 규칙으로 계산한 평균 점수로는 ${top.map((r) => `${iljuName(r.p)}(${r.mean}점)`).join(', ')} 순으로 높습니다. 일지에 천을귀인이 있거나 지지가 일간을 생해 주는 일주가 상위권에 많습니다.` },
+    { q: '점수가 낮은 일주는 나쁜 일주인가요?', a: `아닙니다. ${bottom.map((r) => iljuName(r.p)).join('·')}처럼 평균이 낮은 일주는 기운이 한쪽으로 강하게 모인 경우가 많아 균형 점수에서 손해를 볼 뿐, 그만큼 개성과 추진력이 강합니다. 실제 삶은 나머지 기둥과 대운에 따라 크게 달라집니다.` },
+    { q: '일주 랭킹은 어떻게 계산했나요?', a: `가능한 모든 사주 518,400가지를 사주 랭킹과 같은 규칙(오행 균형·일간 강약·용신·길신·합·충형)으로 점수화한 뒤, 같은 일주를 가진 8,640가지 사주의 평균을 냈습니다. 전체 평균은 ${avg}점입니다.` },
+  ];
+  return articlePage(ctx, {
+    path: '/saju/ilju-ranking/', h1: '60일주 랭킹', eyebrow: '재미로 보는 사주', title: '60일주 랭킹 — 평균 사주 점수가 가장 높은 일주는?',
+    description: `60갑자 일주별 평균 사주 점수 순위. 1위 ${iljuName(top[0].p)}(${top[0].mean}점)부터 60위까지, 518,400가지 사주를 같은 규칙으로 계산한 결과와 이유를 정리했습니다.`,
+    crumbs: [['사주 백과', '/saju/'], ['60일주 랭킹', '/saju/ilju-ranking/']],
+    lead: `60일주 랭킹은 가능한 모든 사주 518,400가지를 같은 규칙으로 점수화한 뒤 일주별 평균을 비교한 순위입니다. 1위는 ${iljuName(top[0].p)}(${top[0].mean}점), 2위는 ${iljuName(top[1].p)}(${top[1].mean}점), 3위는 ${iljuName(top[2].p)}(${top[2].mean}점)이며 전체 평균은 ${avg}점입니다.`,
+    content: `<div class="table-wrap"><table class="grid-table"><thead><tr><th scope="col">순위</th><th scope="col">일주</th><th scope="col">평균 점수</th><th scope="col">특징</th></tr></thead><tbody>${rows.map((r, i) => `<tr><td class="num">${i + 1}</td><th scope="row"><a href="/saju/ilju/${iljuSlug(r.p)}/"><span class="hz el-${STEM_EL[r.p.s]}">${pillarH(r.p)}</span> ${iljuName(r.p)}</a></th><td class="num">${r.mean}</td><td>${why(r)}</td></tr>`).join('')}</tbody></table></div>
+      <section class="prose"><h2>점수 계산 기준</h2><p>오행 균형(25점), 일간 강약의 중화(20점), 용신·희신의 힘(15점), 천을귀인·문창·식신 등 길신(15점), 지지의 합(15점)을 더하고 충·형·원진을 뺍니다. 일주 하나만으로는 사주가 정해지지 않으므로, 같은 일주의 모든 조합을 평균했습니다.</p>
+      <p class="cta"><a class="btn" href="/saju-ranking/">내 사주는 518,400가지 중 몇 위?</a></p></section>`,
+    faq,
   });
 }

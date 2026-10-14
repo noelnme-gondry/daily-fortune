@@ -4,7 +4,9 @@ import {
   ANIMAL, ANIMAL_SLUG, EL_K, EL_H, STEM_EL, BR_EL, addDays, dow, fmtDate, fmtShort, pillarLabel, pillarH,
   dayPillar, monthPillar, yearPillar, yearPillarOfDate, lunarText, solarTerms, ttiDay, ttiYear, samjaeYear, toUTC,
 } from '../../engine/index.js';
-import { esc, faqBlock, faqLd } from '../util.js';
+import { esc, faqBlock, faqLd, tip } from '../util.js';
+import { TIPS } from '../../content/tips.js';
+import { adSlot } from '../layout.js';
 
 const BAND = (s) => (s >= 75 ? ['high', '대길'] : s >= 60 ? ['good', '길'] : s >= 45 ? ['mid', '평'] : ['low', '주의']);
 export const bandChip = (s) => { const [k, n] = BAND(s); return `<span class="band band-${k}">${n}</span>`; };
@@ -37,7 +39,7 @@ const HINT = '<p class="hint">한국 표준시로 입력하면 동경 127.5° �
 export function toolBlock(mode, ctx, extra = {}) {
   const pair = mode === 'compatibility';
   const data = `data-tool="${mode}" data-date="${ctx.todayISO}"${extra.year ? ` data-year="${extra.year}"` : ''}`;
-  const label = { today: '오늘의 운세 보기', tomorrow: '내일의 운세 보기', week: '이번 주 운세 보기', month: '이달의 운세 보기', year: `${extra.year}년 운세 보기`, lifetime: '평생 운세 보기', compatibility: '궁합 보기', manseryeok: '사주 원국 계산', home: '내 운세 보기' }[mode];
+  const label = { today: '오늘의 운세 보기', tomorrow: '내일의 운세 보기', week: '이번 주 운세 보기', month: '이달의 운세 보기', year: `${extra.year}년 운세 보기`, lifetime: '평생 운세 보기', compatibility: '궁합 보기', manseryeok: '사주 원국 계산', story: '내 인생 캐릭터 보기', rank: '내 사주 순위 보기', home: '내 운세 보기' }[mode];
   const form = pair
     ? `<form class="pform card pair-form" id="tool-form" novalidate><h2 class="form-title">두 사람의 사주 입력</h2><div class="pair-grid">${personFields('a', ctx, '나')}${personFields('b', ctx, '상대')}</div><div class="form-actions"><button class="btn" type="submit">${label}</button><button class="link-btn" type="button" data-sample>예시 두 사람으로 보기</button></div>${HINT}</form>`
     : `<form class="pform card" id="tool-form" novalidate><h2 class="form-title">내 사주 입력</h2>${personFields('a', ctx)}<div class="form-actions"><button class="btn" type="submit">${label}</button><button class="link-btn" type="button" data-sample>예시 인물로 보기</button></div>${HINT}</form>`;
@@ -56,10 +58,10 @@ export function dayBox(o, label) {
   return `<section class="daybox card" aria-label="${esc(label)} 일진">
     <div class="daybox-main"><span class="daybox-k">${esc(label)}</span><b class="daybox-d">${fmtDate(o)}</b><span class="muted">${lunarText(o)}</span></div>
     <dl class="daybox-grid">
-      <div><dt>일진</dt><dd><span class="hz el-${STEM_EL[dp.s]}">${pillarH(dp)}</span> ${pillarLabel(dp).slice(0, 2)}일</dd></div>
-      <div><dt>월건</dt><dd><span class="hz">${pillarH(mp)}</span> ${pillarLabel(mp).slice(0, 2)}월</dd></div>
-      <div><dt>세차</dt><dd><span class="hz">${pillarH(yp)}</span> ${pillarLabel(yp).slice(0, 2)}년</dd></div>
-      ${nt ? `<div><dt>다음 절기</dt><dd>${nt.name} ${nt.date.m}/${nt.date.d} ${nt.time}</dd></div>` : ''}
+      <div><dt>일진 ${tip(TIPS.ilJin, '일진 설명')}</dt><dd><span class="hz el-${STEM_EL[dp.s]}">${pillarH(dp)}</span> ${pillarLabel(dp).slice(0, 2)}일</dd></div>
+      <div><dt>월건 ${tip(TIPS.wolGeon, '월건 설명')}</dt><dd><span class="hz">${pillarH(mp)}</span> ${pillarLabel(mp).slice(0, 2)}월</dd></div>
+      <div><dt>세차 ${tip(TIPS.seCha, '세차 설명')}</dt><dd><span class="hz">${pillarH(yp)}</span> ${pillarLabel(yp).slice(0, 2)}년</dd></div>
+      ${nt ? `<div><dt>다음 절기 ${tip(TIPS.term, '절기 설명')}</dt><dd>${nt.name} ${nt.date.m}/${nt.date.d} ${nt.time}</dd></div>` : ''}
     </dl>
   </section>`;
 }
@@ -95,6 +97,8 @@ const HOW = {
   year: ['그 해의 년주(세운)를 원국에 대입합니다.', '그 해에 지나고 있는 10년 대운을 32% 비중으로 더합니다.', '각 달 15일의 절기 월주 65% · 년주 35%로 월별 점수를 냅니다.'],
   lifetime: ['일간의 성질과 오행 분포로 타고난 기질을 읽습니다.', '월지·일지 가중치와 지장간으로 신강·신약과 용신을 정합니다.', '대운 9개를 각각 점수화해 인생의 리듬을 그래프로 보여 줍니다.', '앞으로 15년의 세운에서 결혼·자녀·재물·이사 신호를 찾습니다.'],
   compatibility: ['일간끼리의 천간합·상생·상극을 봅니다.', '배우자궁인 일지, 띠(년지), 월지의 합·충·원진을 비교합니다.', '서로에게 필요한 용신 오행을 상대 사주가 얼마나 채워 주는지 계산합니다.', '앞으로 10년 세운에서 두 사람의 결혼·자녀·재물 신호를 합쳐 시기를 고릅니다.'],
+  story: ['0~29세는 년주·월주, 30~59세는 일주, 60세 이후는 시주를 그 시기의 뿌리로 봅니다.', '각 시기를 지나는 대운을 겹치는 햇수만큼 반영해 시기 점수(대운 70%·원국 30%)를 냅니다.', '시기에 가장 강한 십신이 캐릭터 직업, 점수가 수식어, 그 기둥의 신살이 스킬이 됩니다.', '세 시기 점수의 모양으로 인생 곡선 유형을 정합니다.'],
+  rank: ['여덟 글자를 오행 균형·일간 강약·용신의 힘·길신·합·충형·특수 신살 7개 항목으로 점수화합니다.', '가능한 모든 사주 518,400가지(시간 모름 43,200가지)를 같은 규칙으로 미리 계산해 두었습니다.', '내 점수보다 높은 사주 수 + 1이 내 순위이며, 항목별 점수는 전체 평균과 비교해 근거로 보여 줍니다.', '재물·명예·매력·건강·지혜 분야 점수도 같은 방식으로 백분위를 냅니다.'],
   manseryeok: ['년주: 입춘 절입 시각 기준', '월주: 매달 절입 시각 기준', '일주: 60일 주기 일진', '시주: 동경 127.5° 평균태양시(표준시 −30분), 밤 11시 30분부터 다음 날 자시'],
 };
 function howBlock(mode) {
@@ -114,9 +118,12 @@ function relatedFor(path, ctx) {
     [`/year/${y + 1}/`, `${y + 1}년 운세`, '내년 총운과 월별 운세'],
     ['/lifetime/', '평생 운세', '기질·대운·결혼 시기'],
     ['/compatibility/', '사주 궁합', '평생 궁합과 결혼 길일'],
+    ['/life-story/', '사주로 본 내 인생은?', '초반·중반·후반 인생 캐릭터'],
+    ['/saju-ranking/', '내 사주 랭킹', '518,400가지 사주 중 몇 위?'],
     ['/tti/today/', '띠별 오늘의 운세', '12띠 오늘 점수'],
   ];
-  return related(all.filter(([h]) => h !== path).slice(0, 6));
+  const fun = all.filter(([h]) => h === '/life-story/' || h === '/saju-ranking/');
+  return related([...fun, ...all.filter(([h]) => h !== path && !fun.some(([f]) => f === h))].filter(([h]) => h !== path).slice(0, 6));
 }
 function webApp(tool, ctx) {
   return { '@type': 'WebApplication', name: `${SITE.name} ${tool.h1}`, url: `${ctx.site}${tool.path}`, description: tool.desc, applicationCategory: 'LifestyleApplication', operatingSystem: 'Web', inLanguage: 'ko-KR', offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' }, publisher: { '@id': `${ctx.site}/#org` } };
@@ -129,7 +136,7 @@ function toolPage(key, ctx, opts = {}) {
   return {
     path: t.path, title: t.title, description: t.desc, crumbs: opts.crumbs || [[t.nav, t.path]], section: t.path,
     tool: true, ld: [webApp(t, ctx), faqLd(t.faq)],
-    body: `${hero(t.h1, t.lead)}${top}${toolBlock(mode, ctx, opts)}${howBlock(mode === 'year' ? 'year' : mode)}${extraAfter}${faqBlock(t.faq)}${relatedFor(t.path, ctx)}`,
+    body: `${hero(t.h1, t.lead)}${top}${toolBlock(mode, ctx, opts)}${adSlot(ctx, 'inline')}${howBlock(mode === 'year' ? 'year' : mode)}${extraAfter}${faqBlock(t.faq)}${relatedFor(t.path, ctx)}`,
   };
 }
 
@@ -153,6 +160,12 @@ export const month = (ctx) => toolPage('month', ctx, { top: monthBox(ctx.today) 
 export const lifetime = (ctx) => toolPage('lifetime', ctx);
 export const compatibility = (ctx) => toolPage('compatibility', ctx, {
   after: `<section class="prose"><h2>띠 궁합만 빠르게 보고 싶다면</h2><p>태어난 해의 띠만으로 보는 궁합은 <a href="/tti/compatibility/">띠 궁합표</a>에서 12띠 모든 조합을 확인할 수 있습니다. 다만 띠는 여덟 글자 중 한 글자일 뿐이라, 정확한 궁합은 위의 사주 궁합으로 보세요.</p></section>`,
+});
+export const story = (ctx) => toolPage('story', ctx, {
+  after: `<section class="prose"><h2>캐릭터 도감</h2><p>사주의 십신 열 가지가 캐릭터 직업이 됩니다. 비견은 독립 전사, 겁재는 승부사 검객, 식신은 풍요의 음유시인, 상관은 재치의 이야기꾼, 편재는 대륙의 모험 상인, 정재는 성실한 재무관, 편관은 불굴의 장군, 정관은 명예의 기사, 편인은 은둔의 연금술사, 정인은 지혜의 현자입니다. <a href="/saju/sipsin/">십신 뜻 자세히 보기</a></p></section>`,
+});
+export const rank = (ctx) => toolPage('rank', ctx, {
+  after: `<section class="prose"><h2>60일주 중 가장 점수가 높은 일주는?</h2><p>모든 사주를 같은 규칙으로 계산해 일주별 평균 점수를 낸 <a href="/saju/ilju-ranking/">60일주 랭킹</a>도 확인해 보세요.</p></section>`,
 });
 export const manseryeok = (ctx) => toolPage('manseryeok', ctx, {
   after: `<section class="box-sec"><div class="sec-head"><h2>연도별 만세력 표</h2></div><div class="cards">${[ctx.today.y, ctx.today.y + 1].map((y) => `<a class="card link-card" href="/manseryeok/${y}/"><b>${y}년 만세력</b><span>${pillarLabel(yearPillar(y))}년 · 월별 일진과 24절기</span></a>`).join('')}</div></section>`,
@@ -190,6 +203,11 @@ export function home(ctx) {
     ['/compatibility/', '사주 궁합', '평생 궁합, 조심할 점, 결혼 길일'],
     ['/manseryeok/', '만세력', '사주팔자 원국과 대운 바로 계산'],
   ];
+  const fun = [
+    ['/life-story/', '사주로 본 내 인생은?', '초반·중반·후반을 캐릭터로 — 나는 어떤 주인공일까?'],
+    ['/saju-ranking/', '내 사주 랭킹', '518,400가지 사주 중 내 사주는 몇 위?'],
+    ['/saju/ilju-ranking/', '60일주 랭킹', '평균 점수가 가장 높은 일주는?'],
+  ];
   const ty = [...Array(12).keys()].map((t) => ttiYear(t, y));
   const sj = samjaeYear(y);
   const body = `
@@ -197,6 +215,7 @@ export function home(ctx) {
       <div class="home-intro"><p class="eyebrow">${esc(SITE.tagline)}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
       ${toolBlock('home', ctx)}
     </section>
+    <section class="box-sec fun-sec"><div class="sec-head"><h2>재미로 보는 사주</h2></div><div class="cards three">${fun.map(([h, t, d]) => `<a class="card link-card fun-card" href="${h}"><b>${t}</b><span>${d}</span></a>`).join('')}</div></section>
     ${dayBox(o, '오늘')}
     <section class="box-sec"><div class="sec-head"><h2>운세 종류</h2></div><div class="cards three">${cards.map(([h, t, d]) => `<a class="card link-card" href="${h}"><b>${t}</b><span>${d}</span></a>`).join('')}</div></section>
     <section class="box-sec"><div class="sec-head"><h2>띠별 오늘의 운세 · ${o.m}월 ${o.d}일</h2><a href="/tti/today/">해설 보기</a></div>${ttiDayList(o, { short: true })}</section>

@@ -1,16 +1,8 @@
-// 결과 공유: 링크 복사, 휴대폰 공유 시트, 카카오톡(키가 있을 때만)
+// 공유: 페이지 공유 바(모든 페이지)와 결과 공유(카드 주소 + 이미지 저장). 카카오는 키가 있을 때만 켠다.
+import { track } from './analytics.js';
+
 const KAKAO_KEY = import.meta.env.VITE_KAKAO_JS_KEY || '';
 const KAKAO_SDK = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js';
-
-export function shareBlock() {
-  return `<section class="share" aria-label="결과 공유">
-    <button class="btn ghost" type="button" data-share="copy">결과 링크 복사</button>
-    ${typeof navigator !== 'undefined' && navigator.share ? '<button class="btn ghost" type="button" data-share="native">공유하기</button>' : ''}
-    ${KAKAO_KEY ? '<button class="btn kakao" type="button" data-share="kakao">카카오톡 공유</button>' : ''}
-    <span class="toast" role="status" aria-live="polite"></span>
-  </section>
-  <p class="hint">공유 링크에는 생년월일시가 주소의 # 뒤에 담깁니다. 이 부분은 서버로 전송되지 않지만, 링크를 받은 사람은 볼 수 있습니다.</p>`;
-}
 
 let kakaoReady = null;
 function loadKakao() {
@@ -25,26 +17,71 @@ function loadKakao() {
   return kakaoReady;
 }
 
-export function wireShare(root, { hash, title, name }) {
-  const url = `${location.origin}${location.pathname}${hash}`;
-  const toast = root.querySelector('.share .toast');
-  const say = (m) => { if (toast) toast.textContent = m; };
-  root.querySelectorAll('[data-share]').forEach((btn) => btn.addEventListener('click', async () => {
-    const kind = btn.dataset.share;
-    const text = `${name ? `${name}님의 ` : ''}${title} 결과`;
-    if (kind === 'copy') {
-      try { await navigator.clipboard.writeText(url); say('링크를 복사했습니다.'); } catch (e) { window.prompt('아래 링크를 복사하세요', url); }
-    } else if (kind === 'native') {
-      try { await navigator.share({ title: text, url }); } catch (e) { /* 사용자가 취소 */ }
-    } else if (kind === 'kakao') {
+const enc = encodeURIComponent;
+export function resultShareHtml() {
+  return `<section class="share-bar result-share" aria-label="결과 공유">
+    <span class="share-k">결과 공유</span>
+    ${KAKAO_KEY ? '<button class="sbtn kakao" type="button" data-share="kakao">카카오톡</button>' : ''}
+    ${navigator.share ? '<button class="sbtn" type="button" data-share="native">공유하기</button>' : ''}
+    <button class="sbtn" type="button" data-share="copy">링크 복사</button>
+    <a class="sbtn" data-share="x" target="_blank" rel="noopener">X</a>
+    <a class="sbtn" data-share="facebook" target="_blank" rel="noopener">페이스북</a>
+    <button class="sbtn strong" type="button" data-share="image">이미지 저장</button>
+    <span class="toast" role="status" aria-live="polite"></span>
+  </section>
+  <p class="hint">공유 링크에는 생년월일시가 담기지 않고, 결과 요약(점수·제목·입력한 이름)만 담깁니다.</p>`;
+}
+
+// el: 공유 바, opts: { url, title, text, kind, card }
+export function wireShare(el, opts) {
+  const say = (m) => { const t = el.querySelector('.toast'); if (t) t.textContent = m; };
+  const x = el.querySelector('[data-share="x"]');
+  if (x) x.href = `https://twitter.com/intent/tweet?text=${enc(opts.title)}&url=${enc(opts.url)}`;
+  const fb = el.querySelector('[data-share="facebook"]');
+  if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${enc(opts.url)}`;
+  if (KAKAO_KEY) { const k = el.querySelector('[data-share="kakao"]'); if (k) k.hidden = false; }
+  if (navigator.share) { const n = el.querySelector('[data-share="native"]'); if (n) n.hidden = false; }
+  el.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-share]');
+    if (!b) return;
+    const method = b.dataset.share;
+    track('share', { method, content_type: opts.kind || 'page', item_id: location.pathname });
+    if (method === 'x' || method === 'facebook' || method === 'band') return; // 링크로 새 창
+    e.preventDefault();
+    if (method === 'copy') {
+      try { await navigator.clipboard.writeText(opts.url); say('링크를 복사했습니다.'); } catch (er) { window.prompt('아래 링크를 복사하세요', opts.url); }
+    } else if (method === 'native') {
+      try { await navigator.share({ title: opts.title, text: opts.text, url: opts.url }); } catch (er) { /* 취소 */ }
+    } else if (method === 'kakao') {
       try {
         const Kakao = await loadKakao();
         Kakao.Share.sendDefault({
           objectType: 'feed',
-          content: { title: text, description: '생년월일시로 보는 사주 오행 운세', imageUrl: `${location.origin}/og-default.png`, link: { mobileWebUrl: url, webUrl: url } },
-          buttons: [{ title: '결과 보기', link: { mobileWebUrl: url, webUrl: url } }],
+          content: { title: opts.title, description: opts.text || '생년월일시로 보는 사주 오행 운세', imageUrl: `${location.origin}${opts.image || '/og-default.png'}`, link: { mobileWebUrl: opts.url, webUrl: opts.url } },
+          buttons: [{ title: opts.card ? '결과 보기' : '바로 가기', link: { mobileWebUrl: opts.url, webUrl: opts.url } }],
         });
-      } catch (e) { say('카카오톡 공유를 불러오지 못했습니다. 링크 복사를 이용해 주세요.'); }
+      } catch (er) { say('카카오톡 공유를 불러오지 못했습니다. 링크 복사를 이용해 주세요.'); }
+    } else if (method === 'image' && opts.card) {
+      say('이미지를 만드는 중입니다…');
+      try {
+        const { drawCard } = await import('./card.js');
+        const blob = await drawCard(opts.card);
+        const file = new File([blob], `ohaeng-${opts.kind || 'result'}.png`, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try { await navigator.share({ files: [file], title: opts.title }); say(''); return; } catch (er) { /* 취소 시 저장으로 */ }
+        }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = file.name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        say('이미지를 저장했습니다.');
+        track('share_image', { content_type: opts.kind });
+      } catch (er) { say('이미지를 만들지 못했습니다.'); }
     }
-  }));
+  });
+}
+
+// 서버가 그린 페이지 공유 바
+export function initPageShare() {
+  document.querySelectorAll('[data-share-page]').forEach((el) => wireShare(el, { url: el.dataset.url, title: el.dataset.title, text: el.dataset.text, kind: 'page' }));
 }
