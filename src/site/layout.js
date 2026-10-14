@@ -4,6 +4,7 @@ import { BRAND } from '../content/brand.js';
 import { esc, attr, abs } from './util.js';
 import { uiIcon } from './icons.js';
 import { ttiNav } from './tti-nav.js';
+import { partnerAdSlot } from './partner-ad.js';
 
 export function navItems(ctx) {
   const y = ctx.today.y;
@@ -143,6 +144,7 @@ ${page.section === '/tti/' ? `${ttiNav(ctx, page.path)}<div class="tti-content" 
 ${ads ? adSlot(ctx, 'bottom') : ''}
 ${page.share === false ? '' : shareBar(page, url)}
 </main>
+${partnerAdSlot(page)}
 <footer class="site-foot">
   <div class="wrap">
     <div class="foot-groups">${foot}</div>
