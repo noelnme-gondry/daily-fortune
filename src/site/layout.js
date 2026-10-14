@@ -8,7 +8,7 @@ export function navItems(ctx) {
   const y = ctx.today.y;
   return [
     ['/today/', '오늘의 운세'], ['/tomorrow/', '내일 운세'], ['/week/', '주간'], ['/month/', '월간'],
-    [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/life-story/', '내 인생 캐릭터'], ['/saju-ranking/', '사주 랭킹'],
+    [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/tojeong/', '무료 토정비결'], ['/life-story/', '내 인생 캐릭터'], ['/saju-ranking/', '사주 랭킹'],
     ['/compatibility/', '궁합'], ['/tti/', '띠별 운세'], ['/manseryeok/', '만세력'], ['/saju/', '사주 백과'],
   ];
 }
@@ -16,7 +16,7 @@ export function navItems(ctx) {
 function footerGroups(ctx) {
   const y = ctx.today.y;
   return [
-    ['운세', [['/today/', '오늘의 운세'], ['/tomorrow/', '내일의 운세'], ['/week/', '이번 주 운세'], ['/month/', '이달의 운세'], [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/compatibility/', '사주 궁합']]],
+    ['운세', [['/today/', '오늘의 운세'], ['/tomorrow/', '내일의 운세'], ['/week/', '이번 주 운세'], ['/month/', '이달의 운세'], [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/tojeong/', '무료 토정비결'], ['/compatibility/', '사주 궁합']]],
     ['재미로 보는 사주', [['/life-story/', '사주로 본 내 인생은?'], ['/saju-ranking/', '내 사주 랭킹'], ['/saju/ilju-ranking/', '60일주 랭킹']]],
     ['띠·만세력', [['/tti/', '띠별 운세'], ['/tti/today/', '띠별 오늘의 운세'], [`/tti/${y}/`, `${y}년 띠별 운세`], ['/tti/samjae/', '삼재 띠 계산'], ['/tti/compatibility/', '띠 궁합표'], ['/manseryeok/', '만세력 계산기'], [`/manseryeok/${y}/`, `${y}년 만세력`]]],
     ['사주 백과', [['/saju/ilju/', '60일주'], ['/saju/ilgan/', '일간 10가지'], ['/saju/sipsin/', '십신'], ['/saju/ohaeng/', '오행'], ['/saju/sinsal/', '신살'], ['/saju/12unseong/', '12운성'], ['/saju/glossary/', '사주 용어 사전'], ['/saju/guide/', '사주 보는 법']]],
@@ -35,12 +35,12 @@ export function graph(page, ctx) {
   const org = { '@type': 'Organization', '@id': `${ctx.site}/#org`, name: SITE.name, alternateName: [SITE.alt, SITE.searchName], url: `${ctx.site}/`, logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png`, width: 512, height: 512 } };
   const nodes = [org];
   if (page.path === '/') {
-    nodes.push({ '@type': 'WebSite', '@id': `${ctx.site}/#website`, url: `${ctx.site}/`, name: SITE.name, alternateName: [SITE.alt, SITE.searchName], description: SITE.description, inLanguage: 'ko-KR', publisher: { '@id': `${ctx.site}/#org` } });
+    nodes.push({ '@type': 'WebSite', '@id': `${ctx.site}/#website`, url: `${ctx.site}/`, name: SITE.name, alternateName: [SITE.alt, SITE.searchName], description: SITE.description, inLanguage: 'ko-KR', isAccessibleForFree: true, publisher: { '@id': `${ctx.site}/#org` } });
   }
   const webpage = {
     '@type': page.pageType || 'WebPage', '@id': `${url}#webpage`, url, name: page.title, description: page.description, inLanguage: 'ko-KR',
     isPartOf: { '@type': 'WebSite', '@id': `${ctx.site}/#website`, name: SITE.name, url: `${ctx.site}/` },
-    dateModified: page.modified || ctx.buildDate,
+    dateModified: page.modified || ctx.buildDate, isAccessibleForFree: true,
   };
   if (page.crumbs && page.crumbs.length) {
     const all = [['홈', '/'], ...page.crumbs];
@@ -85,7 +85,7 @@ export function layout(page, ctx) {
   const img = `${ctx.site}${page.ogImage || '/og-default.png'}`;
   const cfg = ctx.cfg;
   const ads = cfg.adsense && !page.noAds;
-  const nav = navItems(ctx).map(([p, n], i) => `<a class="${[4, 7, 10, 11].includes(i) ? 'nav-start' : ''}" href="${p}"${page.path === p || (p !== '/' && page.section === p) ? ' aria-current="page"' : ''}>${esc(n)}</a>`).join('');
+  const nav = navItems(ctx).map(([p, n]) => `<a class="${[`/year/${ctx.today.y}/`, '/life-story/', '/tti/', '/manseryeok/'].includes(p) ? 'nav-start' : ''}" href="${p}"${page.path === p || (p !== '/' && page.section === p) ? ' aria-current="page"' : ''}>${esc(n)}</a>`).join('');
   const foot = footerGroups(ctx).map(([h, links]) => `<div><h2>${esc(h)}</h2><ul>${links.map(([p, n]) => `<li><a href="${p}">${esc(n)}</a></li>`).join('')}</ul></div>`).join('');
   const ld = JSON.stringify(graph(page, ctx)).replace(/</g, '\\u003c');
   return `<!doctype html>

@@ -193,6 +193,9 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .home-intro { display: grid; gap: 12px; padding-top: 8px; }
 .home-discovery { display: grid; gap: 28px; min-width: 0; }
 .home-intro h1 { font-size: clamp(27px, 3.3vw, 36px); }
+.home-tools { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 1000px) { .home-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .home-tools { grid-template-columns: minmax(0, 1fr); } }
 .home-features { display: grid; gap: 10px; }
 .home-feature { display: grid; grid-template-columns: 64px minmax(0, 1fr) 20px; align-items: center; gap: 14px; padding: 12px; text-decoration: none; color: var(--ink); }
 .home-feature:hover { border-color: var(--accent); background: var(--accent-soft); }
@@ -221,6 +224,29 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 /* 계산기 */
 .tool { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start; }
 .tool-home { grid-template-columns: minmax(0, 1fr); }
+.tojeong-layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); align-items: start; gap: 24px; }
+.tojeong-years { display: flex; flex-wrap: wrap; gap: 10px; }
+.tojeong-result { display: grid; gap: 20px; min-width: 0; }
+.tojeong-empty { display: grid; gap: 16px; padding: 28px; }
+.tojeong-empty ul { margin: 0; padding-left: 20px; }
+.tojeong-heading { display: flex; align-items: center; gap: 18px; }
+.tojeong-heading h2 { font-size: clamp(21px, 3vw, 28px); }
+.tojeong-code { flex: none; padding: 14px 16px; border: 1px solid var(--accent); border-radius: var(--r); color: var(--accent); background: var(--accent-soft); font: 700 34px/1.2 var(--f-display); font-variant-numeric: tabular-nums; }
+.tojeong-months { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.tojeong-months button { display: grid; gap: 2px; padding: 12px 4px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); cursor: pointer; }
+.tojeong-months button span { font-size: 12px; color: var(--ink-2); }
+.tojeong-months button:hover { border-color: var(--accent); }
+.tojeong-months button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.tojeong-month-detail { padding-top: 18px; border-top: 1px solid var(--line); }
+.tojeong-month-detail h3 { margin-bottom: 14px; }
+.tojeong-calculation { display: grid; margin: 0; }
+.tojeong-calculation > div { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.tojeong-calculation > div:last-child { border-bottom: 0; }
+.tojeong-calculation dt { font-weight: 600; color: var(--accent); }
+.tojeong-calculation dd { margin: 0; }
+.tojeong-calculation dd:last-child { color: var(--ink-2); font-size: 13px; }
+@media (max-width: 900px) { .tojeong-layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 480px) { .tojeong-months { grid-template-columns: repeat(4, minmax(0, 1fr)); } .tojeong-heading { align-items: flex-start; gap: 12px; } .tojeong-code { font-size: 28px; padding: 10px; } }
 .tool-pair { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 900px) { .tool { grid-template-columns: minmax(0, 1fr); } }
 .pform { padding: 20px; display: grid; gap: 16px; align-content: start; }

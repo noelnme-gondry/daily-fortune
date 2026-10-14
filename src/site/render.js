@@ -2,7 +2,8 @@
 import { todayKST, isoDate, ANIMAL_SLUG, STEM_SLUG, TG_SLUG, EL_SLUG, sexagenary, iljuSlug, pillarKo, pillarH, pillarLabel, yearPillar, ANIMAL } from '../engine/index.js';
 import { SINSAL, ILJU_TAG, SIPSIN, GLOSSARY } from '../content/knowledge.js';
 import T from '../content/text.js';
-import { SITE, TOOLS, ABOUT, TTI_COPY } from '../content/pages.js';
+import { SITE, TOOLS, ABOUT, TTI_COPY, FREE_ACCESS } from '../content/pages.js';
+import { TOJEONG } from '../content/tojeong.js';
 import { layout } from './layout.js';
 import { esc } from './util.js';
 import * as tools from './pages/tools.js';
@@ -10,6 +11,7 @@ import * as saju from './pages/saju.js';
 import * as tti from './pages/tti.js';
 import * as manse from './pages/manse.js';
 import * as info from './pages/info.js';
+import { tojeongPage } from './pages/tojeong.js';
 import { sharePage } from './pages/share.js';
 import { config } from './config.js';
 
@@ -29,6 +31,8 @@ function routeTable(ctx) {
   add('/month/', tools.month, { p: 0.8, cf: 'monthly', daily: true });
   add('/year/', tools.yearHub, { p: 0.7 });
   for (const yr of years) add(`/year/${yr}/`, (c) => tools.yearPage(yr, c), { p: 0.9 });
+  add('/tojeong/', tojeongPage, { p: 0.9 });
+  for (const yr of years) add(`/tojeong/${yr}/`, (c) => tojeongPage(c, yr), { p: 0.9 });
   add('/lifetime/', tools.lifetime, { p: 0.9 });
   add('/compatibility/', tools.compatibility, { p: 0.9 });
   add('/life-story/', tools.story, { p: 0.9 });
@@ -126,7 +130,7 @@ export function createSite({ site, assets, now = Date.now() }) {
   };
 }
 
-/* ── GEO: llms.txt (https://llmstxt.org) ───────────────────────────── */
+/* ── 보조 요약: llms.txt (검색·AI 인용을 보장하는 규격은 아님) ───── */
 function llmsTxt(ctx, routes, page) {
   const { site } = ctx;
   const y = ctx.today.y;
@@ -139,12 +143,14 @@ function llmsTxt(ctx, routes, page) {
 ${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일시와 성별로 사주 원국(년주·월주·일주·시주)을 세우고, 기간의 간지(일진·월운·세운·대운)가 원국과 맺는 십신·합충형·12운성·신살·용신 관계를 0~100점 점수와 해설로 바꿉니다. 같은 입력이면 항상 같은 결과가 나오며(난수 미사용), 계산은 사용자의 브라우저에서 이루어집니다. 계산 규칙은 ${site}/about/ 에 공개되어 있습니다.
 
 주요 사실:
+- 이용 요금: ${FREE_ACCESS.description}
+- 무료 토정비결은 음력 생년월일로 144괘를 구해 총운과 음력 12개월 한글 해설을 모두 제공합니다. 생시·성별을 사용하지 않으며 사주 신년운세와 별도 계산입니다. ${site}/tojeong/
 - 년주는 입춘, 월주는 절기 절입 시각으로 바뀝니다. 시진 선택은 해당 지지의 대표 시각으로 계산하며 밤 자시는 다음 날 일주를 사용합니다. 기존 정확한 시각 입력은 동경 127.5° 평균태양시(한국 표준시 −30분) 보정 후 밤 11시 30분부터 다음 날 자시로 계산합니다.
 - 한국 서머타임(1948–51, 1955–60, 1987–88)과 1954–61년 UTC+8:30 표준시를 보정합니다. 음력은 한국천문연구원 기준입니다.
 - ${y}년은 ${pillarLabel(yearPillar(y))}년, ${y + 1}년은 ${pillarLabel(yearPillar(y + 1))}년입니다.
 
 ## 운세 계산기
-${pick((p) => ['/today/', '/tomorrow/', '/week/', '/month/', `/year/${y}/`, `/year/${y + 1}/`, '/lifetime/', '/compatibility/', '/manseryeok/'].includes(p))}
+${pick((p) => ['/today/', '/tomorrow/', '/week/', '/month/', `/year/${y}/`, `/year/${y + 1}/`, '/tojeong/', `/tojeong/${y}/`, `/tojeong/${y + 1}/`, '/lifetime/', '/compatibility/', '/manseryeok/'].includes(p))}
 
 ## 재미로 보는 사주
 ${pick((p) => ['/life-story/', '/saju-ranking/', '/saju/ilju-ranking/'].includes(p))}
@@ -171,6 +177,8 @@ function llmsFull(ctx) {
   const out = [`# ${SITE.name} 전체 요약`, '', `> ${SITE.description}`, '', `출처: ${site}/ · 최종 업데이트 ${CONTENT_UPDATED}`, ''];
   out.push('## 계산 방법', '', ABOUT.lead, '');
   for (const s of ABOUT.sections) { out.push(`### ${s.h}`, ...s.items.map((i) => `- ${i}`), ''); }
+  out.push('## 무료 토정비결', '', TOJEONG.lead, TOJEONG.convention, TOJEONG.readingNote, TOJEONG.editionNote, `이용: ${site}/tojeong/`, `해설 출처 (MIT): ${TOJEONG.source}`, '');
+  for (const f of TOJEONG.faq) out.push(`### ${f.q}`, f.a, '');
   out.push('## 사주 용어 사전', '');
   for (const g of GLOSSARY) out.push(`- **${g.term}(${g.hanja})**: ${g.def}`);
   out.push('', '## 일간 10가지', '');
