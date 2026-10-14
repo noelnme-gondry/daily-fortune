@@ -169,6 +169,7 @@ export async function mount(root) {
     showError('');
     let html = '';
     let res;
+    let leaderRank;
     if (!pair) html += chartCard(ca, a, today);
     html += navTabs(tabMode, today);
     if (mode === 'today') { res = day(ca, today, 'today'); html += dayView(res); }
@@ -180,13 +181,18 @@ export async function mount(root) {
     else if (mode === 'compatibility') { res = compat(ca, cb, today); html += compatView(res, ca, cb, today); }
     else if (mode === 'manseryeok') { html += manseView(ca); }
     else if (mode === 'story') { res = lifeStory(ca, today); html += storyView(res, ca); }
-    else if (mode === 'rank') { res = sajuRank(ca, RANK_TABLE); html += rankView(res, ca); }
+    else if (mode === 'rank') {
+      res = sajuRank(ca, RANK_TABLE);
+      // 밤 자시·절기 경계도 시간 제외 입력과 일치하도록 생년월일에서 다시 계산한다.
+      leaderRank = sajuRank(buildChart(toEngine({ ...a, noTime: true })), RANK_TABLE);
+      html += rankView(res, ca, leaderRank);
+    }
     const share = shareFor(mode, res, ca, cb, today, yr);
     if (share) html += resultShareHtml();
     if (pair) html += compatMatchesShell(ca, cb);
     stopMatches?.();
     renderResultWithPartnerAd(out, html);
-    if (mode === 'rank') mountRankLeaders($('.rank-leaders', out), res);
+    if (mode === 'rank') mountRankLeaders($('.rank-leaders', out), leaderRank);
     if (pair) stopMatches = mountCompatMatches($('.compat-matches', out), { a: toEngine(a), b: toEngine(b) }, { a: ca, b: cb }, today);
     root.classList.add('has-result');
     if (share) wireShare($('.result-share', out), share);

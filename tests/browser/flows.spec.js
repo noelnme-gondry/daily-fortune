@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { todayKST } from '../../src/engine/core.js';
-import { buildChart, lifetime, month, year } from '../../src/engine/index.js';
+import { buildChart, lifetime, month, year, sajuRank } from '../../src/engine/index.js';
 import { navItems } from '../../src/site/layout.js';
 import { BRAND } from '../../src/content/brand.js';
 import LEADERS from '../../src/content/rank-leaders.js';
+import RANK_TABLE from '../../src/content/rank-table.js';
 
 test.beforeEach(async ({ context }) => {
   await context.route('https://**/*', (route) => route.abort());
@@ -366,13 +367,13 @@ test('랭킹 분야 변경 · 실제 상위 5개 · 비교 상세', async ({ pag
   await expect(page.locator('dialog[open]')).toHaveCount(0);
 });
 
-test('명예의 전당은 모든 분야에서 1위부터 나오고 내 생일과 성별에 따라 바뀌지 않는다', async ({ page }) => {
+test('명예의 전당은 시간 제외 기준으로 고정되고 모든 분야에서 내 생일·성별·시간 유무와 무관하다', async ({ page }) => {
   await ready(page, '/saju-ranking/');
   await calculateExact(page);
   for (const kind of ['four', 'three']) {
     await page.locator('#a-notime').setChecked(kind === 'three');
     await page.locator('button[type="submit"]').click();
-    for (const [category, rows] of Object.entries(LEADERS[kind])) {
+    for (const [category, rows] of Object.entries(LEADERS.three)) {
       await page.locator('[data-leader-category]').selectOption(category);
       const panel = page.locator(`[data-leader-panel="${category}"]`);
       await expect(panel).toBeVisible();
@@ -403,8 +404,45 @@ test('명예의 전당은 모든 분야에서 1위부터 나오고 내 생일과
   const dialog = page.getByRole('dialog');
   await expect(dialog).toHaveAccessibleName('종합 2위 · 경오일주');
   await expect(dialog.locator('.leader-birth')).toContainText('일치하는 양력 출생일은 미확인');
-  await expect(dialog.locator('.leader-pillars dd')).toHaveCount(4);
+  await expect(dialog.locator('.leader-pillars dd')).toHaveCount(3);
   await expect(dialog.locator('.comparison')).toContainText('88.8점');
+});
+
+test('개인 랭킹은 출생시간을 반영하고 명예의 전당 비교 점수는 밤 자시·시간 모름에도 같은 날짜 기준이다', async ({ page }) => {
+  await ready(page, '/saju-ranking/');
+  await calculateExact(page);
+  const input = { gender: 'F', calendar: 'solar', y: 1993, m: 1, d: 28 };
+  const comparison = sajuRank(buildChart({ ...input, time: null }), RANK_TABLE);
+  const cases = [{ time: '03:40' }, { time: null }, { time: '23:40' }, { timeBranch: 'n0' }];
+  for (const time of cases) {
+    await page.locator('#a-notime').setChecked(time.time === null);
+    if (time.timeBranch) {
+      await page.locator('input[name="a-tmode"][value="branch"]').check();
+      await page.locator('#a-branch').selectOption(time.timeBranch);
+    } else if (time.time) {
+      await page.locator('input[name="a-tmode"][value="exact"]').check();
+      await page.locator('#a-time').fill(time.time);
+    }
+    await page.locator('button[type="submit"]').click();
+    const personal = sajuRank(buildChart({ ...input, ...time }), RANK_TABLE);
+    await expect(page.locator('.rank-head .rank-num')).toHaveText(`${personal.rank.toLocaleString('ko-KR')}위`);
+    await expect(page.locator('.rank-head + .box h3 .num')).toHaveText(String(personal.total));
+    await expect(page.locator('.rank-leaders > .hint')).toContainText('출생시간을 제외');
+    for (const [category, rows] of Object.entries(LEADERS.three)) {
+      await page.locator('[data-leader-category]').selectOption(category);
+      await page.locator(`[data-leader-panel="${category}"] .leader-button`).first().click();
+      const dialog = page.getByRole('dialog');
+      const score = category === 'total' ? comparison.total : comparison.cats.find((c) => c.key === category).score;
+      await expect(dialog.locator('.comparison b')).toHaveText([`${rows[0].score}점`, `${score}점`]);
+      await expect(dialog.locator('.comparison')).toContainText('시간 제외');
+      await expect(dialog.locator('.leader-pillars dt')).toHaveText(['년주', '월주', '일주']);
+      await page.keyboard.press('Escape');
+    }
+  }
+  await page.reload();
+  await expect(page.locator('.rank-head')).toContainText('4기둥 기준');
+  await page.locator('[data-leader-panel="total"] .leader-button').first().click();
+  await expect(page.getByRole('dialog').locator('.comparison b')).toHaveText([`${LEADERS.three.total[0].score}점`, `${comparison.total}점`]);
 });
 
 test('명예의 전당 20페이지는 100개를 중복 없이 보여주며 하단 이동·포커스·모바일 폭을 지킨다', async ({ page }) => {
@@ -415,7 +453,7 @@ test('명예의 전당 20페이지는 100개를 중복 없이 보여주며 하�
   for (let number = 1; number <= 20; number++) {
     await section.getByRole('button', { name: `${number}페이지`, exact: true }).click();
     await expect(section.locator('.leader-button')).toHaveCount(5);
-    const expected = LEADERS.four.total.slice((number - 1) * 5, number * 5);
+    const expected = LEADERS.three.total.slice((number - 1) * 5, number * 5);
     await expect(section.locator('.leader-score')).toHaveText(expected.map((r) => `${r.score}점`));
     ids.push(...await section.locator('.leader-button').evaluateAll((buttons) => buttons.map((b) => b.getAttribute('aria-controls'))));
     await expect(section.locator('.ranking-pagination [aria-current="page"]')).toHaveText(String(number));
@@ -426,7 +464,7 @@ test('명예의 전당 20페이지는 100개를 중복 없이 보여주며 하�
   const lastId = await last.getAttribute('aria-controls');
   await last.click();
   await expect(page.locator('dialog[open]')).toHaveAttribute('id', lastId);
-  await expect(page.locator('dialog[open] .comparison')).toContainText(`${LEADERS.four.total[99].score}점`);
+  await expect(page.locator('dialog[open] .comparison')).toContainText(`${LEADERS.three.total[99].score}점`);
   await page.keyboard.press('Escape');
   await expect(last).toBeFocused();
   await section.getByRole('button', { name: '1페이지', exact: true }).click();
@@ -452,7 +490,7 @@ test('명예의 전당 20페이지는 100개를 중복 없이 보여주며 하�
   }
 });
 
-test('랭킹 날짜·시진·장단점과 감점별 개운 가이드가 실제 진입 경로에 연결된다', async ({ page }) => {
+test('랭킹 날짜·년월일주·장단점과 감점별 개운 가이드가 실제 진입 경로에 연결된다', async ({ page }) => {
   await ready(page, '/saju-ranking/');
   await calculateExact(page);
   const guidance = page.locator('.rank-guidance');
@@ -461,17 +499,17 @@ test('랭킹 날짜·시진·장단점과 감점별 개운 가이드가 실제 �
   await expect(guidance.locator('.repair-list article').first()).toContainText('평균 대비 -');
   expect(await guidance.evaluate((el) => !!(el.compareDocumentPosition(document.querySelector('.rank-leaders')) & window.Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
   const top = page.locator('[data-leader-panel="total"] .leader-button').first();
-  await expect(top).toContainText('양력 1997년 1월 27일');
-  await expect(top).toContainText('자시');
+  await expect(top).toContainText('양력 1955년 7월 8일');
+  await expect(top).not.toContainText('시진');
   await page.setViewportSize({ width: 390, height: 844 });
   await top.click();
   const dialog = page.locator('dialog[open]');
-  await expect(dialog.locator('.leader-pillars dt')).toHaveText(['년주', '월주', '일주', '시주']);
+  await expect(dialog.locator('.leader-pillars dt')).toHaveText(['년주', '월주', '일주']);
   await expect(dialog).toContainText('이 사주의 장점');
   await expect(dialog).toContainText('단점·보완할 점');
   await expect(dialog.locator('.leader-categories > div')).toHaveCount(5);
-  await expect(dialog.locator('.rank-calculation')).toContainText('종합 96.2점');
-  await expect(dialog.locator('[data-rank-part]')).toHaveText(['25점', '19.74점', '12.47점', '13점', '14점', '0점', '0점']);
+  await expect(dialog.locator('.rank-calculation')).toContainText('종합 90.1점');
+  await expect(dialog.locator('[data-rank-part]')).toHaveText(['25점', '17.5점', '12.62점', '12.5점', '10.5점', '0점', '0점']);
   expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
   await page.keyboard.press('Escape');
   await expect(top).toBeFocused();
