@@ -1,0 +1,306 @@
+{
+  "tool": "built-in image_gen",
+  "style": "귀여운 2등신 카툰",
+  "assets": [
+    {
+      "key": "shield",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: independent warrior with round shield. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-5762645e-8203-46ae-84da-7c9ca175b140.png"
+    },
+    {
+      "key": "sword",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: competitive swordsman with chunky wooden sword. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-76ae3ad3-d64c-4afe-ae60-aeb5544895e6.png"
+    },
+    {
+      "key": "lute",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: cheerful bard holding lute and snack basket. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-feee18c8-692e-4aa0-8ada-e6236213de92.png"
+    },
+    {
+      "key": "spark",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: witty storyteller with folding fan. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-1c3a0cae-d4b7-45de-b2f7-9da3c8f938c5.png"
+    },
+    {
+      "key": "compass",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: adventurous merchant with huge travel pack and map. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-d5a51852-cb7e-4e4d-bd00-3a186141c343.png"
+    },
+    {
+      "key": "coin",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: careful treasurer holding abacus and coin chest. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-9da6d5c6-39cf-40d1-811a-dc127f613e49.png"
+    },
+    {
+      "key": "flame",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: resilient general in chunky armor with red banner. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-ff5eb7d8-aa11-4f68-8c70-bf0340847574.png"
+    },
+    {
+      "key": "crown",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: honorable knight with ceremonial sword and tiny crown. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-ca15b74c-1339-4d10-bc36-6ace36456628.png"
+    },
+    {
+      "key": "flask",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: mysterious alchemist with glowing flask and herb pouch. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-eec42443-d0ba-49ed-bb60-c368fa2b599f.png"
+    },
+    {
+      "key": "book",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: wise sage with tiny spectacles, scrolls and thick book. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-74e18937-c450-41ac-95ac-04697f227211.png"
+    },
+    {
+      "key": "beggar",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: penniless wandering adventurer with patched clothes, empty purse, walking stick and comical embarrassed but hopeful expression. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-12b8d41c-90a7-4801-80fb-80af9113ad7e.png"
+    },
+    {
+      "key": "ranger",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: forest ranger with a leaf hood, short bow and tiny binoculars. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-3f709127-d7d0-454f-9e7d-9d5348c29fe9.png"
+    },
+    {
+      "key": "monk",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: barehanded martial artist with headband, bandaged fists and training dummy. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-38503f72-cd80-44e8-b050-f8909019d76f.png"
+    },
+    {
+      "key": "ferryman",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: river ferryman with broad straw hat, bamboo pole and tiny wooden boat. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-be124d01-1432-4950-87d2-9807fca2d0c3.png"
+    },
+    {
+      "key": "beastkeeper",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: friendly beast keeper with a fluffy baby tiger companion and food pouch. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-059f3dcc-da87-47e6-a7d4-3dd368a8de53.png"
+    },
+    {
+      "key": "rogue",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: mischievous rooftop folk rogue with eye mask, hook rope and jingling pouch. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-9c5935b8-0102-4b1d-a68a-0ccc20fe3226.png"
+    },
+    {
+      "key": "gambler",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: comical dice player with oversized wooden dice, fan and empty betting bowl, no modern casino. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-ef68f92f-63dd-4674-b7e2-5f94d381d134.png"
+    },
+    {
+      "key": "wrestler",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: stocky Korean folk wrestler with red belt, rice cake snack and determined eyebrows. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-1be257bb-a967-43de-80e8-e921de6a3d30.png"
+    },
+    {
+      "key": "corsair",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: tiny playful fantasy pirate captain with patchwork sail, spyglass and toy-sized saber. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-ffbef7a4-8023-4f6d-98c0-a1bf4b6822c6.png"
+    },
+    {
+      "key": "chef",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: cheerful dumpling chef with enormous steaming pot, ladle and flour dust. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-2bd56815-4b42-4cd1-a532-d3baa4ab1bf3.png"
+    },
+    {
+      "key": "gardener",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: peach orchard gardener with straw bonnet, watering can and basket of peaches. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-5bf53aeb-8ea3-4111-a0a1-c030c74710e0.png"
+    },
+    {
+      "key": "potter",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: ceramic potter with small pottery wheel, clay-covered hands and lopsided moon jar. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-15eba450-5aa6-4f6c-aa43-ae7ee7620fe7.png"
+    },
+    {
+      "key": "brewer",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: traditional rice brew maker with earthen jars, grain basket and cheerful round face. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-b0f35773-0133-4b57-a7d2-0c805f84f00b.png"
+    },
+    {
+      "key": "jester",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: Korean mask dance jester holding a grinning wooden mask, bells and ribbon sleeves. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-e61ab456-9408-4c6b-a388-1618ffbfba2b.png"
+    },
+    {
+      "key": "inventor",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: eccentric clockwork inventor with tiny wooden robot, goggles and wind-up key. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-27212143-e31d-45b8-b9db-386fbc166f71.png"
+    },
+    {
+      "key": "painter",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: ink painter with oversized brush, ink pot and mischievous ink splash on cheek. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-d19cf19f-57f1-47ea-be95-c44898eef61c.png"
+    },
+    {
+      "key": "acrobat",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: cute tightrope acrobat with balancing fan, colorful ribbon and low practice rope. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-6fb14acd-6420-48b8-ab19-32c067163d7c.png"
+    },
+    {
+      "key": "treasurehunter",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: ruins treasure hunter with shovel, crumpled treasure map and tiny ancient chest. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-22803c72-d212-4acb-9daf-586d65d587df.png"
+    },
+    {
+      "key": "caravan",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: silk road caravan merchant with rolled fabrics, abacus and small overloaded cart. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-99284fa5-ae50-4c61-869b-bbce86b5916e.png"
+    },
+    {
+      "key": "seacaptain",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: star navigating sea captain with compass, star chart and miniature ship wheel. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-f888b1be-28e8-4313-816a-835f39c1f26f.png"
+    },
+    {
+      "key": "innkeeper",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: warm crossroads innkeeper carrying food tray, wooden sign without lettering and lantern. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-7156e28d-6113-4a76-bd98-4abcbf9c2228.png"
+    },
+    {
+      "key": "smith",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: blacksmith with chunky hammer, small anvil and comical soot marks. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-132d765e-abdf-48d7-8a75-3ef17107127d.png"
+    },
+    {
+      "key": "tailor",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: silk tailor with giant spool, pincushion and patterned patchwork robe. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-47e64299-47c0-4328-b0cc-e547dba8af66.png"
+    },
+    {
+      "key": "farmer",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: rice farmer with straw hat, rice bundle and hoe, muddy boots. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-d05d750c-4d62-4243-9a89-f6cf5e3ff229.png"
+    },
+    {
+      "key": "accountant",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: meticulous ledger accountant with large abacus, scroll accounts without writing and tiny spectacles. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-9fd3a2e0-89a4-4abb-867f-49bbfe9ff1e8.png"
+    },
+    {
+      "key": "demonhunter",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: friendly dawn exorcist with paper talismans without text, bell and tiny harmless ghost. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-232cf8bf-93d8-402f-bbc0-6a34b0567e4c.png"
+    },
+    {
+      "key": "guard",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: castle gate guard with oversized spear, padded armor and heavy keyring. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-fb49e5b9-56ce-4e83-8969-a60511db4fd8.png"
+    },
+    {
+      "key": "firefighter",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: historical fantasy fire rescuer with water bucket, rope coil and soot-covered helmet. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-5884ad63-95a4-4f62-8102-01831dfad637.png"
+    },
+    {
+      "key": "courier",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: swift relay courier with scroll satchel, small horse hobby stick and windblown scarf. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-54371666-7b07-4d74-a88e-92ed09db2d7d.png"
+    },
+    {
+      "key": "magistrate",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: village magistrate with traditional official hat, wooden seal and balance scales. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-b8c1e679-6a1a-458c-93dc-b5e8bace81cf.png"
+    },
+    {
+      "key": "diplomat",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: peace envoy in neat silk robe carrying olive-like branch, ceremonial fan and document tube. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-1b1587e2-3d74-4184-a818-f928bc01667e.png"
+    },
+    {
+      "key": "architect",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: fortress architect with rolled blueprints without writing, ruler and tiny castle model. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-1a11a349-a17c-4a91-9d6d-c2635092104d.png"
+    },
+    {
+      "key": "steward",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: royal steward with neat uniform hanbok, keyring and carefully balanced tea tray. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-dde0b3c8-23f1-485a-9b77-54f22fe81d9f.png"
+    },
+    {
+      "key": "stargazer",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: star tower astrologer with oversized telescope, moon hat and star globe. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-68452b2f-31b3-47b0-a336-dbffae46e733.png"
+    },
+    {
+      "key": "puppeteer",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: shadow puppet performer with two tiny wooden marionettes and string controls. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-6a9fae54-ef13-4d66-bc52-4237cae90b9e.png"
+    },
+    {
+      "key": "herbalist",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: mist forest herbalist with mushroom hat, herb basket and tiny mortar. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-dbe40239-767f-4839-a1db-ea66e112cd68.png"
+    },
+    {
+      "key": "tinkerer",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: scrap alchemist with odd pots, patched apron and quirky recycled mechanical bird. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-ff4d827d-26e6-47d5-b7b7-f9de2f8c3d02.png"
+    },
+    {
+      "key": "librarian",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: secret library librarian with tall stack of books, large glasses and rolling ladder. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-793e9368-17d9-442b-b272-b2d00242b5d3.png"
+    },
+    {
+      "key": "teacher",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: village school teacher with gentle face, large blank primer and bamboo pointer. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-15c2d588-7af5-4c07-aa63-d725c108baa9.png"
+    },
+    {
+      "key": "healer",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: forest spring healer with water gourd, herb bandages and small bird companion. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-f1b1402d-142c-42a2-a03f-08faa5919bc9.png"
+    },
+    {
+      "key": "scribe",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: history scribe with large brush, scroll backpack and small seal stamp. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-0f358c04-d98f-40cb-8a2c-92fedbbe2b51.png"
+    },
+    {
+      "key": "brokenblade",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: comical defeated wandering swordsman with snapped wooden sword, patched robe and embarrassed smile. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-b42fadd9-960d-424d-a4e8-43fabb8c9d06.png"
+    },
+    {
+      "key": "hungrychef",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: hungry chef holding a completely empty cooking pot and single tiny radish, hopeful funny face. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-6c8bb902-c929-41a6-b10b-e6317ca26534.png"
+    },
+    {
+      "key": "booedjester",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: unpopular street jester performing for one tiny chicken, patched mask and drooping bells. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-632f2f79-19ad-451c-bdc8-74a622c118bc.png"
+    },
+    {
+      "key": "bankrupt",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: bankrupt merchant with empty broken handcart, inside-out pockets and optimistic sheepish face. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-0bef6d16-90af-4bc7-84fa-1a37f7ba8df1.png"
+    },
+    {
+      "key": "jobseeker",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: unemployed scholar in rumpled hanbok holding blank application scroll, patched socks and instant-looking rice bowl. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-725bd072-8129-4560-a005-9154f6b73f04.png"
+    },
+    {
+      "key": "woundedguard",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: resting soldier with bandaged leg, crutch, oversized helmet and tiny flower tucked in armor. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-cf8cd105-e7e1-411c-8a3c-050b0c00c7bf.png"
+    },
+    {
+      "key": "exiledknight",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: exiled knight with dented empty medal ribbon, rusty toy sword and patched cape, comical hopeful face. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-88b5069a-3b61-40dc-8f19-c0c2e3d116b8.png"
+    },
+    {
+      "key": "exploded",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: alchemist after harmless cartoon explosion with soot face, singed hair, cracked goggles and smoking flask. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-ca3ed3f0-4af1-4f11-a9b9-b4107b03cd8a.png"
+    },
+    {
+      "key": "pennilesssage",
+      "prompt": "Use case: stylized-concept. A cute funny 2D CARTOON CHIBI RPG character sprite for a Korean fortune game. Exactly TWO HEADS TALL, huge round head, tiny squat body, stubby legs and mitten hands, simple dot eyes, expressive thick eyebrows, comical face, bold clean ink outlines, flat cel shading, limited palette of indigo, cream, muted vermilion and warm gold. Subject/role: penniless wandering sage with threadbare robe, one worn book, empty coin purse and warm smile. Korean fantasy hanbok inspired outfit reduced to simple chunky shapes. Full body single figure centered on solid warm ivory #f8f9f5 background, generous padding, square composition. Friendly collectible sticker style. NO realism, NO painterly scenery, NO realistic anatomy, NO long legs, NO glamour, NO text, NO letters, NO UI, NO watermark.",
+      "source": "/Users/gondry/.codex/generated_images/01a1386e-db30-7473-bd2f-71b85545cd31/exec-f145f304-8062-4b60-aaad-75e1ebd091d0.png"
+    }
+  ]
+}
