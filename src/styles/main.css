@@ -551,7 +551,16 @@ p, li { text-wrap: pretty; }
 .faq-item > p { padding: 0 22px 20px; }
 
 /* 띠 아이콘과 모든 띠 페이지에 유지되는 다섯 메뉴 */
-.animal-icon { width: 48px; height: 48px; flex: none; background: var(--accent-soft); border-radius: 14px; padding: 5px; }
+.animal-icon { display: block; width: 48px; height: 48px; flex: none; object-fit: contain; }
+.zodiac-cards { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.zodiac-cards .tti-card { gap: 10px; padding: 16px 14px; }
+.zodiac-cards .animal-icon { width: 64px; height: 64px; justify-self: center; }
+.zodiac-cards .tti-card b { align-items: baseline; }
+.zodiac-cards .tti-card > span { font-size: 13px; }
+.zodiac-hero { display: flex; align-items: flex-start; gap: 20px; }
+.zodiac-hero > .animal-icon { width: 88px; height: 88px; }
+.zodiac-hero > .page-hero { min-width: 0; }
+.chips .animal-icon { width: 32px; height: 32px; }
 .tti-name { align-items: center; }
 .tti-nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
 .tti-nav .link-card { padding: 14px; }
@@ -726,11 +735,15 @@ body:has(dialog[open]) { overflow: hidden; }
 .comparison > div { display: grid; gap: 6px; padding: 18px; background: var(--accent-soft); border-radius: 12px; }
 .comparison b { font-size: 28px; color: var(--accent); }
 @media (max-width: 900px) {
+  .zodiac-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .tti-nav { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .tti-nav > a { grid-column: span 2; }
   .tti-nav > a:nth-last-child(-n+2) { grid-column: span 3; }
 }
 @media (max-width: 560px) {
+  .zodiac-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .zodiac-hero { gap: 12px; }
+  .zodiac-hero > .animal-icon { width: 64px; height: 64px; }
   .job-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .job-card { padding: 8px; }
   .gnav-row { flex-wrap: nowrap; width: max-content; }

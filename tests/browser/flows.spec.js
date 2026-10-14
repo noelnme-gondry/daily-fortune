@@ -238,6 +238,38 @@ test('홈의 주요 콘텐츠가 입력 폼 옆에 보이고 첫 영역이 과�
   }
 });
 
+test('12띠 생성형 심볼이 홈 카드·일별 상세·연간 운세에 로드된다', async ({ page }) => {
+  await page.goto('/');
+  const cards = page.locator('.zodiac-cards .tti-card');
+  await expect(cards).toHaveCount(12);
+  const sources = [];
+  for (const card of await cards.all()) {
+    const img = card.locator('img.animal-icon');
+    await img.scrollIntoViewIfNeeded();
+    await expect.poll(() => img.evaluate((el) => el.naturalWidth)).toBeGreaterThan(0);
+    sources.push(await img.getAttribute('src'));
+  }
+  expect(new Set(sources).size).toBe(12);
+  expect(sources.every((src) => /^\/zodiac\/[a-z]+\.webp$/.test(src))).toBe(true);
+  await page.goto('/tti/today/');
+  await page.locator('.tti-name').first().click();
+  const daily = page.locator('dialog[open] .animal-icon');
+  await expect(daily).toHaveAttribute('src', sources[0]);
+  await expect.poll(() => daily.evaluate((el) => el.naturalWidth)).toBeGreaterThan(0);
+  for (const y of [todayKST().y, todayKST().y + 1]) {
+    await page.goto(`/tti/${y}/`);
+    await expect(page.locator('.zodiac-year-link img.animal-icon')).toHaveCount(12);
+    await page.locator('.zodiac-year-link').first().click();
+    const annual = page.locator('.zodiac-hero .animal-icon');
+    await expect(annual).toHaveAttribute('src', sources[0]);
+    await expect.poll(() => annual.evaluate((el) => el.naturalWidth)).toBeGreaterThan(0);
+  }
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto('/');
+  await page.locator('.zodiac-cards').scrollIntoViewIfNeeded();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+});
+
 test('띠 기본은 오늘 · 쥐띠 상세는 일별 라이트박스 · 다섯 메뉴 유지 및 뒤로가기', async ({ page }) => {
   await page.goto('/tti/');
   await expect(page.locator('h1')).toContainText('오늘');

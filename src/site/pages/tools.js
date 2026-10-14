@@ -225,7 +225,7 @@ export function home(ctx) {
     <section class="box-sec"><div class="sec-head"><h2>띠별 오늘의 운세 · ${o.m}월 ${o.d}일</h2><a href="/tti/today/">해설 보기</a></div>${ttiDayList(o, { short: true })}</section>
     <section class="box-sec"><div class="sec-head"><h2>${y}년 ${pillarLabel(yearPillar(y))}년 띠별 운세</h2><a href="/tti/${y}/">12띠 전체</a></div>
       <p class="muted">${y}년 삼재: ${sj.map((s) => `${ANIMAL[s.tti]}띠(${s.name})`).join(', ')}</p>
-      <div class="cards four">${ty.map((r) => `<a class="card link-card tti-card" href="/tti/${y}/${ANIMAL_SLUG[r.tti]}/"><b>${r.animal}띠 <span class="num">${r.score}</span></b><span>${esc(r.headline)}</span></a>`).join('')}</div></section>
+      <div class="cards zodiac-cards">${ty.map((r) => `<a class="card link-card tti-card" href="/tti/${y}/${ANIMAL_SLUG[r.tti]}/">${animalIcon(r.tti)}<b>${r.animal}띠 <span class="num">${r.score}</span></b><span>${esc(r.headline)}</span></a>`).join('')}</div></section>
     <section class="box-sec"><div class="sec-head"><h2>사주 백과</h2><a href="/saju/">전체 보기</a></div><div class="cards three">
       <a class="card link-card" href="/saju/ilju/"><b>60일주 총정리</b><span>갑자일주부터 계해일주까지 성격·연애·직업</span></a>
       <a class="card link-card" href="/saju/sipsin/"><b>십신 뜻</b><span>비견·식신·정재·정관·정인 등 10가지</span></a>
