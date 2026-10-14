@@ -1,7 +1,7 @@
 // 띠별 운세: 허브, 연도별 12띠, 띠별 상세(출생 연도별), 삼재, 띠 궁합표, 띠별 오늘의 운세
 import { TTI_COPY } from '../../content/pages.js';
 import TT from '../../content/tti.js';
-import { ANIMAL, ANIMAL_SLUG, BR_H, BR_K, pillarLabel, yearPillar, ttiYear, ttiCompat, ttiMatches, samjaeYear, samjaeBranches, fmtDate, ttiMonths, addDays } from '../../engine/index.js';
+import { ANIMAL, ANIMAL_SLUG, BR_H, BR_K, pillarLabel, yearPillar, ttiYear, ttiDay, ttiCompat, ttiMatches, samjaeYear, samjaeBranches, fmtDate, fmtShort, dow, ttiMonths, addDays } from '../../engine/index.js';
 import { esc, faqBlock, faqLd, factTable } from '../util.js';
 import { hero, bandChip, dayBox, ttiDayList } from './tools.js';
 import { animalIcon, uiIcon } from '../icons.js';
@@ -36,6 +36,12 @@ export function yearIndex(y, ctx) {
   return page;
 }
 
+// 출생 연도별 월간 흐름은 서버에서 미리 계산해 넣는다. 브라우저가 사주 엔진을 받지 않아도 된다.
+function cohortData(t, y, r) {
+  const data = { all: ttiMonths(t, y), cohorts: Object.fromEntries(r.cohorts.map((c) => [c.birthYear, { score: c.score, text: c.text, months: ttiMonths(t, y, c.birthYear) }])) };
+  return `<script type="application/json" id="tti-cohort-data">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;
+}
+
 export function animalYear(t, y, ctx) {
   const r = ttiYear(t, y);
   const m = ttiMatches(t);
@@ -60,7 +66,7 @@ export function animalYear(t, y, ctx) {
     ${factTable([['종합 점수', `<span class="num">${r.score}</span>점 ${bandChip(r.score)}`], ['해와의 관계', `${BR_K[r.pillar.b]}(${BR_H[r.pillar.b]}) ↔ ${BR_K[t]}(${BR_H[t]}) · ${r.rel === '없음' ? '특별한 합충 없음' : r.rel}`], ['삼재', r.samjae ? r.samjae.name : '해당 없음'], ['좋은 달', r.goodMonths.length ? r.goodMonths.map((x) => `${x}월`).join(', ') : '—'], ['조심할 달', r.cautionMonths.length ? r.cautionMonths.map((x) => `${x}월`).join(', ') : '—'], ['행운의 색 · 숫자 · 방향', `${r.lucky.color} · ${r.lucky.number} · ${r.lucky.dir}`]], `${name} 핵심 정리`)}
     <section class="cats-static">${r.cats.map((c) => `<article class="cat"><div class="cat-top"><h3>${c.name}</h3>${bandChip(c.score)}<div class="track"><i style="width:${c.score}%"></i></div><span class="num">${c.score}</span></div><p>${esc(c.text)}</p></article>`).join('')}</section>
     <section class="cohort-picker box card"><h2>내 출생 연도로 보기</h2><label for="tti-birth-year">출생 연도<select class="input" id="tti-birth-year" data-cohort data-tti="${t}" data-year="${y}"><option value="">${r.animal}띠 공통 운세</option>${cohorts.map((c) => `<option value="${c.birthYear}">${c.birthYear}년생 · ${c.pillarText}</option>`).join('')}</select></label><p data-cohort-text aria-live="polite">출생 연도를 선택하면 해당 연생의 해석과 월별 점수만 보여드립니다.</p><p class="hint">위 총운·분야별 해석은 띠 공통입니다. 띠는 입춘 기준이므로 1월~2월 초 출생은 앞 띠일 수 있습니다. 개인 원국 전체를 반영한 결과는 사주 운세에서 확인하세요.</p></section>
-    <section class="box-sec"><h2>${y}년 1~12월 운세</h2><p class="hint">각 달 15일의 월운 65% + 연간 점수 35%에 출생 연도의 천간 관계를 반영합니다. 월별 점수는 이 사이트의 해석 규칙이며 통계적 예측값이 아닙니다.</p><div class="monthly-flow" data-monthly-flow>${ttiMonthCards(ttiMonths(t, y))}</div></section>
+    <section class="box-sec"><h2>${y}년 1~12월 운세</h2><p class="hint">각 달 15일의 월운 65% + 연간 점수 35%에 출생 연도의 천간 관계를 반영합니다. 월별 점수는 이 사이트의 해석 규칙이며 통계적 예측값이 아닙니다.</p><div class="monthly-flow" data-monthly-flow>${ttiMonthCards(ttiMonths(t, y))}</div>${cohortData(t, y, r)}</section>
     <p class="cta"><a class="btn" href="/year/${y}/">내 사주로 ${y}년 운세 정확히 보기</a></p>
     ${faqBlock(faq)}
     <nav class="chips" aria-label="다른 띠">${ANIMAL.map((n, i) => `<a class="chip${i === t ? ' on' : ''}" href="/tti/${y}/${ANIMAL_SLUG[i]}/">${animalIcon(i)}${n}띠</a>`).join('')}</nav>
@@ -119,15 +125,39 @@ export function today(ctx) {
   };
 }
 
+// 띠별 오늘·내일: 그 띠만의 점수 근거, 12띠 중 순위, 7일 흐름, 출생 연도, 잘 맞는 띠를 함께 싣는다.
 export function animalDay(t, ctx, tomorrow = false) {
   const date = tomorrow ? addDays(ctx.today, 1) : ctx.today;
   const animal = ANIMAL[t], slug = ANIMAL_SLUG[t], period = tomorrow ? 'tomorrow' : 'today';
   const word = tomorrow ? '내일' : '오늘';
+  const r = ttiDay(t, date);
+  const all = [...Array(12).keys()].map((i) => ttiDay(i, date));
+  const rank = 1 + all.filter((x) => x.score > r.score).length;
+  const top = all.filter((x) => x.tti !== t).sort((a, b) => b.score - a.score)[0];
+  const week = [...Array(7).keys()].map((i) => { const d = addDays(date, i); return { d, score: ttiDay(t, d).score }; });
+  const best = week.slice(1).sort((a, b) => b.score - a.score)[0];
+  const m = ttiMatches(t);
+  const y = ctx.today.y;
+  const births = ttiYear(t, y).cohorts.filter((c) => c.age >= 6 && c.age <= 90).map((c) => c.birthYear);
+  const first = r.text.split(/(?<=[.!?])\s+/)[0];
   return {
     path: `/tti/${period}/${slug}/`, section: '/tti/',
-    title: `${animal}띠 ${word}의 운세 — ${date.m}월 ${date.d}일 상세 해석`,
-    description: `${fmtDate(date)} ${animal}띠 ${word}의 운세. 일진 관계, 오행, 월운에 따른 점수 근거와 행운의 색·숫자를 확인하세요.`,
+    title: `${animal}띠 ${word}의 운세 — ${date.m}월 ${date.d}일 ${r.score}점`,
+    description: `${fmtDate(date)} ${animal}띠 ${word}의 운세 ${r.score}점. ${first} 12띠 중 ${rank}위이며, 앞으로 7일 흐름과 행운의 색·숫자, 잘 맞는 띠를 함께 확인하세요.`,
     crumbs: [['띠별 운세', '/tti/'], [`${animal}띠 ${word} 운세`, `/tti/${period}/${slug}/`]],
-    body: `${hero(`${animal}띠 ${word}의 운세`, `${fmtDate(date)}의 띠별 해석입니다.`)}<article class="box card">${ttiDailyDetail(t, date, word)}</article><a class="btn ghost" href="/tti/today/">12띠 오늘의 운세로 돌아가기</a>`,
+    body: `${hero(`${animal}띠 ${word}의 운세`, `${fmtDate(date)} ${animal}띠는 12띠 가운데 ${rank}위(${r.score}점)입니다. ${top.score > r.score ? `${word} 가장 운이 좋은 띠는 ${top.animal}띠(${top.score}점)입니다.` : `${word}은 ${animal}띠가 가장 운이 좋은 띠입니다.`}`)}
+      <article class="box card">${ttiDailyDetail(t, date, word)}</article>
+      <section class="box card tti-week"><h2>${animal}띠의 앞으로 7일</h2>
+        <ol class="tti-week-list">${week.map((w, i) => `<li${i === 0 ? ' class="is-today"' : ''}><span>${'일월화수목금토'[dow(w.d)]} ${fmtShort(w.d)}</span><i style="--s:${w.score}" aria-hidden="true"></i><b class="num">${w.score}</b>${bandChip(w.score)}</li>`).join('')}</ol>
+        <p class="hint">${best.score >= r.score ? `이번 7일 중에서는 ${best.d.m}월 ${best.d.d}일(${'일월화수목금토'[dow(best.d)]})이 ${best.score}점으로 가장 좋습니다.` : `${word}이 이번 7일 중 가장 좋은 날입니다.`}</p>
+      </section>
+      ${factTable([
+        ['출생 연도', `${births.map((b) => `${b}`).join(' · ')}년생 <small>(1월~2월 초 출생은 입춘 전이라 앞 띠일 수 있습니다)</small>`],
+        ['잘 맞는 띠', m.good.map((g) => `${ANIMAL[g.tti]}띠(${g.rel})`).join(', ')],
+        ['조심할 띠', m.bad.map((g) => `${ANIMAL[g.tti]}띠(${g.rel})`).join(', ')],
+        [`${y}년 · ${y + 1}년 운세`, `<a href="/tti/${y}/${slug}/">${y}년 ${animal}띠 운세</a> · <a href="/tti/${y + 1}/${slug}/">${y + 1}년 ${animal}띠 운세</a>`],
+      ], `${animal}띠 한눈에 보기`)}
+      <nav class="chips" aria-label="다른 띠 ${word} 운세">${ANIMAL.map((n, i) => `<a class="chip${i === t ? ' on' : ''}" href="/tti/${period}/${ANIMAL_SLUG[i]}/">${animalIcon(i)}${n}띠</a>`).join('')}</nav>
+      <a class="btn ghost" href="/tti/today/">12띠 오늘의 운세로 돌아가기</a>`,
   };
 }

@@ -328,6 +328,17 @@ test('연간 띠 운세: 출생 연도 선택 후 12개월과 내 해석만 갱�
   await expect(page.locator('h2').filter({ hasText: '출생 연도별' })).toHaveCount(0);
 });
 
+test('연간 띠 운세는 사주 엔진 없이 연생별 흐름을 보여 주고 저장된 생일로 연도를 고른다', async ({ page }) => {
+  const engine = [];
+  page.on('request', (req) => { if (/\/src\/engine\/(index|chart|calendar|fortune)\.js|lunar-javascript/.test(req.url())) engine.push(req.url()); });
+  await page.addInitScript(() => sessionStorage.setItem('ohaeng:profile', JSON.stringify({ name: '쥐띠', gender: 'M', calendar: 'solar', y: 1996, m: 5, d: 5, timeMode: 'exact', time: '10:00', noTime: false })));
+  await page.goto(`/tti/${todayKST().y}/rat/`);
+  await expect(page.locator('[data-cohort]')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('[data-cohort]')).toHaveValue('1996');
+  await expect(page.locator('[data-cohort-text]')).toContainText('1996년생');
+  expect(engine).toEqual([]);
+});
+
 for (const width of [320, 768, 1024, 1440]) test(`${width}px 실제 도구 경로 · 줄바꿈 · 가로 넘침`, async ({ page }) => {
   await page.setViewportSize({ width, height: 960 });
   const errors = []; page.on('pageerror', (e) => errors.push(e.message));

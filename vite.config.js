@@ -86,6 +86,13 @@ export default defineConfig({
     manifest: true,
     rollupOptions: {
       input: { main: 'src/client/main.js', style: 'src/styles/main.css' },
+      // 거의 바뀌지 않는 달력 라이브러리는 따로 묶어 배포가 바뀌어도 브라우저 캐시를 재사용한다.
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/lunar-javascript')) return 'lunar';
+          if (id.includes('node_modules/korean-lunar-calendar')) return 'korean-lunar';
+        },
+      },
     },
   },
   server: { port: 5173 },

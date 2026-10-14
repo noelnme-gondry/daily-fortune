@@ -608,6 +608,11 @@ p, li { text-wrap: pretty; }
 .tti-factors section { padding: 16px; background: var(--sunk); border-radius: 12px; }
 .tti-factors h3 { font-size: 17px; }
 .tti-factors small { color: var(--ink-2); }
+.tti-week { display: grid; gap: 12px; margin-block: 20px; }
+.tti-week-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tti-week-list li { display: grid; grid-template-columns: 76px minmax(0, 1fr) 30px auto; align-items: center; gap: 10px; font-size: 14px; }
+.tti-week-list li.is-today span { font-weight: 700; color: var(--accent); }
+.tti-week-list i { height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--accent) calc(var(--s) * 1%), var(--sunk) 0); }
 .cohort-picker { display: grid; gap: 10px; }
 .cohort-picker select { max-width: 340px; }
 .monthly-flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
