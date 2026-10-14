@@ -1,6 +1,8 @@
 // 공통 HTML 뼈대: 메타 태그, Open Graph, JSON-LD(@graph), 헤더 내비게이션, 이동 경로, 푸터
 import { SITE } from '../content/pages.js';
 import { esc, attr, abs } from './util.js';
+import { uiIcon } from './icons.js';
+import { ttiNav } from './tti-nav.js';
 
 export function navItems(ctx) {
   const y = ctx.today.y;
@@ -30,10 +32,10 @@ function crumbsHtml(crumbs) {
 
 export function graph(page, ctx) {
   const url = abs(ctx, page.canonicalPath || page.path);
-  const org = { '@type': 'Organization', '@id': `${ctx.site}/#org`, name: SITE.name, alternateName: SITE.alt, url: `${ctx.site}/`, logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png`, width: 512, height: 512 } };
+  const org = { '@type': 'Organization', '@id': `${ctx.site}/#org`, name: SITE.name, alternateName: [SITE.alt, SITE.searchName], url: `${ctx.site}/`, logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png`, width: 512, height: 512 } };
   const nodes = [org];
   if (page.path === '/') {
-    nodes.push({ '@type': 'WebSite', '@id': `${ctx.site}/#website`, url: `${ctx.site}/`, name: SITE.name, alternateName: SITE.alt, description: SITE.description, inLanguage: 'ko-KR', publisher: { '@id': `${ctx.site}/#org` } });
+    nodes.push({ '@type': 'WebSite', '@id': `${ctx.site}/#website`, url: `${ctx.site}/`, name: SITE.name, alternateName: [SITE.alt, SITE.searchName], description: SITE.description, inLanguage: 'ko-KR', publisher: { '@id': `${ctx.site}/#org` } });
   }
   const webpage = {
     '@type': page.pageType || 'WebPage', '@id': `${url}#webpage`, url, name: page.title, description: page.description, inLanguage: 'ko-KR',
@@ -66,12 +68,12 @@ function shareBar(page, url) {
   const u = encodeURIComponent(url);
   return `<section class="share-bar" aria-label="이 페이지 공유" data-share-page data-url="${attr(url)}" data-title="${attr(page.ogTitle || page.title)}" data-text="${attr(page.description)}">
   <span class="share-k">이 페이지 공유</span>
-  <button class="sbtn kakao" type="button" data-share="kakao" hidden>카카오톡</button>
-  <button class="sbtn" type="button" data-share="native" hidden>공유하기</button>
-  <button class="sbtn" type="button" data-share="copy">링크 복사</button>
-  <a class="sbtn" data-share="x" href="https://twitter.com/intent/tweet?text=${t}&amp;url=${u}" target="_blank" rel="noopener">X</a>
-  <a class="sbtn" data-share="facebook" href="https://www.facebook.com/sharer/sharer.php?u=${u}" target="_blank" rel="noopener">페이스북</a>
-  <a class="sbtn" data-share="band" href="https://band.us/plugin/share?body=${t}%0A${u}&amp;route=${encodeURIComponent(url.split('/').slice(0, 3).join('/'))}" target="_blank" rel="noopener">밴드</a>
+  <button class="sbtn kakao" type="button" data-share="kakao" hidden>${uiIcon('kakao')}카카오톡</button>
+  <button class="sbtn" type="button" data-share="native" hidden>${uiIcon('native')}공유하기</button>
+  <button class="sbtn" type="button" data-share="copy">${uiIcon('copy')}링크 복사</button>
+  <a class="sbtn" data-share="x" href="https://twitter.com/intent/tweet?text=${t}&amp;url=${u}" target="_blank" rel="noopener">${uiIcon('x')}X</a>
+  <a class="sbtn" data-share="facebook" href="https://www.facebook.com/sharer/sharer.php?u=${u}" target="_blank" rel="noopener">${uiIcon('facebook')}페이스북</a>
+  <a class="sbtn" data-share="band" href="https://band.us/plugin/share?body=${t}%0A${u}&amp;route=${encodeURIComponent(url.split('/').slice(0, 3).join('/'))}" target="_blank" rel="noopener">${uiIcon('band')}밴드</a>
   <span class="toast" role="status" aria-live="polite"></span>
 </section>`;
 }
@@ -83,7 +85,7 @@ export function layout(page, ctx) {
   const img = `${ctx.site}${page.ogImage || '/og-default.png'}`;
   const cfg = ctx.cfg;
   const ads = cfg.adsense && !page.noAds;
-  const nav = navItems(ctx).map(([p, n]) => `<a href="${p}"${page.path === p || (p !== '/' && page.section === p) ? ' aria-current="page"' : ''}>${esc(n)}</a>`).join('');
+  const nav = navItems(ctx).map(([p, n], i) => `<a class="${[4, 7, 10, 11].includes(i) ? 'nav-start' : ''}" href="${p}"${page.path === p || (p !== '/' && page.section === p) ? ' aria-current="page"' : ''}>${esc(n)}</a>`).join('');
   const foot = footerGroups(ctx).map(([h, links]) => `<div><h2>${esc(h)}</h2><ul>${links.map(([p, n]) => `<li><a href="${p}">${esc(n)}</a></li>`).join('')}</ul></div>`).join('');
   const ld = JSON.stringify(graph(page, ctx)).replace(/</g, '\\u003c');
   return `<!doctype html>
@@ -111,6 +113,7 @@ export function layout(page, ctx) {
 ${page.ogType === 'article' ? `<meta property="article:modified_time" content="${page.modified || ctx.buildDate}">\n` : ''}${cfg.naverVerify ? `<meta name="naver-site-verification" content="${attr(cfg.naverVerify)}">\n` : ''}${cfg.googleVerify ? `<meta name="google-site-verification" content="${attr(cfg.googleVerify)}">\n` : ''}<meta name="theme-color" content="#2b3a8f" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#101318" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="alternate" type="application/rss+xml" title="${SITE.name} 사주 백과" href="/rss.xml">
@@ -125,13 +128,13 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
 <a class="skip" href="#main">본문 바로가기</a>
 <header class="site-head">
   <div class="wrap head-row">
-    <a class="brand" href="/"><span class="seal" aria-hidden="true">運</span><span class="brand-name"><b>${SITE.name}</b><small>사주 오행 운세</small></span></a>
+    <a class="brand" href="/"><img class="brand-icon" src="/favicon.svg" alt="" width="36" height="36"><span class="brand-name"><b>${SITE.name}</b><small>무료 사주 · 오늘의 운세 · 궁합</small></span></a>
   </div>
   <nav class="gnav" aria-label="주요 메뉴"><div class="wrap gnav-row">${nav}</div></nav>
 </header>
 <main id="main" class="wrap">
 ${crumbsHtml(page.crumbs)}
-${page.body}
+${page.section === '/tti/' ? `${ttiNav(ctx, page.path)}<div class="tti-content" data-tti-content>${page.body}</div>` : page.body}
 ${ads ? adSlot(ctx, 'bottom') : ''}
 ${page.share === false ? '' : shareBar(page, url)}
 </main>

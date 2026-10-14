@@ -9,7 +9,7 @@ export function about(ctx) {
     crumbs: [['소개 · 계산 방법', '/about/']], section: '/about/', pageType: 'AboutPage', ogType: 'article',
     ld: [{ '@type': 'Article', headline: ABOUT.h1, inLanguage: 'ko-KR', datePublished: ctx.published, dateModified: ctx.buildDate, author: { '@id': `${ctx.site}/#org` }, publisher: { '@id': `${ctx.site}/#org` }, mainEntityOfPage: { '@id': `${ctx.site}/about/#webpage` } }],
     body: `<article class="article">${hero(ABOUT.h1, ABOUT.lead)}${ABOUT.sections.map((s) => `<section class="prose"><h2>${esc(s.h)}</h2><ul>${s.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul></section>`).join('')}
-      <section class="prose"><h2>사용 데이터와 라이브러리</h2><ul><li>절기·간지 계산: lunar-javascript (천문 알고리즘 기반)</li><li>한국 음력 변환: korean-lunar-calendar (한국천문연구원 음력 기준)</li><li>해설 문장: ${esc(SITE.publisher)}이 명리학 문헌의 일반적인 해석을 바탕으로 작성</li></ul></section>
+      <p class="note">토정비결 설명 출처: <a href="https://encykorea.aks.ac.kr/Article/E0059207" target="_blank" rel="noopener">한국민족문화대백과사전 · 토정비결</a></p><section class="prose"><h2>사용 데이터와 라이브러리</h2><ul><li>절기·간지 계산: lunar-javascript (천문 알고리즘 기반)</li><li>한국 음력 변환: korean-lunar-calendar (한국천문연구원 음력 기준)</li><li>해설 문장: ${esc(SITE.publisher)}이 명리학 문헌의 일반적인 해석을 바탕으로 작성</li></ul></section>
       <p class="note">${esc(ABOUT.note)}</p><p class="updated">최종 업데이트 ${ctx.buildDate}</p></article>`,
   };
 }

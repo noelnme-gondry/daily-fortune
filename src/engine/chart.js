@@ -4,6 +4,7 @@ import {
   gz, pillarH, elRel, tenGod, stageOf, hongran, cheonhui,
 } from './core.js';
 import { Solar, lunarText, solarOfLunar, utcOffset } from './calendar.js';
+import { birthTime } from '../domain/birth-time.js';
 
 const PILLAR_KO = { year: '년주', month: '월주', day: '일주', hour: '시주' };
 
@@ -17,16 +18,19 @@ export function buildChart(input) {
     birth = s;
   }
   if (!(birth.y >= 1900 && birth.y <= 2050)) throw new ChartInputError('1900~2050년 사이의 날짜만 계산할 수 있습니다.');
-  const hasTime = typeof input.time === 'string' && /^\d{1,2}:\d{2}$/.test(input.time);
-  const [hh, mi] = hasTime ? input.time.split(':').map(Number) : [12, 0];
+  const selected = input.timeBranch === undefined ? null : birthTime(input.timeBranch);
+  if (input.timeBranch !== undefined && !selected) throw new ChartInputError('태어난 시진을 선택해 주세요.');
+  const time = selected ? selected.time : input.time;
+  const hasTime = typeof time === 'string' && /^\d{1,2}:\d{2}$/.test(time);
+  const [hh, mi] = hasTime ? time.split(':').map(Number) : [12, 0];
   const { off, dst } = utcOffset(birth);
   const base = Date.UTC(birth.y, birth.m - 1, birth.d, hh, mi);
   const at = (shift) => {
     const t = new Date(base + shift * 60000);
     return Solar.fromYmdHms(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate(), t.getUTCHours(), t.getUTCMinutes(), 0);
   };
-  const solA = hasTime ? at(480 - off) : at(0);
-  const solB = hasTime ? at(510 - off) : at(0);
+  const solA = selected ? at(-30) : hasTime ? at(480 - off) : at(0);
+  const solB = selected ? at(0) : hasTime ? at(510 - off) : at(0);
   const ecA = solA.getLunar().getEightChar(); ecA.setSect(1);
   const ecB = solB.getLunar().getEightChar(); ecB.setSect(1);
   const pillars = { year: gz(ecA.getYear()), month: gz(ecA.getMonth()), day: gz(ecB.getDay()), hour: hasTime ? gz(ecB.getTime()) : null };
@@ -37,7 +41,7 @@ export function buildChart(input) {
   const daeun = yun.getDaYun().slice(1, 10).map((d) => ({ startYear: d.getStartYear(), age: d.getStartYear() - birth.y, ...gz(d.getGanZhi()) }));
 
   return {
-    ...a, input, birth, hasTime, dst, name: (input.name || '').trim(),
+    ...a, input, birth, hasTime, dst: !selected && dst, name: (input.name || '').trim(),
     lunarText: lunarText(birth, true), daeun,
   };
 }

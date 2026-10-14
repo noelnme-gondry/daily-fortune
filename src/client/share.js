@@ -1,5 +1,6 @@
 // 공유: 페이지 공유 바(모든 페이지)와 결과 공유(카드 주소 + 이미지 저장). 카카오는 키가 있을 때만 켠다.
 import { track } from './analytics.js';
+import { uiIcon } from '../site/icons.js';
 
 const KAKAO_KEY = import.meta.env.VITE_KAKAO_JS_KEY || '';
 const KAKAO_SDK = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js';
@@ -34,6 +35,7 @@ export function resultShareHtml() {
 
 // el: 공유 바, opts: { url, title, text, kind, card }
 export function wireShare(el, opts) {
+  el.querySelectorAll('[data-share]').forEach((button) => { if (!button.querySelector('svg')) button.insertAdjacentHTML('afterbegin', uiIcon(button.dataset.share)); });
   const say = (m) => { const t = el.querySelector('.toast'); if (t) t.textContent = m; };
   const x = el.querySelector('[data-share="x"]');
   if (x) x.href = `https://twitter.com/intent/tweet?text=${enc(opts.title)}&url=${enc(opts.url)}`;

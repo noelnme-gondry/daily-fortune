@@ -62,9 +62,9 @@ export function ttiYear(tti, y) {
   }
   const luckyEl = (BR_EL[tti] + 4) % 5;
   const E = T.element[luckyEl];
-  // 해당 띠로 태어난 연도별 (입춘 기준 띠, 1940~2015년생)
+  // 기준 해에서 100년 전까지의 출생 연도를 매년 다시 구성한다.
   const cohorts = [];
-  for (let by = 1940; by <= 2015; by++) {
+  for (let by = y - 100; by <= y; by++) {
     const bp = yearPillar(by);
     if (bp.b !== tti) continue;
     const tg = tenGod(bp.s, yp.s);
@@ -93,6 +93,33 @@ export function ttiDay(tti, o) {
   const text = [fill(pick(TT.dayRel[rel], key + 'r'), { a }), pick(TT.dayElem[e], key + 'e'), pick(TT.dayAdvice[band], key + 'a')].join(' ');
   const E = T.element[(BR_EL[tti] + 4) % 5];
   return { tti, animal: a, score, band, rel, text, color: pick(E.color, key + 'c'), number: pick(E.number, key + 'n') };
+}
+
+// 일별 총점과 같은 요인을 상세 화면에 그대로 공개한다.
+export function ttiDayDetails(tti, o) {
+  const dp = dayPillar(o), mp = monthPillar(o);
+  const rel = relKey(dp.b, tti), mrel = relKey(mp.b, tti);
+  const e = elRel(BR_EL[tti], BR_EL[dp.b]), es = elRel(BR_EL[tti], STEM_EL[dp.s]);
+  const key = `ttid${tti}|${o.y}-${o.m}-${o.d}`;
+  return [
+    { label: '오늘의 지지 관계', value: REL_W[rel] * 0.95, text: `${pillarLabel(dp)}일 · 관계: ${rel}. ${fill(pick(TT.dayRel[rel], key + 'r'), { a: ANIMAL[tti] })}` },
+    { label: '오늘의 오행', value: ELEM_W[e] * 0.9 + ELEM_W[es] * 0.5, text: `${pick(TT.dayElem[e], key + 'e')} 지지 오행 90%, 천간 오행 50%의 계수를 적용합니다.` },
+    { label: '이번 달의 바탕', value: REL_W[mrel] * 0.25, text: `${pillarLabel(mp)}월의 지지와 ${ANIMAL[tti]}띠의 관계는 ${mrel}입니다. 기본 60점에 일진·월운 가감을 더하고 22~97점으로 제한합니다.` },
+  ];
+}
+
+export function ttiMonths(tti, y, birthYear = null) {
+  const annual = ttiYear(tti, y);
+  const cohort = birthYear === null ? null : annual.cohorts.find((c) => c.birthYear === birthYear);
+  if (birthYear !== null && !cohort) throw new RangeError('해당 띠의 출생 연도를 선택해 주세요.');
+  const adjustment = cohort ? COHORT_W[cohort.tg] : 0;
+  return Array.from({ length: 12 }, (_, i) => {
+    const m = i + 1, mp = monthPillar({ y, m, d: 15 });
+    const rel = relKey(mp.b, tti), e = elRel(BR_EL[tti], BR_EL[mp.b]);
+    const score = clamp(Math.round(annual.score * 0.35 + (60 + REL_W[rel] + ELEM_W[e]) * 0.65 + adjustment), 22, 97);
+    const band = bandOf(score), key = `ttim${tti}|${y}-${m}|${birthYear ?? 'all'}`;
+    return { m, score, pillarText: pillarLabel(mp), rel, text: `${fill(pick(TT.dayRel[rel], key + 'r'), { a: ANIMAL[tti] })} ${pick(TT.dayAdvice[band], key + 'a')}` };
+  });
 }
 
 export function ttiCompat(a, b) {
