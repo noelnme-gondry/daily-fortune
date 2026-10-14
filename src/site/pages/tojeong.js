@@ -55,7 +55,7 @@ export function tojeongPage(ctx, year) {
     : `${y}년 ${ko(ganji)}년 ${TOJEONG.description}`;
   const faq = TOJEONG.faq;
   return {
-    path, title, description, section: '/tojeong/',
+    path, title, description, section: '/tojeong/', share: false,
     crumbs: next ? [['무료 토정비결', '/tojeong/'], [`${y}년 토정비결`, path]] : [['무료 토정비결', path]],
     ld: [faqLd(faq), { '@type': 'WebApplication', name: next ? `${y}년 토정비결` : TOJEONG.h1, description, url: `${ctx.site}${path}`, applicationCategory: 'LifestyleApplication', operatingSystem: 'Web', inLanguage: 'ko-KR', isAccessibleForFree: true, offers: { '@type': 'Offer', price: FREE_ACCESS.price, priceCurrency: FREE_ACCESS.currency }, publisher: { '@id': `${ctx.site}/#org` } }],
     body: `${hero(next ? `${y}년 토정비결` : TOJEONG.h1, TOJEONG.lead, FREE_ACCESS.summary)}

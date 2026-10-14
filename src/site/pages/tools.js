@@ -141,7 +141,7 @@ function toolPage(key, ctx, opts = {}) {
   const faq = [...t.faq, FREE_FAQ];
   return {
     path: t.path, title: t.title, description: t.desc, crumbs: opts.crumbs || [[t.nav, t.path]], section: t.path,
-    tool: true, ld: [webApp(t, ctx), faqLd(faq)],
+    tool: true, share: false, ld: [webApp(t, ctx), faqLd(faq)],
     body: `${hero(t.h1, t.lead, FREE_ACCESS.summary)}${top}${toolBlock(mode, ctx, opts)}${adSlot(ctx, 'inline')}<div class="info-panels">${disclosure('tool-method', '계산 방법과 점수 기준', howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', '관련 운세와 더 알아보기', extraAfter) : ''}${disclosure('tool-faq', '자주 묻는 질문', faqBlock(faq), 'help')}${disclosure('tool-related', '다른 운세 둘러보기', relatedFor(t.path, ctx))}</div>`,
   };
 }

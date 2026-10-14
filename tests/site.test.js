@@ -102,7 +102,7 @@ test('광고·GA·공유·정보 아이콘', () => {
   assert.ok(html.includes('page_location:u.origin+u.pathname'), 'GA에 # 뒤와 쿼리를 보내지 않는다');
   assert.ok(html.includes('data-ad-slot="1234567890"'));
   assert.ok(html.includes('adsbygoogle.js?client=ca-pub-3073450406371629'));
-  assert.ok(html.includes('data-share-page'));
+  assert.ok(!html.includes('data-share-page'));
   assert.ok(html.includes('class="info"'));
   assert.equal(s2.adsTxt(), 'google.com, pub-3073450406371629, DIRECT, f08c47fec0942fa0\n');
   const share = s2.renderShare(new URLSearchParams({ k: 'rank', n: '서윤', s: '67.1', r: '95445', w: '1', t: 'B' }));
@@ -115,6 +115,15 @@ test('광고·GA·공유·정보 아이콘', () => {
   assert.ok(!s3.render('/today/').includes('adsbygoogle'));
   assert.equal(s3.adsTxt(), '');
   delete process.env.GA_MEASUREMENT_ID; delete process.env.ADSENSE_SLOT_INLINE; delete process.env.ADSENSE_CLIENT;
+});
+
+test('결과 공유가 있는 계산기에는 별도 페이지 공유를 표시하지 않는다', () => {
+  for (const { path } of site.routes) {
+    const html = site.render(path);
+    const resultPage = /data-tool="(?!home")/.test(html) || html.includes('id="tojeong-tool"');
+    if (resultPage) assert.doesNotMatch(html, /data-share-page/, path);
+  }
+  for (const path of ['/', '/tti/', '/saju/']) assert.match(site.render(path), /data-share-page/, path);
 });
 
 test('새 페이지: 인생 캐릭터·사주 랭킹·60일주 랭킹', () => {
