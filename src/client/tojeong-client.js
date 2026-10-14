@@ -3,7 +3,7 @@ import { tojeongView } from './tojeong-view.js';
 import { tojeongHeadline } from '../content/tojeong.js';
 import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, cleanName } from '../site/share-codec.js';
-import { load, save, removeSaved, sessionLoad, sessionSave, SAMPLE } from './profile.js';
+import { load, save, removeSaved, sessionLoad, sessionSave } from './profile.js';
 import { track } from './analytics.js';
 
 export async function mountTojeong(root) {
@@ -72,10 +72,6 @@ export async function mountTojeong(root) {
       catch { status.textContent = '기기 저장에 실패했습니다. 결과는 계산되었지만 다음 방문에 복원되지 않을 수 있습니다.'; }
     } else status.textContent = temporary ? '현재 탭에만 임시로 유지됩니다. 기존 기기 저장본은 삭제 버튼으로 지울 수 있습니다.' : '이 브라우저에서는 저장할 수 없습니다. 현재 화면에서 결과를 확인하세요.';
     out.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-  form.querySelector('[data-tojeong-sample]').addEventListener('click', async () => {
-    fill(SAMPLE.a);
-    if (await render(SAMPLE.a, 'sample')) out.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
   form.querySelector('[data-tojeong-delete]').addEventListener('click', async () => {
     try {

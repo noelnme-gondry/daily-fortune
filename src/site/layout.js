@@ -1,5 +1,6 @@
 // 공통 HTML 뼈대: 메타 태그, Open Graph, JSON-LD(@graph), 헤더 내비게이션, 이동 경로, 푸터
 import { SITE } from '../content/pages.js';
+import { BRAND } from '../content/brand.js';
 import { esc, attr, abs } from './util.js';
 import { uiIcon } from './icons.js';
 import { ttiNav } from './tti-nav.js';
@@ -11,6 +12,11 @@ export function navItems(ctx) {
     [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/tojeong/', '무료 토정비결'], ['/life-story/', '내 인생 캐릭터'], ['/saju-ranking/', '사주 랭킹'],
     ['/compatibility/', '궁합'], ['/tti/', '띠별 운세'], ['/manseryeok/', '만세력'], ['/saju/', '사주 백과'],
   ];
+}
+
+function navHtml(page, ctx) {
+  const current = (path) => page.path === path || page.section === path;
+  return navItems(ctx).map(([path, name]) => `<a href="${path}"${current(path) ? ' aria-current="page"' : ''}>${esc(name)}</a>`).join('');
 }
 
 function footerGroups(ctx) {
@@ -32,10 +38,10 @@ function crumbsHtml(crumbs) {
 
 export function graph(page, ctx) {
   const url = abs(ctx, page.canonicalPath || page.path);
-  const org = { '@type': 'Organization', '@id': `${ctx.site}/#org`, name: SITE.name, alternateName: [SITE.alt, SITE.searchName], url: `${ctx.site}/`, logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png`, width: 512, height: 512 } };
+  const org = { '@type': 'Organization', '@id': `${ctx.site}/#org`, name: SITE.name, alternateName: SITE.alt, url: `${ctx.site}/`, logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png?v=sun`, width: 512, height: 512 } };
   const nodes = [org];
   if (page.path === '/') {
-    nodes.push({ '@type': 'WebSite', '@id': `${ctx.site}/#website`, url: `${ctx.site}/`, name: SITE.name, alternateName: [SITE.alt, SITE.searchName], description: SITE.description, inLanguage: 'ko-KR', isAccessibleForFree: true, publisher: { '@id': `${ctx.site}/#org` } });
+    nodes.push({ '@type': 'WebSite', '@id': `${ctx.site}/#website`, url: `${ctx.site}/`, name: SITE.name, alternateName: SITE.alt, description: SITE.description, inLanguage: 'ko-KR', isAccessibleForFree: true, publisher: { '@id': `${ctx.site}/#org` } });
   }
   const webpage = {
     '@type': page.pageType || 'WebPage', '@id': `${url}#webpage`, url, name: page.title, description: page.description, inLanguage: 'ko-KR',
@@ -82,10 +88,10 @@ export function layout(page, ctx) {
   const url = abs(ctx, page.canonicalPath || page.path);
   const ogUrl = page.ogPath ? abs(ctx, page.ogPath) : url;
   const title = page.path === '/' ? page.title : `${page.title} | ${SITE.name}`;
-  const img = `${ctx.site}${page.ogImage || '/og-default.png'}`;
+  const img = `${ctx.site}${page.ogImage || '/og-default.png'}?v=sun`;
   const cfg = ctx.cfg;
   const ads = cfg.adsense && !page.noAds;
-  const nav = navItems(ctx).map(([p, n]) => `<a class="${[`/year/${ctx.today.y}/`, '/life-story/', '/tti/', '/manseryeok/'].includes(p) ? 'nav-start' : ''}" href="${p}"${page.path === p || (p !== '/' && page.section === p) ? ' aria-current="page"' : ''}>${esc(n)}</a>`).join('');
+  const nav = navHtml(page, ctx);
   const foot = footerGroups(ctx).map(([h, links]) => `<div><h2>${esc(h)}</h2><ul>${links.map(([p, n]) => `<li><a href="${p}">${esc(n)}</a></li>`).join('')}</ul></div>`).join('');
   const ld = JSON.stringify(graph(page, ctx)).replace(/</g, '\\u003c');
   return `<!doctype html>
@@ -112,10 +118,10 @@ export function layout(page, ctx) {
 <meta name="twitter:image" content="${img}">
 ${page.ogType === 'article' ? `<meta property="article:modified_time" content="${page.modified || ctx.buildDate}">\n` : ''}${cfg.naverVerify ? `<meta name="naver-site-verification" content="${attr(cfg.naverVerify)}">\n` : ''}${cfg.googleVerify ? `<meta name="google-site-verification" content="${attr(cfg.googleVerify)}">\n` : ''}<meta name="theme-color" content="#2b3a8f" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#101318" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
+<link rel="icon" href="/favicon.svg?v=sun" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png?v=sun" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=sun">
+<link rel="manifest" href="/site.webmanifest?v=sun">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600;900&display=swap">
@@ -127,7 +133,7 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
 <a class="skip" href="#main">본문 바로가기</a>
 <header class="site-head">
   <div class="wrap head-row">
-    <a class="brand" href="/"><img class="brand-icon" src="/favicon.svg" alt="" width="36" height="36"><span class="brand-name"><b>${SITE.name}</b><small>무료 사주 · 오늘의 운세 · 궁합</small></span></a>
+    <a class="brand" href="/" aria-label="${attr(SITE.name)} 홈"><img class="brand-logo" src="${BRAND.logo}" alt="" width="48" height="48"><span class="brand-name"><b>${SITE.name}</b><small>${BRAND.descriptor}</small></span></a>
   </div>
   <nav class="gnav" aria-label="주요 메뉴"><div class="wrap gnav-row">${nav}</div></nav>
 </header>

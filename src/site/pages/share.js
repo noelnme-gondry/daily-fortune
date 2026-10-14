@@ -1,6 +1,7 @@
 // 공유 카드 착지 페이지 (/share/?k=…). 허용된 값만 받아 카드로 보여 주고 "나도 해 보기"로 연결한다.
 // 생년월일시는 받지 않으며, 검색 색인에서 제외한다.
 import T from '../../content/text.js';
+import { BRAND } from '../../content/brand.js';
 import { ILJU_TAG } from '../../content/knowledge.js';
 import { CLASSES, ARCS } from '../../content/story.js';
 import { JOB_BY_ID } from '../../content/character-jobs.js';
@@ -73,7 +74,7 @@ export function parseShare(q) {
     if (y === null || !/^[1-8][1-6][1-3]$/.test(g || '') || !READINGS[g]) return null;
     card.kicker = `${who}의 ${y}년 토정비결`; card.big = `${g}괘`; card.title = tojeongHeadline(READINGS[g]);
     card.lines = [['상괘 · 중괘 · 하괘', g.split('').join(' · ')]];
-    card.foot = '오행 운세 · 같은 생년월일이면 언제나 같은 괘';
+    card.foot = `${BRAND.name} · 같은 생년월일이면 언제나 같은 괘`;
   }
   return card;
 }
@@ -83,21 +84,21 @@ const OG = { story: '/og-story.png', rank: '/og-rank.png', compat: '/og-compat.p
 export function sharePage(q, ctx) {
   const card = q ? parseShare(q) : null;
   const generic = !card;
-  const c = card || { kind: 'today', tool: '/', label: '오행 운세', kicker: '친구가 보낸 운세 결과', big: '오행 운세', title: '생년월일시로 보는 나의 사주 운세', lines: [] };
+  const c = card || { kind: 'today', tool: '/', label: BRAND.name, kicker: '친구가 보낸 운세 결과', big: BRAND.name, title: '생년월일시로 보는 나의 사주 운세', lines: [] };
   const title = generic ? '공유된 운세 결과' : `${c.kicker} — ${c.big}`;
-  const desc = generic ? '친구가 공유한 사주 운세 결과입니다. 내 생년월일시로 나의 운세도 확인해 보세요.' : `${c.title} · 나의 결과도 확인해 보세요. 생년월일시로 보는 무료 사주 운세, 오행 운세.`;
+  const desc = generic ? '친구가 공유한 사주 운세 결과입니다. 내 생년월일시로 나의 운세도 확인해 보세요.' : `${c.title} · 나의 결과도 확인해 보세요. 생년월일시로 보는 무료 사주 운세, ${BRAND.name}.`;
   const others = [['/life-story/', '사주로 본 내 인생은?'], ['/saju-ranking/', '내 사주 랭킹'], ['/today/', '오늘의 운세'], ['/tojeong/', '무료 토정비결'], ['/compatibility/', '사주 궁합']].filter(([h]) => h !== c.tool).slice(0, 4);
   return {
     path: '/share/', canonicalPath: c.tool, title, ogTitle: title, description: desc, noindex: true, noAds: true, crumbs: [], share: false,
     gaTitle: `공유 카드 — ${SHARE_KINDS[c.kind] ? SHARE_KINDS[c.kind].label : '일반'}`, ogImage: OG[c.kind] || '/og-default.png',
     body: `<section class="share-land">
       <article class="share-card card" aria-label="공유된 결과">
-        <span class="seal" aria-hidden="true">運</span>
+        <img class="brand-logo" src="${BRAND.logo}" alt="" width="48" height="48">
         <p class="sc-kicker">${esc(c.kicker)}</p>
         <p class="sc-big">${esc(c.big)}${c.hz ? ` <span class="hz">${esc(c.hz)}</span>` : ''}</p>
         <h1 class="sc-title">${esc(c.title)}</h1>
         ${c.lines.length ? `<dl class="sc-lines">${c.lines.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
-        <p class="sc-foot">${esc(c.foot || '오행 운세 · 같은 생년월일시면 언제나 같은 결과')}</p>
+        <p class="sc-foot">${esc(c.foot || `${BRAND.name} · 같은 생년월일시면 언제나 같은 결과`)}</p>
       </article>
       <div class="share-cta">
         <a class="btn" href="${c.tool}" data-ga-cta="share_landing">${generic ? '내 운세 보기' : `나의 ${esc(c.label)} 보기`}</a>

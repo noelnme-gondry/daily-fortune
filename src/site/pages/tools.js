@@ -47,8 +47,8 @@ export function toolBlock(mode, ctx, extra = {}) {
   const data = `data-tool="${mode}" data-date="${ctx.todayISO}"${extra.year ? ` data-year="${extra.year}"` : ''}`;
   const label = { today: '오늘의 운세 보기', tomorrow: '내일의 운세 보기', week: '이번 주 운세 보기', month: '이달의 운세 보기', year: `${extra.year}년 운세 보기`, lifetime: '평생 운세 보기', compatibility: '궁합 보기', manseryeok: '사주 원국 계산', story: '내 인생 캐릭터 보기', rank: '내 사주 순위 보기', home: '내 운세 보기' }[mode];
   const form = pair
-    ? `<form class="pform card pair-form" id="tool-form" novalidate><h2 class="form-title">두 사람의 사주 입력</h2><div class="pair-grid">${personFields('a', ctx, '나')}${personFields('b', ctx, '상대')}</div><div class="form-actions"><button class="btn" type="submit">${label}</button><button class="link-btn" type="button" data-sample>예시 두 사람으로 보기</button></div>${HINT}</form>`
-    : `<form class="pform card" id="tool-form" novalidate><h2 class="form-title">내 사주 입력</h2>${personFields('a', ctx)}<div class="form-actions"><button class="btn" type="submit">${label}</button><button class="link-btn" type="button" data-sample>예시 인물로 보기</button></div>${HINT}</form>`;
+    ? `<form class="pform card pair-form" id="tool-form" novalidate><h2 class="form-title">두 사람의 사주 입력</h2><div class="pair-grid">${personFields('a', ctx, '나')}${personFields('b', ctx, '상대')}</div><div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT}</form>`
+    : `<form class="pform card" id="tool-form" novalidate><h2 class="form-title">내 사주 입력</h2>${personFields('a', ctx)}<div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT}</form>`;
   const empty = `<div class="result" id="result" aria-live="polite">${mode === 'home' ? '' : '<div class="result-empty card"><p><b>생년월일시를 입력하면 결과가 여기에 나타납니다.</b></p><p class="muted">이 기기에 저장을 선택하면 다음 방문에도 입력 정보를 불러올 수 있습니다.</p><noscript><p>운세 계산은 브라우저에서 이루어지므로 자바스크립트를 켜 주세요.</p></noscript></div>'}</div>`;
   return `<section class="tool ${pair ? 'tool-pair' : ''} ${mode === 'home' ? 'tool-home' : ''}" id="tool" ${data} aria-label="운세 계산기">${form}${empty}</section>`;
 }
@@ -241,7 +241,7 @@ export function home(ctx) {
     ${faqBlock(HOME.faq)}`;
   return {
     path: '/', title: HOME.title, description: SITE.description, section: '/', tool: true, crumbs: [],
-    ld: [faqLd(HOME.faq), { '@type': 'ItemList', name: '오행 운세 운세 종류', itemListElement: cards.map(([h, t], i) => ({ '@type': 'ListItem', position: i + 1, name: t, url: `${ctx.site}${h}` })) }],
+    ld: [faqLd(HOME.faq), { '@type': 'ItemList', name: `${SITE.name} 운세 종류`, itemListElement: cards.map(([h, t], i) => ({ '@type': 'ListItem', position: i + 1, name: t, url: `${ctx.site}${h}` })) }],
     body,
   };
 }

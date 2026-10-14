@@ -2,7 +2,7 @@
   "name": "daily-fortune",
   "private": true,
   "version": "2.0.0",
-  "description": "오행 운세 — 사주 오행으로 보는 오늘·내일·주간·월간·연간·평생 운세와 궁합 (결정론적 계산)",
+  "description": "make your own day — 사주 오행으로 보는 오늘·내일·주간·월간·연간·평생 운세와 궁합 (결정론적 계산)",
   "type": "module",
   "engines": {
     "node": ">=20"

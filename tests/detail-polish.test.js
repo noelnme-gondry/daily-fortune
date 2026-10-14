@@ -10,10 +10,10 @@ import { rankGuidance, rankHighlights } from '../src/engine/rank-guidance.js';
 import { resolveBirthTime } from '../src/domain/birth-time.js';
 import { utcOffset } from '../src/engine/calendar.js';
 
-test('상위 60개 표시 항목의 출생 예시는 실제 입력으로 원국·점수를 재현한다', () => {
+test('상위 1,200개 표시 항목에서 제공하는 출생 예시는 실제 입력으로 원국·점수를 재현한다', () => {
   for (const [kind, categories] of Object.entries(LEADERS)) for (const [category, rows] of Object.entries(categories)) {
     for (const row of rows) {
-      assert.ok(row.examples.length > 0);
+      assert.ok(Array.isArray(row.examples));
       for (const input of row.examples) {
         const chart = buildChart(input);
         assert.ok(matchingPillars(row.pillars, chart.pillars));
@@ -35,7 +35,8 @@ test('날짜 역산은 미확인 조합을 꾸며 내지 않고 경계가 달라
   assert.deepEqual(findBirthExamples(impossibleMonth), []);
   assert.equal(matchingPillars(row.pillars, impossibleMonth), false);
   assert.equal(matchingPillars(row.pillars, { ...row.pillars, hour: null }), false);
-  assert.ok(findBirthExamples(LEADERS.three.total[0].pillars).length);
+  const three = buildChart({ y: 1955, m: 7, d: 8, calendar: 'solar', gender: 'M', time: null });
+  assert.ok(findBirthExamples(three.pillars).some((p) => p.y === 1955 && p.m === 7 && p.d === 8), '시간 모름은 실제 입력과 같은 정오 기준으로 날짜를 역산한다');
 });
 
 test('개운 가이드는 실제 감점과 용신·희신을 사용하고 점수를 바꾸지 않는다', () => {

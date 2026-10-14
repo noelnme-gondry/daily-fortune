@@ -17,7 +17,7 @@ function birthForm(ctx) {
       <select class="input" id="tj-m" aria-label="태어난 달">${options(Array.from({ length: 12 }, (_, i) => i + 1), 1, '월')}</select>
       <select class="input" id="tj-d" aria-label="태어난 날">${options(Array.from({ length: 31 }, (_, i) => i + 1), 1, '일')}</select>
     </div><label class="check"><input type="checkbox" id="tj-leap" disabled> 음력 윤달에 태어났어요</label></fieldset>
-    <div class="form-actions"><button class="btn" type="submit">무료 토정비결 보기</button><button class="link-btn" type="button" data-tojeong-sample>예시 보기</button></div>
+    <div class="form-actions"><button class="btn" type="submit">무료 토정비결 보기</button></div>
     <p class="form-error" role="alert" id="tj-error" hidden></p>
     <div class="storage-options"><label class="check"><input type="checkbox" id="tj-save"> 이 기기에 저장</label><button class="link-btn" type="button" data-tojeong-delete>저장된 토정비결 정보 삭제</button><p class="hint" id="tj-storage-status" role="status">생일은 서버로 보내지 않습니다. 저장을 선택하면 이 기기에 보관합니다.</p></div>
   </form>`;

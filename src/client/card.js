@@ -1,4 +1,5 @@
 // 결과 이미지 카드(1080×1350 PNG)를 캔버스로 그린다. 인스타그램 스토리·메신저 공유용.
+import { BRAND } from '../content/brand.js';
 const C = { bg: '#eceee9', paper: '#f8f9f5', ink: '#1a1d21', ink2: '#535a61', line: '#d2d6ce', accent: '#2b3a8f', seal: '#b4362b' };
 const DISPLAY = 'Hahmlet, "Noto Serif KR", serif';
 const BODY = '"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
@@ -34,11 +35,9 @@ export async function drawCard(data) {
   ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
   roundRect(ctx, M, M, W - 2 * M, H - 2 * M, 36); ctx.fillStyle = C.paper; ctx.fill();
   ctx.strokeStyle = C.line; ctx.lineWidth = 3; ctx.stroke();
-  // 도장
-  ctx.save(); ctx.translate(M + 110, M + 120); ctx.rotate(-0.07);
-  roundRect(ctx, -46, -46, 92, 92, 14); ctx.fillStyle = C.seal; ctx.fill();
-  ctx.fillStyle = '#fff'; ctx.font = '900 58px "Noto Serif KR", serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('運', 0, 4);
-  ctx.restore();
+  const logo = new Image();
+  logo.src = '/icon-192.png?v=sun';
+  try { await logo.decode(); ctx.drawImage(logo, M + 60, M + 64, 112, 112); } catch (e) { /* 로고를 불러오지 못해도 결과와 브랜드명은 표시한다. */ }
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   const x = M + 64, maxW = W - 2 * M - 128;
   let y = M + 290;
@@ -65,7 +64,9 @@ export async function drawCard(data) {
     }
   }
   ctx.fillStyle = C.ink2; ctx.font = `500 34px ${BODY}`;
-  ctx.fillText(`오행 운세 · ${location.host}`, x, H - M - 70);
+  ctx.fillText(BRAND.name, x, H - M - 82);
+  ctx.font = `400 24px ${BODY}`;
+  ctx.fillText(location.host, x, H - M - 42);
   ctx.fillStyle = C.seal; ctx.font = `600 32px ${BODY}`;
   ctx.fillText('나도 해 보기 →', x + maxW - ctx.measureText('나도 해 보기 →').width, H - M - 70);
   return new Promise((res) => cv.toBlob(res, 'image/png'));
