@@ -13,6 +13,7 @@ import { track } from './analytics.js';
 import { birthTimeOptions, normalizeBranch, branchOfTime } from '../domain/birth-time.js';
 import { compatMatchesShell, mountCompatMatches } from './compat-matches-view.js';
 import { mountRankLeaders } from './rank-leaders-view.js';
+import { renderResultWithPartnerAd } from './partner-ad.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const sexIdx = (p) => [...Array(60).keys()].find((n) => n % 10 === p.s && n % 12 === p.b);
@@ -184,7 +185,7 @@ export async function mount(root) {
     if (share) html += resultShareHtml();
     if (pair) html += compatMatchesShell(ca, cb);
     stopMatches?.();
-    out.innerHTML = html;
+    renderResultWithPartnerAd(out, html);
     if (mode === 'rank') mountRankLeaders($('.rank-leaders', out), res);
     if (pair) stopMatches = mountCompatMatches($('.compat-matches', out), { a: toEngine(a), b: toEngine(b) }, { a: ca, b: cb }, today);
     root.classList.add('has-result');
