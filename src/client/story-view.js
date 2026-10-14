@@ -1,11 +1,12 @@
 import { ADJ } from '../content/story.js';
 import { esc } from '../site/util.js';
 import { jobCatalog } from './job-catalog.js';
-const BADGES = ['♛', '☀', '↗', '✦', '➜', '⚒', '☾', '☂'];
+import { uiIcon } from '../site/icons.js';
+const BADGES = ['crown', 'sun', 'rise', 'sparkle', 'arrow', 'hammer', 'moon', 'umbrella'];
 const ADJECTIVES = Object.values(ADJ).flat();
 const storyParagraphs = (story) => story.split(/ (?=제\d+장)/).map((p) => `<p>${esc(p)}</p>`).join('');
 export function portrait(s, small = false) {
-  return `<div class="portrait portrait-${s.band} prefix-${ADJECTIVES.indexOf(s.character.adj)}"><img src="/characters/${s.character.portrait}.webp" alt="${esc(s.character.full)} 캐릭터" width="640" height="640" loading="lazy"><span class="portrait-badge" aria-label="${esc(s.character.adj)}">${BADGES[ADJECTIVES.indexOf(s.character.adj)]}</span>${small ? '' : `<span class="portrait-caption">${esc(s.character.adj)} · ${s.skill.name}</span>`}</div>`;
+  return `<div class="portrait portrait-${s.band} prefix-${ADJECTIVES.indexOf(s.character.adj)}"><img src="/characters/${s.character.portrait}.webp" alt="${esc(s.character.full)} 캐릭터" width="640" height="640" loading="lazy"><span class="portrait-badge" role="img" aria-label="${esc(s.character.adj)}">${uiIcon(BADGES[ADJECTIVES.indexOf(s.character.adj)])}</span>${small ? '' : `<span class="portrait-caption">${esc(s.character.adj)} · ${s.skill.name}</span>`}</div>`;
 }
 export function storyDeck(st) {
   const cards = st.stages.map((s, i) => `<button class="chapter-card card${s.now ? ' now' : ''}" type="button" data-dialog="story-${s.key}" aria-haspopup="dialog" aria-controls="story-${s.key}"><span class="chapter-k">CHAPTER ${String(i + 1).padStart(2, '0')}${s.now ? ' · 지금' : ''}</span>${portrait(s, true)}<span class="chapter-age">${s.ages}</span><b>${esc(s.character.full)}</b><span class="muted">${{high: '전성기', good: '성장기', mid: '수련기', low: '시련기'}[s.band]} · 흐름 ${s.score}점 · 자세히 보기 ↗</span></button>`).join('');

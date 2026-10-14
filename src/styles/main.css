@@ -188,9 +188,35 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .tti-score { font: 700 18px/1 var(--f-display); }
 
 /* 홈 */
-.home-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 28px; align-items: start; }
+.home-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
 @media (max-width: 900px) { .home-hero { grid-template-columns: minmax(0, 1fr); } }
 .home-intro { display: grid; gap: 12px; padding-top: 8px; }
+.home-discovery { display: grid; gap: 28px; min-width: 0; }
+.home-intro h1 { font-size: clamp(27px, 3.3vw, 36px); }
+.home-features { display: grid; gap: 10px; }
+.home-feature { display: grid; grid-template-columns: 64px minmax(0, 1fr) 20px; align-items: center; gap: 14px; padding: 12px; text-decoration: none; color: var(--ink); }
+.home-feature:hover { border-color: var(--accent); background: var(--accent-soft); }
+.home-feature > img { display: block; width: 64px; height: 64px; border-radius: 10px; }
+.home-feature > span:not(.home-feature-icon) { display: grid; gap: 5px; }
+.home-feature b { font-size: 16px; }
+.home-feature small { color: var(--ink-2); font-size: 12px; }
+.home-feature-icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); }
+.home-feature-icon .ui-icon { width: 27px; height: 27px; }
+.home-feature > .ui-icon { color: var(--accent); }
+.home-hero .tool-home { gap: 0; }
+.home-hero .person { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 14px; }
+.home-hero .field { align-content: start; }
+.home-hero .field-gender .seg { margin-top: 6px; }
+.home-hero .seg { height: 42px; }
+.home-hero .seg span { height: 40px; padding-block: 0; display: grid; place-items: center; }
+.home-hero .field-birth, .home-hero .field-time { grid-column: 1 / -1; }
+.home-hero .field-birth { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: center; }
+.home-hero .field-birth .check { grid-column: 1 / -1; }
+.home-hero .pform { gap: 14px; }
+.home-hero .storage-options { display: flex; flex-wrap: wrap; align-items: center; gap: 7px 14px; }
+.home-hero .storage-options .hint { flex-basis: 100%; }
+.home-hero .pform > .hint { font-size: 11px; }
+.home-hero .result:empty { display: none; }
 
 /* 계산기 */
 .tool { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start; }
@@ -562,7 +588,8 @@ p, li { text-wrap: pretty; }
 .portrait-high { border-color: var(--earth); box-shadow: 0 0 0 3px color-mix(in srgb, var(--earth) 20%, transparent); }
 .portrait-good { border-color: var(--accent); }
 .portrait-low { border-style: dashed; border-color: var(--seal); }
-.portrait-badge { position: absolute; right: 8px; top: 8px; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--accent); background: var(--paper); box-shadow: 0 2px 10px #0002; font-size: 23px; }
+.portrait-badge { position: absolute; right: 8px; top: 8px; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--accent); background: var(--paper); box-shadow: 0 2px 10px #0002; line-height: 0; }
+.portrait-badge .ui-icon { display: block; width: 18px; height: 18px; }
 .prefix-0 .portrait-badge, .prefix-1 .portrait-badge { background: var(--earth); color: var(--paper); }
 .prefix-6 .portrait-badge, .prefix-7 .portrait-badge { color: var(--seal); }
 .portrait-caption { display: block; padding: 8px 12px; font-size: 12px; background: var(--accent-soft); color: var(--accent); }
@@ -616,6 +643,84 @@ body:has(dialog[open]) { overflow: hidden; }
 .leader-button { display: grid; grid-template-columns: 60px 1fr auto; gap: 12px; align-items: center; width: 100%; text-align: left; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); cursor: pointer; }
 .leader-button:hover { border-color: var(--accent); }
 .leader-button small { display: block; color: var(--ink-2); }
+.leader-filter { display: grid; gap: 4px; min-width: 150px; font-size: 13px; }
+.leader-filter .input { min-height: 40px; }
+.leader-button { grid-template-columns: 52px minmax(0, 1fr) auto; gap: 8px 16px; padding: 18px; color: var(--ink); }
+.leader-place { align-self: start; color: var(--accent); font-size: 19px; }
+.leader-summary { display: grid; gap: 4px; }
+.leader-summary > b { font-size: 18px; }
+.leader-date { font-size: 15px; }
+.leader-score { font-size: 24px; align-self: start; white-space: nowrap; }
+.leader-score small { display: inline; font-size: 12px; margin-left: 3px; }
+.leader-preview { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--ink-2); padding-top: 8px; border-top: 1px solid var(--line); }
+.leader-open { grid-column: 2 / -1; font-size: 12px; color: var(--accent); }
+.leader-detail { display: grid; gap: 24px; padding: 24px; }
+.leader-detail h3 { font-size: 18px; }
+.leader-birth { display: grid; gap: 10px; }
+.leader-birth p:not(.hint) { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
+.leader-birth span { font-size: 14px; color: var(--ink-2); }
+.leader-pillars, .leader-categories { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; border-block: 1px solid var(--line); }
+.leader-pillars > div, .leader-categories > div { text-align: center; padding: 12px 4px; }
+.leader-pillars > div + div, .leader-categories > div + div { border-left: 1px solid var(--line); }
+.leader-pillars dt, .leader-categories dt { font-size: 12px; color: var(--ink-2); }
+.leader-pillars dd, .leader-categories dd { margin: 6px 0 0; font-weight: 600; }
+.leader-pillars dd { font: 600 24px var(--f-hanja); }
+.leader-pillars small { display: block; margin-top: 5px; font: 13px var(--f-body); }
+.leader-traits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.leader-traits h3 { margin-bottom: 12px; }
+.leader-traits ul { padding-left: 18px; margin: 0; display: grid; gap: 12px; }
+.leader-traits li, .leader-traits section > p { font-size: 14px; }
+.leader-traits li p { margin-top: 5px; color: var(--ink-2); }
+.weakest-category { margin-top: 12px; }
+.leader-categories { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.rank-guidance { display: grid; gap: 20px; }
+.support-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.support-element { border-top: 3px solid var(--el); background: var(--bg); padding: 16px; border-radius: 0 0 10px 10px; }
+.support-element h4 { display: flex; gap: 10px; align-items: center; font-size: 15px; }
+.element-token { color: var(--el); font: 700 24px var(--f-display); }
+.support-element dl { margin: 14px 0; display: grid; gap: 8px; font-size: 14px; }
+.support-element dl > div { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; }
+.support-element dt { display: flex; align-items: center; gap: 7px; color: var(--ink-2); }
+.support-element dd { margin: 0; }
+.support-element p { font-size: 14px; }
+.repair-list { display: grid; }
+.repair-list article { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 24px; padding: 16px 0; border-top: 1px solid var(--line); }
+.repair-list h5 { font-size: 16px; margin: 4px 0 8px; }
+.repair-list p { font-size: 14px; }
+.repair-score { color: var(--seal); font-size: 12px; }
+.repair-caution { color: var(--ink-2); margin-top: 8px; }
+.guidance-caution { display: flex; gap: 10px; align-items: start; font-size: 14px; padding: 14px; background: var(--sunk); border-radius: 8px; }
+.guidance-caution .ui-icon { margin-top: 3px; }
+.pillar-table-wrap { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; }
+.pillar-table { table-layout: fixed; }
+.pillar-table th, .pillar-table td { padding: 10px 6px; text-align: center; vertical-align: middle; border-bottom: 1px solid var(--line); }
+.pillar-table th:first-child { width: 86px; background: var(--sunk); }
+.pillar-table thead th { background: var(--paper); }
+.pillar-table tbody th { font-size: 12px; font-weight: 500; color: var(--ink-2); }
+.pillar-table th > span { display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+.pillar-table td + td, .pillar-table thead th + th { border-left: 1px solid var(--line); }
+.pillar-table .is-day { background: var(--accent-soft); }
+.pillar-table em { font-style: normal; color: var(--accent); margin-left: 4px; }
+.pillar-table .char { margin-inline: auto; }
+.pillar-table .muted { font-size: 11px; }
+.zodiac-year-table th, .zodiac-year-table td { vertical-align: middle; padding: 14px 18px; }
+.zodiac-year-table th:first-child { width: 23%; }
+.zodiac-year-table th:nth-child(2) { width: 13%; }
+.zodiac-year-table th:nth-child(3) { width: 27%; }
+.zodiac-year-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); min-height: 56px; }
+.zodiac-year-link > span { display: grid; gap: 3px; }
+.zodiac-year-link b { font-size: 16px; white-space: nowrap; }
+.zodiac-year-link small { font-size: 11px; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
+.zodiac-year-link > .ui-icon { margin-left: auto; width: 16px; color: var(--accent); }
+.zodiac-year-link .animal-icon { width: 48px; height: 48px; flex: none; }
+.zodiac-year-table tbody tr:hover { background: var(--bg); }
+.zodiac-year-score { display: inline-flex; gap: 8px; align-items: center; }
+.zodiac-year-score > b { font-size: 19px; }
+.zodiac-birth-years span { display: inline-block; font-size: 13px; margin: 2px 8px 2px 0; color: var(--ink-2); }
+.share-bar .sbtn { border-radius: 10px; height: 42px; justify-content: center; font-weight: 500; }
+.share-bar .ui-icon { display: block; width: 18px; height: 18px; }
+.share-bar [data-share="x"] { width: 42px; padding: 0; }
+.share-bar [data-share="facebook"] .brand-icon { color: #0866ff; }
 .rank-dialog { max-width: 600px; }
 .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .comparison > div { display: grid; gap: 6px; padding: 18px; background: var(--accent-soft); border-radius: 12px; }
@@ -640,7 +745,8 @@ body:has(dialog[open]) { overflow: hidden; }
   .chapter-card b { font-size: 12px; }
   .chapter-age { font-size: 14px; }
   .chapter-k { font-size: 9px; }
-  .chapter-card .portrait-badge { width: 22px; height: 22px; font-size: 16px; top: 3px; right: 3px; }
+  .chapter-card .portrait-badge { width: 24px; height: 24px; top: 5px; right: 5px; }
+  .chapter-card .portrait-badge .ui-icon { width: 14px; height: 14px; }
   .chapter-card .muted { font-size: 10px; }
   .character-sheet { gap: 18px; padding: 18px; }
   .character-sheet .portrait { width: min(100%, 260px); justify-self: center; }
@@ -652,4 +758,23 @@ body:has(dialog[open]) { overflow: hidden; }
   .tti-nav .link-card b { font-size: 13px; }
   .tti-nav .link-card span { font-size: 11px; }
   .leader-button { grid-template-columns: 42px 1fr auto; gap: 8px; padding: 12px; font-size: 13px; }
+  .leader-summary > b { font-size: 15px; }
+  .leader-date { font-size: 13px; }
+  .leader-score { font-size: 20px; }
+  .leader-detail { padding: 16px; }
+  .support-grid, .repair-list article, .leader-traits { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .pillar-table th:first-child { width: 64px; }
+  .pillar-table th, .pillar-table td { padding: 8px 3px; }
+  .pillar-table .char { width: 44px; font-size: 27px; }
+  .pillar-table tbody th { font-size: 10px; }
+  .pillar-table .info { width: 17px; height: 17px; font-size: 11px; }
+  .zodiac-year-table { min-width: 680px; }
+  .zodiac-year-table th, .zodiac-year-table td { padding: 12px; }
+  .zodiac-year-link { gap: 8px; }
+  .zodiac-year-link .animal-icon { width: 40px; height: 40px; }
+  .home-hero .field-birth { grid-template-columns: minmax(0, 1fr); }
+  .home-hero { gap: 20px; }
+  .home-discovery { gap: 20px; }
+  .home-feature { grid-template-columns: 48px minmax(0, 1fr) 16px; gap: 10px; }
+  .home-feature > img, .home-feature-icon { width: 48px; height: 48px; }
 }

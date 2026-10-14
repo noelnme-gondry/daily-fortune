@@ -4,7 +4,7 @@ import TT from '../../content/tti.js';
 import { ANIMAL, ANIMAL_SLUG, BR_H, BR_K, pillarLabel, yearPillar, ttiYear, ttiCompat, ttiMatches, samjaeYear, samjaeBranches, fmtDate, ttiMonths, addDays } from '../../engine/index.js';
 import { esc, faqBlock, faqLd, factTable } from '../util.js';
 import { hero, bandChip, dayBox, ttiDayList } from './tools.js';
-import { animalIcon } from '../icons.js';
+import { animalIcon, uiIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
 import { ttiMonthCards } from '../tti-months.js';
 
@@ -29,10 +29,9 @@ export function yearIndex(y, ctx) {
   };
   page.ld = [article(ctx, page), { '@type': 'ItemList', name: `${y}년 띠별 운세`, itemListElement: rows.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: `${y}년 ${r.animal}띠 운세`, url: `${ctx.site}/tti/${y}/${ANIMAL_SLUG[r.tti]}/` })) }];
   page.body = `<article class="article">${hero(page.h1, lead, `${pillarLabel(yp)}년`)}
-    <div class="table-wrap"><table class="grid-table"><thead><tr><th scope="col">띠</th><th scope="col">점수</th><th scope="col">한 줄 요약</th><th scope="col">출생 연도</th></tr></thead><tbody>
-    ${rows.map((r) => `<tr><th scope="row"><a href="/tti/${y}/${ANIMAL_SLUG[r.tti]}/">${animalIcon(r.tti)}${r.animal}띠</a></th><td><span class="num">${r.score}</span> ${bandChip(r.score)}</td><td>${esc(r.headline)}${r.samjae ? ` · ${r.samjae.name}` : ''}</td><td>${r.cohorts.filter((c) => c.age >= 10 && c.age <= 86).map((c) => `${yy(c.birthYear)}년생`).join(', ')}</td></tr>`).join('')}
+    <div class="table-wrap zodiac-year-wrap"><table class="grid-table zodiac-year-table"><thead><tr><th scope="col">띠</th><th scope="col">점수</th><th scope="col">한 줄 요약</th><th scope="col">출생 연도</th></tr></thead><tbody>
+    ${rows.map((r) => `<tr><th scope="row"><a class="zodiac-year-link" href="/tti/${y}/${ANIMAL_SLUG[r.tti]}/">${animalIcon(r.tti)}<span><b>${r.animal}띠</b><small>자세히 보기</small></span>${uiIcon('arrow')}</a></th><td><span class="zodiac-year-score"><b class="num">${r.score}</b>${bandChip(r.score)}</span></td><td>${esc(r.headline)}${r.samjae ? ` · ${r.samjae.name}` : ''}</td><td class="zodiac-birth-years">${r.cohorts.filter((c) => c.age >= 10 && c.age <= 86).map((c) => `<span>${c.birthYear}년생</span>`).join(' ')}</td></tr>`).join('')}
     </tbody></table></div>
-    <div class="cards four">${rows.map((r) => `<a class="card link-card tti-card" href="/tti/${y}/${ANIMAL_SLUG[r.tti]}/"><b>${animalIcon(r.tti)}${r.animal}띠 <span class="num">${r.score}</span></b><span>${esc(r.headline)}</span></a>`).join('')}</div>
     <p class="updated">최종 업데이트 ${ctx.buildDate} · <a href="/about/">계산 방법</a></p></article>`;
   return page;
 }
