@@ -65,12 +65,35 @@ export function calculateTojeong(input, targetYear) {
   if (!month || !birthday || !year) fail('이 해의 음력 날짜를 확인할 수 없습니다.');
   const ganji = { year: year.getChineseGapja().year.slice(0, 2), month: month.getChineseGapja().month.slice(0, 2), day: birthday.getChineseGapja().day.slice(0, 2) };
   const values = { age: targetYear - l.y + 1, monthDays, birthDay: effectiveDay, taese: tojeongNumbers(ganji.year).taese, wolgeon: tojeongNumbers(ganji.month).wolgeon, iljin: tojeongNumbers(ganji.day).iljin };
-  const start = year.getSolarCalendar(), end = lunarDate(targetYear + 1, 1, 1)?.getSolarCalendar();
-  if (!end) fail('음력 한 해의 범위를 확인할 수 없습니다.');
-  const endDate = new Date(Date.UTC(end.year, end.month - 1, end.day) - 86400000);
   return {
     ...tojeongGwae(values), targetYear, birth, ganji, values,
     normalizedLeap: l.leap, adjustedDay: effectiveDay !== l.d,
-    period: { start: { y: start.year, m: start.month, d: start.day }, end: { y: endDate.getUTCFullYear(), m: endDate.getUTCMonth() + 1, d: endDate.getUTCDate() } },
+    period: lunarYearPeriod(targetYear),
   };
+}
+
+// 음력 한 해(설날~다음 설날 전날)의 양력 범위
+function lunarYearPeriod(targetYear) {
+  const start = lunarDate(targetYear, 1, 1)?.getSolarCalendar(), end = lunarDate(targetYear + 1, 1, 1)?.getSolarCalendar();
+  if (!start || !end) fail('음력 한 해의 범위를 확인할 수 없습니다.');
+  const endDate = new Date(Date.UTC(end.year, end.month - 1, end.day) - 86400000);
+  return { start: { y: start.year, m: start.month, d: start.day }, end: { y: endDate.getUTCFullYear(), m: endDate.getUTCMonth() + 1, d: endDate.getUTCDate() } };
+}
+
+// 보는 해의 작괘 기준표. 상괘는 음력 출생 연도(세는나이)로, 중괘는 음력 생월로 정해진다.
+// 하괘는 생일의 일진으로 정해져 날마다 다르므로 표에 넣지 않는다.
+export function tojeongYearTable(targetYear) {
+  const first = lunarDate(targetYear, 1, 1);
+  if (!first) fail('이 해의 음력 날짜를 확인할 수 없습니다.');
+  const ganji = first.getChineseGapja().year.slice(0, 2);
+  const { taese } = tojeongNumbers(ganji);
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const m = i + 1, days = lunarDate(targetYear, m, 30) ? 30 : 29;
+    const monthGanji = lunarDate(targetYear, m, 1).getChineseGapja().month.slice(0, 2);
+    const { wolgeon } = tojeongNumbers(monthGanji);
+    return { m, ganji: monthGanji, days, wolgeon, middle: (days + wolgeon) % 6 || 6 };
+  });
+  const uppers = Array.from({ length: 8 }, (_, i) => ({ upper: i + 1, years: [] }));
+  for (let y = TOJEONG_RANGE.min; y <= targetYear; y++) uppers[((targetYear - y + 1 + taese) % 8 || 8) - 1].years.push(y);
+  return { targetYear, ganji, taese, months, uppers, period: lunarYearPeriod(targetYear) };
 }

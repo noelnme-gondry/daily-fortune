@@ -1,15 +1,15 @@
 import LEADERS from '../content/rank-leaders.js';
 import TABLE from '../content/rank-table.js';
 import { RANK_CATS } from '../engine/rank.js';
-import { analyze } from '../engine/chart.js';
+import { analyze, birthTimesFor } from '../engine/chart.js';
 import { rankHighlights } from '../engine/rank-guidance.js';
 import { pillarKo, pillarH } from '../engine/core.js';
-import { birthTime } from '../domain/birth-time.js';
+import { resolveBirthTime } from '../domain/birth-time.js';
 import { esc } from '../site/util.js';
 
 const PILLAR_LABELS = [['year', '년주'], ['month', '월주'], ['day', '일주'], ['hour', '시주']];
 const dateText = (p) => `${p.y}년 ${p.m}월 ${p.d}일`;
-const timeText = (p) => p.timeBranch ? birthTime(p.timeBranch).label : '시간 모름 · 3기둥';
+const timeText = (p) => p.timeBranch ? resolveBirthTime(p.timeBranch, birthTimesFor(p).off)?.label || '시진 확인 필요' : '시간 모름 · 3기둥';
 const pillars = (p) => `<dl class="leader-pillars">${PILLAR_LABELS.map(([key, name]) => `<div><dt>${name}</dt><dd>${p[key] ? `${pillarH(p[key])}<small>${pillarKo(p[key])}</small>` : '—<small>시간 모름</small>'}</dd></div>`).join('')}</dl>`;
 const highlightList = (items, empty) => items.length ? `<ul>${items.map((i) => `<li><b>${i.name} · 평균 대비 ${i.pts > 0 ? '+' : ''}${i.pts}점</b><p>${esc(i.text)}</p></li>`).join('')}</ul>` : `<p>${empty}</p>`;
 

@@ -103,8 +103,8 @@ export function ttiDayDetails(tti, o) {
   const key = `ttid${tti}|${o.y}-${o.m}-${o.d}`;
   return [
     { label: '오늘의 지지 관계', value: REL_W[rel] * 0.95, text: `${pillarLabel(dp)}일 · 관계: ${rel}. ${fill(pick(TT.dayRel[rel], key + 'r'), { a: ANIMAL[tti] })}` },
-    { label: '오늘의 오행', value: ELEM_W[e] * 0.9 + ELEM_W[es] * 0.5, text: `${pick(TT.dayElem[e], key + 'e')} 지지 오행 90%, 천간 오행 50%의 계수를 적용합니다.` },
-    { label: '이번 달의 바탕', value: REL_W[mrel] * 0.25, text: `${pillarLabel(mp)}월의 지지와 ${ANIMAL[tti]}띠의 관계는 ${mrel}입니다. 기본 60점에 일진·월운 가감을 더하고 22~97점으로 제한합니다.` },
+    { label: '오늘의 오행', value: ELEM_W[e] * 0.9 + ELEM_W[es] * 0.5, text: `${pick(TT.dayElem[e], key + 'e')} ${pillarLabel(dp)}일의 오행이 ${ANIMAL[tti]}띠의 오행과 맺는 관계입니다.` },
+    { label: '이번 달의 바탕', value: REL_W[mrel] * 0.25, text: mrel === '없음' ? `${pillarLabel(mp)}월은 ${ANIMAL[tti]}띠와 특별한 합충이 없어 오늘 하루의 흐름이 그대로 드러납니다.` : `${pillarLabel(mp)}월의 지지와 ${ANIMAL[tti]}띠의 관계는 ${mrel}입니다. 한 달 내내 은은하게 깔리는 기운입니다.` },
   ];
 }
 

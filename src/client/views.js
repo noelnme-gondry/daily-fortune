@@ -4,11 +4,11 @@ import {
 } from '../engine/index.js';
 
 import { TIPS } from '../content/tips.js';
-import { birthTimeLabel } from '../domain/birth-time.js';
 import { storyDeck } from './story-view.js';
 import { rankPlay } from './rank-view.js';
 import { rankGuidanceView } from './rank-guidance-view.js';
 import { pillarTable } from './pillar-table.js';
+import { characterImg } from '../site/util.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 const hz = (p) => `${STEM_H[p.s]}${BR_H[p.b]}`;
@@ -40,7 +40,7 @@ export function chartCard(c, profile, today) {
   const ss = [...new Set(c.natalSS.map(([n]) => n))];
   const cur = c.daeun.filter((d) => d.startYear <= today.y).pop();
   const p = profile;
-  const birth = `${p.calendar === 'lunar' ? `음력 ${p.leap ? '윤' : ''}` : '양력 '}${p.y}.${String(p.m).padStart(2, '0')}.${String(p.d).padStart(2, '0')} · ${esc(birthTimeLabel(p))}`;
+  const birth = `${p.calendar === 'lunar' ? `음력 ${p.leap ? '윤' : ''}` : '양력 '}${p.y}.${String(p.m).padStart(2, '0')}.${String(p.d).padStart(2, '0')} · ${esc(c.timeLabel)}`;
   const day = c.pillars.day;
   return `<section class="chart-card card" aria-label="사주 원국">
     <div class="chart-head"><h2>${esc(c.name || '나')}의 사주 원국 ${tip(TIPS.chart, '사주 원국 보는 법')}</h2><span class="muted">${birth}${p.calendar === 'lunar' ? ` (양력 ${isoDate(c.birth)})` : ` · ${c.lunarText}`} · ${c.gender === 'F' ? '여성' : '남성'}${c.dst ? ' · 서머타임 보정' : ''}</span></div>
@@ -169,33 +169,21 @@ export function manseView(c) {
 }
 
 /* ── 사주로 본 내 인생 ───────────────────────────── */
-const ICONS = {
-  shield: '<path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/>',
-  sword: '<path d="M14.5 3H21v6.5L10 20.5 3.5 14z"/><path d="M5 15l4 4M3 21l3-3"/>',
-  lute: '<circle cx="9" cy="15" r="5"/><path d="M12.5 11.5L20 4M17 3l4 4"/><circle cx="9" cy="15" r="1.5"/>',
-  spark: '<path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/>',
-  compass: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
-  coin: '<ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
-  flame: '<path d="M12 22c4 0 7-2.8 7-6.8 0-3.7-2.6-6.1-4.2-8.7-.6 2-1.6 3-2.8 3.5C12.3 7 11 4.2 8.8 2 8.6 6 5 8.6 5 14.6 5 18.8 8 22 12 22z"/>',
-  crown: '<path d="M3 18h18l-1.5-10-4.5 4-3-7-3 7-4.5-4z"/><path d="M3 21h18"/>',
-  flask: '<path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 001.3 2h12.4a1.5 1.5 0 001.3-2L14 9V3"/><path d="M7 15h10"/>',
-  book: '<path d="M4 4.5A2.5 2.5 0 016.5 2H20v17H6.5A2.5 2.5 0 004 21.5z"/><path d="M4 21.5V4.5M8 7h8"/>',
-};
-const icon = (k) => `<svg class="cls-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[k] || ICONS.spark}</svg>`;
 function arcChart(stages) {
-  const W = 600, H = 170, L = 60, R = 60, Tp = 30, B = 36;
+  // 아홉 구간도 휴대폰에서 읽히도록 좁은 좌표계(글자 13단위 ≈ 화면 11px)를 쓴다.
+  const W = 380, H = 168, L = 36, R = 16, Tp = 28, B = 30;
   const iw = W - L - R, ih = H - Tp - B;
   const x = (i) => L + (iw * i) / (stages.length - 1);
-  const y = (v) => Tp + ih * (1 - (v - 20) / 70);
-  const pts = stages.map((s, i) => `${x(i)},${y(Math.max(20, Math.min(90, s.score))).toFixed(1)}`).join(' ');
-  return `<svg class="chart-svg arc" viewBox="0 0 ${W} ${H}" role="img" aria-label="인생 곡선">
-    <line class="grid" x1="${L}" x2="${W - R}" y1="${y(60)}" y2="${y(60)}"></line><text x="${L - 8}" y="${y(60) + 4}" text-anchor="end">60점</text>
+  const y = (v) => Tp + ih * (1 - (Math.max(20, Math.min(90, v)) - 20) / 70);
+  const pts = stages.map((s, i) => `${x(i)},${y(s.score).toFixed(1)}`).join(' ');
+  return `<svg class="chart-svg arc" viewBox="0 0 ${W} ${H}" role="img" aria-label="인생 곡선: ${stages.map((s) => `${s.label} ${s.score}점`).join(', ')}">
+    <line class="grid" x1="${L}" x2="${W - R}" y1="${y(60)}" y2="${y(60)}"></line><text class="axis" x="2" y="${y(60) + 4}">60점</text>
     <polyline class="line" points="${pts}"></polyline>
-    ${stages.map((s, i) => `<circle class="pt${s.now ? ' cur' : ''}" cx="${x(i)}" cy="${y(Math.max(20, Math.min(90, s.score))).toFixed(1)}" r="7"></circle><text class="v" x="${x(i)}" y="${(y(Math.max(20, Math.min(90, s.score))) - 14).toFixed(1)}" text-anchor="middle">${s.score}</text><text x="${x(i)}" y="${H - 10}" text-anchor="middle">${s.label}</text>`).join('')}
+    ${stages.map((s, i) => `<circle class="pt${s.now ? ' cur' : ''}" cx="${x(i)}" cy="${y(s.score).toFixed(1)}" r="5"></circle><text class="v" x="${x(i)}" y="${(y(s.score) - 10).toFixed(1)}" text-anchor="middle">${s.score}</text><text x="${x(i)}" y="${H - 9}" text-anchor="middle">${s.label}</text>`).join('')}
   </svg>`;
 }
 export function storyView(st, c) {
-  return `<section class="report-head card story-head"><div class="arc-badge" aria-hidden="true">${icon(st.stages[1].character.icon)}</div><div class="report-text"><div class="when"><span>사주로 본 ${esc(c.name || '나')}의 인생은</span></div><h2>${esc(st.arc.name)}</h2><p>${esc(st.arc.desc)}</p></div></section>
+  return `<section class="report-head card story-head"><div class="arc-badge" aria-hidden="true">${characterImg((st.stages.find((s) => s.now) || st.stages[0]).character.portrait, '', { thumb: true, sizes: '96px', size: 96 })}</div><div class="report-text"><div class="when"><span>사주로 본 ${esc(c.name || '나')}의 인생은</span></div><h2>${esc(st.arc.name)}</h2><p>${esc(st.arc.desc)}</p></div></section>
     <section class="box card"><div class="box-head"><h3>인생 곡선</h3><span class="muted">빨간 점 = 지금 시기 (만 ${st.nowAge}세)</span></div>${arcChart(st.stages)}</section>
     ${storyDeck(st)}`;
 }

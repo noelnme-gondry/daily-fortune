@@ -37,3 +37,11 @@ export function tip(text, label = '설명 보기') {
   const id = `tip-s${++tipSeq}`;
   return `<span class="tipwrap"><button type="button" class="info" aria-label="${attr(label)}" aria-describedby="${id}" data-tip-id="${id}">i</button><span role="tooltip" id="${id}" class="tip">${esc(text)}</span></span>`;
 }
+
+// 캐릭터 그림: 카드·목록은 384px 썸네일(고해상도 화면은 원본), 상세 창은 640px 원본
+export function characterImg(id, alt = '', { thumb = false, sizes = '(max-width: 640px) 31vw, 220px', size = thumb ? 384 : 640 } = {}) {
+  const a = `alt="${attr(alt)}" loading="lazy" decoding="async"`;
+  return thumb
+    ? `<img src="/characters/384/${id}.webp" srcset="/characters/384/${id}.webp 384w, /characters/${id}.webp 640w" sizes="${sizes}" width="${size}" height="${size}" ${a}>`
+    : `<img src="/characters/${id}.webp" width="${size}" height="${size}" ${a}>`;
+}

@@ -10,13 +10,17 @@
 npm install
 npm run dev      # 개발 서버 (http://localhost:5173) — 페이지를 운영과 같은 렌더러로 즉석 생성
 npm test         # 엔진·사이트 테스트 (node:test)
-npm run test:all # 엔진 + Chrome 브라우저 사용자 흐름 검증
+npm run test:all # 엔진 + 브라우저(Chromium) 사용자 흐름 검증
 npm run lint     # 소스·테스트 정적 검사
 npm run build    # vite build + 전 페이지 정적 생성(dist/)
 npm start        # 운영 서버 (dist 자산 + 날짜별 즉석 렌더링)
 ```
 
-브라우저 검증은 설치된 Google Chrome을 사용합니다. Chrome이 없는 환경에서는 `npx playwright install chrome`으로 설치한 뒤 실행합니다.
+브라우저 검증은 Playwright 번들 Chromium을 씁니다. 처음 한 번 `npx playwright install chromium`으로 설치하고, 이미 설치된 브라우저를 쓰려면 `PLAYWRIGHT_CHROMIUM_PATH=/경로/chrome npm run test:browser`처럼 실행 파일 경로를 넘깁니다.
+
+GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint → 단위 테스트 → 빌드 → 브라우저 테스트를 실행합니다.
+
+캐릭터 그림을 추가·교체하면 `node scripts/gen-thumbs.mjs`로 카드용 384px 썸네일(`public/characters/384/`)을 다시 만듭니다.
 
 ### 환경 변수
 
@@ -153,7 +157,7 @@ tests/          node:test 테스트
 
 ### 기기 저장 및 순위 데이터
 
-- `이 기기에 저장`을 선택할 때만 IndexedDB에 나·상대 입력을 보관합니다. 미선택 입력은 같은 탭의 sessionStorage에만 남습니다. 기존 localStorage는 이전 성공 뒤 제거합니다. 삭제 버튼은 두 사람의 저장본을 함께 지웁니다.
+- `이 기기에 저장`을 선택할 때만 IndexedDB에 나·상대 입력을 보관합니다. 미선택 입력은 같은 탭의 sessionStorage에만 남습니다. 이전 버전이 자동 저장한 localStorage 입력은 현재 탭으로만 옮기고 바로 지웁니다(저장은 다시 선택해야 함). 삭제 버튼은 두 사람의 저장본을 함께 지웁니다.
 - `npm run generate:leaders`는 기존 랭킹 산식으로 종합·5개 분야의 상위 후보를 구하고, 1930년 이후 양력 날짜·시진을 역산해 실제 입력 경로로 원국이 재현되는 대표 조합 5개씩을 저장합니다. 같은 점수의 순위는 동일하며, 실제 사람의 순위가 아닙니다. 날짜를 확인하지 못한 조합은 목록에서 제외하되 순위는 기존 이론 분포표 기준을 유지합니다.
 - 개인 랭킹의 개운 가이드는 평균 대비 낮은 항목의 근거와 용신·희신·기신을 사용합니다. 색·방향은 공통 오행 데이터에서 가져오며, 소품이나 행동으로 원래 점수를 바꾸지 않습니다.
 - UI·캐릭터 배지는 Lucide SVG, X·Facebook·KakaoTalk은 Simple Icons의 로고를 사용합니다. 출처와 라이선스는 `docs/icon-licenses.md`에 기록합니다.

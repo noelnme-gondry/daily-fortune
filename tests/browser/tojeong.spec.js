@@ -41,21 +41,22 @@ test('홈에서 무료 토정비결 진입 · 12개월 키보드 선택 · 내�
   }
 });
 
-test('토정비결 IndexedDB 저장·다른 탭 복원·삭제는 사주 저장본을 보존한다', async ({ page, context }) => {
+test('토정비결 기기 저장·다른 탭 복원·삭제는 사주 저장본을 보존한다', async ({ page, context }) => {
   await page.goto('/today/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').fill('사주 보존');
   await page.getByRole('radio', { name: '여성', exact: true }).check();
   await page.locator('#a-y').selectOption('1989');
-  await page.locator('#a-time').selectOption('3');
+  await page.locator('input[name="a-tmode"][value="branch"]').check();
+  await page.locator('#a-branch').selectOption('3');
   await page.locator('#save-device').check();
   await page.getByRole('button', { name: '오늘의 운세 보기', exact: true }).click();
-  await expect(page.locator('[data-storage-status]')).toContainText('IndexedDB에 저장');
+  await expect(page.locator('[data-storage-status]')).toContainText('이 기기에 저장했습니다');
   await ready(page);
   await enter(page);
   await page.locator('#tj-save').check();
   await page.getByRole('button', { name: '무료 토정비결 보기', exact: true }).click();
-  await expect(page.locator('#tj-storage-status')).toContainText('IndexedDB에 저장');
+  await expect(page.locator('#tj-storage-status')).toContainText('이 기기에 저장했습니다');
   const next = await context.newPage();
   await ready(next);
   await expect(next.locator('#tj-name')).toHaveValue('검증');
@@ -68,7 +69,7 @@ test('토정비결 IndexedDB 저장·다른 탭 복원·삭제는 사주 저장�
   await next.goto('/today/');
   await expect(next.locator('#a-name')).toHaveValue('사주 보존');
   await expect(next.locator('#a-y')).toHaveValue('1989');
-  await expect(next.locator('#a-time')).toHaveValue('3');
+  await expect(next.locator('#a-branch')).toHaveValue('3');
   await expect(next.getByRole('radio', { name: '여성', exact: true })).toBeChecked();
 });
 
@@ -90,4 +91,23 @@ test('토정비결의 윤달 조정 표시 · 잘못된 날짜 거부 · 저장 
   await expect(page.locator('#tj-error')).toContainText('존재하지 않는 날짜');
   await expect(page.locator('.tojeong-code')).toHaveCount(0);
   expect(JSON.parse(await page.evaluate(() => sessionStorage.getItem('ohaeng:tojeong'))).y).toBe(1993);
+});
+
+test('올해 연도 주소는 /tojeong/으로 이동 · 자기 괘 해설만 받기 · 결과 공유', async ({ page }) => {
+  const data = [];
+  page.on('request', (req) => { if (req.url().includes('/data/tojeong/')) data.push(new URL(req.url()).pathname); });
+  await page.goto(`/tojeong/${todayKST().y}/`);
+  expect(new URL(page.url()).pathname).toBe('/tojeong/');
+  await ready(page, '/tojeong/');
+  await expect(page.locator('.tojeong-year-table')).toContainText(`${todayKST().y}년 토정비결 작괘 기준표`);
+  await enter(page);
+  await page.getByRole('button', { name: '무료 토정비결 보기', exact: true }).click();
+  const code = calculateTojeong({ calendar: 'solar', y: 1993, m: 6, d: 21 }, todayKST().y).code;
+  await expect(page.locator('.tojeong-code')).toHaveText(code);
+  expect(data).toEqual([`/data/tojeong/${code}.json`]);
+  await expect(page.locator('.result-share [data-share="copy"]')).toBeVisible();
+  const href = await page.locator('.result-share [data-share="x"]').getAttribute('href');
+  expect(decodeURIComponent(decodeURIComponent(href))).toContain(`k=tojeong&n=검증&y=${todayKST().y}&g=${code}`);
+  await page.goto(`/share/?k=tojeong&n=검증&y=${todayKST().y}&g=${code}`);
+  await expect(page.locator('.sc-big')).toHaveText(`${code}괘`);
 });

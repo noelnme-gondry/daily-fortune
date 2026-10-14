@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { BIRTH_TIMES } from '../src/domain/birth-time.js';
+import { birthTimeOptions, branchOfTime } from '../src/domain/birth-time.js';
+import { utcOffset } from '../src/engine/calendar.js';
 import { buildChart, ttiDay, ttiDayDetails, ttiMonths, ttiYear, lifeStory, day, scoresOf, rankScore, rankFromTable } from '../src/engine/index.js';
 import { analyze } from '../src/engine/chart.js';
 import { gameStats } from '../src/engine/story.js';
@@ -14,18 +15,40 @@ import { siteUrl } from '../src/site/util.js';
 
 const A = { gender: 'F', calendar: 'solar', y: 1993, m: 1, d: 28, time: '03:40' };
 const TODAY = { y: 2026, m: 10, d: 14 };
-test('모든 시진은 현대·서머타임·음력 입력에서도 선택한 시주를 유지', () => {
-  for (const time of BIRTH_TIMES) for (const input of [A, { ...A, y: 1988, m: 7, d: 1 }, { ...A, calendar: 'lunar' }]) {
-    const c = buildChart(toEngine({ ...input, timeMode: 'branch', timeBranch: time.value }));
-    assert.equal(c.pillars.hour.b, time.branch, `${input.y} ${time.label}`);
+const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+const dayHour = (c) => JSON.stringify([c.pillars.day, c.pillars.hour]);
+test('시진 선택은 그 구간의 어떤 시계 시각을 넣어도 같은 일주·시주가 된다(30분·서머타임·1954~61년 표준시)', () => {
+  // 1990 평시(UTC+9), 1987 서머타임, 1956 동경 127.5° 표준시, 1957 그 기간의 서머타임, 1950 서머타임
+  for (const date of [{ y: 1990, m: 5, d: 10 }, { y: 1987, m: 7, d: 10 }, { y: 1956, m: 3, d: 5 }, { y: 1957, m: 6, d: 15 }, { y: 1950, m: 6, d: 1 }]) {
+    const opts = birthTimeOptions(utcOffset(date).off);
+    assert.equal(opts[0].start, 0); assert.equal(opts.at(-1).end, 1440);
+    for (const o of opts) {
+      const ref = dayHour(buildChart({ ...date, gender: 'M', calendar: 'solar', timeBranch: o.value }));
+      assert.equal(JSON.parse(ref)[1].b, o.branch, o.label);
+      for (const t of [o.start, o.end - 1]) assert.equal(dayHour(buildChart({ ...date, gender: 'M', calendar: 'solar', time: hhmm(t) })), ref, `${date.y} ${o.label} ${hhmm(t)}`);
+    }
   }
+});
+test('밤 11시~11시 30분 출생은 해시·당일 일주이고 11시 30분 이후만 다음 날 자시다', () => {
+  const D = { gender: 'M', calendar: 'solar', y: 1990, m: 5, d: 10 };
+  assert.equal(branchOfTime('23:10', 540).value, '11');
+  assert.equal(branchOfTime('23:40', 540).value, 'n0');
+  assert.equal(dayHour(buildChart({ ...D, timeBranch: '11' })), dayHour(buildChart({ ...D, time: '23:10' })));
+  assert.equal(buildChart({ ...D, timeBranch: 'n0' }).pillars.day.b, buildChart({ ...D, d: 11, time: '06:00' }).pillars.day.b);
+  // 1987년 서머타임 02:10은 표준시 01:10 → 자시
+  assert.equal(branchOfTime('02:10', utcOffset({ y: 1987, m: 7, d: 10 }).off).branch, 0);
+  assert.equal(buildChart({ ...D, y: 1987, m: 7, d: 10, time: '02:10' }).pillars.hour.b, 0);
+});
+test('이전 저장값·시간 모름·잘못된 시진', () => {
   const branch = (timeBranch) => buildChart({ ...A, timeBranch });
   assert.equal(branch('3').pillars.hour.b, 3);
   assert.equal(branch('zi-early').pillars.day.b, buildChart({ ...A, time: '06:00' }).pillars.day.b);
   assert.equal(branch('zi-late').pillars.day.b, buildChart({ ...A, d: 29, time: '06:00' }).pillars.day.b);
   assert.equal(buildChart(toEngine({ ...A, timeMode: 'branch', timeBranch: '3', noTime: true })).pillars.hour, null);
+  assert.equal(buildChart(toEngine({ ...A, timeMode: 'branch', timeBranch: '3' })).timeLabel, '묘시 · 05:30~07:30');
+  assert.equal(buildChart(toEngine({ ...A, timeMode: 'exact', time: '03:40', timeBranch: null })).timeLabel, '03:40');
   assert.throws(() => buildChart({ ...A, timeBranch: 'wrong' }));
-  assert.deepEqual(buildChart(toEngine(A)).pillars, buildChart(A).pillars, '기존 정확한 입력 보존');
+  assert.deepEqual(buildChart(toEngine(A)).pillars, buildChart(A).pillars, '정확한 시각 입력 보존');
 });
 test('일반 점수 환산과 상세 설명의 일별 가감은 같은 계산', () => {
   const zero = { acc: Array.from({ length: 7 }, () => new Map()), L: 0 };

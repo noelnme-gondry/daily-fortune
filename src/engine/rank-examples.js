@@ -14,7 +14,7 @@ export function findBirthExamples(pillars, from = 1930) {
   const examples = [];
   for (const solar of candidates) {
     const input = { y: solar.getYear(), m: solar.getMonth(), d: solar.getDay(), calendar: 'solar', gender: 'M',
-      ...(pillars.hour ? { timeBranch: hour.b ? String(hour.b) : 'zi-early' } : { time: null }) };
+      ...(pillars.hour ? { timeBranch: String(hour.b) } : { time: null }) };
     if (matchingPillars(pillars, buildChart(input).pillars)) examples.push(input);
   }
   return examples.sort((a, b) => b.y - a.y || b.m - a.m || b.d - a.d).slice(0, 2);
