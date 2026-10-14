@@ -50,11 +50,13 @@ for (const width of [320, 768]) {
 test('데스크톱 메뉴는 기존 위치를 유지하고 모바일 전환 상태가 남지 않는다', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/today/');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.evaluate(() => window.scrollTo(0, 900));
   await expect(page.locator('.site-head')).toHaveClass(/is-hidden/);
   await page.setViewportSize({ width: 1024, height: 900 });
   await expect(page.locator('.site-head')).not.toHaveAttribute('data-scroll-header', '');
   expect(await page.locator('.site-head').evaluate((el) => window.getComputedStyle(el).position)).toBe('static');
   await page.locator('button[type="submit"]').click();
+  await expect(page.locator('#result .chart-card')).toBeVisible();
   await expect(page.getByRole('navigation', { name: '다른 운세 보기' })).toBeVisible();
 });
