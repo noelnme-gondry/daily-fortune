@@ -73,6 +73,8 @@ app.get(/.*/, (req, res, next) => {
     return res.redirect(301, `${p}/${q}`);
   }
   const c = current();
+  const moved = c.site.redirect(p);
+  if (moved) return res.redirect(301, moved);
   let html = c.html.get(p);
   if (!html) {
     html = c.site.render(p);

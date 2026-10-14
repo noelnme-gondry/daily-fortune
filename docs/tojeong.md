@@ -23,6 +23,8 @@
 - 원본: `molpass/mcp-tojeong/data/tojeong_144.json`.
 - 고정 커밋: `d252dbfe9ad68a91665490f9800cefa86f90f07d`.
 - 로컬: `src/content/tojeong-144.json`. 내용 수정 없이 보관하고 표시할 때만 문단을 나눈다.
+- 배포: 브라우저는 144괘 전체를 받지 않는다. 빌드 때 `vite.config.js`의 `tojeongData`가 괘별 파일(`/data/tojeong/{괘}.json`, 약 4.5KB)을 내보내고, 계산기는 자기 괘 하나만 받는다. 서버(공유 카드)는 `src/content/tojeong-readings.js`로 원본을 읽는다.
+- 주소: 올해는 `/tojeong/` 하나만 두고 `/tojeong/{올해}/`는 301로 보낸다. 내년은 `/tojeong/{내년}/`. 각 페이지에는 그해의 태세수·음력 월별 날수·월건수·중괘와 출생 연도별 상괘를 정리한 작괘 기준표를 싣는다.
 - SHA-256: `d92d0e984e6a30450a7a7e14191e9fdd425440f2e8c80b91f211d84cf923ccdd`.
 - 제공자는 1998년 개인 소장 자료를 현대 맞춤법으로 윤문한 한글 해설이라고 밝히고 MIT로 공개했다. Copyright © 2026 Lee, JungHoon. 라이선스 전문은 `public/licenses/mcp-tojeong.txt`에 포함하며 페이지와 결과에서 링크한다.
 - 고서 한문 원전이나 오행 운세의 자체 번역으로 표시하지 않는다. 판본별 차이와 길흉 표현의 성격을 화면에 안내한다. 고서와의 144괘 전수 대조는 미실시다.

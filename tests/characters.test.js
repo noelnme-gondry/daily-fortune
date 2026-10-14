@@ -7,7 +7,7 @@ import { ALL_JOBS, CHARACTER_JOBS, SETBACK_JOBS, JOB_BY_ID } from '../src/conten
 import { ADJ, CLASSES } from '../src/content/story.js';
 import { selectJob } from '../src/engine/story.js';
 import { buildChart, lifeStory } from '../src/engine/index.js';
-import { characterCode, storyCode } from '../src/site/share-codec.js';
+import { characterCode } from '../src/site/share-codec.js';
 import { parseShare } from '../src/site/pages/share.js';
 
 test('직업 도감: 50개 모험 직업과 10개 몰락형, 독립된 그림·스킬', async () => {
@@ -88,10 +88,10 @@ test('공유: 모든 직업 영구 ID 복원, 기존 3·9챕터 링크 유지, �
     const card = parseShare(new URLSearchParams({ k: 'story', a: 'wave', c: Array(9).fill(code).join(',') }));
     assert.ok(card.lines.every(([, name]) => name === `${adj} ${job.name}`));
   }
-  const old = storyCode(ADJ.low[1], '편재', true);
-  const q = new URLSearchParams({ k: 'story', a: 'wave', c: Array(9).fill(old).join(',') });
-  assert.ok(parseShare(q).lines[0][1].includes('거지 모험가'));
-  assert.equal(parseShare(new URLSearchParams({ k: 'story', a: 'wave', c1: old, c2: '0-1', c3: '3-9' })).lines.length, 3);
+  // 이전 3챕터 링크("형용사번호-십신번호")는 계속 읽고, 배포된 적 없는 "-b" 형식은 거부한다.
+  assert.equal(parseShare(new URLSearchParams({ k: 'story', a: 'wave', c1: '7-4', c2: '0-1', c3: '3-9' })).lines.length, 3);
+  assert.equal(parseShare(new URLSearchParams({ k: 'story', a: 'wave', c1: '7-4-b', c2: '0-1', c3: '3-9' })), null);
+  const q = new URLSearchParams({ k: 'story', a: 'wave' });
   for (const bad of ['v2.8.shield', 'v2.1.missingjob', 'v2.1.__proto__', 'v2.1.constructor', 'v2.1.<script>']) {
     q.set('c', Array(9).fill(bad).join(','));
     assert.equal(parseShare(q), null, bad);

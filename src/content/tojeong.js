@@ -1,7 +1,7 @@
 export const TOJEONG = {
-  title: '무료 토정비결 — 올해 총운과 12개월 월별 운세',
+  title: '무료 토정비결 — 올해 총운과 12개월 월별 풀이',
   h1: '무료 토정비결',
-  description: '생년월일로 144괘 중 나의 토정비결을 확인하세요. 회원가입 없이 올해·내년 총운과 음력 1~12월 해설까지 모두 무료입니다. 양력·음력·윤달 입력을 지원합니다.',
+  description: '토정비결을 무료로 확인하세요. 생년월일로 144괘 중 나의 괘를 구해 총운과 음력 1~12월 풀이를 보여 드립니다. 양력·음력·윤달 입력을 지원합니다.',
   lead: '생년월일로 찾는 한 해의 이야기. 144괘에 담긴 총운과 음력 열두 달의 흐름을 읽어 보세요. 좋은 흐름과 조심할 대목까지, 모든 해설을 무료로 볼 수 있습니다.',
   source: 'https://github.com/molpass/mcp-tojeong/tree/d252dbfe9ad68a91665490f9800cefa86f90f07d',
   encyclopedia: 'https://encykorea.aks.ac.kr/Article/E0059207',
@@ -15,3 +15,6 @@ export const TOJEONG = {
     { q: '다른 사이트와 괘가 다를 수 있나요?', a: '네. 음력 출생 연도로 세는나이를 구하고, 보는 해의 음력 생월 날수와 월건수로 중괘를 구하는 방식을 사용합니다. 윤달과 생일 30일의 처리, 판본에 따라 결과가 달라질 수 있어 계산에 사용한 수를 결과에 공개합니다.' },
   ],
 };
+
+// 공유 카드 제목: 총운의 첫 문장(괘사의 첫 구절)
+export const tojeongHeadline = (reading) => String(reading?.chongun || '').split(/(?<=[.!?])\s+/)[0].trim().slice(0, 80);

@@ -92,3 +92,22 @@ test('토정비결의 윤달 조정 표시 · 잘못된 날짜 거부 · 저장 
   await expect(page.locator('.tojeong-code')).toHaveCount(0);
   expect(JSON.parse(await page.evaluate(() => sessionStorage.getItem('ohaeng:tojeong'))).y).toBe(1993);
 });
+
+test('올해 연도 주소는 /tojeong/으로 이동 · 자기 괘 해설만 받기 · 결과 공유', async ({ page }) => {
+  const data = [];
+  page.on('request', (req) => { if (req.url().includes('/data/tojeong/')) data.push(new URL(req.url()).pathname); });
+  await page.goto(`/tojeong/${todayKST().y}/`);
+  expect(new URL(page.url()).pathname).toBe('/tojeong/');
+  await ready(page, '/tojeong/');
+  await expect(page.locator('.tojeong-year-table')).toContainText(`${todayKST().y}년 토정비결 작괘 기준표`);
+  await enter(page);
+  await page.getByRole('button', { name: '무료 토정비결 보기', exact: true }).click();
+  const code = calculateTojeong({ calendar: 'solar', y: 1993, m: 6, d: 21 }, todayKST().y).code;
+  await expect(page.locator('.tojeong-code')).toHaveText(code);
+  expect(data).toEqual([`/data/tojeong/${code}.json`]);
+  await expect(page.locator('.result-share [data-share="copy"]')).toBeVisible();
+  const href = await page.locator('.result-share [data-share="x"]').getAttribute('href');
+  expect(decodeURIComponent(decodeURIComponent(href))).toContain(`k=tojeong&n=검증&y=${todayKST().y}&g=${code}`);
+  await page.goto(`/share/?k=tojeong&n=검증&y=${todayKST().y}&g=${code}`);
+  await expect(page.locator('.sc-big')).toHaveText(`${code}괘`);
+});

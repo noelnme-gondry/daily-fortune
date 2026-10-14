@@ -84,7 +84,14 @@ test('토정비결: MIT 원본 144괘와 1,728개 월별 해설이 손실 없이
 test('토정비결: 공개 진입·SEO·무료 FAQ·새해 경로가 연결된다', () => {
   const site = createSite({ site: 'https://unse.example', assets: { css: '/a.css', js: '/a.js' }, now: Date.UTC(2026, 9, 14) });
   assert.ok(site.render('/').includes('<b>무료 토정비결</b>'));
-  for (const path of ['/tojeong/', '/tojeong/2026/', '/tojeong/2027/']) {
+  // 올해 연도 주소는 같은 내용이라 /tojeong/으로 보내고, 해마다 다른 작괘 기준표를 싣는다.
+  assert.equal(site.has('/tojeong/2026/'), false);
+  assert.equal(site.redirect('/tojeong/2026/'), '/tojeong/');
+  assert.ok(site.render('/tojeong/').includes('병오(丙午)년') && site.render('/tojeong/').includes('태세수는 <b>16</b>'));
+  assert.ok(site.render('/tojeong/2027/').includes('정미(丁未)년'));
+  assert.ok(site.render('/tojeong/').includes('href="/tojeong/2027/"') && !site.render('/tojeong/2027/').includes('href="/tojeong/2026/"'));
+  assert.ok(!site.llms().includes('/tojeong/2026/'));
+  for (const path of ['/tojeong/', '/tojeong/2027/']) {
     const html = site.render(path);
     assert.ok(html.includes('id="tojeong-tool"'), path);
     assert.ok(html.includes(`href="https://unse.example${path}"`));
@@ -97,6 +104,19 @@ test('토정비결: 공개 진입·SEO·무료 FAQ·새해 경로가 연결된�
   assert.ok(site.llmsFull().includes('무료 토정비결'));
   const next = createSite({ site: 'https://unse.example', assets: { css: '/a.css', js: '/a.js' }, now: Date.UTC(2026, 11, 31, 15) });
   assert.ok(next.has('/tojeong/2028/'));
-  assert.ok(!next.has('/tojeong/2026/'));
+  assert.ok(!next.has('/tojeong/2026/') && !next.has('/tojeong/2027/'));
+  assert.equal(next.redirect('/tojeong/2027/'), '/tojeong/');
   assert.ok(next.render('/tojeong/').includes('data-year="2027"'));
+});
+
+test('토정비결 공유 카드: 괘 번호와 연도만 담고, 잘못된 값은 거부한다', async () => {
+  const { parseShare } = await import('../src/site/pages/share.js');
+  const card = parseShare(new URLSearchParams({ k: 'tojeong', n: '서윤', y: '2026', g: '232' }));
+  assert.equal(card.big, '232괘');
+  assert.equal(card.kicker, '서윤님의 2026년 토정비결');
+  assert.equal(card.title, readings['232'].chongun.split(/(?<=[.!?])\s+/)[0]);
+  assert.equal(card.tool, '/tojeong/');
+  for (const bad of [{ g: '932' }, { g: '171' }, { g: '23' }, { y: '1800' }, { g: '__proto__' }]) {
+    assert.equal(parseShare(new URLSearchParams({ k: 'tojeong', y: '2026', g: '232', ...bad })), null, JSON.stringify(bad));
+  }
 });

@@ -32,7 +32,7 @@ function routeTable(ctx) {
   add('/year/', tools.yearHub, { p: 0.7 });
   for (const yr of years) add(`/year/${yr}/`, (c) => tools.yearPage(yr, c), { p: 0.9 });
   add('/tojeong/', tojeongPage, { p: 0.9 });
-  for (const yr of years) add(`/tojeong/${yr}/`, (c) => tojeongPage(c, yr), { p: 0.9 });
+  add(`/tojeong/${y + 1}/`, (c) => tojeongPage(c, y + 1), { p: 0.8 });
   add('/lifetime/', tools.lifetime, { p: 0.9 });
   add('/compatibility/', tools.compatibility, { p: 0.9 });
   add('/life-story/', tools.story, { p: 0.9 });
@@ -91,9 +91,12 @@ export function createSite({ site, assets, now = Date.now() }) {
   };
   const lastmod = (r) => (r.daily ? ctx.todayISO : CONTENT_UPDATED);
 
+  // 같은 내용을 두 주소로 두지 않는다: 올해 연도의 토정비결 주소는 /tojeong/으로 보낸다.
+  const redirects = new Map([[`/tojeong/${ctx.today.y}/`, '/tojeong/']]);
   return {
     ctx, routes,
     has: (path) => byPath.has(path),
+    redirect: (path) => redirects.get(path) || null,
     page,
     render(path) {
       if (!byPath.has(path)) return null;
@@ -151,7 +154,7 @@ ${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일�
 - ${y}년은 ${pillarLabel(yearPillar(y))}년, ${y + 1}년은 ${pillarLabel(yearPillar(y + 1))}년입니다.
 
 ## 운세 계산기
-${pick((p) => ['/today/', '/tomorrow/', '/week/', '/month/', `/year/${y}/`, `/year/${y + 1}/`, '/tojeong/', `/tojeong/${y}/`, `/tojeong/${y + 1}/`, '/lifetime/', '/compatibility/', '/manseryeok/'].includes(p))}
+${pick((p) => ['/today/', '/tomorrow/', '/week/', '/month/', `/year/${y}/`, `/year/${y + 1}/`, '/tojeong/', `/tojeong/${y + 1}/`, '/lifetime/', '/compatibility/', '/manseryeok/'].includes(p))}
 
 ## 재미로 보는 사주
 ${pick((p) => ['/life-story/', '/saju-ranking/', '/saju/ilju-ranking/'].includes(p))}

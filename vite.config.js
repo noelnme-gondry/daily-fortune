@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { defineConfig } from 'vite';
 
 // 개발 서버: 페이지 HTML을 운영과 같은 렌더러(src/site/render.js)로 즉석 생성한다.
@@ -32,7 +33,13 @@ function sitePages() {
             res.setHeader('Location', `${path}/${url.search}`);
             return res.end();
           }
-          let html = site.render(path);
+          const moved = site.redirect(path);
+          if (moved) {
+            res.statusCode = 301;
+            res.setHeader('Location', moved);
+            return res.end();
+          }
+          let html = path === '/share/' ? site.renderShare(url.searchParams) : site.render(path);
           res.statusCode = html ? 200 : 404;
           html = await server.transformIndexHtml(req.url, html || site.notFound());
           res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -46,9 +53,33 @@ function sitePages() {
   };
 }
 
+// 토정비결 해설: 브라우저는 144괘 전체 대신 자기 괘 하나(/data/tojeong/{괘}.json)만 받는다.
+// 원본은 src/content/tojeong-144.json 하나로 두고, 개발 서버는 즉석 응답·빌드는 괘별 파일로 내보낸다.
+function tojeongData() {
+  const file = new URL('./src/content/tojeong-144.json', import.meta.url);
+  const read = () => JSON.parse(fs.readFileSync(file, 'utf8'));
+  return {
+    name: 'ohaeng-tojeong-data',
+    configureServer(server) {
+      server.middlewares.use('/data/tojeong/', (req, res, next) => {
+        const code = /^\/([1-8][1-6][1-3])\.json$/.exec(req.url.split('?')[0])?.[1];
+        const reading = code && read()[code];
+        if (!reading) return next();
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.end(JSON.stringify(reading));
+      });
+    },
+    generateBundle() {
+      for (const [code, reading] of Object.entries(read())) {
+        this.emitFile({ type: 'asset', fileName: `data/tojeong/${code}.json`, source: JSON.stringify(reading) });
+      }
+    },
+  };
+}
+
 export default defineConfig({
   publicDir: 'public',
-  plugins: [sitePages()],
+  plugins: [sitePages(), tojeongData()],
   build: {
     outDir: 'dist',
     emptyOutDir: true,

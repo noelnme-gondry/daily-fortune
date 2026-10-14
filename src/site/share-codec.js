@@ -1,11 +1,9 @@
 // 공유 카드 주소 만들기·읽기. 생년월일시는 담지 않고 결과 요약(점수·제목·이름)만 담는다.
 import { ADJ } from '../content/story.js';
-import { TG } from '../engine/core.js';
 
 export const ADJ_FLAT = [...ADJ.high, ...ADJ.good, ...ADJ.mid, ...ADJ.low];
-// 공유 캐릭터 코드: "형용사번호-십신번호" (예: 3-2 = 빛나는 풍요의 음유시인)
-export const storyCode = (adj, tg, beggar = false) => `${ADJ_FLAT.indexOf(adj)}-${TG.indexOf(tg)}${beggar ? "-b" : ""}`;
-// v2부터 직업 영구 ID를 담아 도감 확장 뒤에도 같은 캐릭터를 복원한다.
+// 공유 캐릭터 코드: v2부터 직업 영구 ID를 담아 도감 확장 뒤에도 같은 캐릭터를 복원한다.
+// (이전 형식 "형용사번호-십신번호"는 공유 페이지에서 읽기만 한다)
 export const characterCode = (adj, jobId) => `v2.${ADJ_FLAT.indexOf(adj)}.${jobId}`;
 export const SHARE_KINDS = {
   today: { tool: '/today/', label: '오늘의 운세' },
@@ -18,6 +16,7 @@ export const SHARE_KINDS = {
   story: { tool: '/life-story/', label: '사주로 본 내 인생' },
   rank: { tool: '/saju-ranking/', label: '사주 랭킹' },
   manse: { tool: '/manseryeok/', label: '만세력' },
+  tojeong: { tool: '/tojeong/', label: '토정비결' },
 };
 const NAME_RE = /[^가-힣a-zA-Z0-9 ]/g;
 export const cleanName = (s) => String(s || '').replace(NAME_RE, '').trim().slice(0, 10);

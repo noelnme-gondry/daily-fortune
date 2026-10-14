@@ -245,6 +245,14 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .tojeong-calculation dt { font-weight: 600; color: var(--accent); }
 .tojeong-calculation dd { margin: 0; }
 .tojeong-calculation dd:last-child { color: var(--ink-2); font-size: 13px; }
+.tojeong-year-table { display: grid; gap: 12px; }
+.tojeong-year-table h3 { margin-top: 6px; }
+.tj-table td:last-child, .tj-table th:last-child { text-align: center; }
+.tj-uppers { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tj-uppers li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.tj-uppers li:last-child { border-bottom: 0; }
+.tj-uppers b { color: var(--accent); }
+.tj-uppers span { color: var(--ink-2); font-variant-numeric: tabular-nums; }
 @media (max-width: 900px) { .tojeong-layout { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 480px) { .tojeong-months { grid-template-columns: repeat(4, minmax(0, 1fr)); } .tojeong-heading { align-items: flex-start; gap: 12px; } .tojeong-code { font-size: 28px; padding: 10px; } }
 .tool-pair { grid-template-columns: minmax(0, 1fr); }
