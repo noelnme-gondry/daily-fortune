@@ -1,5 +1,6 @@
 import { collapseDisclosures } from './interactions.js';
 import { initPageShare } from './share.js';
+import { initAdSlotTracking } from './partner-ad.js';
 let pending;
 export function initTtiNavigation() {
   if (!document.querySelector('.tti-nav')) return;
@@ -32,6 +33,7 @@ export function initTtiNavigation() {
       });
       document.body.dataset.page = new URL(url, location.origin).pathname;
       if (push) history.pushState(null, '', url);
+      initAdSlotTracking();
       collapseDisclosures(content);
       if (content.querySelector('[data-cohort]')) import('./tti-client.js').then((m) => m.mountTti()).catch(() => {});
       const h1 = content.querySelector('h1');

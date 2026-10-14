@@ -4,12 +4,15 @@ import { initPageShare } from './share.js';
 import { initAutoEvents } from './analytics.js';
 import { initInteractions } from './interactions.js';
 import { initTtiNavigation } from './tti-navigation.js';
+import { initPartnerAd, initAdSlotTracking } from './partner-ad.js';
 
 initTips();
 initPageShare();
 initAutoEvents();
 initInteractions();
 initTtiNavigation();
+initPartnerAd();
+initAdSlotTracking();
 if (document.querySelector('[data-cohort]')) import('./tti-client.js').then((m) => m.mountTti()).catch(() => {});
 const tojeong = document.getElementById('tojeong-tool');
 if (tojeong) import('./tojeong-client.js').then((m) => m.mountTojeong(tojeong)).catch(() => {
