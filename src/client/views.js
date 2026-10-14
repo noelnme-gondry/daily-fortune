@@ -188,7 +188,7 @@ export function storyView(st, c) {
 }
 
 /* ── 사주 랭킹 ───────────────────────────── */
-export function rankView(r, c) {
+export function rankView(r, c, leaderRank) {
   const of = r.of.toLocaleString('ko-KR');
   const reasons = r.reasons.map((x) => `<li class="${x.pts >= 0 ? 'up' : 'down'}"><span class="pts num">${x.pts >= 0 ? '+' : ''}${x.pts}</span><span><b>${x.name}</b> ${esc(x.text)}</span></li>`).join('');
   return `<section class="report-head card rank-head"><div class="tier tier-${r.tier.code.replace('+', 'p')}"><b>${r.tier.code}</b><span>등급</span></div><div class="report-text">
@@ -200,5 +200,5 @@ export function rankView(r, c) {
       <div class="pct-bar" aria-label="상위 ${r.pct}%"><i style="left:${Math.min(99, 100 - r.pct)}%"></i><span>하위</span><span>상위</span></div>
       <h4 class="sub-h">이 순위가 나온 이유 (전체 사주 평균과 비교)</h4><ul class="reasons">${reasons}</ul></section>
     <section class="box card"><h3>분야별 순위</h3><div class="rank-cats">${r.cats.map((k) => `<div class="rank-cat"><span>${k.name}</span><div class="track"><i style="width:${Math.max(2, 100 - k.pct)}%"></i></div><b>상위 ${k.pct}%</b></div>`).join('')}</div>
-      <p class="hint">사주 랭킹은 여덟 글자의 균형과 조화만 본 재미 지표입니다. 실제 삶은 대운·세운과 노력에 따라 크게 달라집니다.</p></section>${rankGuidanceView(c, r)}${rankPlay(r)}`;
+      <p class="hint">사주 랭킹은 여덟 글자의 균형과 조화만 본 재미 지표입니다. 실제 삶은 대운·세운과 노력에 따라 크게 달라집니다.</p></section>${rankGuidanceView(c, r)}${rankPlay(r, leaderRank)}`;
 }
