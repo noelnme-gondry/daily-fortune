@@ -38,8 +38,12 @@ function routeTable(ctx) {
     add(`/manseryeok/${yr}/`, (c) => manse.manseYear(yr, c), { p: 0.6 });
     for (let m = 1; m <= 12; m++) add(`/manseryeok/${yr}/${m}/`, (c) => manse.manseMonth(yr, m, c), { p: 0.5 });
   }
-  add('/tti/', tti.hub, { p: 0.8 });
+  add('/tti/', tti.hub, { p: 0.8, cf: 'daily', daily: true });
   add('/tti/today/', tti.today, { p: 0.8, cf: 'daily', daily: true });
+  for (let t = 0; t < 12; t++) {
+    add(`/tti/today/${ANIMAL_SLUG[t]}/`, (c) => tti.animalDay(t, c), { p: 0.7, cf: 'daily', daily: true });
+    add(`/tti/tomorrow/${ANIMAL_SLUG[t]}/`, (c) => tti.animalDay(t, c, true), { p: 0.5, cf: 'daily', daily: true });
+  }
   for (const yr of years) {
     add(`/tti/${yr}/`, (c) => tti.yearIndex(yr, c), { p: 0.8 });
     for (let t = 0; t < 12; t++) add(`/tti/${yr}/${ANIMAL_SLUG[t]}/`, (c) => tti.animalYear(t, yr, c), { p: 0.7 });
@@ -135,7 +139,7 @@ function llmsTxt(ctx, routes, page) {
 ${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일시와 성별로 사주 원국(년주·월주·일주·시주)을 세우고, 기간의 간지(일진·월운·세운·대운)가 원국과 맺는 십신·합충형·12운성·신살·용신 관계를 0~100점 점수와 해설로 바꿉니다. 같은 입력이면 항상 같은 결과가 나오며(난수 미사용), 계산은 사용자의 브라우저에서 이루어집니다. 계산 규칙은 ${site}/about/ 에 공개되어 있습니다.
 
 주요 사실:
-- 년주는 입춘, 월주는 절기 절입 시각으로 바뀝니다. 시주는 동경 127.5° 평균태양시(한국 표준시 −30분)로 정하며 밤 11시 30분 이후는 다음 날 자시입니다.
+- 년주는 입춘, 월주는 절기 절입 시각으로 바뀝니다. 시진 선택은 해당 지지의 대표 시각으로 계산하며 밤 자시는 다음 날 일주를 사용합니다. 기존 정확한 시각 입력은 동경 127.5° 평균태양시(한국 표준시 −30분) 보정 후 밤 11시 30분부터 다음 날 자시로 계산합니다.
 - 한국 서머타임(1948–51, 1955–60, 1987–88)과 1954–61년 UTC+8:30 표준시를 보정합니다. 음력은 한국천문연구원 기준입니다.
 - ${y}년은 ${pillarLabel(yearPillar(y))}년, ${y + 1}년은 ${pillarLabel(yearPillar(y + 1))}년입니다.
 

@@ -5,10 +5,10 @@ import {
 } from '../engine/index.js';
 import RANK_TABLE from '../content/rank-table.js';
 import { ILJU_TAG } from '../content/knowledge.js';
-import { load, save, toEngine, SAMPLE } from './profile.js';
+import { load, save, removeSaved, sessionLoad, sessionSave, toEngine, SAMPLE } from './profile.js';
 import { chartCard, dayView, weekView, monthView, yearView, lifeView, compatView, manseView, storyView, rankView } from './views.js';
 import { resultShareHtml, wireShare } from './share.js';
-import { shareUrl, storyCode, SHARE_KINDS, cleanName } from '../site/share-codec.js';
+import { shareUrl, characterCode, SHARE_KINDS, cleanName } from '../site/share-codec.js';
 import { track } from './analytics.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -23,7 +23,13 @@ function fillForm(form, who, p) {
   if ([...f('y').options].some((o) => +o.value === p.y)) f('y').value = String(p.y);
   f('m').value = String(p.m); f('d').value = String(p.d);
   f('leap').checked = !!p.leap; f('leap').disabled = p.calendar !== 'lunar';
-  f('time').value = p.time || '12:00'; f('time').disabled = !!p.noTime;
+  if (p.timeMode !== 'branch' && p.time) {
+    let legacy = f('time').querySelector('option[value="legacy"]');
+    if (!legacy) { legacy = document.createElement('option'); legacy.value = 'legacy'; f('time').append(legacy); }
+    legacy.textContent = `기존 입력 ${p.time} 유지`;
+    legacy.dataset.time = p.time;
+  }
+  f('time').value = p.timeMode === 'branch' ? p.timeBranch : p.time ? 'legacy' : '6'; f('time').disabled = !!p.noTime;
   f('notime').checked = !!p.noTime;
 }
 function readForm(form, who) {
@@ -34,7 +40,9 @@ function readForm(form, who) {
     calendar: $(`input[name="${who}-cal"]:checked`, form).value,
     leap: f('leap').checked,
     y: +f('y').value, m: +f('m').value, d: +f('d').value,
-    time: f('time').value || '12:00', noTime: f('notime').checked,
+    timeMode: f('time').value === 'legacy' ? 'exact' : 'branch',
+    time: f('time').value === 'legacy' ? f('time').selectedOptions[0].dataset.time : null,
+    timeBranch: f('time').value, noTime: f('notime').checked,
   };
 }
 const check = (p) => (p.calendar === 'solar' && p.d > daysIn(p.y, p.m) ? `${p.y}년 ${p.m}월에는 ${p.d}일이 없습니다.` : '');
@@ -74,9 +82,9 @@ function shareFor(mode, res, ca, cb, today, yr) {
   }
   if (mode === 'story') {
     const st = res;
-    const codes = st.stages.map((s) => storyCode(s.character.adj, s.tg));
-    return { kind: 'story', url: shareUrl(o, { k: 'story', n, a: st.arc.key, c1: codes[0], c2: codes[1], c3: codes[2] }), title: `사주로 본 ${who(n)}의 인생: ${st.arc.name}`, text: st.stages.map((s) => `${s.label} ${s.character.full}`).join(' → '), image: '/og-story.png',
-      card: { kicker: `사주로 본 ${who(n)}의 인생은`, big: st.arc.name, title: st.arc.desc.split('. ')[0] + '.', lines: st.stages.map((s) => [s.label, s.character.full]) } };
+    const codes = st.stages.map((s) => characterCode(s.character.adj, s.character.portrait));
+    return { kind: 'story', url: shareUrl(o, { k: 'story', n, a: st.arc.key, c: codes.join(',') }), title: `사주로 본 ${who(n)}의 인생: ${st.arc.name}`, text: st.stages.map((s) => `${s.label} ${s.character.full}`).join(' → '), image: '/og-story.png',
+      card: { kicker: `사주로 본 ${who(n)}의 인생은`, big: st.arc.name, title: st.arc.desc.split('. ')[0] + '.', lines: st.stages.filter((_, i) => [0, 4, 8].includes(i)).map((s) => [s.ages, s.character.full]) } };
   }
   if (mode === 'rank') {
     const r = res;
@@ -86,7 +94,7 @@ function shareFor(mode, res, ca, cb, today, yr) {
   return null;
 }
 
-export function mount(root) {
+export async function mount(root) {
   const mode = root.dataset.tool;
   const form = $('#tool-form', root);
   const out = $('#result', root);
@@ -149,13 +157,36 @@ export function mount(root) {
     return true;
   }
 
-  const a0 = load('a');
-  const b0 = load('b');
+  const storageStatus = $('[data-storage-status]', form);
+  const persist = $('#save-device', form);
+  form.inert = true;
+  let savedA, savedB;
+  try { [savedA, savedB] = await Promise.all([load('a'), load('b')]); }
+  catch { storageStatus.textContent = '저장소를 불러오지 못했습니다. 저장 없이 계산할 수 있습니다.'; }
+  finally { form.inert = false; }
+  persist.checked = !!savedA;
+  try { const preference = sessionStorage.getItem('ohaeng:save-device'); if (preference !== null) persist.checked = preference === 'true'; } catch { /* 접근 제한 */ }
+  persist.addEventListener('change', () => { try { sessionStorage.setItem('ohaeng:save-device', String(persist.checked)); } catch { /* 접근 제한 */ } });
+  const a0 = sessionLoad('a') || savedA;
+  const b0 = sessionLoad('b') || savedB;
   fillForm(form, 'a', a0);
   if (pair) fillForm(form, 'b', b0);
   if (mode !== 'home' && a0 && (!pair || b0)) render(a0, b0, 'saved');
 
-  form.addEventListener('submit', (e) => {
+  $('[data-delete-profile]', form).addEventListener('click', async () => {
+    try { await removeSaved(); persist.checked = false; try { sessionStorage.removeItem('ohaeng:save-device'); } catch { /* 접근 제한 */ } storageStatus.textContent = '이 기기의 나·상대 저장 정보를 삭제했습니다. 화면의 입력은 다음 이동까지만 남습니다.'; }
+    catch { storageStatus.textContent = '삭제에 실패했습니다. 저장소 접근을 허용한 뒤 다시 시도해 주세요.'; }
+  });
+  async function remember(a, b) {
+    const temporary = sessionSave('a', a) && (!b || sessionSave('b', b));
+    if (!persist.checked) { storageStatus.textContent = temporary ? '현재 탭에만 임시로 유지됩니다. 기존 기기 저장본은 삭제 버튼으로 지울 수 있습니다.' : '이 브라우저는 저장을 제한하고 있습니다. 현재 화면에서만 결과를 볼 수 있습니다.'; return temporary; }
+    try {
+      await save('a', a); if (b) await save('b', b);
+      storageStatus.textContent = '이 기기의 IndexedDB에 저장했습니다.';
+      return true;
+    } catch { storageStatus.textContent = '기기 저장에 실패했습니다. 결과는 계산되었지만 새로 방문하면 입력이 사라질 수 있습니다.'; return false; }
+  }
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const a = readForm(form, 'a');
     const b = pair ? readForm(form, 'b') : null;
@@ -164,13 +195,12 @@ export function mount(root) {
     track('calc_submit', { tool: mode });
     if (mode === 'home') {
       try { buildChart(toEngine(a)); } catch (er) { showError(er.message || '입력한 날짜를 확인해 주세요.'); return; }
-      save('a', a);
-      location.href = '/today/';
+      if (await remember(a)) location.href = '/today/';
+      else showError('저장에 실패했습니다. 기기 저장 선택을 해제하고 다시 계산하거나 오늘의 운세 페이지에서 직접 입력해 주세요.');
       return;
     }
     if (render(a, b, 'form')) {
-      save('a', a);
-      if (pair) save('b', b);
+      await remember(a, b);
       out.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   });
@@ -179,8 +209,9 @@ export function mount(root) {
     track('sample_click', { tool: mode });
     fillForm(form, 'a', SAMPLE.a);
     if (pair) fillForm(form, 'b', SAMPLE.b);
-    if (mode === 'home') { save('a', SAMPLE.a); location.href = '/today/'; return; }
+    if (mode === 'home') { if (sessionSave('a', SAMPLE.a)) location.href = '/today/'; else showError('임시 저장을 사용할 수 없습니다. 오늘의 운세 페이지에서 예시 인물을 선택해 주세요.'); return; }
     render(SAMPLE.a, SAMPLE.b, 'sample');
     out.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+  root.dataset.ready = 'true';
 }

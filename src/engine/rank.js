@@ -1,9 +1,8 @@
 // 사주 랭킹: 원국 자체의 "균형·조화·길신"을 점수로 매기고, 가능한 모든 사주(4기둥 518,400가지, 시간 모름 3기둥 43,200가지)
 // 분포표에서 순위를 찾는다. 대운·성별과 무관하게 여덟 글자만으로 계산한다.
 import {
-  STEM_EL, BR_EL, EL_K, EL_H, GWIIN, LIUHE, branchRels, stemHe, stemChung, josa, hongran, cheonhui,
+  EL_K, EL_H, GWIIN, LIUHE, branchRels, stemHe, stemChung, josa, hongran, cheonhui,
 } from './core.js';
-import { analyze } from './chart.js';
 
 const POS_KO = { year: '년지', month: '월지', day: '일지', hour: '시지' };
 const STEM_POS_KO = { year: '년간', month: '월간', day: '일간', hour: '시간' };

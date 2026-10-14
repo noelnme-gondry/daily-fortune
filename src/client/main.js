@@ -2,10 +2,15 @@
 import { initTips } from './tips.js';
 import { initPageShare } from './share.js';
 import { initAutoEvents } from './analytics.js';
+import { initInteractions } from './interactions.js';
+import { initTtiNavigation } from './tti-navigation.js';
 
 initTips();
 initPageShare();
 initAutoEvents();
+initInteractions();
+initTtiNavigation();
+if (document.querySelector('[data-cohort]')) import('./tti-client.js').then((m) => m.mountTti()).catch(() => {});
 
 // 수동 광고 단위(ADSENSE_SLOT_*)가 있으면 채운다
 document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(() => {

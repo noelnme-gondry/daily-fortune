@@ -4,7 +4,9 @@ import { TG } from '../engine/core.js';
 
 export const ADJ_FLAT = [...ADJ.high, ...ADJ.good, ...ADJ.mid, ...ADJ.low];
 // 공유 캐릭터 코드: "형용사번호-십신번호" (예: 3-2 = 빛나는 풍요의 음유시인)
-export const storyCode = (adj, tg) => `${ADJ_FLAT.indexOf(adj)}-${TG.indexOf(tg)}`;
+export const storyCode = (adj, tg, beggar = false) => `${ADJ_FLAT.indexOf(adj)}-${TG.indexOf(tg)}${beggar ? "-b" : ""}`;
+// v2부터 직업 영구 ID를 담아 도감 확장 뒤에도 같은 캐릭터를 복원한다.
+export const characterCode = (adj, jobId) => `v2.${ADJ_FLAT.indexOf(adj)}.${jobId}`;
 export const SHARE_KINDS = {
   today: { tool: '/today/', label: '오늘의 운세' },
   tomorrow: { tool: '/tomorrow/', label: '내일의 운세' },

@@ -3,6 +3,7 @@
 import T from '../../content/text.js';
 import { ILJU_TAG } from '../../content/knowledge.js';
 import { CLASSES, ARCS } from '../../content/story.js';
+import { JOB_BY_ID } from '../../content/character-jobs.js';
 import { TG, sexagenary, iljuSlug, pillarKo, pillarH, COMPAT_HEADLINES, TIERS, parseISO } from '../../engine/index.js';
 import { SHARE_KINDS, cleanName, ADJ_FLAT } from '../share-codec.js';
 import { esc } from '../util.js';
@@ -13,9 +14,14 @@ const ILJU = new Map([...Array(60).keys()].map((n) => { const p = sexagenary(n);
 const int = (v, lo, hi) => { const x = Number(v); return Number.isFinite(x) && x >= lo && x <= hi ? x : null; };
 
 function storyChar(code) {
-  const m = /^(\d)-(\d)$/.exec(code || '');
+  const current = /^v2\.(\d)\.([a-z]+)$/.exec(code || '');
+  if (current) {
+    const job = JOB_BY_ID[current[2]], adj = ADJ_FLAT[+current[1]];
+    return job && adj ? `${adj} ${job.name}` : null;
+  }
+  const m = /^(\d)-(\d)(-b)?$/.exec(code || '');
   if (!m || !ADJ_FLAT[+m[1]] || !TG[+m[2]]) return null;
-  return `${ADJ_FLAT[+m[1]]} ${CLASSES[TG[+m[2]]].name}`;
+  return `${ADJ_FLAT[+m[1]]} ${m[3] ? "빈 주머니의 거지 모험가" : CLASSES[TG[+m[2]]].name}`;
 }
 
 export function parseShare(q) {
@@ -44,10 +50,12 @@ export function parseShare(q) {
     card.kicker = `${name || '나'} × ${n2 || '상대'} 궁합`; card.big = `${s}점`; card.title = h;
   } else if (k === 'story') {
     const arc = ARCS[q.get('a')];
-    const chars = ['c1', 'c2', 'c3'].map((x) => storyChar(q.get(x)));
+    const modern = q.has('c');
+    const chars = modern ? q.get('c').split(',').map(storyChar) : ['c1', 'c2', 'c3'].map((x) => storyChar(q.get(x)));
+    if (modern && chars.length !== 9) return null;
     if (!arc || chars.some((c) => !c)) return null;
     card.kicker = `사주로 본 ${who}의 인생은`; card.big = arc.name; card.title = arc.desc.split('. ')[0] + '.';
-    card.lines = [['초반', chars[0]], ['중반', chars[1]], ['후반', chars[2]]];
+    card.lines = modern ? chars.map((c, i) => [`${i * 10}~${i * 10 + 9}세`, c]) : [['초반', chars[0]], ['중반', chars[1]], ['후반', chars[2]]];
   } else if (k === 'rank') {
     const s = int(q.get('s'), 0, 100), r = int(q.get('r'), 1, 518400), w = q.get('w') === '0' ? 0 : 1;
     const tier = TIERS.find((t) => t[1] === q.get('t'));

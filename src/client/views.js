@@ -4,6 +4,9 @@ import {
 } from '../engine/index.js';
 
 import { TIPS } from '../content/tips.js';
+import { birthTimeLabel } from '../domain/birth-time.js';
+import { storyDeck } from './story-view.js';
+import { rankPlay } from './rank-view.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 const hz = (p) => `${STEM_H[p.s]}${BR_H[p.b]}`;
@@ -57,7 +60,7 @@ export function chartCard(c, profile, today) {
   const ss = [...new Set(c.natalSS.map(([n]) => n))];
   const cur = c.daeun.filter((d) => d.startYear <= today.y).pop();
   const p = profile;
-  const birth = `${p.calendar === 'lunar' ? `음력 ${p.leap ? '윤' : ''}` : '양력 '}${p.y}.${String(p.m).padStart(2, '0')}.${String(p.d).padStart(2, '0')}${c.hasTime ? ` ${p.time}` : ' (시간 모름)'}`;
+  const birth = `${p.calendar === 'lunar' ? `음력 ${p.leap ? '윤' : ''}` : '양력 '}${p.y}.${String(p.m).padStart(2, '0')}.${String(p.d).padStart(2, '0')} · ${esc(birthTimeLabel(p))}`;
   const day = c.pillars.day;
   return `<section class="chart-card card" aria-label="사주 원국">
     <div class="chart-head"><h2>${esc(c.name || '나')}의 사주 원국 ${tip(TIPS.chart, '사주 원국 보는 법')}</h2><span class="muted">${birth}${p.calendar === 'lunar' ? ` (양력 ${isoDate(c.birth)})` : ` · ${c.lunarText}`} · ${c.gender === 'F' ? '여성' : '남성'}${c.dst ? ' · 서머타임 보정' : ''}</span></div>
@@ -202,28 +205,19 @@ const icon = (k) => `<svg class="cls-icon" viewBox="0 0 24 24" aria-hidden="true
 function arcChart(stages) {
   const W = 600, H = 170, L = 60, R = 60, Tp = 30, B = 36;
   const iw = W - L - R, ih = H - Tp - B;
-  const x = (i) => L + (iw * i) / 2;
+  const x = (i) => L + (iw * i) / (stages.length - 1);
   const y = (v) => Tp + ih * (1 - (v - 20) / 70);
   const pts = stages.map((s, i) => `${x(i)},${y(Math.max(20, Math.min(90, s.score))).toFixed(1)}`).join(' ');
   return `<svg class="chart-svg arc" viewBox="0 0 ${W} ${H}" role="img" aria-label="인생 곡선">
-    <line class="grid" x1="${L}" x2="${W - R}" y1="${y(60)}" y2="${y(60)}"></line><text x="${L - 8}" y="${y(60) + 4}" text-anchor="end">평균</text>
+    <line class="grid" x1="${L}" x2="${W - R}" y1="${y(60)}" y2="${y(60)}"></line><text x="${L - 8}" y="${y(60) + 4}" text-anchor="end">60점</text>
     <polyline class="line" points="${pts}"></polyline>
-    ${stages.map((s, i) => `<circle class="pt${s.now ? ' cur' : ''}" cx="${x(i)}" cy="${y(Math.max(20, Math.min(90, s.score))).toFixed(1)}" r="7"></circle><text class="v" x="${x(i)}" y="${(y(Math.max(20, Math.min(90, s.score))) - 14).toFixed(1)}" text-anchor="middle">${s.score}</text><text x="${x(i)}" y="${H - 10}" text-anchor="middle">${s.label} · ${s.ages}</text>`).join('')}
+    ${stages.map((s, i) => `<circle class="pt${s.now ? ' cur' : ''}" cx="${x(i)}" cy="${y(Math.max(20, Math.min(90, s.score))).toFixed(1)}" r="7"></circle><text class="v" x="${x(i)}" y="${(y(Math.max(20, Math.min(90, s.score))) - 14).toFixed(1)}" text-anchor="middle">${s.score}</text><text x="${x(i)}" y="${H - 10}" text-anchor="middle">${s.label}</text>`).join('')}
   </svg>`;
 }
 export function storyView(st, c) {
-  const statRows = (stats) => st.statNames.map(([k, n]) => `<div class="stat"><span>${n}</span><div class="track"><i style="width:${stats[k]}%"></i></div><b class="num">${stats[k]}</b></div>`).join('');
-  const evLine = (e) => `<li><b class="num">${e.y}</b> (${e.age}세) ${e.kind}의 해${e.past ? ' <span class="muted">· 지난 시기</span>' : ''}</li>`;
   return `<section class="report-head card story-head"><div class="arc-badge" aria-hidden="true">${icon(st.stages[1].character.icon)}</div><div class="report-text"><div class="when"><span>사주로 본 ${esc(c.name || '나')}의 인생은</span></div><h2>${esc(st.arc.name)}</h2><p>${esc(st.arc.desc)}</p></div></section>
     <section class="box card"><div class="box-head"><h3>인생 곡선</h3><span class="muted">빨간 점 = 지금 시기 (만 ${st.nowAge}세)</span></div>${arcChart(st.stages)}</section>
-    <div class="story-cards">${st.stages.map((s) => `<article class="story-card card band-${s.band}${s.now ? ' now' : ''}">
-      <header><span class="stage-tag">${s.title} · ${s.ages}${s.now ? ' · 지금' : ''}</span>${icon(s.character.icon)}<h3><small>${esc(s.character.adj)}</small>${esc(s.character.name)}</h3><span class="lv">시기 점수 <b class="num">${s.score}</b></span></header>
-      <div class="stats"><h4>능력치 ${tip(TIPS.stats, '능력치 설명')}</h4>${statRows(s.stats)}</div>
-      <p class="skill"><b>스킬 · ${esc(s.skill.name)}</b> ${esc(s.skill.desc)}</p>
-      <p>${esc(s.story)}</p>
-      ${s.events.length ? `<div class="events-mini"><h4>주요 사건이 일어나기 쉬운 해</h4><ul>${s.events.map(evLine).join('')}</ul></div>` : ''}
-      <p class="quest"><b>퀘스트</b> ${esc(s.quest)}</p>
-    </article>`).join('')}</div>`;
+    ${storyDeck(st)}`;
 }
 
 /* ── 사주 랭킹 ───────────────────────────── */
@@ -239,5 +233,5 @@ export function rankView(r, c) {
       <div class="pct-bar" aria-label="상위 ${r.pct}%"><i style="left:${Math.min(99, 100 - r.pct)}%"></i><span>하위</span><span>상위</span></div>
       <h4 class="sub-h">이 순위가 나온 이유 (전체 사주 평균과 비교)</h4><ul class="reasons">${reasons}</ul></section>
     <section class="box card"><h3>분야별 순위</h3><div class="rank-cats">${r.cats.map((k) => `<div class="rank-cat"><span>${k.name}</span><div class="track"><i style="width:${Math.max(2, 100 - k.pct)}%"></i></div><b>상위 ${k.pct}%</b></div>`).join('')}</div>
-      <p class="hint">사주 랭킹은 여덟 글자의 균형과 조화만 본 재미 지표입니다. 실제 삶은 대운·세운과 노력에 따라 크게 달라집니다.</p></section>`;
+      <p class="hint">사주 랭킹은 여덟 글자의 균형과 조화만 본 재미 지표입니다. 실제 삶은 대운·세운과 노력에 따라 크게 달라집니다.</p></section>${rankPlay(r)}`;
 }

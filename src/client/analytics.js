@@ -8,6 +8,8 @@ export function track(name, params = {}) {
 // 페이지 공통 클릭 이벤트: 카드·CTA·탭·FAQ
 export function initAutoEvents() {
   document.addEventListener('click', (e) => {
+    const faq = e.target.closest('.faq-button');
+    if (faq?.getAttribute('aria-expanded') === 'false') track('faq_open', { question: faq.textContent.slice(0, 90) });
     const a = e.target.closest('a');
     if (a) {
       const href = a.getAttribute('href') || '';
@@ -17,11 +19,4 @@ export function initAutoEvents() {
       else if (a.closest('.cta')) track('select_content', { content_type: 'cta', item_id: href });
     }
   });
-  document.addEventListener('toggle', (e) => {
-    const d = e.target;
-    if (d.tagName === 'DETAILS' && d.open && d.closest('.faq')) {
-      const q = d.querySelector('summary');
-      track('faq_open', { question: q ? q.textContent.slice(0, 90) : '' });
-    }
-  }, true);
 }
