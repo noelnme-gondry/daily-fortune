@@ -11,7 +11,7 @@ export function config() {
       pub: adClient.replace(/^ca-/, ''),
       slots: { inline: env('ADSENSE_SLOT_INLINE').trim(), bottom: env('ADSENSE_SLOT_BOTTOM').trim() },
     } : null,
-    naverVerify: env('NAVER_SITE_VERIFICATION', '74d80ca55a133ebebd6562fc4b041e6e1633a9a7').trim(),
+    naverVerify: env('NAVER_SITE_VERIFICATION', 'b8891c3ebeb248742c25823689dcdb21019a7363').trim(),
     googleVerify: env('GOOGLE_SITE_VERIFICATION').trim(),
   };
 }

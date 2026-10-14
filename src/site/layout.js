@@ -119,7 +119,8 @@ ${page.ogType === 'article' ? `<meta property="article:modified_time" content="$
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600;900&display=swap">
 <link rel="stylesheet" href="${ctx.assets.css}">
 ${page.tool && ctx.assets.tool ? `<link rel="modulepreload" href="${ctx.assets.tool}">\n` : ''}<script type="application/ld+json">${ld}</script>
-${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${attr(cfg.adsense.client)}" crossorigin="anonymous"></script>\n` : ''}</head>
+${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-account" content="${attr(cfg.adsense.client)}">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${attr(cfg.adsense.client)}" crossorigin="anonymous"></script>\n` : ''}</head>
 <body${page.tool ? ' class="has-tool"' : ''} data-page="${attr(page.path)}">
 <a class="skip" href="#main">본문 바로가기</a>
 <header class="site-head">
