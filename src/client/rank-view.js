@@ -1,11 +1,8 @@
-import LEADERS from '../content/rank-leaders.js';
-import { TIERS, RANK_CATS } from '../engine/rank.js';
-import { pillarKo, pillarH } from '../engine/core.js';
+import { TIERS } from '../engine/rank.js';
+import { rankLeadersView } from './rank-leaders-view.js';
 import { uiIcon } from '../site/icons.js';
 export function rankPlay(r) {
-  const tables = LEADERS[r.withHour ? 'four' : 'three'];
   const medals = r.cats.filter((c) => c.pct <= 20);
-  const categories = [['total', '종합'], ...RANK_CATS];
   return `<section class="box card rank-play"><div class="sec-head"><h3>${uiIcon('trophy')} 나의 사주 업적</h3><span class="chip">${r.tier.code} · ${r.tier.name}</span></div><div class="achievement-grid">${(medals.length ? medals : [r.cats.slice().sort((a, b) => a.pct - b.pct)[0]]).map((m) => `<article><span aria-hidden="true">✦</span><b>${m.name} ${m.pct <= 20 ? '특화' : '주력'}</b><span>상위 ${m.pct}% · ${m.score}점</span></article>`).join('')}</div><h4>등급 지도</h4><ol class="tier-ladder">${TIERS.slice().reverse().map(([lim, code, name]) => `<li${code === r.tier.code ? ' aria-current="step"' : ''}><b>${code}</b><span>${name}</span><small>상위 ${lim}% 이내</small></li>`).join('')}</ol><p class="hint">이론상 원국 조합의 순위입니다. 실제 사람의 분포나 인생의 성적표가 아닙니다.</p></section>
-  <section class="box card"><div class="sec-head"><h3>명예의 전당 · 상위 5개 조합</h3><label>분야 <select class="input" data-leader-category aria-label="명예의 전당 분야">${categories.map(([k,n]) => `<option value="${k}">${n}</option>`).join('')}</select></label></div><p class="hint">같은 점수는 공동 순위입니다. 동점자가 많으면 대표 조합 5개만 표시합니다. 원국을 누르면 내 점수와 비교합니다.</p>${categories.map(([k,n]) => `<div data-leader-panel="${k}"${k !== 'total' ? ' hidden' : ''}><ol class="leader-list">${tables[k].map((s,i) => `<li><button class="leader-button" type="button" data-dialog="leader-${k}-${i}" aria-haspopup="dialog"><b>${s.rank}위</b><span>${pillarKo(s.pillars.day)}일주 <small>${Object.values(s.pillars).filter(Boolean).map(pillarH).join(' ')}</small></span><strong>${s.score}점</strong></button><dialog class="character-dialog rank-dialog" id="leader-${k}-${i}" aria-labelledby="leader-title-${k}-${i}"><div class="dialog-bar"><h2 id="leader-title-${k}-${i}">${n} ${s.rank}위 조합</h2><button class="sbtn" type="button" data-close-dialog autofocus>닫기 ×</button></div><div class="box"><p class="hz">${Object.values(s.pillars).filter(Boolean).map(pillarH).join(' · ')}</p><div class="comparison"><div><span>대표 조합</span><b>${s.score}점</b></div><div><span>내 ${n} 점수</span><b>${k === 'total' ? r.total : r.cats.find((c) => c.key === k).score}점</b></div></div><p>같은 점수 ${s.tied.toLocaleString('ko-KR')}개 조합 · 종합 등급 ${s.tier}</p><p class="hint">년주·월주·일주·시주 순서입니다. 실제 출생일을 찾은 인물이 아니라 기존 규칙으로 열거한 이론상 조합입니다.</p></div></dialog></li>`).join('')}</ol></div>`).join('')}</section>`;
+  ${rankLeadersView(r)}`;
 }

@@ -162,6 +162,82 @@ test('랭킹 분야 변경 · 실제 상위 5개 · 비교 상세', async ({ pag
   await expect(page.locator('dialog[open]')).toHaveCount(0);
 });
 
+test('랭킹 날짜·시진·장단점과 감점별 개운 가이드가 실제 진입 경로에 연결된다', async ({ page }) => {
+  await ready(page, '/saju-ranking/');
+  await page.locator('[data-sample]').click();
+  const guidance = page.locator('.rank-guidance');
+  await expect(guidance).toContainText('내게 복이 되는 습관');
+  await expect(guidance.locator('.support-element')).toHaveCount(2);
+  await expect(guidance.locator('.repair-list article').first()).toContainText('평균 대비 -');
+  expect(await guidance.evaluate((el) => !!(el.compareDocumentPosition(document.querySelector('.rank-leaders')) & window.Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+  const top = page.locator('[data-leader-panel="total"] .leader-button').first();
+  await expect(top).toContainText('양력 1997년 1월 27일');
+  await expect(top).toContainText('자시');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await top.click();
+  const dialog = page.locator('dialog[open]');
+  await expect(dialog.locator('.leader-pillars dt')).toHaveText(['년주', '월주', '일주', '시주']);
+  await expect(dialog).toContainText('이 사주의 장점');
+  await expect(dialog).toContainText('단점·보완할 점');
+  await expect(dialog.locator('.leader-categories > div')).toHaveCount(5);
+  expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(top).toBeFocused();
+});
+
+test('캐릭터 배지의 SVG 중심과 원국 표의 행 경계가 정렬된다', async ({ page }) => {
+  await ready(page, '/life-story/');
+  await page.locator('[data-sample]').click();
+  await expect(page.locator('.pillar-table tbody tr')).toHaveCount(6);
+  expect(await page.locator('.pillar-table tbody tr').evaluateAll((rows) => rows.every((row) => {
+    const cells = [...row.children];
+    const top = cells[0].getBoundingClientRect().top;
+    return cells.every((c) => Math.abs(c.getBoundingClientRect().top - top) < 1 && window.getComputedStyle(c).verticalAlign === 'middle');
+  }))).toBe(true);
+  expect(await page.locator('.chapter-card .portrait-badge').evaluateAll((badges) => badges.every((b) => {
+    const icon = b.querySelector('svg'); if (!icon) return false;
+    const a = b.getBoundingClientRect(), s = icon.getBoundingClientRect();
+    return Math.abs((a.x + a.width / 2) - (s.x + s.width / 2)) < 1 && Math.abs((a.y + a.height / 2) - (s.y + s.height / 2)) < 1;
+  }))).toBe(true);
+  await expect(page.locator('.result-share [data-share="x"]')).toHaveAccessibleName('X에 공유');
+  await expect(page.locator('.result-share [data-share="facebook"] svg')).toHaveAttribute('fill', 'currentColor');
+});
+
+test('올해·내년 띠별 표의 아이콘·이름·점수 정렬과 좁은 화면 스크롤', async ({ page }) => {
+  for (const y of [todayKST().y, todayKST().y + 1]) {
+    await page.setViewportSize({ width: 1440, height: 960 });
+    await page.goto(`/tti/${y}/`);
+    await expect(page.locator('.zodiac-year-link')).toHaveCount(12);
+    expect(await page.locator('.zodiac-year-link').evaluateAll((links) => links.every((link) => {
+      const a = link.querySelector('.animal-icon').getBoundingClientRect();
+      const b = link.querySelector('span').getBoundingClientRect();
+      return Math.abs(a.y + a.height / 2 - b.y - b.height / 2) < 1 && window.getComputedStyle(link).textDecorationLine === 'none';
+    }))).toBe(true);
+    await page.setViewportSize({ width: 320, height: 800 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    await page.locator('.zodiac-year-link').first().click();
+    await expect(page).toHaveURL(new RegExp(`/tti/${y}/rat/`));
+  }
+});
+
+test('홈의 주요 콘텐츠가 입력 폼 옆에 보이고 첫 영역이 과하게 늘어나지 않는다', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await ready(page, '/');
+  const hero = await page.locator('.home-hero').boundingBox();
+  const features = await page.locator('.home-features').boundingBox();
+  const form = await page.locator('#tool-form').boundingBox();
+  expect(hero.height).toBeLessThan(740);
+  expect(features.y).toBeLessThan(form.y + form.height / 2);
+  await expect(page.locator('.home-feature')).toHaveCount(3);
+  const name = await page.locator('#a-name').boundingBox();
+  const gender = await page.locator('.field-gender .seg').boundingBox();
+  expect(Math.abs(name.y - gender.y)).toBeLessThan(1);
+  for (const width of [320, 768, 1024]) {
+    await page.setViewportSize({ width, height: 960 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+  }
+});
+
 test('띠 기본은 오늘 · 쥐띠 상세는 일별 라이트박스 · 다섯 메뉴 유지 및 뒤로가기', async ({ page }) => {
   await page.goto('/tti/');
   await expect(page.locator('h1')).toContainText('오늘');

@@ -111,7 +111,7 @@ tests/          node:test 테스트
 | `/saju/…` | 사주 백과: 60일주, 일간 10, 십신 10, 오행 5, 신살 10, 12운성, 용어 사전, 사주 보는 법 |
 | `/about/` `/privacy/` | 계산 방법 공개, 개인정보처리방침 |
 
-- **SEO**: 페이지마다 고유한 `title`·`description`·`canonical`, Open Graph·Twitter 카드, 이동 경로, 내부 링크(푸터 사이트맵·관련 페이지), `sitemap.xml`, 의미 있는 h1~h2 구조. 404는 실제 404 상태 코드로 응답합니다.
+- **SEO**: 페이지마다 고유한 `title`·`description`·`canonical`, Open Graph·Twitter 카드, 이동 경로, 내부 링크(푸터 메뉴·관련 페이지), `sitemap.xml`, 의미 있는 h1~h2 구조. 검색 수집용 파일은 화면 메뉴에 노출하지 않습니다. 404는 실제 404 상태 코드로 응답합니다.
 - **AEO(답변 엔진)**: 각 페이지 첫 문단을 질문에 바로 답하는 정의형 문장으로 쓰고, 핵심 정리 표와 질문형 FAQ(`FAQPage` 구조화 데이터)를 둡니다.
 - **GEO(생성형 엔진)**: `llms.txt`·`llms-full.txt`로 사이트 요약과 핵심 사실을 제공하고, `robots.txt`에서 GPTBot·ClaudeBot·PerplexityBot·Google-Extended·Yeti(네이버) 등을 명시적으로 허용합니다. 계산 규칙을 `/about/`에 공개해 인용 가능한 근거를 둡니다.
 - **구조화 데이터(JSON-LD @graph)**: Organization, WebSite, WebPage, BreadcrumbList, WebApplication(계산기), Article(백과·띠), FAQPage, DefinedTermSet(용어 사전), HowTo(사주 보는 법), ItemList, Dataset(만세력).
@@ -154,4 +154,6 @@ tests/          node:test 테스트
 ### 기기 저장 및 순위 데이터
 
 - `이 기기에 저장`을 선택할 때만 IndexedDB에 나·상대 입력을 보관합니다. 미선택 입력은 같은 탭의 sessionStorage에만 남습니다. 기존 localStorage는 이전 성공 뒤 제거합니다. 삭제 버튼은 두 사람의 저장본을 함께 지웁니다.
-- `npm run generate:leaders`는 기존 랭킹 산식으로 종합·5개 분야의 상위 대표 조합을 다시 만듭니다. 같은 점수의 순위는 동일하며, 실제 사람의 순위가 아닙니다.
+- `npm run generate:leaders`는 기존 랭킹 산식으로 종합·5개 분야의 상위 후보를 구하고, 1930년 이후 양력 날짜·시진을 역산해 실제 입력 경로로 원국이 재현되는 대표 조합 5개씩을 저장합니다. 같은 점수의 순위는 동일하며, 실제 사람의 순위가 아닙니다. 날짜를 확인하지 못한 조합은 목록에서 제외하되 순위는 기존 이론 분포표 기준을 유지합니다.
+- 개인 랭킹의 개운 가이드는 평균 대비 낮은 항목의 근거와 용신·희신·기신을 사용합니다. 색·방향은 공통 오행 데이터에서 가져오며, 소품이나 행동으로 원래 점수를 바꾸지 않습니다.
+- UI·캐릭터 배지는 Lucide SVG, X·Facebook·KakaoTalk은 Simple Icons의 로고를 사용합니다. 출처와 라이선스는 `docs/icon-licenses.md`에 기록합니다.

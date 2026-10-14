@@ -5,7 +5,7 @@ import {
   dayPillar, monthPillar, yearPillar, yearPillarOfDate, lunarText, solarTerms, ttiDay, ttiYear, samjaeYear, toUTC,
 } from '../../engine/index.js';
 import { esc, faqBlock, faqLd, tip, disclosure } from '../util.js';
-import { animalIcon } from '../icons.js';
+import { animalIcon, uiIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
 import { TIPS } from '../../content/tips.js';
 import { adSlot } from '../layout.js';
@@ -22,16 +22,16 @@ function personFields(p, ctx, legend) {
   const ds = [...Array(31).keys()].map((i) => `<option value="${i + 1}">${i + 1}일</option>`).join('');
   return `<fieldset class="person" data-person="${p}">
     ${legend ? `<legend class="person-legend">${esc(legend)}</legend>` : ''}
-    <div class="field"><label for="${p}-name">이름 (선택)</label><input class="input" id="${p}-name" maxlength="12" autocomplete="off" placeholder="결과에 표시할 이름"></div>
-    <fieldset class="field"><legend>성별</legend>
+    <div class="field field-name"><label for="${p}-name">이름 (선택)</label><input class="input" id="${p}-name" maxlength="12" autocomplete="off" placeholder="결과에 표시할 이름"></div>
+    <fieldset class="field field-gender"><legend>성별</legend>
       <div class="seg"><label><input type="radio" name="${p}-gender" value="F"><span>여성</span></label><label><input type="radio" name="${p}-gender" value="M" checked><span>남성</span></label></div>
     </fieldset>
-    <fieldset class="field"><legend>생년월일</legend>
+    <fieldset class="field field-birth"><legend>생년월일</legend>
       <div class="seg"><label><input type="radio" name="${p}-cal" value="solar" checked><span>양력</span></label><label><input type="radio" name="${p}-cal" value="lunar"><span>음력</span></label></div>
       <div class="ymd"><select class="input" id="${p}-y" aria-label="태어난 해">${ys.join('')}</select><select class="input" id="${p}-m" aria-label="태어난 달">${ms}</select><select class="input" id="${p}-d" aria-label="태어난 날">${ds}</select></div>
       <label class="check"><input type="checkbox" id="${p}-leap" disabled> 음력 윤달</label>
     </fieldset>
-    <fieldset class="field"><legend>태어난 시각</legend>
+    <fieldset class="field field-time"><legend>태어난 시각</legend>
       <select class="input" id="${p}-time" aria-label="태어난 시진" aria-describedby="${p}-time-hint">${BIRTH_TIMES.map((t) => `<option value="${t.value}"${t.value === '6' ? ' selected' : ''}>${t.label}</option>`).join('')}</select>
       <label class="check"><input type="checkbox" id="${p}-notime"> 시간을 몰라요</label>
       <p class="hint" id="${p}-time-hint">오전 6시는 묘시입니다. 시진의 대표 시각으로 계산하므로 절입일·시간대 경계에서는 결과가 달라질 수 있습니다.</p>
@@ -215,10 +215,11 @@ export function home(ctx) {
   const sj = samjaeYear(y);
   const body = `
     <section class="home-hero">
-      <div class="home-intro"><p class="eyebrow">${esc(SITE.tagline)}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
+      <div class="home-discovery"><div class="home-intro"><p class="eyebrow">${esc(SITE.tagline)}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
+        <section class="box-sec fun-sec"><div class="sec-head"><h2>재미로 보는 사주</h2></div><div class="home-features">${fun.map(([h, t, d], i) => `<a class="card home-feature" href="${h}">${i === 0 ? '<img src="/characters/ranger.webp" width="72" height="72" alt="">' : `<span class="home-feature-icon">${uiIcon(i === 1 ? 'trophy' : 'book')}</span>`}<span><b>${t}</b><small>${d}</small></span>${uiIcon('arrow')}</a>`).join('')}</div></section>
+      </div>
       ${toolBlock('home', ctx)}
     </section>
-    <section class="box-sec fun-sec"><div class="sec-head"><h2>재미로 보는 사주</h2></div><div class="cards three">${fun.map(([h, t, d]) => `<a class="card link-card fun-card" href="${h}"><b>${t}</b><span>${d}</span></a>`).join('')}</div></section>
     ${dayBox(o, '오늘')}
     <section class="box-sec"><div class="sec-head"><h2>운세 종류</h2></div><div class="cards three">${cards.map(([h, t, d]) => `<a class="card link-card" href="${h}"><b>${t}</b><span>${d}</span></a>`).join('')}</div></section>
     <section class="box-sec"><div class="sec-head"><h2>띠별 오늘의 운세 · ${o.m}월 ${o.d}일</h2><a href="/tti/today/">해설 보기</a></div>${ttiDayList(o, { short: true })}</section>

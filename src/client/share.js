@@ -25,7 +25,7 @@ export function resultShareHtml() {
     ${KAKAO_KEY ? '<button class="sbtn kakao" type="button" data-share="kakao">카카오톡</button>' : ''}
     ${navigator.share ? '<button class="sbtn" type="button" data-share="native">공유하기</button>' : ''}
     <button class="sbtn" type="button" data-share="copy">링크 복사</button>
-    <a class="sbtn" data-share="x" target="_blank" rel="noopener">X</a>
+    <a class="sbtn" data-share="x" aria-label="X에 공유" target="_blank" rel="noopener"></a>
     <a class="sbtn" data-share="facebook" target="_blank" rel="noopener">페이스북</a>
     <button class="sbtn strong" type="button" data-share="image">이미지 저장</button>
     <span class="toast" role="status" aria-live="polite"></span>

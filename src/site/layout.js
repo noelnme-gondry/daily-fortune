@@ -20,7 +20,7 @@ function footerGroups(ctx) {
     ['재미로 보는 사주', [['/life-story/', '사주로 본 내 인생은?'], ['/saju-ranking/', '내 사주 랭킹'], ['/saju/ilju-ranking/', '60일주 랭킹']]],
     ['띠·만세력', [['/tti/', '띠별 운세'], ['/tti/today/', '띠별 오늘의 운세'], [`/tti/${y}/`, `${y}년 띠별 운세`], ['/tti/samjae/', '삼재 띠 계산'], ['/tti/compatibility/', '띠 궁합표'], ['/manseryeok/', '만세력 계산기'], [`/manseryeok/${y}/`, `${y}년 만세력`]]],
     ['사주 백과', [['/saju/ilju/', '60일주'], ['/saju/ilgan/', '일간 10가지'], ['/saju/sipsin/', '십신'], ['/saju/ohaeng/', '오행'], ['/saju/sinsal/', '신살'], ['/saju/12unseong/', '12운성'], ['/saju/glossary/', '사주 용어 사전'], ['/saju/guide/', '사주 보는 법']]],
-    ['사이트', [['/about/', '소개 · 계산 방법'], ['/privacy/', '개인정보처리방침'], ['/sitemap.xml', '사이트맵'], ['/llms.txt', 'llms.txt']]],
+    ['사이트', [['/about/', '소개 · 계산 방법'], ['/privacy/', '개인정보처리방침']]],
   ];
 }
 
@@ -71,7 +71,7 @@ function shareBar(page, url) {
   <button class="sbtn kakao" type="button" data-share="kakao" hidden>${uiIcon('kakao')}카카오톡</button>
   <button class="sbtn" type="button" data-share="native" hidden>${uiIcon('native')}공유하기</button>
   <button class="sbtn" type="button" data-share="copy">${uiIcon('copy')}링크 복사</button>
-  <a class="sbtn" data-share="x" href="https://twitter.com/intent/tweet?text=${t}&amp;url=${u}" target="_blank" rel="noopener">${uiIcon('x')}X</a>
+  <a class="sbtn" data-share="x" aria-label="X에 공유" href="https://twitter.com/intent/tweet?text=${t}&amp;url=${u}" target="_blank" rel="noopener">${uiIcon('x')}</a>
   <a class="sbtn" data-share="facebook" href="https://www.facebook.com/sharer/sharer.php?u=${u}" target="_blank" rel="noopener">${uiIcon('facebook')}페이스북</a>
   <a class="sbtn" data-share="band" href="https://band.us/plugin/share?body=${t}%0A${u}&amp;route=${encodeURIComponent(url.split('/').slice(0, 3).join('/'))}" target="_blank" rel="noopener">${uiIcon('band')}밴드</a>
   <span class="toast" role="status" aria-live="polite"></span>
@@ -116,7 +116,6 @@ ${page.ogType === 'article' ? `<meta property="article:modified_time" content="$
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="alternate" type="application/rss+xml" title="${SITE.name} 사주 백과" href="/rss.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600;900&display=swap">
