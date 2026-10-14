@@ -27,6 +27,9 @@ test('직업 도감: 50개 모험 직업과 10개 몰락형, 독립된 그림·�
     assert.equal(meta.height, 640, job.id);
     assert.equal(meta.format, 'webp');
     digests.add(crypto.createHash('sha256').update(data).digest('hex'));
+    // 카드·도감용 384px 썸네일(scripts/gen-thumbs.mjs)
+    const thumb = await sharp(fs.readFileSync(new URL(`../public/characters/384/${job.id}.webp`, import.meta.url))).metadata();
+    assert.equal(thumb.width, 384, `${job.id} 썸네일`);
     assert.ok(job.desc && job.quest && job.skill[1]);
   }
   assert.equal(digests.size, ALL_JOBS.length, '같은 그림을 다른 파일명으로 복제하면 안 된다');

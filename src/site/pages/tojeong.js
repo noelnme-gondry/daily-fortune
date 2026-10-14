@@ -37,8 +37,8 @@ function yearTable(y) {
     <p>${y}년은 음력 <b>${ko(t.ganji)}(${t.ganji})년</b>으로 태세수는 <b>${t.taese}</b>입니다. 풀이 기간은 양력 ${ymd(t.period.start)}부터 ${ymd(t.period.end)}까지입니다.</p>
     <h3>음력 생월로 정해지는 중괘</h3>
     <div class="scroll-x"><table class="tj-table">
-      <thead><tr><th scope="col">음력 생월</th><th scope="col">${y}년 그 달</th><th scope="col">날수</th><th scope="col">월건수</th><th scope="col">중괘</th></tr></thead>
-      <tbody>${t.months.map((m) => `<tr><th scope="row">${m.m}월</th><td>${ko(m.ganji)}(${m.ganji})월</td><td>${m.days}일(${m.days === 30 ? '큰달' : '작은달'})</td><td>${m.wolgeon}</td><td><b>${m.middle}</b></td></tr>`).join('')}</tbody>
+      <thead><tr><th scope="col">음력 생월</th><th scope="col">그 달 간지</th><th scope="col">날수</th><th scope="col">월건수</th><th scope="col">중괘</th></tr></thead>
+      <tbody>${t.months.map((m) => `<tr><th scope="row">${m.m}월</th><td>${ko(m.ganji)} <small>${m.ganji}</small></td><td>${m.days}일 <small>${m.days === 30 ? '큰달' : '작은달'}</small></td><td>${m.wolgeon}</td><td><b>${m.middle}</b></td></tr>`).join('')}</tbody>
     </table></div>
     <h3>음력 출생 연도로 정해지는 상괘</h3>
     <ul class="tj-uppers">${t.uppers.map((u) => `<li><b>상괘 ${u.upper}</b><span>${u.years.slice().reverse().join(' · ')}년생</span></li>`).join('')}</ul>

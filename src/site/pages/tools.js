@@ -49,7 +49,7 @@ export function toolBlock(mode, ctx, extra = {}) {
   const form = pair
     ? `<form class="pform card pair-form" id="tool-form" novalidate><h2 class="form-title">두 사람의 사주 입력</h2><div class="pair-grid">${personFields('a', ctx, '나')}${personFields('b', ctx, '상대')}</div><div class="form-actions"><button class="btn" type="submit">${label}</button><button class="link-btn" type="button" data-sample>예시 두 사람으로 보기</button></div>${HINT}</form>`
     : `<form class="pform card" id="tool-form" novalidate><h2 class="form-title">내 사주 입력</h2>${personFields('a', ctx)}<div class="form-actions"><button class="btn" type="submit">${label}</button><button class="link-btn" type="button" data-sample>예시 인물로 보기</button></div>${HINT}</form>`;
-  const empty = `<div class="result" id="result" aria-live="polite">${mode === 'home' ? '' : '<div class="result-empty card"><p><b>생년월일과 시진을 입력하면 결과가 여기에 나타납니다.</b></p><p class="muted">이 기기에 저장을 선택하면 다음 방문에도 입력 정보를 불러올 수 있습니다.</p><noscript><p>운세 계산은 브라우저에서 이루어지므로 자바스크립트를 켜 주세요.</p></noscript></div>'}</div>`;
+  const empty = `<div class="result" id="result" aria-live="polite">${mode === 'home' ? '' : '<div class="result-empty card"><p><b>생년월일시를 입력하면 결과가 여기에 나타납니다.</b></p><p class="muted">이 기기에 저장을 선택하면 다음 방문에도 입력 정보를 불러올 수 있습니다.</p><noscript><p>운세 계산은 브라우저에서 이루어지므로 자바스크립트를 켜 주세요.</p></noscript></div>'}</div>`;
   return `<section class="tool ${pair ? 'tool-pair' : ''} ${mode === 'home' ? 'tool-home' : ''}" id="tool" ${data} aria-label="운세 계산기">${form}${empty}</section>`;
 }
 
@@ -189,7 +189,7 @@ export function yearPage(y, ctx) {
 export function yearHub(ctx) {
   const ys = [ctx.today.y, ctx.today.y + 1];
   return {
-    path: '/year/', title: '무료 신년운세 — 올해·내년 총운과 월별 운세', description: `${ys.join('년·')}년 신년운세를 무료로 확인하세요. 내 사주와 세운·대운으로 계산한 연간 총운과 월별 운세를 회원가입 없이 제공합니다. 토정비결과의 차이도 안내합니다.`,
+    path: '/year/', title: '신년운세 — 올해·내년 사주 총운과 월별 운세', description: `${ys.join('년·')}년 신년운세. 내 사주와 세운·대운으로 계산한 연간 총운과 분야별 점수, 1~12월 월별 운세를 연도별로 확인하세요. 토정비결과의 차이도 안내합니다.`,
     crumbs: [['신년운세', '/year/']], section: '/year/',
     body: `${hero('무료 신년운세', '신년운세는 그 해의 간지(세운)가 내 사주 원국과 맺는 관계로 한 해의 흐름을 봅니다. 연도를 골라 총운과 1~12월 월별 운세를 확인하세요.', FREE_ACCESS.summary)}<div class="cards">${ys.map((y) => `<a class="card link-card" href="/year/${y}/"><b>${y}년 운세</b><span>${pillarLabel(yearPillar(y))}년 · ${ANIMAL[yearPillar(y).b]}띠 해</span></a>`).join('')}</div><p class="note">이곳의 신년운세는 사주 방식으로 계산합니다. 144괘로 한 해를 읽으려면 <a href="/tojeong/">무료 토정비결</a>을 이용하세요. <a href="/about/#tojeong">두 방식의 차이</a>도 확인할 수 있습니다.</p>`,
   };
@@ -220,7 +220,7 @@ export function home(ctx) {
   const body = `
     <section class="home-hero">
       <div class="home-discovery"><div class="home-intro"><p class="eyebrow">${esc(SITE.tagline)}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
-        <section class="box-sec fun-sec"><div class="sec-head"><h2>재미로 보는 사주</h2></div><div class="home-features">${fun.map(([h, t, d], i) => `<a class="card home-feature" href="${h}">${i === 0 ? '<img src="/characters/ranger.webp" width="72" height="72" alt="">' : `<span class="home-feature-icon">${uiIcon(i === 1 ? 'trophy' : 'book')}</span>`}<span><b>${t}</b><small>${d}</small></span>${uiIcon('arrow')}</a>`).join('')}</div></section>
+        <section class="box-sec fun-sec"><div class="sec-head"><h2>재미로 보는 사주</h2></div><div class="home-features">${fun.map(([h, t, d], i) => `<a class="card home-feature" href="${h}">${i === 0 ? '<img src="/characters/384/ranger.webp" width="72" height="72" alt="">' : `<span class="home-feature-icon">${uiIcon(i === 1 ? 'trophy' : 'book')}</span>`}<span><b>${t}</b><small>${d}</small></span>${uiIcon('arrow')}</a>`).join('')}</div></section>
       </div>
       ${toolBlock('home', ctx)}
     </section>

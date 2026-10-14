@@ -247,6 +247,8 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .tojeong-calculation dd:last-child { color: var(--ink-2); font-size: 13px; }
 .tojeong-year-table { display: grid; gap: 12px; }
 .tojeong-year-table h3 { margin-top: 6px; }
+.tj-table th, .tj-table td { padding: 8px 4px; white-space: nowrap; font-size: 13.5px; }
+.tj-table small { color: var(--ink-2); font-size: 12px; }
 .tj-table td:last-child, .tj-table th:last-child { text-align: center; }
 .tj-uppers { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .tj-uppers li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 14px; }
@@ -500,28 +502,14 @@ select.input { padding-right: 4px; }
 /* 사주로 본 내 인생 */
 .story-head { grid-template-columns: 96px minmax(0, 1fr); }
 .arc-badge { width: 96px; height: 96px; border-radius: 24px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
-.arc-badge .cls-icon { width: 56px; height: 56px; }
-.story-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-@media (max-width: 1080px) { .story-cards { grid-template-columns: minmax(0, 1fr); } }
-.story-card { padding: 18px; display: grid; gap: 12px; align-content: start; border-top: 4px solid var(--line); }
-.story-card.band-high { border-top-color: var(--seal); }
-.story-card.band-good { border-top-color: var(--accent); }
-.story-card.now { box-shadow: 0 0 0 2px var(--seal) inset; }
-.story-card header { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'tag tag' 'icon name' 'icon lv'; gap: 2px 12px; align-items: center; }
-.stage-tag { grid-area: tag; font-size: 12.5px; font-weight: 600; color: var(--seal); margin-bottom: 6px; }
-.story-card .cls-icon { grid-area: icon; width: 52px; height: 52px; padding: 10px; border-radius: 14px; background: var(--accent-soft); color: var(--accent); }
-.story-card h3 { grid-area: name; font-size: 20px; }
-.story-card h3 small { display: block; font: 500 13px/1.4 var(--f-body); color: var(--ink-2); }
-.lv { grid-area: lv; font-size: 13px; color: var(--ink-2); }
-.lv b { color: var(--ink); font-size: 15px; }
+.arc-badge { overflow: hidden; }
+.arc-badge img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .stats { display: grid; gap: 5px; }
-.stats h4, .events-mini h4 { font: 600 13px/1.4 var(--f-body); color: var(--ink-2); margin: 0 0 2px; display: flex; align-items: center; }
+.stats h4 { font: 600 13px/1.4 var(--f-body); color: var(--ink-2); margin: 0 0 2px; display: flex; align-items: center; }
 .stat { display: grid; grid-template-columns: 44px minmax(0, 1fr) 26px; gap: 8px; align-items: center; font-size: 13px; }
 .stat b { text-align: right; }
 .skill { font-size: 14px; padding: 10px 12px; border-radius: 10px; background: var(--sunk); }
 .skill b { color: var(--accent); margin-right: 4px; }
-.story-card > p { font-size: 14.5px; }
-.events-mini ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13.5px; }
 .quest { font-size: 14px; border-left: 3px solid var(--seal); padding-left: 10px; }
 .quest b { color: var(--seal); margin-right: 4px; }
 
@@ -549,7 +537,9 @@ select.input { padding-right: 4px; }
 .rank-cats { display: grid; gap: 8px; }
 .rank-cat { display: grid; grid-template-columns: 82px minmax(0, 1fr) 76px; gap: 10px; align-items: center; font-size: 14px; }
 .rank-cat b { text-align: right; font-size: 13.5px; }
-.chart-svg.arc { max-height: 200px; }
+.chart-svg.arc { max-height: 220px; }
+.chart-svg.arc text { font-size: 13px; }
+.chart-svg.arc .axis { font-size: 11px; }
 
 /* 공통 문장·버튼·구역 구분 */
 p, li { text-wrap: pretty; }
