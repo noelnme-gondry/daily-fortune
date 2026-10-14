@@ -4,6 +4,16 @@ const selector = '[data-partner-ad-slot="common"]';
 const viewedPaths = new Set();
 let stopTracking;
 
+// 재계산으로 결과 HTML을 교체해도 기존 광고 지면을 한 개만 유지한다.
+export function renderResultWithPartnerAd(out, html) {
+  const ad = document.querySelector('.partner-ad');
+  out.innerHTML = html;
+  if (!ad) return;
+  const anchor = out.querySelector('.result-share + .hint') || document.querySelector('main');
+  anchor.after(ad);
+  initAdSlotTracking();
+}
+
 export function initPartnerAd() {
   const slot = document.querySelector(selector);
   if (!slot || slot.dataset.adState) return;

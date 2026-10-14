@@ -5,6 +5,7 @@ import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, cleanName } from '../site/share-codec.js';
 import { load, save, removeSaved, sessionLoad, sessionSave } from './profile.js';
 import { track } from './analytics.js';
+import { renderResultWithPartnerAd } from './partner-ad.js';
 
 export async function mountTojeong(root) {
   const form = root.querySelector('form'), out = root.querySelector('#tojeong-result');
@@ -31,7 +32,7 @@ export async function mountTojeong(root) {
     }
     return readings.get(code);
   };
-  const showError = (message) => { field('error').textContent = message; field('error').hidden = false; out.replaceChildren(); };
+  const showError = (message) => { field('error').textContent = message; field('error').hidden = false; renderResultWithPartnerAd(out, ''); };
   let latest = 0;
   async function render(p, source) {
     const token = ++latest;
@@ -42,7 +43,7 @@ export async function mountTojeong(root) {
     try {
       const r = await reading(result.code);
       if (token !== latest) return false;
-      out.innerHTML = tojeongView(result, r, p.name) + resultShareHtml();
+      renderResultWithPartnerAd(out, tojeongView(result, r, p.name) + resultShareHtml());
       wireShare(out.querySelector('.result-share'), shareFor(result, r, p.name));
       field('error').hidden = true;
       track('calc_result', { tool: 'tojeong', source, calendar: p.calendar });

@@ -493,6 +493,8 @@ select.input { padding-right: 4px; }
 /* 빈 상태에도 배너 크기를 유지하고, 외곽선은 실제 너비를 줄이지 않는다. */
 .partner-ad-slot:empty { background: var(--paper); outline: 1px solid var(--line); }
 .partner-ad-slot iframe { display: block; border: 0; }
+.result .partner-ad, .tojeong-result .partner-ad { padding-bottom: 0; }
+.result .partner-ad-inner, .tojeong-result .partner-ad-inner { padding-inline: 0; }
 
 /* 공유 카드 착지 페이지 */
 .share-land { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 28px; align-items: start; }

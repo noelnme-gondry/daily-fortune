@@ -58,6 +58,77 @@ test('화면 폭을 줄여도 배너를 다시 요청하지 않고 지면과 ifr
   expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
 });
 
+async function calculateResult(page, path) {
+  await page.goto(path);
+  const tojeong = path === '/tojeong/';
+  await expect(page.locator(tojeong ? '#tojeong-tool' : '#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('button[type="submit"]').click();
+  await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+}
+
+for (const width of [390, 1440]) {
+  test(`${width}px에서 운세·궁합·캐릭터·랭킹·토정비결 광고는 결과 공유 바로 아래에 한 개만 유지된다`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of ['/today/', '/compatibility/', '/life-story/', '/saju-ranking/', '/tojeong/']) {
+      await calculateResult(page, path);
+      const slot = page.locator('[data-partner-ad-slot="common"]');
+      await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+      await expect(page.locator('main + .partner-ad')).toHaveCount(0);
+      const resultBox = await page.locator('#result, #tojeong-result').boundingBox();
+      const box = await slot.boundingBox();
+      expect(box.width).toBe(resultBox.width);
+      expect(box.x).toBe(resultBox.x);
+      expect(box.height).toBe(140);
+      expect((await slot.locator('iframe').boundingBox()).width).toBe(box.width);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      if (path === '/compatibility/') await expect(page.locator('.partner-ad + .compat-matches')).toHaveCount(1);
+      await slot.evaluate((el) => el.setAttribute('data-test-instance', 'original'));
+      await page.locator(path === '/tojeong/' ? '#tj-d' : '#a-d').selectOption('2');
+      await page.locator('button[type="submit"]').click();
+      await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+      await expect(slot).toHaveCount(1);
+      await expect(slot).toHaveAttribute('data-test-instance', 'original');
+      await expect(slot.locator('iframe')).toHaveCount(1);
+      expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
+    }
+  });
+}
+
+test('저장된 결과 복원에도 공유 아래에 배너를 놓고, 이동한 위치에서 노출 이벤트를 한 번 측정한다', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await calculateResult(page, '/today/');
+  await expect(page.locator('[data-storage-status]')).toContainText('현재 탭에만');
+  await page.reload();
+  await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+  expect(await slotEvents(page)).toHaveLength(0);
+  await showFraction(page, 0.4);
+  expect(await slotEvents(page)).toHaveLength(0);
+  await showFraction(page, 0.6);
+  await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
+  await page.locator('button[type="submit"]').click();
+  await showFraction(page, 0.8);
+  expect(await slotEvents(page)).toHaveLength(1);
+});
+
+test('토정비결 결과를 오류로 비웠다가 다시 계산해도 광고가 사라지거나 복제되지 않는다', async ({ page }) => {
+  await calculateResult(page, '/tojeong/');
+  const slot = page.locator('[data-partner-ad-slot="common"]');
+  await slot.evaluate((el) => el.setAttribute('data-test-instance', 'original'));
+  await page.locator('#tj-m').selectOption('2');
+  await page.locator('#tj-d').selectOption('31');
+  await page.locator('button[type="submit"]').click();
+  await expect(page.locator('#tj-error')).toBeVisible();
+  await expect(page.locator('.result-share')).toHaveCount(0);
+  await expect(page.locator('main + .partner-ad')).toHaveCount(1);
+  await expect(slot).toHaveAttribute('data-test-instance', 'original');
+  await page.locator('#tj-d').selectOption('1');
+  await page.locator('button[type="submit"]').click();
+  await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+  await expect(slot).toHaveCount(1);
+  await expect(slot).toHaveAttribute('data-test-instance', 'original');
+  expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
+});
+
 test('띠 메뉴의 부분 이동에도 기존 광고 지면을 중복 생성하거나 교체하지 않는다', async ({ page }) => {
   await page.goto('/tti/');
   const slot = page.locator('[data-partner-ad-slot="common"]');
