@@ -6,7 +6,7 @@ import { TOJEONG } from '../../content/tojeong.js';
 
 export function about(ctx) {
   return {
-    path: '/about/', title: ABOUT.title, description: '오행 운세의 무료 이용 범위와 사주 계산 규칙을 안내합니다. 사주 신년운세와 토정비결의 차이, 절기 기준 원국, 용신과 운세 점수 계산 근거를 확인하세요.',
+    path: '/about/', title: ABOUT.title, description: `${SITE.name}의 무료 이용 범위와 사주 계산 규칙을 안내합니다. 사주 신년운세와 토정비결의 차이, 절기 기준 원국, 용신과 운세 점수 계산 근거를 확인하세요.`,
     crumbs: [['소개 · 계산 방법', '/about/']], section: '/about/', pageType: 'AboutPage', ogType: 'article',
     ld: [{ '@type': 'Article', headline: ABOUT.h1, inLanguage: 'ko-KR', datePublished: ctx.published, dateModified: ctx.buildDate, author: { '@id': `${ctx.site}/#org` }, publisher: { '@id': `${ctx.site}/#org` }, mainEntityOfPage: { '@id': `${ctx.site}/about/#webpage` } }],
     body: `<article class="article">${hero(ABOUT.h1, ABOUT.lead)}${ABOUT.sections.map((s) => `<section class="prose"${s.id ? ` id="${esc(s.id)}"` : ''}><h2>${esc(s.h)}</h2><ul>${s.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul></section>`).join('')}
@@ -16,9 +16,9 @@ export function about(ctx) {
 }
 export function privacy(ctx) {
   return {
-    path: '/privacy/', title: PRIVACY.title, description: '오행 운세 개인정보처리방침. 생년월일시 등 입력 정보는 서버로 전송되지 않으며 사용자 기기에만 저장됩니다.',
+    path: '/privacy/', title: PRIVACY.title, description: `${SITE.name} 개인정보처리방침. 생년월일시 등 입력 정보는 서버로 전송되지 않으며 사용자 기기에만 저장됩니다.`,
     crumbs: [[PRIVACY.h1, '/privacy/']], section: '/privacy/',
-    body: `<article class="article">${hero(PRIVACY.h1, '오행 운세는 개인정보를 수집하지 않는 것을 원칙으로 합니다.')}${PRIVACY.sections.map((s) => `<section class="prose"><h2>${esc(s.h)}</h2><p>${esc(s.text)}</p></section>`).join('')}<p class="updated">시행일 ${ctx.published}</p></article>`,
+    body: `<article class="article">${hero(PRIVACY.h1, `${SITE.name}는 개인정보를 수집하지 않는 것을 원칙으로 합니다.`)}${PRIVACY.sections.map((s) => `<section class="prose"><h2>${esc(s.h)}</h2><p>${esc(s.text)}</p></section>`).join('')}<p class="updated">시행일 ${ctx.published}</p></article>`,
   };
 }
 export function notFound() {

@@ -1,4 +1,4 @@
-# 오행 운세
+# make your own day
 
 > 배포·GA·애드센스·검색 등록 등 남은 설정은 [TODO.md](TODO.md)에 체크리스트로 정리되어 있습니다.
 
@@ -21,6 +21,8 @@ npm start        # 운영 서버 (dist 자산 + 날짜별 즉석 렌더링)
 GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint → 단위 테스트 → 빌드 → 브라우저 테스트를 실행합니다.
 
 캐릭터 그림을 추가·교체하면 `node scripts/gen-thumbs.mjs`로 카드용 384px 썸네일(`public/characters/384/`)을 다시 만듭니다.
+
+브랜드 이름과 문구는 `src/content/brand.js`, 승인된 해 로고 원본은 `assets/brand/sun-logo.png`에서 관리합니다. 변경 후 `node scripts/gen-brand.mjs`로 로고·파비콘·홈 화면 아이콘·공유 이미지를 다시 만듭니다.
 
 ### 환경 변수
 

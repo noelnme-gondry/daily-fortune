@@ -8,6 +8,7 @@ import { createSite } from './src/site/render.js';
 import { siteUrl } from './src/site/util.js';
 import { readAssets } from './src/site/assets.js';
 import { todayKST, isoDate } from './src/engine/core.js';
+import { BRAND } from './src/content/brand.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, 'dist');
@@ -89,4 +90,4 @@ app.get(/.*/, (req, res, next) => {
 app.use(express.static(dist, { index: false, maxAge: '1d' }));
 app.use((req, res) => res.status(404).type('html').send(current().site.notFound()));
 
-app.listen(PORT, () => console.log(`오행 운세 서버가 ${PORT} 포트에서 실행 중입니다 (${SITE})`));
+app.listen(PORT, () => console.log(`${BRAND.name} 서버가 ${PORT} 포트에서 실행 중입니다 (${SITE})`));

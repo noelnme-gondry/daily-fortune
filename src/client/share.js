@@ -1,6 +1,7 @@
 // 공유: 페이지 공유 바(모든 페이지)와 결과 공유(카드 주소 + 이미지 저장). 카카오는 키가 있을 때만 켠다.
 import { track } from './analytics.js';
 import { uiIcon } from '../site/icons.js';
+import { BRAND } from '../content/brand.js';
 
 const KAKAO_KEY = import.meta.env.VITE_KAKAO_JS_KEY || '';
 const KAKAO_SDK = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js';
@@ -59,7 +60,7 @@ export function wireShare(el, opts) {
         const Kakao = await loadKakao();
         Kakao.Share.sendDefault({
           objectType: 'feed',
-          content: { title: opts.title, description: opts.text || '생년월일시로 보는 사주 오행 운세', imageUrl: `${location.origin}${opts.image || '/og-default.png'}`, link: { mobileWebUrl: opts.url, webUrl: opts.url } },
+          content: { title: opts.title, description: opts.text || BRAND.descriptor, imageUrl: `${location.origin}${opts.image || '/og-default.png'}?v=sun`, link: { mobileWebUrl: opts.url, webUrl: opts.url } },
           buttons: [{ title: opts.card ? '결과 보기' : '바로 가기', link: { mobileWebUrl: opts.url, webUrl: opts.url } }],
         });
       } catch (er) { say('카카오톡 공유를 불러오지 못했습니다. 링크 복사를 이용해 주세요.'); }
@@ -68,7 +69,7 @@ export function wireShare(el, opts) {
       try {
         const { drawCard } = await import('./card.js');
         const blob = await drawCard(opts.card);
-        const file = new File([blob], `ohaeng-${opts.kind || 'result'}.png`, { type: 'image/png' });
+        const file = new File([blob], `${BRAND.name.replaceAll(' ', '-')}-${opts.kind || 'result'}.png`, { type: 'image/png' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try { await navigator.share({ files: [file], title: opts.title }); say(''); return; } catch (er) { /* 취소 시 저장으로 */ }
         }

@@ -1,5 +1,6 @@
 // 사주 백과: 60일주·일간·십신·오행·신살·12운성·용어 사전·사주 보는 법
 import T from '../../content/text.js';
+import { SITE } from '../../content/pages.js';
 import { ILJU_TAG, STEM_COLOR, BRANCH_TG_NOTE, STAGE_NOTE, GANJI_REL, STAGE_INFO, SIPSIN, OHAENG, SINSAL, GLOSSARY, GUIDE_STEPS } from '../../content/knowledge.js';
 import {
   STEM_H, STEM_K, BR_H, BR_K, ANIMAL, EL_K, EL_H, EL_SLUG, STEM_EL, BR_EL, BR_MAIN, HIDDEN, TG, TG_H, TG_SLUG, STEM_SLUG, STAGES, STAGES_H,
@@ -14,12 +15,12 @@ import RANK from '../../content/rank-table.js';
 const article = (ctx, page, extra = {}) => ({
   '@type': 'Article', headline: page.h1 || page.title, description: page.description, inLanguage: 'ko-KR',
   datePublished: ctx.published, dateModified: ctx.buildDate, author: { '@id': `${ctx.site}/#org` }, publisher: { '@id': `${ctx.site}/#org` },
-  mainEntityOfPage: { '@id': `${ctx.site}${page.path}#webpage` }, image: `${ctx.site}/og-default.png`, ...extra,
+  mainEntityOfPage: { '@id': `${ctx.site}${page.path}#webpage` }, image: `${ctx.site}/og-default.png?v=sun`, ...extra,
 });
 function articlePage(ctx, p) {
   const page = { ogType: 'article', modified: ctx.buildDate, section: '/saju/', ...p };
   page.ld = [article(ctx, page, p.about ? { about: p.about } : {}), faqLd(p.faq), ...(p.ld || [])];
-  page.body = `<article class="article">${hero(p.h1, p.lead, p.eyebrow)}${p.content}${adSlot(ctx, 'inline')}${faqBlock(p.faq)}${p.after || ''}<p class="updated">최종 업데이트 ${ctx.buildDate} · ${esc('오행 운세 편집팀')} · <a href="/about/">계산 방법</a></p></article>`;
+  page.body = `<article class="article">${hero(p.h1, p.lead, p.eyebrow)}${p.content}${adSlot(ctx, 'inline')}${faqBlock(p.faq)}${p.after || ''}<p class="updated">최종 업데이트 ${ctx.buildDate} · ${esc(SITE.publisher)} · <a href="/about/">계산 방법</a></p></article>`;
   return page;
 }
 const tool = (href, text) => `<p class="cta"><a class="btn" href="${href}">${esc(text)}</a></p>`;
@@ -45,7 +46,7 @@ export function hub(ctx) {
     path: '/saju/', title: '사주 백과 — 일주·십신·오행·신살 쉽게 정리', description: '사주명리의 기본 개념을 쉽게 정리한 사주 백과입니다. 60일주 성격, 일간 10가지, 십신과 오행, 도화살·역마살 같은 신살, 12운성, 용어 사전과 사주 보는 법을 담았습니다.',
     crumbs: [['사주 백과', '/saju/']], section: '/saju/',
     ld: [{ '@type': 'ItemList', name: '사주 백과', itemListElement: secs.map(([h, t], i) => ({ '@type': 'ListItem', position: i + 1, name: t, url: `${ctx.site}${h}` })) }],
-    body: `${hero('사주 백과', '사주(四柱)는 태어난 연·월·일·시를 천간과 지지 여덟 글자로 나타낸 것이고, 명리학은 이 여덟 글자의 오행 관계로 기질과 운의 흐름을 읽는 학문입니다. 사주 백과는 오행 운세의 계산에 쓰이는 개념을 하나씩 풀어 설명합니다.')}
+    body: `${hero('사주 백과', `사주(四柱)는 태어난 연·월·일·시를 천간과 지지 여덟 글자로 나타낸 것이고, 명리학은 이 여덟 글자의 오행 관계로 기질과 운의 흐름을 읽는 학문입니다. 사주 백과는 ${SITE.name}의 계산에 쓰이는 개념을 하나씩 풀어 설명합니다.`)}
       <div class="cards">${secs.map(([h, t, d]) => `<a class="card link-card" href="${h}"><b>${t}</b><span>${d}</span></a>`).join('')}</div>
       <section class="box-sec"><div class="sec-head"><h2>60일주 바로 가기</h2></div>${iljuGrid()}</section>`,
   };
@@ -116,7 +117,7 @@ export function iljuPage(n, ctx) {
     { q: `${name}에게 맞는 직업은 무엇인가요?`, a: `일지 ${tg}의 성향으로 ${career.jobs} 같은 분야가 잘 맞습니다. ${career.note}` },
     { q: `${name}의 연애와 결혼 스타일은?`, a: T.spousePalace[tg] },
     { q: `${josa(name, '과/와')} 잘 맞는 일주는?`, a: `천간합과 지지 육합을 함께 이루는 ${iljuName(best)}(${pillarH(best)})가 대표적인 천생연분 일주입니다. 반대로 천간이 극하고 지지가 충하는 ${iljuName(bad)}(${pillarH(bad)})와는 맞추는 노력이 필요합니다.` },
-    { q: `내 일주가 ${name}인지 어떻게 알 수 있나요?`, a: '일주는 태어난 날짜의 간지로 정해지며 띠와 상관이 없습니다. 오행 운세 만세력에 생년월일을 넣으면 바로 확인할 수 있습니다.' },
+    { q: `내 일주가 ${name}인지 어떻게 알 수 있나요?`, a: `일주는 태어난 날짜의 간지로 정해지며 띠와 상관이 없습니다. ${SITE.name} 만세력에 생년월일을 넣으면 바로 확인할 수 있습니다.` },
   ];
   const prev = sexagenary((n + 59) % 60), next = sexagenary((n + 1) % 60);
   const content = `
@@ -343,7 +344,7 @@ export function guide(ctx) {
     lead: '사주는 생년월일시로 네 기둥을 세우고, 일간을 기준으로 오행의 균형과 십신의 관계를 읽은 뒤, 대운과 세운이 원국에 어떤 영향을 주는지 보는 순서로 해석합니다.',
     content: `<ol class="steps">${GUIDE_STEPS.map((s) => `<li><h2>${esc(s.title)}</h2><p>${esc(s.text)}</p></li>`).join('')}</ol>${tool('/manseryeok/', '만세력으로 내 원국 세우기')}`,
     ld: [{ '@type': 'HowTo', name: '사주 보는 법', inLanguage: 'ko-KR', step: GUIDE_STEPS.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, name: s.title, text: s.text })) }],
-    faq: [{ q: '사주를 혼자 공부할 수 있나요?', a: '오행·십신·합충의 기본 규칙만 익히면 원국의 큰 그림은 혼자서도 읽을 수 있습니다. 오행 운세의 만세력과 사주 백과로 내 원국을 보며 하나씩 대입해 보세요.' }],
+    faq: [{ q: '사주를 혼자 공부할 수 있나요?', a: `오행·십신·합충의 기본 규칙만 익히면 원국의 큰 그림은 혼자서도 읽을 수 있습니다. ${SITE.name}의 만세력과 사주 백과로 내 원국을 보며 하나씩 대입해 보세요.` }],
   });
 }
 
