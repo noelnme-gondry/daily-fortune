@@ -8,14 +8,16 @@ async function ready(page, path) {
   await page.goto(path);
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('#tool-form')).not.toHaveAttribute('inert', '');
-  await expect(page.locator('input[type="time"]')).toHaveCount(0);
+  // 시각 입력과 시진 선택 중 하나만 보인다(저장된 방식에 따라 다름)
+  await expect(page.locator('#a-time:visible, #a-branch:visible')).toHaveCount(1);
 }
 async function calculate(page, persist = false) {
   await page.locator('#a-name').fill('검증');
   await page.locator('#a-y').selectOption('1993');
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
-  await page.locator('#a-time').selectOption('3');
+  await page.locator('input[name="a-tmode"][value="branch"]').check();
+  await page.locator('#a-branch').selectOption('3');
   await page.locator('#save-device').setChecked(persist);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#result .chart-card')).toBeVisible();
@@ -38,12 +40,13 @@ test('묘시 입력 · 저장 선택 · 새 탭 복원 · 삭제', async ({ page
   await expect(page.locator('.chart-head')).toContainText('묘시');
   expect(await saved(page)).toBeNull();
   await calculate(page, true);
-  await expect(page.locator('[data-storage-status]')).toContainText('IndexedDB에 저장');
+  await expect(page.locator('[data-storage-status]')).toContainText('이 기기에 저장했습니다');
   expect((await saved(page)).timeBranch).toBe('3');
   const next = await context.newPage();
   await ready(next, '/tomorrow/');
   await expect(next.locator('#a-name')).toHaveValue('검증');
-  await expect(next.locator('#a-time')).toHaveValue('3');
+  await expect(next.locator('#a-branch')).toHaveValue('3');
+  await expect(next.locator('#a-branch')).toBeVisible();
   await expect(next.locator('#result .chart-card')).toBeVisible();
   await next.locator('[data-delete-profile]').click();
   await expect(next.locator('[data-storage-status]')).toContainText('삭제했습니다');
@@ -52,16 +55,40 @@ test('묘시 입력 · 저장 선택 · 새 탭 복원 · 삭제', async ({ page
   await expect(next.locator('#result .result-empty')).toBeVisible();
 });
 
-test('예시는 영구 저장하지 않고 기존 localStorage의 정확한 시각을 안전하게 이전', async ({ page }) => {
+test('예시는 영구 저장하지 않고, 이전 버전 localStorage 입력은 동의 없이 기기에 남기지 않는다', async ({ page }) => {
   await ready(page, '/today/');
   await page.locator('[data-sample]').click();
+  await expect(page.locator('#a-time')).toHaveValue('03:40');
+  await expect(page.locator('#a-time')).toBeVisible();
   expect(await saved(page)).toBeNull();
-  await page.evaluate(() => localStorage.setItem('ohaeng:profile', JSON.stringify({ name: '이전값', gender: 'F', calendar: 'solar', y: 1993, m: 1, d: 28, time: '03:40', noTime: false })));
+  await page.evaluate(() => { sessionStorage.clear(); localStorage.setItem('ohaeng:profile', JSON.stringify({ name: '이전값', gender: 'F', calendar: 'solar', y: 1993, m: 1, d: 28, time: '03:40', noTime: false })); });
   await page.reload();
-  await expect(page.locator('#a-time')).toHaveValue('legacy');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#a-time')).toHaveValue('03:40');
   await expect(page.locator('.chart-head')).toContainText('03:40');
-  expect((await saved(page)).time).toBe('03:40');
+  await expect(page.locator('[data-storage-status]')).toContainText('이전 버전');
+  await expect(page.locator('#save-device')).not.toBeChecked();
+  expect(await saved(page)).toBeNull();
   expect(await page.evaluate(() => localStorage.getItem('ohaeng:profile'))).toBeNull();
+});
+
+test('시각과 시진은 서로 같은 시간대로 바뀌고 서머타임 날짜는 구간이 바뀐다', async ({ page }) => {
+  await ready(page, '/today/');
+  await page.locator('#a-time').fill('23:10');
+  await page.locator('input[name="a-tmode"][value="branch"]').check();
+  await expect(page.locator('#a-branch')).toHaveValue('11');
+  await expect(page.locator('#a-branch option:checked')).toHaveText('해시 · 21:30~23:30');
+  await page.locator('#a-y').selectOption('1987');
+  await page.locator('#a-m').selectOption('7');
+  await page.locator('#a-d').selectOption('10');
+  await expect(page.locator('#a-branch option').first()).toHaveText('해시 · 00:00~00:30 (전날 일주)');
+  await expect(page.locator('#a-time-hint')).toContainText('서머타임');
+  await page.locator('#a-branch').selectOption('0');
+  await page.locator('input[name="a-tmode"][value="exact"]').check();
+  await expect(page.locator('#a-time')).toHaveValue('01:30');
+  await page.locator('#a-notime').check();
+  await expect(page.locator('#a-time')).toBeDisabled();
+  await expect(page.locator('#a-time-hint')).toContainText('세 기둥');
 });
 
 test('IndexedDB 접근 실패를 표시하고 계산은 계속 동작', async ({ page }) => {
@@ -137,7 +164,8 @@ test('나쁜 운세 챕터: 몰락 캐릭터와 실패 서사·낮은 분야의 
   await page.locator('#a-y').selectOption('1980');
   await page.locator('#a-m').selectOption('6');
   await page.locator('#a-d').selectOption('1');
-  await page.locator('#a-time').selectOption('3');
+  await page.locator('input[name="a-tmode"][value="branch"]').check();
+  await page.locator('#a-branch').selectOption('3');
   await page.locator('button[type="submit"]').click();
   const card = page.locator('.chapter-card').nth(4);
   await expect(card).toContainText('시련기 · 흐름 44점');
@@ -317,7 +345,8 @@ for (const width of [320, 768, 1024, 1440]) test(`${width}px 실제 도구 경�
 
 test('홈 입력 전달 · 궁합 두 사람 시진과 시간 모름 · 저장 복원', async ({ page }) => {
   await ready(page, '/');
-  await page.locator('#a-time').selectOption('3');
+  await page.locator('input[name="a-tmode"][value="branch"]').check();
+  await page.locator('#a-branch').selectOption('3');
   await page.locator('button[type="submit"]').click();
   await expect(page).toHaveURL(/\/today\/$/);
   await expect(page.locator('.chart-head')).toContainText('묘시');
@@ -329,7 +358,7 @@ test('홈 입력 전달 · 궁합 두 사람 시진과 시간 모름 · 저장 �
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#result .report-head')).toBeVisible();
   await expect(page.locator('#result .report-head .hz')).toHaveCount(2);
-  await expect(page.locator('[data-storage-status]')).toContainText('IndexedDB에 저장');
+  await expect(page.locator('[data-storage-status]')).toContainText('이 기기에 저장했습니다');
   expect((await saved(page, 'b')).noTime).toBe(true);
   await page.reload();
   await expect(page.locator('#result .report-head')).toBeVisible();
@@ -365,10 +394,12 @@ test('잘못된 날짜는 저장하지 않고 음력 선택·시진 계산을 �
   await expect(page.locator('.form-error')).toContainText('31일이 없습니다');
   expect(await saved(page)).toBeNull();
   await page.locator('input[name="a-cal"][value="lunar"]').check();
-  await page.locator('#a-d').selectOption('1'); await page.locator('#a-time').selectOption('zi-late');
+  await page.locator('#a-d').selectOption('1');
+  await page.locator('input[name="a-tmode"][value="branch"]').check();
+  await page.locator('#a-branch').selectOption('n0');
   await expect(page.locator('#a-leap')).toBeEnabled();
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('.chart-head')).toContainText('자시 · 밤');
-  await expect(page.locator('[data-storage-status]')).toContainText('IndexedDB에 저장');
+  await expect(page.locator('.chart-head')).toContainText('자시 · 23:30~24:00 (다음 날 일주)');
+  await expect(page.locator('[data-storage-status]')).toContainText('이 기기에 저장했습니다');
   expect((await saved(page)).calendar).toBe('lunar');
 });

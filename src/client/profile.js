@@ -38,12 +38,15 @@ const validFor = (who, p) => who === 'tojeong'
 
 export async function load(who) {
   const p = await transact('readonly', (s) => s.get(who));
-  if (validFor(who, p)) return p;
-  // 이전 자동 저장 데이터는 성공적으로 옮긴 뒤에만 제거한다.
+  return validFor(who, p) ? p : null;
+}
+// 이전 버전이 동의 없이 자동 저장한 localStorage 입력은 현재 탭으로만 옮기고 바로 지운다.
+// 다시 기기에 남기려면 사용자가 저장을 선택해야 한다.
+export function takeLegacy(who) {
   let legacy;
-  try { legacy = JSON.parse(localStorage.getItem(KEY[who])); } catch { return null; }
+  try { legacy = JSON.parse(localStorage.getItem(KEY[who])); localStorage.removeItem(KEY[who]); } catch { return null; }
   if (!validFor(who, legacy)) return null;
-  await save(who, legacy);
+  sessionSave(who, legacy);
   return legacy;
 }
 export async function save(who, p) {
@@ -59,9 +62,14 @@ export async function removeSaved(who) {
   }
 }
 export function sessionLoad(who) {
-  try { const p = JSON.parse(sessionStorage.getItem(KEY[who])); return validFor(who, p) ? p : null; } catch { return null; }
+  try { const p = JSON.parse(sessionStorage.getItem(KEY[who])); if (validFor(who, p)) return p; } catch { /* 접근 제한 */ }
+  return takeLegacy(who);
 }
 export function sessionSave(who, p) {
   try { sessionStorage.setItem(KEY[who], JSON.stringify(p)); return true; } catch { return false; }
 }
-export const toEngine = (p) => ({ name: p.name, gender: p.gender, calendar: p.calendar, leap: p.leap, y: p.y, m: p.m, d: p.d, time: p.noTime ? null : p.time, ...(!p.noTime && p.timeMode === 'branch' ? { timeBranch: p.timeBranch } : {}) });
+export const toEngine = (p) => ({
+  name: p.name, gender: p.gender, calendar: p.calendar, leap: p.leap, y: p.y, m: p.m, d: p.d,
+  time: p.noTime || p.timeMode === 'branch' ? null : p.time,
+  ...(!p.noTime && p.timeMode === 'branch' ? { timeBranch: p.timeBranch } : {}),
+});

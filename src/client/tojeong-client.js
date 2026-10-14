@@ -48,7 +48,7 @@ export async function mountTojeong(root) {
     if (!render(p, 'form')) return;
     const temporary = sessionSave('tojeong', p);
     if (persist.checked) {
-      try { await save('tojeong', p); status.textContent = '토정비결 생일을 이 기기의 IndexedDB에 저장했습니다.'; }
+      try { await save('tojeong', p); status.textContent = '토정비결 생일을 이 기기에 저장했습니다.'; }
       catch { status.textContent = '기기 저장에 실패했습니다. 결과는 계산되었지만 다음 방문에 복원되지 않을 수 있습니다.'; }
     } else status.textContent = temporary ? '현재 탭에만 임시로 유지됩니다. 기존 기기 저장본은 삭제 버튼으로 지울 수 있습니다.' : '이 브라우저에서는 저장할 수 없습니다. 현재 화면에서 결과를 확인하세요.';
     out.scrollIntoView({ behavior: 'smooth', block: 'start' });

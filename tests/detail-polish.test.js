@@ -7,7 +7,8 @@ import { buildChart, analyze } from '../src/engine/chart.js';
 import { rankScore, sajuRank, PARTS } from '../src/engine/rank.js';
 import { findBirthExamples, matchingPillars } from '../src/engine/rank-examples.js';
 import { rankGuidance, rankHighlights } from '../src/engine/rank-guidance.js';
-import { birthTime } from '../src/domain/birth-time.js';
+import { resolveBirthTime } from '../src/domain/birth-time.js';
+import { utcOffset } from '../src/engine/calendar.js';
 
 test('상위 60개 표시 항목의 출생 예시는 실제 입력으로 원국·점수를 재현한다', () => {
   for (const [kind, categories] of Object.entries(LEADERS)) for (const [category, rows] of Object.entries(categories)) {
@@ -18,7 +19,7 @@ test('상위 60개 표시 항목의 출생 예시는 실제 입력으로 원국�
         assert.ok(matchingPillars(row.pillars, chart.pillars));
         assert.ok(input.y >= 1930);
         assert.equal(!!chart.pillars.hour, kind === 'four');
-        if (input.timeBranch) assert.ok(birthTime(input.timeBranch));
+        if (input.timeBranch) assert.ok(resolveBirthTime(input.timeBranch, utcOffset(input).off));
         const score = rankScore(chart);
         assert.equal(category === 'total' ? score.total : score.cats[category], row.score);
         assert.equal(rankScore(buildChart({ ...input, gender: 'F' })).total, row.total);

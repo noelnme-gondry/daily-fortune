@@ -9,7 +9,7 @@ import { animalIcon, uiIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
 import { TIPS } from '../../content/tips.js';
 import { adSlot } from '../layout.js';
-import { BIRTH_TIMES } from '../../domain/birth-time.js';
+import { birthTimeOptions } from '../../domain/birth-time.js';
 
 const BAND = (s) => (s >= 75 ? ['high', '대길'] : s >= 60 ? ['good', '길'] : s >= 45 ? ['mid', '평'] : ['low', '주의']);
 export const bandChip = (s) => { const [k, n] = BAND(s); return `<span class="band band-${k}">${n}</span>`; };
@@ -32,13 +32,15 @@ function personFields(p, ctx, legend) {
       <label class="check"><input type="checkbox" id="${p}-leap" disabled> 음력 윤달</label>
     </fieldset>
     <fieldset class="field field-time"><legend>태어난 시각</legend>
-      <select class="input" id="${p}-time" aria-label="태어난 시진" aria-describedby="${p}-time-hint">${BIRTH_TIMES.map((t) => `<option value="${t.value}"${t.value === '6' ? ' selected' : ''}>${t.label}</option>`).join('')}</select>
+      <div class="seg seg-time"><label><input type="radio" name="${p}-tmode" value="exact" checked><span>시각 입력</span></label><label><input type="radio" name="${p}-tmode" value="branch"><span>시진만 알아요</span></label></div>
+      <input class="input" type="time" id="${p}-time" value="12:00" aria-label="태어난 시각" aria-describedby="${p}-time-hint">
+      <select class="input" id="${p}-branch" aria-label="태어난 시진" aria-describedby="${p}-time-hint" hidden>${birthTimeOptions().map((t) => `<option value="${t.value}"${t.value === '6' ? ' selected' : ''}>${t.label}</option>`).join('')}</select>
       <label class="check"><input type="checkbox" id="${p}-notime"> 시간을 몰라요</label>
-      <p class="hint" id="${p}-time-hint">오전 6시는 묘시입니다. 시진의 대표 시각으로 계산하므로 절입일·시간대 경계에서는 결과가 달라질 수 있습니다.</p>
+      <p class="hint" id="${p}-time-hint" data-time-hint>출생 당시 시계 시각 그대로 넣으세요. 30분 보정과 서머타임은 자동으로 계산합니다.</p>
     </fieldset>
   </fieldset>`;
 }
-const HINT = '<div class="storage-options"><label class="check"><input type="checkbox" id="save-device"> 이 기기에 저장 (IndexedDB)</label><button class="link-btn" type="button" data-delete-profile>저장된 정보 삭제</button><p class="hint" data-storage-status role="status">저장을 선택하면 다음 방문에도 불러옵니다. 미선택 시 현재 탭에서만 임시로 유지됩니다.</p></div><p class="hint">시진 선택에는 표준시·서머타임 보정을 중복 적용하지 않습니다. 생년월일은 서버로 전송되지 않습니다.</p>';
+const HINT = '<div class="storage-options"><label class="check"><input type="checkbox" id="save-device"> 이 기기에 저장</label><button class="link-btn" type="button" data-delete-profile>저장된 정보 삭제</button><p class="hint" data-storage-status role="status">저장을 선택하면 다음 방문에도 불러옵니다. 미선택 시 현재 탭에서만 임시로 유지됩니다.</p></div><p class="hint">입력한 생년월일은 서버로 전송되지 않습니다.</p>';
 
 export function toolBlock(mode, ctx, extra = {}) {
   const pair = mode === 'compatibility';
@@ -102,7 +104,7 @@ const HOW = {
   compatibility: ['일간끼리의 천간합·상생·상극을 봅니다.', '배우자궁인 일지, 띠(년지), 월지의 합·충·원진을 비교합니다.', '서로에게 필요한 용신 오행을 상대 사주가 얼마나 채워 주는지 계산합니다.', '앞으로 10년 세운에서 두 사람의 결혼·자녀·재물 신호를 합쳐 시기를 고릅니다.'],
   story: ['0~89세를 10년씩 아홉 구간으로 나눕니다. 30세 전은 년주·월주, 30~59세는 일주, 60세 이후는 시주를 바탕으로 봅니다.', '각 시기를 지나는 대운을 겹치는 햇수만큼 반영해 시기 점수(대운 70%·원국 30%)를 냅니다.', '시기에 가장 강한 십신이 캐릭터 직업, 점수가 수식어, 그 기둥의 신살이 스킬이 됩니다.', '게임 능력치는 분야 점수의 차이를 확대하고 직업 보정을 더합니다. 운세 점수와 실제 능력은 구분합니다.'],
   rank: ['여덟 글자를 오행 균형·일간 강약·용신의 힘·길신·합·충형·특수 신살 7개 항목으로 점수화합니다.', '가능한 모든 사주 518,400가지(시간 모름 43,200가지)를 같은 규칙으로 미리 계산해 두었습니다.', '내 점수보다 높은 사주 수 + 1이 내 순위이며, 항목별 점수는 전체 평균과 비교해 근거로 보여 줍니다.', '재물·명예·매력·건강·지혜 분야 점수도 같은 방식으로 백분위를 냅니다.'],
-  manseryeok: ['년주: 입춘 절입 시각 기준', '월주: 매달 절입 시각 기준', '일주: 60일 주기 일진', '시주: 동경 127.5° 평균태양시(표준시 −30분), 밤 11시 30분부터 다음 날 자시'],
+  manseryeok: ['년주: 입춘 절입 시각 기준', '월주: 매달 절입 시각 기준', '일주: 60일 주기 일진', '시주: 동경 127.5° 평균태양시(표준시 −30분), 밤 11시 30분부터 다음 날 자시', '시진 선택: 출생일의 표준시·서머타임에 맞춘 시계 기준 구간의 가운데 시각으로 계산'],
 };
 function howBlock(mode) {
   return `<section class="prose how"><h2>이렇게 계산합니다</h2><ol>${HOW[mode].map((t) => `<li>${esc(t)}</li>`).join('')}</ol><p><a href="/about/">계산 규칙 전체 보기</a></p></section>`;

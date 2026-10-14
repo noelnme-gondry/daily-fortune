@@ -1,19 +1,45 @@
 // 계산기 페이지: 폼 ↔ 저장된 입력값 ↔ 결과 렌더링 ↔ 결과 공유
 import {
-  buildChart, ChartInputError, day, week, month, year, yearMonths, lifetime, compat, lifeStory, sajuRank,
+  buildChart, birthTimesFor, ChartInputError, day, week, month, year, yearMonths, lifetime, compat, lifeStory, sajuRank,
   todayKST, addDays, daysIn, isoDate, iljuSlug, pillarKo, pillarH, josa,
 } from '../engine/index.js';
 import RANK_TABLE from '../content/rank-table.js';
 import { ILJU_TAG } from '../content/knowledge.js';
-import { load, save, removeSaved, sessionLoad, sessionSave, toEngine, SAMPLE } from './profile.js';
+import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine, SAMPLE } from './profile.js';
 import { chartCard, dayView, weekView, monthView, yearView, lifeView, compatView, manseView, storyView, rankView } from './views.js';
 import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, characterCode, SHARE_KINDS, cleanName } from '../site/share-codec.js';
 import { track } from './analytics.js';
+import { birthTimeOptions, normalizeBranch, branchOfTime } from '../domain/birth-time.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const sexIdx = (p) => [...Array(60).keys()].find((n) => n % 10 === p.s && n % 12 === p.b);
 
+// 시각 입력 방식(정확한 시각 / 시진)과 날짜에 맞는 시계 기준 시진 구간을 화면에 반영한다.
+const TIME_HINT = {
+  exact: '출생 당시 시계 시각 그대로 넣으세요. 30분 보정과 서머타임은 자동으로 계산합니다.',
+  branch: '출생 당시 시계 기준 구간입니다.',
+  none: '시주 없이 년·월·일 세 기둥으로 계산합니다.',
+};
+function syncTime(form, who, want) {
+  const f = (id) => $(`#${who}-${id}`, form);
+  if (!f('branch')) return;
+  const mode = $(`input[name="${who}-tmode"]:checked`, form).value;
+  const noTime = f('notime').checked;
+  const { off, note } = birthTimesFor({ calendar: $(`input[name="${who}-cal"]:checked`, form).value, leap: f('leap').checked, y: +f('y').value, m: +f('m').value, d: +f('d').value });
+  const opts = birthTimeOptions(off);
+  const current = normalizeBranch(want ?? f('branch').value);
+  const sameBranch = (v) => v != null && opts.find((o) => o.branch === +String(v).replace(/^[np]/, ''));
+  const pick = opts.find((o) => o.value === current) || sameBranch(current) || opts.find((o) => o.value === '6');
+  f('branch').innerHTML = opts.map((o) => `<option value="${o.value}">${o.label}</option>`).join('');
+  f('branch').value = pick.value;
+  f('time').hidden = mode !== 'exact';
+  f('branch').hidden = mode !== 'branch';
+  f('time').disabled = f('branch').disabled = noTime;
+  form.querySelectorAll(`input[name="${who}-tmode"]`).forEach((r) => { r.disabled = noTime; });
+  $(`#${who}-time-hint`, form).textContent = noTime ? TIME_HINT.none : mode === 'exact' ? TIME_HINT.exact : `${TIME_HINT.branch}${note ? ` ${note}` : ''}`;
+  return off;
+}
 function fillForm(form, who, p) {
   if (!p) return;
   const f = (id) => $(`#${who}-${id}`, form);
@@ -23,29 +49,29 @@ function fillForm(form, who, p) {
   if ([...f('y').options].some((o) => +o.value === p.y)) f('y').value = String(p.y);
   f('m').value = String(p.m); f('d').value = String(p.d);
   f('leap').checked = !!p.leap; f('leap').disabled = p.calendar !== 'lunar';
-  if (p.timeMode !== 'branch' && p.time) {
-    let legacy = f('time').querySelector('option[value="legacy"]');
-    if (!legacy) { legacy = document.createElement('option'); legacy.value = 'legacy'; f('time').append(legacy); }
-    legacy.textContent = `기존 입력 ${p.time} 유지`;
-    legacy.dataset.time = p.time;
-  }
-  f('time').value = p.timeMode === 'branch' ? p.timeBranch : p.time ? 'legacy' : '6'; f('time').disabled = !!p.noTime;
+  const branch = p.timeMode === 'branch';
+  $(`input[name="${who}-tmode"][value="${branch ? 'branch' : 'exact'}"]`, form).checked = true;
+  f('time').value = !branch && p.time ? p.time : '12:00';
   f('notime').checked = !!p.noTime;
+  syncTime(form, who, branch ? p.timeBranch : undefined);
 }
 function readForm(form, who) {
   const f = (id) => $(`#${who}-${id}`, form);
+  const mode = $(`input[name="${who}-tmode"]:checked`, form).value;
   return {
     name: f('name').value.trim().slice(0, 12),
     gender: $(`input[name="${who}-gender"]:checked`, form).value,
     calendar: $(`input[name="${who}-cal"]:checked`, form).value,
     leap: f('leap').checked,
     y: +f('y').value, m: +f('m').value, d: +f('d').value,
-    timeMode: f('time').value === 'legacy' ? 'exact' : 'branch',
-    time: f('time').value === 'legacy' ? f('time').selectedOptions[0].dataset.time : null,
-    timeBranch: f('time').value, noTime: f('notime').checked,
+    timeMode: mode,
+    time: mode === 'exact' ? f('time').value : null,
+    timeBranch: mode === 'branch' ? f('branch').value : null,
+    noTime: f('notime').checked,
   };
 }
-const check = (p) => (p.calendar === 'solar' && p.d > daysIn(p.y, p.m) ? `${p.y}년 ${p.m}월에는 ${p.d}일이 없습니다.` : '');
+const check = (p) => (p.calendar === 'solar' && p.d > daysIn(p.y, p.m) ? `${p.y}년 ${p.m}월에는 ${p.d}일이 없습니다.`
+  : !p.noTime && p.timeMode === 'exact' && !/^\d{1,2}:\d{2}$/.test(p.time || '') ? '태어난 시각을 입력하거나 ‘시간을 몰라요’를 선택해 주세요.' : '');
 function navTabs(mode, today) {
   const y = today.y;
   const items = [['today', '/today/', '오늘'], ['tomorrow', '/tomorrow/', '내일'], ['week', '/week/', '이번 주'], ['month', '/month/', '이번 달'], [`year${y}`, `/year/${y}/`, `${y}년`], [`year${y + 1}`, `/year/${y + 1}/`, `${y + 1}년`], ['lifetime', '/lifetime/', '평생'], ['story', '/life-story/', '인생 캐릭터'], ['rank', '/saju-ranking/', '사주 랭킹'], ['compatibility', '/compatibility/', '궁합'], ['manseryeok', '/manseryeok/', '만세력']];
@@ -107,7 +133,15 @@ export async function mount(root) {
     if (!$(`#${p}-name`, form)) return;
     form.addEventListener('change', (e) => {
       if (e.target.name === `${p}-cal`) $(`#${p}-leap`, form).disabled = e.target.value !== 'lunar';
-      if (e.target.id === `${p}-notime`) $(`#${p}-time`, form).disabled = e.target.checked;
+      if (!e.target.closest(`[data-person="${p}"]`)) return;
+      if (e.target.name === `${p}-tmode`) {
+        // 방식을 바꿔도 같은 시간대를 유지한다: 시각 → 그 시각의 시진, 시진 → 구간의 가운데 시각
+        const off = birthTimesFor(readForm(form, p)).off;
+        const time = $(`#${p}-time`, form), branch = $(`#${p}-branch`, form);
+        if (e.target.value === 'branch') { syncTime(form, p, branchOfTime(time.value, off)?.value); return; }
+        if (branchOfTime(time.value, off)?.value !== branch.value) time.value = birthTimeOptions(off).find((o) => o.value === branch.value)?.time || time.value;
+      }
+      if (e.target.id !== `${p}-time`) syncTime(form, p);
     });
   });
 
@@ -167,10 +201,13 @@ export async function mount(root) {
   persist.checked = !!savedA;
   try { const preference = sessionStorage.getItem('ohaeng:save-device'); if (preference !== null) persist.checked = preference === 'true'; } catch { /* 접근 제한 */ }
   persist.addEventListener('change', () => { try { sessionStorage.setItem('ohaeng:save-device', String(persist.checked)); } catch { /* 접근 제한 */ } });
-  const a0 = sessionLoad('a') || savedA;
-  const b0 = sessionLoad('b') || savedB;
+  const legacy = ['a', 'b'].map(takeLegacy);
+  if (legacy.some(Boolean)) storageStatus.textContent = '이전 버전에서 자동 저장된 입력을 불러왔습니다. 다음 방문에도 쓰려면 ‘이 기기에 저장’을 선택하세요.';
+  const a0 = sessionLoad('a') || savedA || legacy[0];
+  const b0 = sessionLoad('b') || savedB || legacy[1];
   fillForm(form, 'a', a0);
   if (pair) fillForm(form, 'b', b0);
+  for (const p of pair ? ['a', 'b'] : ['a']) syncTime(form, p);
   if (mode !== 'home' && a0 && (!pair || b0)) render(a0, b0, 'saved');
 
   $('[data-delete-profile]', form).addEventListener('click', async () => {
@@ -182,7 +219,7 @@ export async function mount(root) {
     if (!persist.checked) { storageStatus.textContent = temporary ? '현재 탭에만 임시로 유지됩니다. 기존 기기 저장본은 삭제 버튼으로 지울 수 있습니다.' : '이 브라우저는 저장을 제한하고 있습니다. 현재 화면에서만 결과를 볼 수 있습니다.'; return temporary; }
     try {
       await save('a', a); if (b) await save('b', b);
-      storageStatus.textContent = '이 기기의 IndexedDB에 저장했습니다.';
+      storageStatus.textContent = '이 기기에 저장했습니다.';
       return true;
     } catch { storageStatus.textContent = '기기 저장에 실패했습니다. 결과는 계산되었지만 새로 방문하면 입력이 사라질 수 있습니다.'; return false; }
   }

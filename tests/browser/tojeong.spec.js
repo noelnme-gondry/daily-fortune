@@ -41,21 +41,22 @@ test('홈에서 무료 토정비결 진입 · 12개월 키보드 선택 · 내�
   }
 });
 
-test('토정비결 IndexedDB 저장·다른 탭 복원·삭제는 사주 저장본을 보존한다', async ({ page, context }) => {
+test('토정비결 기기 저장·다른 탭 복원·삭제는 사주 저장본을 보존한다', async ({ page, context }) => {
   await page.goto('/today/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').fill('사주 보존');
   await page.getByRole('radio', { name: '여성', exact: true }).check();
   await page.locator('#a-y').selectOption('1989');
-  await page.locator('#a-time').selectOption('3');
+  await page.locator('input[name="a-tmode"][value="branch"]').check();
+  await page.locator('#a-branch').selectOption('3');
   await page.locator('#save-device').check();
   await page.getByRole('button', { name: '오늘의 운세 보기', exact: true }).click();
-  await expect(page.locator('[data-storage-status]')).toContainText('IndexedDB에 저장');
+  await expect(page.locator('[data-storage-status]')).toContainText('이 기기에 저장했습니다');
   await ready(page);
   await enter(page);
   await page.locator('#tj-save').check();
   await page.getByRole('button', { name: '무료 토정비결 보기', exact: true }).click();
-  await expect(page.locator('#tj-storage-status')).toContainText('IndexedDB에 저장');
+  await expect(page.locator('#tj-storage-status')).toContainText('이 기기에 저장했습니다');
   const next = await context.newPage();
   await ready(next);
   await expect(next.locator('#tj-name')).toHaveValue('검증');
@@ -68,7 +69,7 @@ test('토정비결 IndexedDB 저장·다른 탭 복원·삭제는 사주 저장�
   await next.goto('/today/');
   await expect(next.locator('#a-name')).toHaveValue('사주 보존');
   await expect(next.locator('#a-y')).toHaveValue('1989');
-  await expect(next.locator('#a-time')).toHaveValue('3');
+  await expect(next.locator('#a-branch')).toHaveValue('3');
   await expect(next.getByRole('radio', { name: '여성', exact: true })).toBeChecked();
 });
 

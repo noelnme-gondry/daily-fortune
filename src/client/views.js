@@ -4,7 +4,6 @@ import {
 } from '../engine/index.js';
 
 import { TIPS } from '../content/tips.js';
-import { birthTimeLabel } from '../domain/birth-time.js';
 import { storyDeck } from './story-view.js';
 import { rankPlay } from './rank-view.js';
 import { rankGuidanceView } from './rank-guidance-view.js';
@@ -40,7 +39,7 @@ export function chartCard(c, profile, today) {
   const ss = [...new Set(c.natalSS.map(([n]) => n))];
   const cur = c.daeun.filter((d) => d.startYear <= today.y).pop();
   const p = profile;
-  const birth = `${p.calendar === 'lunar' ? `음력 ${p.leap ? '윤' : ''}` : '양력 '}${p.y}.${String(p.m).padStart(2, '0')}.${String(p.d).padStart(2, '0')} · ${esc(birthTimeLabel(p))}`;
+  const birth = `${p.calendar === 'lunar' ? `음력 ${p.leap ? '윤' : ''}` : '양력 '}${p.y}.${String(p.m).padStart(2, '0')}.${String(p.d).padStart(2, '0')} · ${esc(c.timeLabel)}`;
   const day = c.pillars.day;
   return `<section class="chart-card card" aria-label="사주 원국">
     <div class="chart-head"><h2>${esc(c.name || '나')}의 사주 원국 ${tip(TIPS.chart, '사주 원국 보는 법')}</h2><span class="muted">${birth}${p.calendar === 'lunar' ? ` (양력 ${isoDate(c.birth)})` : ` · ${c.lunarText}`} · ${c.gender === 'F' ? '여성' : '남성'}${c.dst ? ' · 서머타임 보정' : ''}</span></div>

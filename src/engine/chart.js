@@ -4,7 +4,7 @@ import {
   gz, pillarH, elRel, tenGod, stageOf, hongran, cheonhui,
 } from './core.js';
 import { Solar, lunarText, solarOfLunar, utcOffset } from './calendar.js';
-import { birthTime } from '../domain/birth-time.js';
+import { resolveBirthTime, offsetNote } from '../domain/birth-time.js';
 
 const PILLAR_KO = { year: '년주', month: '월주', day: '일주', hour: '시주' };
 
@@ -18,19 +18,21 @@ export function buildChart(input) {
     birth = s;
   }
   if (!(birth.y >= 1900 && birth.y <= 2050)) throw new ChartInputError('1900~2050년 사이의 날짜만 계산할 수 있습니다.');
-  const selected = input.timeBranch === undefined ? null : birthTime(input.timeBranch);
-  if (input.timeBranch !== undefined && !selected) throw new ChartInputError('태어난 시진을 선택해 주세요.');
+  const { off, dst } = utcOffset(birth);
+  // 시진만 고른 경우: 그 날짜의 시계 기준 시진 구간 가운데 시각으로 바꿔 정확한 시각과 같은 보정을 거친다.
+  const branchMode = input.timeBranch != null && input.timeBranch !== '';
+  const selected = branchMode ? resolveBirthTime(input.timeBranch, off) : null;
+  if (branchMode && !selected) throw new ChartInputError('태어난 시진을 선택해 주세요.');
   const time = selected ? selected.time : input.time;
   const hasTime = typeof time === 'string' && /^\d{1,2}:\d{2}$/.test(time);
   const [hh, mi] = hasTime ? time.split(':').map(Number) : [12, 0];
-  const { off, dst } = utcOffset(birth);
   const base = Date.UTC(birth.y, birth.m - 1, birth.d, hh, mi);
   const at = (shift) => {
     const t = new Date(base + shift * 60000);
     return Solar.fromYmdHms(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate(), t.getUTCHours(), t.getUTCMinutes(), 0);
   };
-  const solA = selected ? at(-30) : hasTime ? at(480 - off) : at(0);
-  const solB = selected ? at(0) : hasTime ? at(510 - off) : at(0);
+  const solA = hasTime ? at(480 - off) : at(0);
+  const solB = hasTime ? at(510 - off) : at(0);
   const ecA = solA.getLunar().getEightChar(); ecA.setSect(1);
   const ecB = solB.getLunar().getEightChar(); ecB.setSect(1);
   const pillars = { year: gz(ecA.getYear()), month: gz(ecA.getMonth()), day: gz(ecB.getDay()), hour: hasTime ? gz(ecB.getTime()) : null };
@@ -41,9 +43,19 @@ export function buildChart(input) {
   const daeun = yun.getDaYun().slice(1, 10).map((d) => ({ startYear: d.getStartYear(), age: d.getStartYear() - birth.y, ...gz(d.getGanZhi()) }));
 
   return {
-    ...a, input, birth, hasTime, dst: !selected && dst, name: (input.name || '').trim(),
+    ...a, input, birth, hasTime, dst: hasTime && dst, name: (input.name || '').trim(),
+    timeLabel: !hasTime ? '시간 모름' : selected ? selected.label : time,
     lunarText: lunarText(birth, true), daeun,
   };
+}
+
+// 입력 폼용: 날짜(양력·음력)에 맞는 시계 기준 시진 구간. 날짜가 잘못되면 평소(UTC+9) 구간을 준다.
+export function birthTimesFor(input) {
+  let birth = { y: +input.y, m: +input.m, d: +input.d };
+  if (input.calendar === 'lunar') birth = solarOfLunar(birth.y, birth.m, birth.d, input.leap) || birth;
+  let off = 540;
+  try { off = utcOffset(birth).off; } catch { /* 범위 밖 날짜 */ }
+  return { off, note: offsetNote(off) };
 }
 
 // 네 기둥(또는 세 기둥)만으로 하는 분석. 날짜 라이브러리를 쓰지 않아 전체 사주 집계(랭킹)에도 쓴다.
