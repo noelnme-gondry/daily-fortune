@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { AD_POSITION_EXPERIMENT } from '../../src/domain/ad-experiment.js';
 
 test.beforeEach(async ({ context }) => {
   await context.route('https://**/*', (route) => route.abort());
@@ -15,10 +16,27 @@ test.beforeEach(async ({ context }) => {
       options.container.append(wrapper);
     } };`,
   }));
-  await context.addInitScript(() => {
+  await context.addInitScript((key) => {
+    try { if (!localStorage.getItem(key)) localStorage.setItem(key, 'A'); } catch { /* 저장 차단 테스트 */ }
     window.adEvents = [];
     window.gtag = (...args) => window.adEvents.push(args);
-  });
+  }, AD_POSITION_EXPERIMENT.storageKey);
+});
+
+test('B는 계산 결과 첫 부분에 광고를 두고 결과로 이동할 때 광고를 건너뛰지 않는다', async ({ page }) => {
+  await page.addInitScript((key) => localStorage.setItem(key, 'B'), AD_POSITION_EXPERIMENT.storageKey);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/today/');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('button[type="submit"]').click();
+  await expect(page.locator('#result > .partner-ad:first-child')).toHaveCount(1);
+  await expect(page.locator('[data-partner-ad-slot]')).toBeInViewport({ ratio: 1 });
+  await expect.poll(async () => {
+    const slot = await page.locator('[data-partner-ad-slot]').boundingBox();
+    const headerBottom = await page.locator('.site-head').evaluate((el) => el.getBoundingClientRect().bottom);
+    return slot.y >= Math.max(0, headerBottom);
+  }).toBe(true);
+  await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(0);
 });
 
 for (const width of [320, 390, 768, 1024, 1440]) {
@@ -58,12 +76,12 @@ test('화면 폭을 줄여도 배너를 다시 요청하지 않고 지면과 ifr
   expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
 });
 
-async function calculateResult(page, path) {
+async function calculateResult(page, path, variant = 'A') {
   await page.goto(path);
   const tojeong = path === '/tojeong/';
   await expect(page.locator(tojeong ? '#tojeong-tool' : '#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+  await expect(page.locator(variant === 'B' ? '#result > .partner-ad:first-child, #tojeong-result > .partner-ad:first-child' : '.result-share + .hint + .partner-ad')).toHaveCount(1);
   await expect(page.locator('[data-share-page]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: '링크 복사', exact: true })).toHaveCount(1);
 }
@@ -113,6 +131,104 @@ test('저장된 결과 복원에도 공유 아래에 배너를 놓고, 이동한
   expect(await slotEvents(page)).toHaveLength(1);
 });
 
+for (const width of [390, 1440]) {
+  test(`${width}px B의 주요 계산기·재계산·복원에서도 광고는 결과 위 한 개다`, async ({ page }) => {
+    await page.addInitScript((key) => localStorage.setItem(key, 'B'), AD_POSITION_EXPERIMENT.storageKey);
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of ['/today/', '/compatibility/', '/life-story/', '/saju-ranking/', '/tojeong/']) {
+      await calculateResult(page, path, 'B');
+      const slot = page.locator('[data-partner-ad-slot]');
+      await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+      await expect(slot).toBeInViewport({ ratio: 1 });
+      const result = page.locator('#result, #tojeong-result');
+      expect((await slot.boundingBox()).width).toBe((await result.boundingBox()).width);
+      await slot.evaluate((el) => el.setAttribute('data-test-instance', 'original'));
+      await page.locator(path === '/tojeong/' ? '#tj-d' : '#a-d').selectOption('2');
+      await page.locator('button[type="submit"]').click();
+      await expect(result.locator(':scope > .partner-ad:first-child')).toHaveCount(1);
+      await expect(slot).toHaveAttribute('data-test-instance', 'original');
+      await expect(slot.locator('iframe')).toHaveCount(1);
+      expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
+      await page.reload();
+      await expect(result.locator(':scope > .partner-ad:first-child')).toHaveCount(1);
+    }
+  });
+}
+
+test('A/B 배정은 새 문서 이동에도 유지되고 일반 페이지는 실험에 포함하지 않는다', async ({ page }) => {
+  await page.goto('/today/');
+  await page.evaluate((key) => localStorage.setItem(key, 'B'), AD_POSITION_EXPERIMENT.storageKey);
+  await page.reload();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ad-variant', 'B');
+  await page.goto('/tomorrow/');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ad-variant', 'B');
+  await page.goto('/tojeong/');
+  await expect(page.locator('#tojeong-tool')).toHaveAttribute('data-ad-variant', 'B');
+  await page.goto('/');
+  await expect(page.locator('[data-ad-variant]')).toHaveCount(0);
+  await showFraction(page, 0.8);
+  await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
+  expect((await slotEvents(page))[0][2]).not.toHaveProperty('experiment_id');
+});
+
+test('홈에서 계산해 오늘의 운세로 진입해도 저장된 B 배정으로 결과를 복원한다', async ({ page }) => {
+  await page.addInitScript((key) => localStorage.setItem(key, 'B'), AD_POSITION_EXPERIMENT.storageKey);
+  await page.goto('/');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('button[type="submit"]').click();
+  await expect(page).toHaveURL(/\/today\/$/);
+  await expect(page.locator('#result > .partner-ad:first-child')).toHaveCount(1);
+  expect(await page.evaluate(() => window.adEvents.find((e) => e[1] === 'ad_experiment_exposure')?.[2].experiment_variant)).toBe('B');
+});
+
+test('브라우저·탭 저장이 모두 막혀도 같은 문서의 B 배정과 계산이 유지된다', async ({ page }) => {
+  await page.addInitScript(() => {
+    for (const name of ['localStorage', 'sessionStorage']) Object.defineProperty(window, name, { get() { throw new Error('storage blocked'); } });
+    Math.random = () => 0.75;
+  });
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/today/');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  for (const day of ['2', '3']) {
+    await page.locator('#a-d').selectOption(day);
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('#result > .partner-ad:first-child')).toHaveCount(1);
+    await expect(page.locator('#result .chart-card')).toBeVisible();
+  }
+  expect(await page.evaluate(() => window.adEvents.find((e) => e[1] === 'ad_experiment_exposure')?.[2])).toMatchObject({ experiment_variant: 'B', assignment_scope: 'page' });
+  expect(errors).toEqual([]);
+});
+
+for (const variant of ['A', 'B']) {
+  test(`${variant}는 계산 후 실험 진입·광고 도달·결과 도달을 한 번씩 구분하고 공유에 그룹을 붙인다`, async ({ page }) => {
+    await page.addInitScript(({ key, variant }) => localStorage.setItem(key, variant), { key: AD_POSITION_EXPERIMENT.storageKey, variant });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/today/?name=private-name#private-birth');
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await showFraction(page, 0.8);
+    expect(await slotEvents(page)).toHaveLength(0);
+    expect(await page.evaluate(() => window.adEvents.filter((e) => e[1] === 'ad_experiment_exposure'))).toHaveLength(0);
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('#result .chart-card')).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.adEvents.filter((e) => e[1] === 'result_view').length)).toBe(1);
+    await showFraction(page, 0.8);
+    await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
+    await page.getByRole('button', { name: '링크 복사', exact: true }).click();
+    await page.locator('button[type="submit"]').click();
+    await showFraction(page, 0.8);
+    const events = await page.evaluate(() => window.adEvents);
+    for (const name of ['ad_experiment_exposure', 'ad_slot_view', 'result_view']) expect(events.filter((e) => e[1] === name)).toHaveLength(1);
+    for (const name of ['ad_experiment_exposure', 'ad_slot_view', 'result_view', 'calc_result', 'share']) {
+      expect(events.find((e) => e[1] === name)?.[2]).toMatchObject({
+        experiment_id: AD_POSITION_EXPERIMENT.id, experiment_variant: variant,
+        ad_placement: AD_POSITION_EXPERIMENT.placements[variant], assignment_scope: 'browser', tool: 'today',
+      });
+    }
+    expect(JSON.stringify(events.filter((e) => ['ad_experiment_exposure', 'ad_slot_view', 'result_view'].includes(e[1])))).not.toContain('private');
+  });
+}
+
 test('토정비결 결과를 오류로 비웠다가 다시 계산해도 광고가 사라지거나 복제되지 않는다', async ({ page }) => {
   await calculateResult(page, '/tojeong/');
   const slot = page.locator('[data-partner-ad-slot="common"]');
@@ -157,7 +273,7 @@ async function showFraction(page, fraction) {
 
 test('발급 코드로 한 번만 초기화하고 절반 이상 노출 시 개인정보 없이 한 번 전송한다', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/today/?name=private-name#private-birth');
+  await page.goto('/tti/?name=private-name#private-birth');
   await expect(page.locator('[data-partner-ad-slot]')).toHaveAttribute('data-ad-state', 'initialized');
   expect(await page.evaluate(() => window.partnerConfig)).toEqual({ id: 1039151, template: 'carousel', trackingCode: 'AF3219545', width: '100%', height: '140', bordered: false, tsource: '' });
   expect(await slotEvents(page)).toHaveLength(0);
@@ -167,7 +283,7 @@ test('발급 코드로 한 번만 초기화하고 절반 이상 노출 시 개�
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
   const event = (await slotEvents(page))[0];
   expect(event.slice(0, 2)).toEqual(['event', 'ad_slot_view']);
-  expect(event[2]).toEqual({ ad_provider: 'coupang', ad_slot: 'common', page_path: '/today/', page_location: 'http://127.0.0.1:4176/today/', page_title: await page.title() });
+  expect(event[2]).toEqual({ ad_provider: 'coupang', ad_slot: 'common', page_path: '/tti/', page_location: 'http://127.0.0.1:4176/tti/', page_title: await page.title() });
   expect(JSON.stringify(event)).not.toContain('private');
   await showFraction(page, 0);
   await showFraction(page, 0.8);
@@ -198,7 +314,7 @@ test('비활성 탭은 집계하지 않고 활성화되면 보이는 지면을 �
     window.testTabVisible = false;
     Object.defineProperty(document, 'visibilityState', { get: () => window.testTabVisible ? 'visible' : 'hidden' });
   });
-  await page.goto('/today/');
+  await page.goto('/tti/');
   await showFraction(page, 0.6);
   expect(await slotEvents(page)).toHaveLength(0);
   await page.evaluate(() => { window.testTabVisible = true; document.dispatchEvent(new window.Event('visibilitychange')); });
@@ -212,6 +328,9 @@ test('광고 로드 실패·GA 미설정에서도 운세를 계산하고 공유�
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/today/');
   await expect(page.locator('[data-partner-ad-slot]')).toHaveAttribute('data-ad-state', 'unavailable');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('button[type="submit"]').click();
+  await expect(page.locator('#result .chart-card')).toBeVisible();
   await showFraction(page, 0.6);
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
   await page.evaluate(() => { delete window.gtag; });
