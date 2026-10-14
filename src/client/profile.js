@@ -1,5 +1,5 @@
 // 영구 보관은 사용자가 선택한 IndexedDB. 미선택 입력은 현재 탭의 세션에만 유지한다.
-const KEY = { a: 'ohaeng:profile', b: 'ohaeng:partner' };
+const KEY = { a: 'ohaeng:profile', b: 'ohaeng:partner', tojeong: 'ohaeng:tojeong' };
 const DB_NAME = 'ohaeng-profiles';
 const STORE = 'profiles';
 
@@ -32,31 +32,34 @@ async function transact(mode, action) {
 export function valid(p) {
   return p && (p.gender === 'M' || p.gender === 'F') && Number.isInteger(p.y) && Number.isInteger(p.m) && Number.isInteger(p.d);
 }
+const validFor = (who, p) => who === 'tojeong'
+  ? p && ['solar', 'lunar'].includes(p.calendar) && [p.y, p.m, p.d].every(Number.isInteger)
+  : valid(p);
 
 export async function load(who) {
   const p = await transact('readonly', (s) => s.get(who));
-  if (valid(p)) return p;
+  if (validFor(who, p)) return p;
   // 이전 자동 저장 데이터는 성공적으로 옮긴 뒤에만 제거한다.
   let legacy;
   try { legacy = JSON.parse(localStorage.getItem(KEY[who])); } catch { return null; }
-  if (!valid(legacy)) return null;
+  if (!validFor(who, legacy)) return null;
   await save(who, legacy);
   return legacy;
 }
 export async function save(who, p) {
-  if (!valid(p)) throw new Error('올바른 생년월일을 입력해 주세요.');
+  if (!validFor(who, p)) throw new Error('올바른 생년월일을 입력해 주세요.');
   await transact('readwrite', (s) => s.put(p, who));
   try { localStorage.removeItem(KEY[who]); } catch { /* 이전 저장소 접근 제한 */ }
 }
-export async function removeSaved() {
-  await transact('readwrite', (s) => s.clear());
-  for (const key of Object.values(KEY)) {
+export async function removeSaved(who) {
+  await transact('readwrite', (s) => who ? s.delete(who) : s.clear());
+  for (const key of who ? [KEY[who]] : Object.values(KEY)) {
     try { localStorage.removeItem(key); } catch { /* 접근 제한 */ }
     try { sessionStorage.removeItem(key); } catch { /* 접근 제한 */ }
   }
 }
 export function sessionLoad(who) {
-  try { const p = JSON.parse(sessionStorage.getItem(KEY[who])); return valid(p) ? p : null; } catch { return null; }
+  try { const p = JSON.parse(sessionStorage.getItem(KEY[who])); return validFor(who, p) ? p : null; } catch { return null; }
 }
 export function sessionSave(who, p) {
   try { sessionStorage.setItem(KEY[who], JSON.stringify(p)); return true; } catch { return false; }

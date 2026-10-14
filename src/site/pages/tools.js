@@ -1,5 +1,5 @@
 // 계산기(도구) 페이지와 홈. 폼과 설명·FAQ는 서버에서 그리고, 결과는 브라우저에서 계산한다.
-import { HOME, TOOLS, SITE, yearTool } from '../../content/pages.js';
+import { HOME, TOOLS, SITE, FREE_ACCESS, FREE_FAQ, yearTool } from '../../content/pages.js';
 import {
   ANIMAL, ANIMAL_SLUG, EL_K, EL_H, STEM_EL, BR_EL, addDays, dow, fmtDate, fmtShort, pillarLabel, pillarH,
   dayPillar, monthPillar, yearPillar, yearPillarOfDate, lunarText, solarTerms, ttiDay, ttiYear, samjaeYear, toUTC,
@@ -129,17 +129,18 @@ function relatedFor(path, ctx) {
   return related([...fun, ...all.filter(([h]) => h !== path && !fun.some(([f]) => f === h))].filter(([h]) => h !== path).slice(0, 6));
 }
 function webApp(tool, ctx) {
-  return { '@type': 'WebApplication', name: `${SITE.name} ${tool.h1}`, url: `${ctx.site}${tool.path}`, description: tool.desc, applicationCategory: 'LifestyleApplication', operatingSystem: 'Web', inLanguage: 'ko-KR', offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' }, publisher: { '@id': `${ctx.site}/#org` } };
+  return { '@type': 'WebApplication', name: `${SITE.name} ${tool.h1}`, url: `${ctx.site}${tool.path}`, description: tool.desc, applicationCategory: 'LifestyleApplication', operatingSystem: 'Web', inLanguage: 'ko-KR', isAccessibleForFree: true, offers: { '@type': 'Offer', price: FREE_ACCESS.price, priceCurrency: FREE_ACCESS.currency }, publisher: { '@id': `${ctx.site}/#org` } };
 }
 function toolPage(key, ctx, opts = {}) {
   const t = opts.tool || TOOLS[key];
   const mode = opts.mode || key;
   const top = opts.top || '';
   const extraAfter = opts.after || '';
+  const faq = [...t.faq, FREE_FAQ];
   return {
     path: t.path, title: t.title, description: t.desc, crumbs: opts.crumbs || [[t.nav, t.path]], section: t.path,
-    tool: true, ld: [webApp(t, ctx), faqLd(t.faq)],
-    body: `${hero(t.h1, t.lead)}${top}${toolBlock(mode, ctx, opts)}${adSlot(ctx, 'inline')}<div class="info-panels">${disclosure('tool-method', '계산 방법과 점수 기준', howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', '관련 운세와 더 알아보기', extraAfter) : ''}${disclosure('tool-faq', '자주 묻는 질문', faqBlock(t.faq), 'help')}${disclosure('tool-related', '다른 운세 둘러보기', relatedFor(t.path, ctx))}</div>`,
+    tool: true, ld: [webApp(t, ctx), faqLd(faq)],
+    body: `${hero(t.h1, t.lead, FREE_ACCESS.summary)}${top}${toolBlock(mode, ctx, opts)}${adSlot(ctx, 'inline')}<div class="info-panels">${disclosure('tool-method', '계산 방법과 점수 기준', howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', '관련 운세와 더 알아보기', extraAfter) : ''}${disclosure('tool-faq', '자주 묻는 질문', faqBlock(faq), 'help')}${disclosure('tool-related', '다른 운세 둘러보기', relatedFor(t.path, ctx))}</div>`,
   };
 }
 
@@ -186,9 +187,9 @@ export function yearPage(y, ctx) {
 export function yearHub(ctx) {
   const ys = [ctx.today.y, ctx.today.y + 1];
   return {
-    path: '/year/', title: '신년운세 — 연도별 사주 운세', description: `${ys.join('년·')}년 신년운세를 내 사주로 확인하세요. 세운과 대운으로 계산한 연간 총운과 월별 운세를 제공합니다.`,
+    path: '/year/', title: '무료 신년운세 — 올해·내년 총운과 월별 운세', description: `${ys.join('년·')}년 신년운세를 무료로 확인하세요. 내 사주와 세운·대운으로 계산한 연간 총운과 월별 운세를 회원가입 없이 제공합니다. 토정비결과의 차이도 안내합니다.`,
     crumbs: [['신년운세', '/year/']], section: '/year/',
-    body: `${hero('신년운세', '신년운세는 그 해의 간지(세운)가 내 사주 원국과 맺는 관계로 한 해의 흐름을 봅니다. 연도를 골라 총운과 1~12월 월별 운세를 확인하세요.')}<div class="cards">${ys.map((y) => `<a class="card link-card" href="/year/${y}/"><b>${y}년 운세</b><span>${pillarLabel(yearPillar(y))}년 · ${ANIMAL[yearPillar(y).b]}띠 해</span></a>`).join('')}</div>`,
+    body: `${hero('무료 신년운세', '신년운세는 그 해의 간지(세운)가 내 사주 원국과 맺는 관계로 한 해의 흐름을 봅니다. 연도를 골라 총운과 1~12월 월별 운세를 확인하세요.', FREE_ACCESS.summary)}<div class="cards">${ys.map((y) => `<a class="card link-card" href="/year/${y}/"><b>${y}년 운세</b><span>${pillarLabel(yearPillar(y))}년 · ${ANIMAL[yearPillar(y).b]}띠 해</span></a>`).join('')}</div><p class="note">이곳의 신년운세는 사주 방식으로 계산합니다. 144괘로 한 해를 읽으려면 <a href="/tojeong/">무료 토정비결</a>을 이용하세요. <a href="/about/#tojeong">두 방식의 차이</a>도 확인할 수 있습니다.</p>`,
   };
 }
 
@@ -203,6 +204,7 @@ export function home(ctx) {
     [`/year/${y}/`, `${y}년 운세`, '올해 총운과 1~12월 월별 운세'],
     [`/year/${y + 1}/`, `${y + 1}년 운세`, '내년 총운과 월별 운세'],
     ['/lifetime/', '평생 운세', '타고난 기질, 대운 흐름, 결혼·재물 시기'],
+    ['/tojeong/', '무료 토정비결', '144괘로 보는 총운과 음력 열두 달의 풀이'],
     ['/compatibility/', '사주 궁합', '평생 궁합, 조심할 점, 결혼 길일'],
     ['/manseryeok/', '만세력', '사주팔자 원국과 대운 바로 계산'],
   ];
@@ -221,11 +223,11 @@ export function home(ctx) {
       ${toolBlock('home', ctx)}
     </section>
     ${dayBox(o, '오늘')}
-    <section class="box-sec"><div class="sec-head"><h2>운세 종류</h2></div><div class="cards three">${cards.map(([h, t, d]) => `<a class="card link-card" href="${h}"><b>${t}</b><span>${d}</span></a>`).join('')}</div></section>
+    <section class="box-sec"><div class="sec-head"><h2>무료로 보는 사주와 운세</h2></div><div class="cards home-tools">${cards.map(([h, t, d]) => `<a class="card link-card" href="${h}"><b>${t}</b><span>${d}</span></a>`).join('')}</div></section>
     <section class="box-sec"><div class="sec-head"><h2>띠별 오늘의 운세 · ${o.m}월 ${o.d}일</h2><a href="/tti/today/">해설 보기</a></div>${ttiDayList(o, { short: true })}</section>
     <section class="box-sec"><div class="sec-head"><h2>${y}년 ${pillarLabel(yearPillar(y))}년 띠별 운세</h2><a href="/tti/${y}/">12띠 전체</a></div>
       <p class="muted">${y}년 삼재: ${sj.map((s) => `${ANIMAL[s.tti]}띠(${s.name})`).join(', ')}</p>
-      <div class="cards four">${ty.map((r) => `<a class="card link-card tti-card" href="/tti/${y}/${ANIMAL_SLUG[r.tti]}/"><b>${r.animal}띠 <span class="num">${r.score}</span></b><span>${esc(r.headline)}</span></a>`).join('')}</div></section>
+      <div class="cards zodiac-cards">${ty.map((r) => `<a class="card link-card tti-card" href="/tti/${y}/${ANIMAL_SLUG[r.tti]}/">${animalIcon(r.tti)}<b>${r.animal}띠 <span class="num">${r.score}</span></b><span>${esc(r.headline)}</span></a>`).join('')}</div></section>
     <section class="box-sec"><div class="sec-head"><h2>사주 백과</h2><a href="/saju/">전체 보기</a></div><div class="cards three">
       <a class="card link-card" href="/saju/ilju/"><b>60일주 총정리</b><span>갑자일주부터 계해일주까지 성격·연애·직업</span></a>
       <a class="card link-card" href="/saju/sipsin/"><b>십신 뜻</b><span>비견·식신·정재·정관·정인 등 10가지</span></a>

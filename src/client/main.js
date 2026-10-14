@@ -11,6 +11,12 @@ initAutoEvents();
 initInteractions();
 initTtiNavigation();
 if (document.querySelector('[data-cohort]')) import('./tti-client.js').then((m) => m.mountTti()).catch(() => {});
+const tojeong = document.getElementById('tojeong-tool');
+if (tojeong) import('./tojeong-client.js').then((m) => m.mountTojeong(tojeong)).catch(() => {
+  const error = document.getElementById('tj-error');
+  error.hidden = false;
+  error.textContent = '토정비결 계산기를 불러오지 못했습니다. 새로고침해 주세요.';
+});
 
 // 수동 광고 단위(ADSENSE_SLOT_*)가 있으면 채운다
 document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(() => {
