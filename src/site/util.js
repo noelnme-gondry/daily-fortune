@@ -25,3 +25,10 @@ export function factTable(rows, caption = '') {
   return `<table class="facts">${caption ? `<caption>${esc(caption)}</caption>` : ''}<tbody>${rows.map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${v}</td></tr>`).join('')}</tbody></table>`;
 }
 export const elSpan = (e, text) => `<span class="el el-${e}">${text}</span>`;
+
+// 정보 아이콘: 마우스를 올리거나(포커스·탭) 하면 설명이 보인다
+let tipSeq = 0;
+export function tip(text, label = '설명 보기') {
+  const id = `tip-s${++tipSeq}`;
+  return `<span class="tipwrap"><button type="button" class="info" aria-label="${attr(label)}" aria-describedby="${id}" data-tip-id="${id}">i</button><span role="tooltip" id="${id}" class="tip">${esc(text)}</span></span>`;
+}

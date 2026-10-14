@@ -10,6 +10,8 @@ import * as saju from './pages/saju.js';
 import * as tti from './pages/tti.js';
 import * as manse from './pages/manse.js';
 import * as info from './pages/info.js';
+import { sharePage } from './pages/share.js';
+import { config } from './config.js';
 
 // 콘텐츠(백과·도구 문구)를 마지막으로 고친 날. 해설을 손보면 함께 올린다.
 export const CONTENT_UPDATED = '2026-10-14';
@@ -29,6 +31,8 @@ function routeTable(ctx) {
   for (const yr of years) add(`/year/${yr}/`, (c) => tools.yearPage(yr, c), { p: 0.9 });
   add('/lifetime/', tools.lifetime, { p: 0.9 });
   add('/compatibility/', tools.compatibility, { p: 0.9 });
+  add('/life-story/', tools.story, { p: 0.9 });
+  add('/saju-ranking/', tools.rank, { p: 0.9 });
   add('/manseryeok/', tools.manseryeok, { p: 0.8 });
   for (const yr of years) {
     add(`/manseryeok/${yr}/`, (c) => manse.manseYear(yr, c), { p: 0.6 });
@@ -44,6 +48,7 @@ function routeTable(ctx) {
   add('/tti/compatibility/', tti.compat, { p: 0.7 });
   add('/saju/', saju.hub, { p: 0.7 });
   add('/saju/ilju/', saju.iljuIndex, { p: 0.7 });
+  add('/saju/ilju-ranking/', saju.iljuRanking, { p: 0.7, feed: true });
   for (let n = 0; n < 60; n++) add(`/saju/ilju/${iljuSlug(sexagenary(n))}/`, (c) => saju.iljuPage(n, c), { p: 0.6, feed: true });
   add('/saju/ilgan/', saju.ilganIndex, { p: 0.6 });
   for (let s = 0; s < 10; s++) add(`/saju/ilgan/${STEM_SLUG[s]}/`, (c) => saju.ilganPage(s, c), { p: 0.6, feed: true });
@@ -63,7 +68,7 @@ function routeTable(ctx) {
 
 export function createSite({ site, assets, now = Date.now() }) {
   const today = todayKST(now);
-  const ctx = { site, assets, today, todayISO: isoDate(today), buildDate: CONTENT_UPDATED, published: PUBLISHED };
+  const ctx = { site, assets, today, todayISO: isoDate(today), buildDate: CONTENT_UPDATED, published: PUBLISHED, cfg: config() };
   const routes = routeTable(ctx);
   const byPath = new Map(routes.map((r) => [r.path, r]));
   const pageCache = new Map();
@@ -87,6 +92,16 @@ export function createSite({ site, assets, now = Date.now() }) {
       return layout(page(path), ctx);
     },
     notFound: () => layout(info.notFound(), ctx),
+    // 공유 카드: 쿼리마다 달라 캐시하지 않는다
+    renderShare(searchParams) {
+      const p = sharePage(searchParams, ctx);
+      if (searchParams && [...searchParams.keys()].length) p.ogPath = `/share/?${searchParams.toString()}`;
+      return layout(p, ctx);
+    },
+    adsTxt() {
+      const a = ctx.cfg.adsense;
+      return a ? `google.com, ${a.pub}, DIRECT, f08c47fec0942fa0\n` : '';
+    },
     sitemap() {
       const urls = routes.map((r) => `  <url><loc>${site}${r.path}</loc><lastmod>${lastmod(r)}</lastmod><changefreq>${r.changefreq}</changefreq><priority>${r.priority.toFixed(1)}</priority></url>`).join('\n');
       return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
@@ -126,6 +141,9 @@ ${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일�
 
 ## 운세 계산기
 ${pick((p) => ['/today/', '/tomorrow/', '/week/', '/month/', `/year/${y}/`, `/year/${y + 1}/`, '/lifetime/', '/compatibility/', '/manseryeok/'].includes(p))}
+
+## 재미로 보는 사주
+${pick((p) => ['/life-story/', '/saju-ranking/', '/saju/ilju-ranking/'].includes(p))}
 
 ## 띠별 운세
 ${pick((p) => p === '/tti/' || p === '/tti/today/' || p === `/tti/${y}/` || p === `/tti/${y + 1}/` || p === '/tti/samjae/' || p === '/tti/compatibility/')}

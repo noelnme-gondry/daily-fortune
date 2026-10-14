@@ -4,5 +4,8 @@ export { dayPillar, monthPillar, yearPillar, yearPillarOfDate, lunarOf, lunarTex
 export { buildChart, daeunAt, ChartInputError } from './chart.js';
 export { CATS, evalPillar, combine, scoresOf, bandOf, day, week, month, year, yearMonths, daeunScores } from './fortune.js';
 export { lifetime, yearSignals } from './lifetime.js';
-export { compat } from './compat.js';
+export { compat, COMPAT_HEADLINES } from './compat.js';
 export { ttiYear, ttiDay, ttiCompat, ttiMatches, samjaeOf, samjaeYear } from './tti.js';
+export { analyze } from './chart.js';
+export { lifeStory } from './story.js';
+export { rankScore, rankReasons, sajuRank, rankFromTable, allPillars, RANK_CATS, TIERS, PARTS } from './rank.js';

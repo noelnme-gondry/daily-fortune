@@ -15,6 +15,7 @@ const MONTH_REL_W = { '합': 1, '삼합': 0.8, '같음': 0.3, '없음': 0, '충'
 const COMP_CAL = { personality: [1.45, 1.59], love: [0.81, 1.85], talk: [0.68, 1.1], money: [0.21, 0.98], family: [0.06, 1.46], total: [1.46, 1.78] };
 const compScore = (raw, k) => { const [m, sd] = COMP_CAL[k]; return clamp(Math.round(64 + 34 * Math.tanh((raw - m) / (2.6 * sd))), 20, 99); };
 const CAT_NAMES = { personality: '성격', love: '애정', talk: '소통', money: '경제', family: '가정·자녀' };
+export const COMPAT_HEADLINES = ['천생연분에 가까운 인연', '서로를 키워 주는 좋은 인연', '노력할수록 깊어지는 인연', '차이를 이해해야 하는 인연', '서로를 배워 가야 하는 인연'];
 
 export function compat(a, b, today) {
   const nameA = a.name || '나', nameB = b.name || '상대';
@@ -139,7 +140,7 @@ export function compat(a, b, today) {
     .sort((x, y) => toUTC(x.date) - toUTC(y.date))
     .map((d) => ({ date: d.date, label: fmtDate(d.date), pillar: d.p, pillarText: pillarLabel(d.p), lunar: lunarText(d.date) }));
 
-  const headline = total >= 85 ? '천생연분에 가까운 인연' : total >= 75 ? '서로를 키워 주는 좋은 인연' : total >= 62 ? '노력할수록 깊어지는 인연' : total >= 50 ? '차이를 이해해야 하는 인연' : '서로를 배워 가야 하는 인연';
+  const headline = COMPAT_HEADLINES[total >= 85 ? 0 : total >= 75 ? 1 : total >= 62 ? 2 : total >= 50 ? 3 : 4];
   return {
     nameA, nameB, total, headline, cats, lines, complement, cautions,
     keys: { dm: dmKey, day: dayKey, year: yearKey, month: monthKey },
