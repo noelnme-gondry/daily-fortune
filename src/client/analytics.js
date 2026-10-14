@@ -1,7 +1,9 @@
 // GA4 이벤트. GA_MEASUREMENT_ID가 없으면 아무것도 하지 않는다. 이름·생년월일 같은 개인정보는 보내지 않는다.
+import { adExperimentParams } from './ad-experiment.js';
+
 export function track(name, params = {}) {
   try {
-    if (typeof window.gtag === 'function') window.gtag('event', name, params);
+    if (typeof window.gtag === 'function') window.gtag('event', name, { ...adExperimentParams(), ...params });
   } catch (e) { /* 분석 실패는 무시 */ }
 }
 

@@ -1,16 +1,38 @@
 import { track } from './analytics.js';
+import { adExperimentParams } from './ad-experiment.js';
 
 const selector = '[data-partner-ad-slot="common"]';
 const viewedPaths = new Set();
+const resultViewedPaths = new Set();
+const exposedPaths = new Set();
 let stopTracking;
+let stopResultTracking;
+let resultReady = false;
 
 // 재계산으로 결과 HTML을 교체해도 기존 광고 지면을 한 개만 유지한다.
 export function renderResultWithPartnerAd(out, html) {
+  stopResultTracking?.();
+  resultReady = false;
   const ad = document.querySelector('.partner-ad');
   out.innerHTML = html;
   if (!ad) return;
-  const anchor = out.querySelector('.result-share + .hint') || document.querySelector('main');
-  anchor.after(ad);
+  const share = out.querySelector('.result-share + .hint');
+  const experiment = adExperimentParams();
+  if (share) {
+    if (experiment.experiment_variant === 'B') out.prepend(ad);
+    else share.after(ad);
+    resultReady = true;
+    if (experiment.experiment_id) {
+      const path = location.pathname;
+      if (!exposedPaths.has(path)) {
+        exposedPaths.add(path);
+        track('ad_experiment_exposure', { page_path: path });
+      }
+      // 큰 결과 카드 전체 대신 첫 제목의 도달을 측정한다. 읽기를 끝냈다는 뜻은 아니다.
+      const start = out.querySelector('h2');
+      if (start) stopResultTracking = observeView(start, 'result_view', resultViewedPaths);
+    }
+  } else document.querySelector('main').after(ad);
   initAdSlotTracking();
 }
 
@@ -39,14 +61,22 @@ export function initPartnerAd() {
 export function initAdSlotTracking() {
   stopTracking?.();
   const slot = document.querySelector(selector);
+  // 계산 전 푸터 도달을 실험 결과로 섞지 않는다. 일반 콘텐츠 페이지는 기존대로 측정한다.
+  if (!slot || (adExperimentParams().experiment_id && !resultReady)) return;
+  stopTracking = observeView(slot, 'ad_slot_view', viewedPaths, {
+    ad_provider: 'coupang', ad_slot: slot.dataset.partnerAdSlot,
+  });
+}
+
+function observeView(target, eventName, seen, params = {}) {
   const path = location.pathname;
-  if (!slot || viewedPaths.has(path) || !window.IntersectionObserver) return;
+  if (seen.has(path) || !window.IntersectionObserver) return;
   let visible = false;
   const report = () => {
-    if (!visible || document.visibilityState !== 'visible' || viewedPaths.has(path)) return;
-    viewedPaths.add(path);
-    track('ad_slot_view', {
-      ad_provider: 'coupang', ad_slot: slot.dataset.partnerAdSlot,
+    if (!visible || document.visibilityState !== 'visible' || seen.has(path)) return;
+    seen.add(path);
+    track(eventName, {
+      ...params,
       page_path: path, page_location: `${location.origin}${path}`, page_title: document.title,
     });
     stop();
@@ -59,7 +89,7 @@ export function initAdSlotTracking() {
     observer.disconnect();
     document.removeEventListener('visibilitychange', report);
   };
-  stopTracking = stop;
   document.addEventListener('visibilitychange', report);
-  observer.observe(slot);
+  observer.observe(target);
+  return stop;
 }

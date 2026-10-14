@@ -5,7 +5,11 @@ import { initAutoEvents } from './analytics.js';
 import { initInteractions } from './interactions.js';
 import { initTtiNavigation } from './tti-navigation.js';
 import { initPartnerAd, initAdSlotTracking } from './partner-ad.js';
+import { initAdExperiment } from './ad-experiment.js';
+import { initMobileHeader } from './mobile-header.js';
 
+initAdExperiment();
+initMobileHeader();
 initTips();
 initPageShare();
 initAutoEvents();

@@ -65,9 +65,17 @@ button, input, select { font: inherit; color: inherit; }
 .gnav a[aria-current="page"] { color: var(--accent); font-weight: 600; border-bottom-color: var(--accent); }
 /* 두 행이 같은 열을 공유하므로 메뉴 길이가 달라도 위아래 경계가 맞는다. */
 @media (max-width: 900px) {
+  html { scroll-padding-top: calc(var(--site-head-height, 0px) + 12px); }
+  .site-head[data-scroll-header] { position: sticky; top: 0; z-index: 20; padding-top: env(safe-area-inset-top, 0px); }
+  .site-head[data-scroll-header].is-hidden { transform: translateY(-100%); }
+  .site-head[data-scroll-header]:focus-within { transform: none; }
+  #result > .tabs { display: none; }
   .gnav-row { position: relative; display: grid; grid-template-columns: repeat(7, auto); padding-inline: 12px; }
   .gnav-row::before { content: ''; position: absolute; inset-inline: 12px; top: 50%; height: 1px; background: var(--line); pointer-events: none; }
   .gnav a { padding-inline: .5cqw; font-size: min(2.55cqw, 12.5px); }
+}
+@media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
+  .site-head[data-scroll-header] { transition: transform 180ms ease; }
 }
 
 main.wrap { padding-block: 18px 56px; display: grid; gap: 28px; }
