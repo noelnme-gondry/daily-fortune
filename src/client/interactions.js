@@ -8,7 +8,6 @@ export function collapseDisclosures(root = document) {
 export function initInteractions() {
   collapseDisclosures();
   document.addEventListener('change', (event) => {
-    if (event.target.matches('[data-leader-category]')) document.querySelectorAll('[data-leader-panel]').forEach((panel) => { panel.hidden = panel.dataset.leaderPanel !== event.target.value; });
     if (event.target.matches('[data-job-family]')) document.querySelectorAll('[data-job-panel]').forEach((panel) => { panel.hidden = panel.dataset.jobPanel !== event.target.value; });
   });
   let opener = null;

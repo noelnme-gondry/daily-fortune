@@ -92,7 +92,12 @@ test('캐릭터 게임 보정은 일반 운세와 랭킹을 바꾸지 않는다'
 });
 test('명예의 전당 점수·공동 순위는 기존 산식·분포표와 일치', () => {
   for (const kind of ['four', 'three']) for (const [category, rows] of Object.entries(LEADERS[kind])) {
-    assert.equal(rows.length, 5);
+    assert.equal(rows.length, 100);
+    assert.equal(new Set(rows.map((r) => JSON.stringify(r.pillars))).size, 100);
+    assert.equal(rows[0].rank, 1, `${kind}/${category}: 해당 분야의 1위부터 표시해야 한다`);
+    const histogram = category === 'total' ? TABLE[kind].total : TABLE[kind].cats[category];
+    const topScores = histogram.flatMap((count, idx) => Array(Math.min(count, 100)).fill(category === 'total' ? idx / 10 : idx)).reverse().slice(0, 100);
+    assert.deepEqual(rows.map((row) => row.score), topScores, `${kind}/${category}: 출생 날짜 유무로 상위 점수를 건너뛰면 안 된다`);
     for (const row of rows) {
       const r = rankScore(analyze(row.pillars));
       assert.equal(row.score, category === 'total' ? r.total : r.cats[category]);

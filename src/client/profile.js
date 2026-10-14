@@ -3,11 +3,6 @@ const KEY = { a: 'ohaeng:profile', b: 'ohaeng:partner', tojeong: 'ohaeng:tojeong
 const DB_NAME = 'ohaeng-profiles';
 const STORE = 'profiles';
 
-export const SAMPLE = {
-  a: { name: '서윤', gender: 'F', calendar: 'solar', leap: false, y: 1993, m: 1, d: 28, time: '03:40', noTime: false },
-  b: { name: '도현', gender: 'M', calendar: 'solar', leap: false, y: 1991, m: 8, d: 14, time: '10:30', noTime: false },
-};
-
 function database() {
   return new Promise((resolve, reject) => {
     if (!globalThis.indexedDB) { reject(new Error('IndexedDB를 사용할 수 없습니다.')); return; }

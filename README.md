@@ -65,9 +65,8 @@ GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint →
 | 이벤트 | 매개변수 | 시점 |
 |--------|----------|------|
 | `calc_submit` | `tool` | 계산기 폼 제출 |
-| `calc_result` | `tool`, `source`(form·saved·sample), `has_time`, `calendar` | 결과 표시 |
+| `calc_result` | `tool`, `source`(form·saved), `has_time`, `calendar` | 결과 표시 |
 | `form_error` | `tool` | 날짜 오류 |
-| `sample_click` | `tool` | 예시 인물로 보기 |
 | `story_result` | `arc` | 인생 캐릭터 결과 |
 | `rank_result` | `tier`, `pct_bucket` | 사주 랭킹 결과 |
 | `compat_result` | `score_band` | 궁합 결과 |
@@ -160,6 +159,7 @@ tests/          node:test 테스트
 ### 기기 저장 및 순위 데이터
 
 - `이 기기에 저장`을 선택할 때만 IndexedDB에 나·상대 입력을 보관합니다. 미선택 입력은 같은 탭의 sessionStorage에만 남습니다. 이전 버전이 자동 저장한 localStorage 입력은 현재 탭으로만 옮기고 바로 지웁니다(저장은 다시 선택해야 함). 삭제 버튼은 두 사람의 저장본을 함께 지웁니다.
-- `npm run generate:leaders`는 기존 랭킹 산식으로 종합·5개 분야의 상위 후보를 구하고, 1930년 이후 양력 날짜·시진을 역산해 실제 입력 경로로 원국이 재현되는 대표 조합 5개씩을 저장합니다. 같은 점수의 순위는 동일하며, 실제 사람의 순위가 아닙니다. 날짜를 확인하지 못한 조합은 목록에서 제외하되 순위는 기존 이론 분포표 기준을 유지합니다.
+- `npm run generate:leaders`는 기존 랭킹 산식과 이론 분포표를 유지하며 종합·5개 분야 각각 1위부터 상위 대표 조합 100개를 저장합니다. 같은 점수는 공동 순위이며, 동점 대표는 출생일이 확인된 조합을 우선합니다. 1930년 이후 양력 날짜·시진은 실제 입력 경로로 재검증하고, 날짜가 미확인이어도 상위 조합을 제외하지 않습니다. 실제 사람의 순위가 아닙니다.
+- 명예의 전당과 궁합 추천은 분야별 최대 100개를 5개씩, 1~20페이지로 표시합니다. 목록 크기와 페이지 단위는 `src/domain/ranking-list.js`에서 함께 관리합니다. 궁합은 기준 인물의 양력 출생연도 ±10년 범위에서 검색하며, 분야나 기준 인물을 바꾸면 1페이지로 돌아갑니다.
 - 개인 랭킹의 개운 가이드는 평균 대비 낮은 항목의 근거와 용신·희신·기신을 사용합니다. 색·방향은 공통 오행 데이터에서 가져오며, 소품이나 행동으로 원래 점수를 바꾸지 않습니다.
 - UI·캐릭터 배지는 Lucide SVG, X·Facebook·KakaoTalk은 Simple Icons의 로고를 사용합니다. 출처와 라이선스는 `docs/icon-licenses.md`에 기록합니다.

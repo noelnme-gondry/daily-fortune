@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { createSite } from '../src/site/render.js';
+import { BRAND } from '../src/content/brand.js';
 
 const SITE = 'https://unse.example';
 const site = createSite({ site: SITE, assets: { css: '/assets/s.css', js: '/assets/m.js', tool: '/assets/t.js' }, now: Date.UTC(2026, 9, 14, 3) });
@@ -13,6 +15,7 @@ test('모든 경로가 렌더링되고 이상한 값이 없다', () => {
     assert.ok(html.startsWith('<!doctype html>'), path);
     const visible = html.replace(/<script[\s\S]*?<\/script>/g, '');
     assert.ok(!/undefined|NaN|\[object Object\]/.test(visible), `${path}: ${(visible.match(/.{30}(undefined|NaN|\[object Object\]).{30}/) || [])[0]}`);
+    assert.ok(!/<button\b[^>]*>[^<]*예시/.test(visible), `${path}: 예시 버튼이 남아 있음`);
   }
 });
 
@@ -29,6 +32,28 @@ test('제목·설명은 페이지마다 고유하고 canonical이 자기 주소�
     assert.equal(head(html, /<meta property="og:url" content="(.*?)">/), `${SITE}${path}`);
     assert.equal((html.match(/<h1[\s>]/g) || []).length, 1, `${path}: h1은 하나`);
   }
+});
+
+test('새 브랜드가 홈·전체 페이지의 검색 정보·설치 이름에 일관되게 적용된다', () => {
+  const home = site.render('/');
+  assert.equal(head(home, /<title>(.*?)<\/title>/), `${BRAND.name} | ${BRAND.descriptor}`);
+  assert.ok(home.includes(`<h1>${BRAND.name}</h1>`));
+  for (const [path, html] of pages) {
+    assert.equal(head(html, /<meta property="og:site_name" content="(.*?)">/), BRAND.name, path);
+    if (path !== '/') assert.ok(head(html, /<title>(.*?)<\/title>/).endsWith(` | ${BRAND.name}`), path);
+    const ld = JSON.parse(head(html, /<script type="application\/ld\+json">(.*?)<\/script>/s));
+    for (const node of ld['@graph'].filter((n) => ['WebSite', 'Organization'].includes(n['@type']))) {
+      assert.equal(node.name, BRAND.name, path);
+      assert.equal(node.alternateName, BRAND.alt, path);
+    }
+    assert.ok(html.includes(`src="${BRAND.logo}"`), path);
+    assert.ok(!html.includes('오행 운세'), `${path}: 이전 브랜드명이 남아 있음`);
+  }
+  const manifest = JSON.parse(fs.readFileSync(new URL('../public/site.webmanifest', import.meta.url), 'utf8'));
+  assert.equal(manifest.name, BRAND.name);
+  assert.equal(manifest.short_name, BRAND.name);
+  assert.ok(site.renderShare(null).includes(BRAND.name));
+  assert.ok(!site.renderShare(null).includes('오행 운세'));
 });
 
 test('JSON-LD는 유효하고 이동 경로·FAQ가 화면과 일치한다', () => {
@@ -50,7 +75,7 @@ test('sitemap·robots·rss·llms.txt', () => {
   assert.ok(site.robots().includes(`Sitemap: ${SITE}/sitemap.xml`));
   for (const bot of ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended', 'Yeti']) assert.ok(site.robots().includes(bot));
   assert.ok(site.rss().includes('<rss version="2.0"'));
-  assert.ok(site.llms().startsWith('# 오행 운세'));
+  assert.ok(site.llms().startsWith(`# ${BRAND.name}`));
   assert.ok(site.llmsFull().includes('갑자일주'));
 });
 

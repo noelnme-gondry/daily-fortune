@@ -15,10 +15,10 @@ const MONTH_REL_W = { '합': 1, '삼합': 0.8, '같음': 0.3, '없음': 0, '충'
 const COMP_CAL = { personality: [1.45, 1.59], love: [0.81, 1.85], talk: [0.68, 1.1], money: [0.21, 0.98], family: [0.06, 1.46], total: [1.46, 1.78] };
 const compScore = (raw, k) => { const [m, sd] = COMP_CAL[k]; return clamp(Math.round(64 + 34 * Math.tanh((raw - m) / (2.6 * sd))), 20, 99); };
 const CAT_NAMES = { personality: '성격', love: '애정', talk: '소통', money: '경제', family: '가정·자녀' };
+export const COMPAT_CATEGORIES = [['total', '종합'], ...Object.entries(CAT_NAMES)];
 export const COMPAT_HEADLINES = ['천생연분에 가까운 인연', '서로를 키워 주는 좋은 인연', '노력할수록 깊어지는 인연', '차이를 이해해야 하는 인연', '서로를 배워 가야 하는 인연'];
 
-export function compat(a, b, today) {
-  const nameA = a.name || '나', nameB = b.name || '상대';
+function compatBasis(a, b) {
   const eA = STEM_EL[a.dm], eB = STEM_EL[b.dm];
   let dmKey, dmW;
   if (stemHe(a.dm, b.dm)) { dmKey = '간합'; dmW = 3; } else {
@@ -54,6 +54,35 @@ export function compat(a, b, today) {
   const cats = Object.keys(raw).map((k) => ({ key: k, name: CAT_NAMES[k], score: compScore(raw[k], k) }));
   const totalRaw = raw.personality + raw.love * 1.2 + raw.talk * 0.8 + raw.money * 0.9 + raw.family * 0.8;
   const total = compScore(totalRaw / 2.2, 'total');
+
+  return { total, cats, eA, eB, dmKey, jeongbae, dayKey, yearKey, monthKey, sA, sB, geopA, geopB, sangA, sangB };
+}
+
+// 추천 검색에서도 기존 두 사람 궁합과 정확히 같은 산식을 사용한다.
+export function compatScores(a, b) {
+  const { total, cats } = compatBasis(a, b);
+  return { total, cats };
+}
+
+// 추천 카드용 근거: 실제 두 원국의 관계와 오행 비중만 설명한다.
+export function compatReasons(a, b) {
+  const s = compatBasis(a, b);
+  const relation = (label, key) => `${label} ${key === '없음' ? '주요 합·충 관계 없음' : key === '같음' ? '같은 지지' : key}`;
+  const dm = { 간합: '두 일간이 천간합을 이룹니다.', 비화: '두 일간의 오행이 같습니다.', 생AB: '기준 인물의 일간이 추천 사주의 일간을 생합니다.', 생BA: '추천 사주의 일간이 기준 인물의 일간을 생합니다.', 극AB: '기준 인물의 일간이 추천 사주의 일간을 극합니다.', 극BA: '추천 사주의 일간이 기준 인물의 일간을 극합니다.' };
+  const reasons = {
+    personality: [dm[s.dmKey], `일간 강약: 기준 ${a.strengthLabel} · 추천 ${b.strengthLabel}`],
+    love: [relation('두 일지:', s.dayKey), s.dmKey === '간합' ? '일간의 천간합이 애정 점수에 가산됩니다.' : dm[s.dmKey]],
+    talk: [relation('두 월지:', s.monthKey), s.sangA && s.sangB ? '두 사주 모두 상관이 많아 소통 점수에 감점이 있습니다.' : dm[s.dmKey]],
+    money: [`기준 인물의 용신 ${EL_K[a.roles.yong]} 기운이 추천 사주에서 ${Math.round(s.sB[a.roles.yong] * 100)}%를 차지합니다.`, `추천 사주의 용신 ${EL_K[b.roles.yong]} 기운이 기준 인물에서 ${Math.round(s.sA[b.roles.yong] * 100)}%를 차지합니다.`],
+    family: [relation('두 년지:', s.yearKey), a.pillars.hour && b.pillars.hour ? relation('두 시지:', relKey(a.pillars.hour.b, b.pillars.hour.b)) : '출생 시간을 모르는 쪽은 시지 관계를 제외합니다.'],
+  };
+  reasons.total = s.cats.slice().sort((x, y) => y.score - x.score).slice(0, 2).map((c) => `${c.name} ${c.score}점 · ${reasons[c.key][0]}`);
+  return reasons;
+}
+
+export function compat(a, b, today) {
+  const nameA = a.name || '나', nameB = b.name || '상대';
+  const { total, cats, eA, eB, dmKey, jeongbae, dayKey, yearKey, monthKey, sA, sB, geopA, geopB, sangA, sangB } = compatBasis(a, b);
 
   const lines = [
     fill(T.compat.dm[dmKey], { A: nameA, B: nameB }) + (jeongbae ? T.compat.dm['정배'] : ''),

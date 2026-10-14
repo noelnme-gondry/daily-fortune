@@ -9,7 +9,8 @@ export function matchingPillars(a, b) {
 }
 
 export function findBirthExamples(pillars, from = 1930) {
-  const hour = pillars.hour || { s: (pillars.day.s % 5) * 2, b: 0 };
+  // 시간 모름 입력은 buildChart에서 정오를 사용한다. 자시로 역산하면 절입일의 원국이 누락된다.
+  const hour = pillars.hour || { s: ((pillars.day.s % 5) * 2 + 6) % 10, b: 6 };
   const candidates = Solar.fromBaZi(...['year', 'month', 'day'].map((key) => pillarH(pillars[key])), pillarH(hour), 1, from);
   const examples = [];
   for (const solar of candidates) {

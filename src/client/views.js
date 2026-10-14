@@ -7,6 +7,7 @@ import { TIPS } from '../content/tips.js';
 import { storyDeck } from './story-view.js';
 import { rankPlay } from './rank-view.js';
 import { rankGuidanceView } from './rank-guidance-view.js';
+import { lifeEventsView } from './life-events-view.js';
 import { pillarTable } from './pillar-table.js';
 import { characterImg } from '../site/util.js';
 
@@ -81,7 +82,7 @@ export function weekView(r, today) {
 export function monthView(r, today) {
   const lead = (r.days[0].dow + 6) % 7;
   const cells = ['월', '화', '수', '목', '금', '토', '일'].map((d) => `<div class="h">${d}</div>`).join('') + '<div class="c blank"></div>'.repeat(lead) +
-    r.days.map((d) => { const s = Math.max(0, Math.round((d.score - 30) * 1.25)); return `<div class="c${s > 52 ? ' hot' : ''}${same(d.date, today) ? ' today' : ''}" style="--s:${Math.min(85, s)}" title="${d.date.m}/${d.date.d} ${d.score}점"><span class="dn">${d.date.d}</span><span class="ps">${hz(d.pillar)}</span></div>`; }).join('');
+    r.days.map((d) => { const s = Math.max(0, Math.round((d.score - 30) * 1.25)); return `<div class="c${s > 52 ? ' hot' : ''}${same(d.date, today) ? ' today' : ''}" style="--s:${Math.min(85, s)}" title="${d.date.m}/${d.date.d} ${d.score}점"><span class="dn">${d.date.d}</span><span class="ps">${hz(d.pillar)}</span><b class="day-score" aria-label="종합 ${d.score}점">${d.score}점</b></div>`; }).join('');
   const dl = (arr) => arr.map((d) => `<span class="chip"><b class="num">${d.date.m}/${d.date.d}</b> ${hz(d.pillar)} · ${d.score}점</span>`).join('');
   return reportHead(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}月</span>`) +
     `<section class="box card"><div class="box-head"><h3>날짜별 기운</h3><span class="legend">낮음 <i style="background:var(--paper)"></i><i style="background:color-mix(in srgb, var(--accent) 45%, var(--paper))"></i><i style="background:color-mix(in srgb, var(--accent) 85%, var(--paper))"></i> 높음</span></div><div class="cal">${cells}</div>
@@ -124,8 +125,6 @@ function daeunChart(list) {
 }
 export function lifeView(L, c, today) {
   const dm = L.dayMaster;
-  const y = (it) => `<li><span class="y">${it.y}</span><span>${it.age}세 · <span class="hz">${hz(it.pillar)}</span>年</span><span class="why">${esc(it.why)}</span></li>`;
-  const ev = L.events.map((g) => `<div class="ev"><h4>${g.name}</h4>${g.items.length ? `<ul>${g.items.map(y).join('')}</ul>` : '<p class="muted">앞으로 15년 안에 두드러진 해가 없습니다.</p>'}</div>`).join('');
   const dlist = L.daeun.map((d) => `<div class="dcard${d.current ? ' cur' : ''}"><span class="muted">${d.age}세 · ${d.startYear}년~</span><b>${hz(d)} 대운</b><span>${d.tgS}·${d.tgB} · ${d.keyword}</span><span class="muted">${d.score}점 · ${d.best} 강세</span></div>`).join('');
   const yong = L.roles.yong;
   return `<div class="life">
@@ -138,7 +137,7 @@ export function lifeView(L, c, today) {
     <section class="box card"><h3>건강</h3>${L.health.map((t) => `<p>${t}</p>`).join('')}</section>
     <section class="box card"><h3>인생의 리듬</h3><p>대운은 10년마다 바뀌는 큰 계절입니다. 점수가 높은 대운에 큰 결정을, 낮은 대운에 내실을 다지는 것이 좋습니다. 빨간 점이 지금의 대운입니다.</p></section>
     <section class="box card wide"><div class="box-head"><h3>대운 흐름</h3><span class="muted">10년 단위 · 만 나이</span></div>${daeunChart(L.daeun)}<div class="daeun-list">${dlist}</div></section>
-    <section class="box card wide"><div class="box-head"><h3>앞으로 15년의 주요 시기</h3><span class="muted">${today.y}–${today.y + 14}년 세운 기준</span></div><div class="events">${ev}</div></section>
+    ${lifeEventsView(L.events, c, today)}
   </div>`;
 }
 

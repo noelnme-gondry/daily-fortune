@@ -5,12 +5,14 @@ import {
 } from '../engine/index.js';
 import RANK_TABLE from '../content/rank-table.js';
 import { ILJU_TAG } from '../content/knowledge.js';
-import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine, SAMPLE } from './profile.js';
+import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine } from './profile.js';
 import { chartCard, dayView, weekView, monthView, yearView, lifeView, compatView, manseView, storyView, rankView } from './views.js';
 import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, characterCode, SHARE_KINDS, cleanName } from '../site/share-codec.js';
 import { track } from './analytics.js';
 import { birthTimeOptions, normalizeBranch, branchOfTime } from '../domain/birth-time.js';
+import { compatMatchesShell, mountCompatMatches } from './compat-matches-view.js';
+import { mountRankLeaders } from './rank-leaders-view.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const sexIdx = (p) => [...Array(60).keys()].find((n) => n % 10 === p.s && n % 12 === p.b);
@@ -128,6 +130,7 @@ export async function mount(root) {
   const pair = mode === 'compatibility';
   const yr = +(root.dataset.year || today.y);
   const tabMode = mode === 'year' ? `year${yr}` : mode;
+  let stopMatches;
 
   ['a', 'b'].forEach((p) => {
     if (!$(`#${p}-name`, form)) return;
@@ -177,10 +180,13 @@ export async function mount(root) {
     else if (mode === 'manseryeok') { html += manseView(ca); }
     else if (mode === 'story') { res = lifeStory(ca, today); html += storyView(res, ca); }
     else if (mode === 'rank') { res = sajuRank(ca, RANK_TABLE); html += rankView(res, ca); }
-    if (source === 'sample') html = `<p class="chip sample-note">예시 인물의 결과입니다. 내 정보를 입력하면 내 결과로 바뀝니다.</p>${html}`;
     const share = shareFor(mode, res, ca, cb, today, yr);
     if (share) html += resultShareHtml();
+    if (pair) html += compatMatchesShell(ca, cb);
+    stopMatches?.();
     out.innerHTML = html;
+    if (mode === 'rank') mountRankLeaders($('.rank-leaders', out), res);
+    if (pair) stopMatches = mountCompatMatches($('.compat-matches', out), { a: toEngine(a), b: toEngine(b) }, { a: ca, b: cb }, today);
     root.classList.add('has-result');
     if (share) wireShare($('.result-share', out), share);
     const ev = { tool: mode, source, has_time: ca.hasTime ? 'yes' : 'no', calendar: a.calendar };
@@ -240,15 +246,6 @@ export async function mount(root) {
       await remember(a, b);
       out.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  });
-  const sample = $('[data-sample]', form);
-  if (sample) sample.addEventListener('click', () => {
-    track('sample_click', { tool: mode });
-    fillForm(form, 'a', SAMPLE.a);
-    if (pair) fillForm(form, 'b', SAMPLE.b);
-    if (mode === 'home') { if (sessionSave('a', SAMPLE.a)) location.href = '/today/'; else showError('임시 저장을 사용할 수 없습니다. 오늘의 운세 페이지에서 예시 인물을 선택해 주세요.'); return; }
-    render(SAMPLE.a, SAMPLE.b, 'sample');
-    out.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
   root.dataset.ready = 'true';
 }

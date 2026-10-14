@@ -1,11 +1,12 @@
-// 기존 랭킹 산식으로 실제 상위 원국 5개씩을 추출한다. 골든 분포표는 변경하지 않는다.
+// 기존 랭킹 산식으로 분야별 상위 원국을 추출한다. 골든 분포표는 변경하지 않는다.
 import fs from 'node:fs';
 import { allPillars, rankScore, RANK_CATS, rankFromTable } from '../src/engine/rank.js';
 import { analyze } from '../src/engine/chart.js';
 import TABLE from '../src/content/rank-table.js';
 import { findBirthExamples } from '../src/engine/rank-examples.js';
+import { RANKING_LIMIT } from '../src/domain/ranking-list.js';
 const exampleCache = new Map();
-const candidatesPerCategory = 200;
+const candidatesPerCategory = RANKING_LIMIT * 2;
 const result = {};
 for (const [kind, withHour] of [['four', true], ['three', false]]) {
   const keys = ['total', ...RANK_CATS.map(([k]) => k)];
@@ -21,16 +22,15 @@ for (const [kind, withHour] of [['four', true], ['three', false]]) {
     }
   }
   for (const key of keys) {
-    const verified = [];
-    for (const row of top[key]) {
+    const cutoff = top[key][RANKING_LIMIT - 1].score;
+    const leaders = top[key].filter((row) => row.score >= cutoff);
+    for (const row of leaders) {
       const cacheKey = JSON.stringify(row.pillars);
       if (!exampleCache.has(cacheKey)) exampleCache.set(cacheKey, findBirthExamples(row.pillars));
       row.examples = exampleCache.get(cacheKey);
-      if (row.examples.length) verified.push(row);
-      if (verified.length === 5) break;
     }
-    if (verified.length !== 5) throw new Error(`${kind}/${key}: 날짜를 확인한 조합이 5개보다 적습니다.`);
-    top[key] = verified;
+    // 출생일 확인 여부는 동점 조합의 대표를 고를 때만 사용한다. 더 높은 점수를 제외하지 않는다.
+    top[key] = leaders.sort((a, b) => b.score - a.score || Number(b.examples.length > 0) - Number(a.examples.length > 0)).slice(0, RANKING_LIMIT);
   }
   for (const key of keys) for (const row of top[key]) {
     const histogram = key === 'total' ? TABLE[kind].total : TABLE[kind].cats[key];
@@ -41,5 +41,5 @@ for (const [kind, withHour] of [['four', true], ['three', false]]) {
   }
   result[kind] = top;
 }
-fs.writeFileSync('src/content/rank-leaders.js', `// scripts/gen-leaders.mjs 자동 생성: 출생 입력으로 재검증한 상위 대표 조합\nexport default ${JSON.stringify(result)};\n`);
-console.log('3·4기둥 × 종합·5분야, 날짜를 확인한 상위 대표 조합 생성');
+fs.writeFileSync('src/content/rank-leaders.js', `// scripts/gen-leaders.mjs 자동 생성: 분야별 상위 조합과 확인된 출생 입력\nexport default ${JSON.stringify(result)};\n`);
+console.log('3·4기둥 × 종합·5분야, 1위부터 상위 대표 조합 생성');
