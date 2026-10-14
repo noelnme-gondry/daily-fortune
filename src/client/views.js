@@ -1,12 +1,14 @@
 // 계산 결과를 HTML로 그리는 함수들 (브라우저 전용, 순수 문자열 생성)
 import {
-  STEM_H, STEM_K, BR_H, BR_K, EL_K, EL_H, STEM_EL, BR_EL, TG, TG_SLUG, iljuSlug, pillarKo, isoDate,
+  STEM_H, BR_H, EL_K, EL_H, STEM_EL, BR_EL, TG, TG_SLUG, iljuSlug, pillarKo, isoDate,
 } from '../engine/index.js';
 
 import { TIPS } from '../content/tips.js';
 import { birthTimeLabel } from '../domain/birth-time.js';
 import { storyDeck } from './story-view.js';
 import { rankPlay } from './rank-view.js';
+import { rankGuidanceView } from './rank-guidance-view.js';
+import { pillarTable } from './pillar-table.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 const hz = (p) => `${STEM_H[p.s]}${BR_H[p.b]}`;
@@ -31,29 +33,7 @@ export function ring(score) {
 }
 
 /* ── 원국 카드 ───────────────────────────── */
-function pillarCol(col) {
-  return `<div class="pillar${col.pos === 'day' ? ' is-day' : ''}">
-    <span class="pl-label">${col.label}${col.pos === 'day' ? '<em>나</em>' : ''}</span>
-    <span class="tg">${tgLink(col.tgS)}</span>
-    <span class="char el-${STEM_EL[col.s]}">${STEM_H[col.s]}<small>${STEM_K[col.s]}</small></span>
-    <span class="char el-${BR_EL[col.b]}">${BR_H[col.b]}<small>${BR_K[col.b]}</small></span>
-    <span class="tg">${tgLink(col.tgB)}</span>
-    <span class="hidden-stems">${col.hidden.map((h) => STEM_H[h]).join('')}</span>
-    <span class="stage">${col.stage}</span>
-  </div>`;
-}
-const legend = () => `<div class="pillar pillar-legend" aria-hidden="false">
-    <span class="pl-label">&nbsp;</span>
-    <span class="lg">십신${tip(TIPS.sipsin, '십신 설명')}</span>
-    <span class="lg big">천간${tip(TIPS.stem, '천간 설명')}</span>
-    <span class="lg big">지지${tip(TIPS.branch, '지지 설명')}</span>
-    <span class="lg">십신</span>
-    <span class="lg">지장간${tip(TIPS.hidden, '지장간 설명')}</span>
-    <span class="lg">12운성${tip(TIPS.stage, '12운성 설명')}</span>
-  </div>`;
 export function chartCard(c, profile, today) {
-  const cols = c.cols.slice().reverse();
-  const unknown = c.hasTime ? '' : '<div class="pillar"><span class="pl-label">시주</span><span class="tg">&nbsp;</span><span class="char unknown">?</span><span class="char unknown">?</span><span class="tg">시간 모름</span><span class="hidden-stems">&nbsp;</span><span class="stage">—</span></div>';
   const max = Math.max(...c.counts, 3);
   const elbars = c.counts.map((n, e) => `<div class="elbar el-${e}"><b>${EL_K[e]} ${EL_H[e]}</b><div class="track"><i style="width:${(n / max) * 100}%"></i></div><span class="num">${n}</span></div>`).join('');
   const si = STRENGTHS.indexOf(c.strengthLabel);
@@ -65,7 +45,7 @@ export function chartCard(c, profile, today) {
   return `<section class="chart-card card" aria-label="사주 원국">
     <div class="chart-head"><h2>${esc(c.name || '나')}의 사주 원국 ${tip(TIPS.chart, '사주 원국 보는 법')}</h2><span class="muted">${birth}${p.calendar === 'lunar' ? ` (양력 ${isoDate(c.birth)})` : ` · ${c.lunarText}`} · ${c.gender === 'F' ? '여성' : '남성'}${c.dst ? ' · 서머타임 보정' : ''}</span></div>
     <div class="chart-body">
-      <div class="pillars">${legend()}${unknown}${cols.map(pillarCol).join('')}</div>
+      ${pillarTable(c, tip)}
       <div class="meta">
         <div><h3>오행 분포 (겉글자 ${c.hasTime ? 8 : 6}자) ${tip(TIPS.elements, '오행 분포 설명')}</h3><div class="elbars">${elbars}</div></div>
         <div><h3>일간 강약 — ${c.strengthLabel} ${tip(TIPS.strength, '일간 강약 설명')}</h3><div class="gauge">${STRENGTHS.map((_, i) => `<span class="${i === si ? 'on' : ''}"></span>`).join('')}</div><div class="gauge-labels">${STRENGTHS.map((s, i) => `<span class="${i === si ? 'on' : ''}">${s}</span>`).join('')}</div></div>
@@ -233,5 +213,5 @@ export function rankView(r, c) {
       <div class="pct-bar" aria-label="상위 ${r.pct}%"><i style="left:${Math.min(99, 100 - r.pct)}%"></i><span>하위</span><span>상위</span></div>
       <h4 class="sub-h">이 순위가 나온 이유 (전체 사주 평균과 비교)</h4><ul class="reasons">${reasons}</ul></section>
     <section class="box card"><h3>분야별 순위</h3><div class="rank-cats">${r.cats.map((k) => `<div class="rank-cat"><span>${k.name}</span><div class="track"><i style="width:${Math.max(2, 100 - k.pct)}%"></i></div><b>상위 ${k.pct}%</b></div>`).join('')}</div>
-      <p class="hint">사주 랭킹은 여덟 글자의 균형과 조화만 본 재미 지표입니다. 실제 삶은 대운·세운과 노력에 따라 크게 달라집니다.</p></section>${rankPlay(r)}`;
+      <p class="hint">사주 랭킹은 여덟 글자의 균형과 조화만 본 재미 지표입니다. 실제 삶은 대운·세운과 노력에 따라 크게 달라집니다.</p></section>${rankGuidanceView(c, r)}${rankPlay(r)}`;
 }

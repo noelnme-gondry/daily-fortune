@@ -3,6 +3,9 @@ import fs from 'node:fs';
 import { allPillars, rankScore, RANK_CATS, rankFromTable } from '../src/engine/rank.js';
 import { analyze } from '../src/engine/chart.js';
 import TABLE from '../src/content/rank-table.js';
+import { findBirthExamples } from '../src/engine/rank-examples.js';
+const exampleCache = new Map();
+const candidatesPerCategory = 200;
 const result = {};
 for (const [kind, withHour] of [['four', true], ['three', false]]) {
   const keys = ['total', ...RANK_CATS.map(([k]) => k)];
@@ -11,11 +14,23 @@ for (const [kind, withHour] of [['four', true], ['three', false]]) {
     const scores = rankScore(analyze(pillars));
     for (const key of keys) {
       const score = key === 'total' ? scores.total : scores.cats[key];
-      if (top[key].length === 5 && score <= top[key][4].score) continue;
+      if (top[key].length === candidatesPerCategory && score <= top[key].at(-1).score) continue;
       top[key].push({ score, pillars, total: scores.total, cats: scores.cats });
       top[key].sort((a, b) => b.score - a.score);
-      top[key] = top[key].slice(0, 5);
+      top[key] = top[key].slice(0, candidatesPerCategory);
     }
+  }
+  for (const key of keys) {
+    const verified = [];
+    for (const row of top[key]) {
+      const cacheKey = JSON.stringify(row.pillars);
+      if (!exampleCache.has(cacheKey)) exampleCache.set(cacheKey, findBirthExamples(row.pillars));
+      row.examples = exampleCache.get(cacheKey);
+      if (row.examples.length) verified.push(row);
+      if (verified.length === 5) break;
+    }
+    if (verified.length !== 5) throw new Error(`${kind}/${key}: 날짜를 확인한 조합이 5개보다 적습니다.`);
+    top[key] = verified;
   }
   for (const key of keys) for (const row of top[key]) {
     const histogram = key === 'total' ? TABLE[kind].total : TABLE[kind].cats[key];
@@ -26,5 +41,5 @@ for (const [kind, withHour] of [['four', true], ['three', false]]) {
   }
   result[kind] = top;
 }
-fs.writeFileSync('src/content/rank-leaders.js', `// scripts/gen-leaders.mjs 자동 생성: 실제 전수 계산 상위 조합\nexport default ${JSON.stringify(result)};\n`);
-console.log('3·4기둥 × 종합·5분야 상위 5개 조합 생성');
+fs.writeFileSync('src/content/rank-leaders.js', `// scripts/gen-leaders.mjs 자동 생성: 출생 입력으로 재검증한 상위 대표 조합\nexport default ${JSON.stringify(result)};\n`);
+console.log('3·4기둥 × 종합·5분야, 날짜를 확인한 상위 대표 조합 생성');
