@@ -64,6 +64,8 @@ async function calculateResult(page, path) {
   await expect(page.locator(tojeong ? '#tojeong-tool' : '#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+  await expect(page.locator('[data-share-page]')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '링크 복사', exact: true })).toHaveCount(1);
 }
 
 for (const width of [390, 1440]) {
@@ -86,6 +88,7 @@ for (const width of [390, 1440]) {
       await page.locator(path === '/tojeong/' ? '#tj-d' : '#a-d').selectOption('2');
       await page.locator('button[type="submit"]').click();
       await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+      await expect(page.locator('[data-share-page]')).toHaveCount(0);
       await expect(slot).toHaveCount(1);
       await expect(slot).toHaveAttribute('data-test-instance', 'original');
       await expect(slot.locator('iframe')).toHaveCount(1);
