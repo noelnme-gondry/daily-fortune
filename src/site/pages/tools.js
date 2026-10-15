@@ -10,6 +10,8 @@ import { ttiDailyDetail } from '../tti-detail.js';
 import { TIPS } from '../../content/tips.js';
 import { adSlot } from '../layout.js';
 import { birthTimeOptions } from '../../domain/birth-time.js';
+import { manseExample, yearExample } from '../public-examples.js';
+import { yearGuide } from '../year-guide.js';
 
 const BAND = (s) => (s >= 75 ? ['high', '대길'] : s >= 60 ? ['good', '길'] : s >= 45 ? ['mid', '평'] : ['low', '주의']);
 export const bandChip = (s) => { const [k, n] = BAND(s); return `<span class="band band-${k}">${n}</span>`; };
@@ -104,7 +106,7 @@ const HOW = {
   compatibility: ['일간끼리의 천간합·상생·상극을 봅니다.', '배우자궁인 일지, 띠(년지), 월지의 합·충·원진을 비교합니다.', '서로에게 필요한 용신 오행을 상대 사주가 얼마나 채워 주는지 계산합니다.', '앞으로 10년 세운에서 두 사람의 결혼·자녀·재물 신호를 합쳐 시기를 고릅니다.'],
   story: ['0~89세를 10년씩 아홉 구간으로 나눕니다. 30세 전은 년주·월주, 30~59세는 일주, 60세 이후는 시주를 바탕으로 봅니다.', '각 시기를 지나는 대운을 겹치는 햇수만큼 반영해 시기 점수(대운 70%·원국 30%)를 냅니다.', '시기에 가장 강한 십신이 캐릭터 직업, 점수가 수식어, 그 기둥의 신살이 스킬이 됩니다.', '게임 능력치는 분야 점수의 차이를 확대하고 직업 보정을 더합니다. 운세 점수와 실제 능력은 구분합니다.'],
   rank: ['여덟 글자를 오행 균형·일간 강약·용신의 힘·길신·합·충형·특수 신살 7개 항목으로 점수화합니다.', '가능한 모든 사주 518,400가지(시간 모름 43,200가지)를 같은 규칙으로 미리 계산해 두었습니다.', '내 점수보다 높은 사주 수 + 1이 내 순위이며, 항목별 점수는 전체 평균과 비교해 근거로 보여 줍니다.', '재물·명예·매력·건강·지혜 분야 점수도 같은 방식으로 백분위를 냅니다.'],
-  manseryeok: ['년주: 입춘 절입 시각 기준', '월주: 매달 절입 시각 기준', '일주: 60일 주기 일진', '시주: 동경 127.5° 평균태양시(표준시 −30분), 밤 11시 30분부터 다음 날 자시', '시진 선택: 출생일의 표준시·서머타임에 맞춘 시계 기준 구간의 가운데 시각으로 계산'],
+  manseryeok: ['년주: 입춘 절입 시각 기준', '월주: 매달 절입 시각 기준', '일주: 60일 주기 일진', '시주: 동경 127.5° 평균태양시. 현행 한국 표준시·서머타임 미적용 기준으로 30분 보정, 밤 11시 30분부터 다음 날 자시', '시진 선택: 출생일의 표준시·서머타임에 맞춘 시계 기준 구간의 가운데 시각으로 계산'],
 };
 function howBlock(mode) {
   return `<section class="prose how"><h2>이렇게 계산합니다</h2><ol>${HOW[mode].map((t) => `<li>${esc(t)}</li>`).join('')}</ol><p><a href="/about/">계산 규칙 전체 보기</a></p></section>`;
@@ -142,6 +144,7 @@ function toolPage(key, ctx, opts = {}) {
   return {
     path: t.path, title: t.title, description: t.desc, crumbs: opts.crumbs || [[t.nav, t.path]], section: t.path,
     tool: true, share: false, ld: [webApp(t, ctx), faqLd(faq)],
+    supplement: `${opts.example || ''}${opts.guide || ''}`,
     body: `${hero(t.h1, t.lead, FREE_ACCESS.summary)}${top}${toolBlock(mode, ctx, opts)}${adSlot(ctx, 'inline')}<div class="info-panels">${disclosure('tool-method', '계산 방법과 점수 기준', howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', '관련 운세와 더 알아보기', extraAfter) : ''}${disclosure('tool-faq', '자주 묻는 질문', faqBlock(faq), 'help')}${disclosure('tool-related', '다른 운세 둘러보기', relatedFor(t.path, ctx))}</div>`,
   };
 }
@@ -174,6 +177,7 @@ export const rank = (ctx) => toolPage('rank', ctx, {
   after: `<section class="prose"><h2>60일주 중 가장 점수가 높은 일주는?</h2><p>모든 사주를 같은 규칙으로 계산해 일주별 평균 점수를 낸 <a href="/saju/ilju-ranking/">60일주 랭킹</a>도 확인해 보세요.</p></section>`,
 });
 export const manseryeok = (ctx) => toolPage('manseryeok', ctx, {
+  example: manseExample(),
   after: `<section class="box-sec"><div class="sec-head"><h2>연도별 만세력 표</h2></div><div class="cards">${[ctx.today.y, ctx.today.y + 1].map((y) => `<a class="card link-card" href="/manseryeok/${y}/"><b>${y}년 만세력</b><span>${pillarLabel(yearPillar(y))}년 · 월별 일진과 24절기</span></a>`).join('')}</div></section>`,
 });
 
@@ -184,7 +188,7 @@ export function yearPage(y, ctx) {
   const sj = samjaeYear(y);
   const top = `<section class="daybox card" aria-label="${y}년 세운"><div class="daybox-main"><span class="daybox-k">${y}년${rel ? ` · ${rel}` : ''}</span><b class="daybox-d">${pillarLabel(yp)}년</b><span class="muted">${STEM_EL[yp.s] === BR_EL[yp.b] ? `천간과 지지가 모두 ${EL_K[STEM_EL[yp.s]]}(${EL_H[STEM_EL[yp.s]]})` : `천간 ${EL_K[STEM_EL[yp.s]]}(${EL_H[STEM_EL[yp.s]]}) · 지지 ${EL_K[BR_EL[yp.b]]}(${EL_H[BR_EL[yp.b]]})`}의 해, ${ANIMAL[yp.b]}띠 해</span></div>
     <dl class="daybox-grid"><div><dt>삼재</dt><dd>${sj.map((s) => `${ANIMAL[s.tti]}띠 ${s.name}`).join(', ')}</dd></div><div><dt>띠별 운세</dt><dd><a href="/tti/${y}/">${y}년 12띠 운세</a></dd></div><div><dt>만세력</dt><dd><a href="/manseryeok/${y}/">${y}년 만세력</a></dd></div></dl></section>`;
-  return toolPage('year', ctx, { tool: t, mode: 'year', year: y, top, crumbs: [['신년운세', '/year/'], [`${y}년 운세`, t.path]] });
+  return toolPage('year', ctx, { tool: t, mode: 'year', year: y, top, example: yearExample(y, ctx), guide: yearGuide(y, ctx, t.path), crumbs: [['신년운세', '/year/'], [`${y}년 운세`, t.path]] });
 }
 export function yearHub(ctx) {
   const ys = [ctx.today.y, ctx.today.y + 1];

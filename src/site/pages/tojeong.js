@@ -1,8 +1,9 @@
-import { FREE_ACCESS } from '../../content/pages.js';
+import { FREE_ACCESS, SITE } from '../../content/pages.js';
 import { TOJEONG } from '../../content/tojeong.js';
 import { TOJEONG_RANGE, tojeongYearTable } from '../../domain/tojeong.js';
 import { esc, faqBlock, faqLd, disclosure } from '../util.js';
 import { hero } from './tools.js';
+import { yearGuide } from '../year-guide.js';
 
 function birthForm(ctx) {
   const years = Array.from({ length: Math.min(ctx.today.y, TOJEONG_RANGE.max) - TOJEONG_RANGE.min + 1 }, (_, i) => Math.min(ctx.today.y, TOJEONG_RANGE.max) - i);
@@ -56,8 +57,9 @@ export function tojeongPage(ctx, year) {
   const faq = TOJEONG.faq;
   return {
     path, title, description, section: '/tojeong/', share: false,
+    supplement: yearGuide(y, ctx, path),
     crumbs: next ? [['무료 토정비결', '/tojeong/'], [`${y}년 토정비결`, path]] : [['무료 토정비결', path]],
-    ld: [faqLd(faq), { '@type': 'WebApplication', name: next ? `${y}년 토정비결` : TOJEONG.h1, description, url: `${ctx.site}${path}`, applicationCategory: 'LifestyleApplication', operatingSystem: 'Web', inLanguage: 'ko-KR', isAccessibleForFree: true, offers: { '@type': 'Offer', price: FREE_ACCESS.price, priceCurrency: FREE_ACCESS.currency }, publisher: { '@id': `${ctx.site}/#org` } }],
+    ld: [faqLd(faq), { '@type': 'WebApplication', name: `${SITE.name} ${next ? `${y}년 토정비결` : TOJEONG.h1}`, description, url: `${ctx.site}${path}`, applicationCategory: 'LifestyleApplication', operatingSystem: 'Web', inLanguage: 'ko-KR', isAccessibleForFree: true, offers: { '@type': 'Offer', price: FREE_ACCESS.price, priceCurrency: FREE_ACCESS.currency }, publisher: { '@id': `${ctx.site}/#org` } }],
     body: `${hero(next ? `${y}년 토정비결` : TOJEONG.h1, TOJEONG.lead, FREE_ACCESS.summary)}
       <nav class="tojeong-years" aria-label="토정비결 연도 선택">${[ctx.today.y, ctx.today.y + 1].map((yr) => `<a class="btn ${yr === y ? '' : 'ghost'}" href="${tojeongPath(ctx, yr)}"${yr === y ? ' aria-current="page"' : ''}>${yr}년 · ${yr === ctx.today.y ? '올해' : '내년'}</a>`).join('')}</nav>
       <section class="tojeong-layout" id="tojeong-tool" data-year="${y}" aria-label="토정비결 계산기">

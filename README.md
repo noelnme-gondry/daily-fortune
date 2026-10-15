@@ -70,24 +70,29 @@ GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint →
 
 ## GA4 이벤트
 
-`page_location`에서 쿼리·`#`를 지우고(utm·gclid는 유지) 공유 카드의 페이지 제목도 일반 제목으로 바꿔 보내므로, 이름·생년월일은 GA로 가지 않습니다. GA4 → 관리 → 맞춤 정의에서 아래 매개변수를 이벤트 범위 측정기준으로 등록하면 보고서에서 볼 수 있습니다.
+`page_location`에는 표준 UTM 6종과 `gclid`·`fbclid`만 남기고, 이전 페이지 URL의 쿼리·`#`도 제거합니다. 공유 카드 제목은 일반 제목으로 보내며, 결과 공유 버튼은 개인 결과 URL을 자동 이탈 클릭 수집용 링크에 남기지 않습니다. 앱 이벤트에는 생년월일·출생 시각·개인 점수·등급을 보내지 않습니다. GA4의 향상된 측정·맞춤 정의·이벤트 수정 규칙은 관리 화면에서도 별도로 확인해야 합니다.
 
 | 이벤트 | 매개변수 | 시점 |
 |--------|----------|------|
+| `calc_start` | `tool` | 첫 입력 변경 또는 첫 제출, 문서당 한 번. 저장 결과 자동 복원은 제외 |
 | `calc_submit` | `tool` | 계산기 폼 제출 |
-| `calc_result` | `tool`, `source`(form·saved), `has_time`, `calendar` | 결과 표시 |
+| `calc_result` | `tool`, `calc_origin`(form·saved·sample) | 계산 성공 후 결과 표시 |
 | `form_error` | `tool` | 날짜 오류 |
 | `ad_slot_view` | `ad_provider`(coupang), `ad_slot`(common), `page_path` | 활성 탭에서 공통 광고 영역 50% 이상 노출, 경로당 한 번 |
 | `ad_experiment_exposure` | `experiment_id`, `experiment_variant`, `ad_placement`, `assignment_scope`, `tool`, `page_path` | 실험 대상의 첫 성공 결과 배치, 경로당 한 번 |
 | `result_view` | 위 실험 매개변수, `page_path` | 활성 탭에서 결과의 첫 제목 50% 이상 도달, 경로당 한 번 |
-| `story_result` | `arc` | 인생 캐릭터 결과 |
-| `rank_result` | `tier`, `pct_bucket` | 사주 랭킹 결과 |
-| `compat_result` | `score_band` | 궁합 결과 |
+| `story_result` | 개인 결과 값 없음 | 인생 캐릭터 결과 |
+| `rank_result` | 개인 결과 값 없음 | 사주 랭킹 결과 |
+| `compat_result` | 개인 결과 값 없음 | 궁합 결과 |
 | `share` | `method`(kakao·native·copy·x·facebook·band·image), `content_type`, `item_id` | 공유 버튼 클릭 (GA4 권장 이벤트) |
 | `share_image` | `content_type` | 결과 이미지 저장 완료 |
 | `tooltip_open` | `tip` | 정보 아이콘 설명 열기 |
 | `faq_open` | `question` | FAQ 펼치기 |
-| `select_content` | `content_type`(card·fun_card·cta·result_tab·share_landing), `item_id` | 카드·CTA·결과 탭·공유 카드 CTA 클릭 |
+| `select_content` | `content_type`(card·fun_card·cta·result_tab·share_landing·public_example), `item_id` | 카드·CTA·결과 탭·공유 카드 CTA 클릭 |
+
+한국 검색 이용 흐름은 국가 `South Korea`, 세션 채널 `Organic Search`, 랜딩 경로를 기준으로 `page_view → calc_start → calc_result`를 나눠 봅니다. 운영 GA4에 `calc_result → fortune_view` 수정 규칙이 적용되어 있다면 실제 수신 이벤트명인 `fortune_view`를 사용합니다. `calc_origin=form`은 직접 입력, `saved`는 저장 입력의 재계산, `sample`은 홈의 예시 계산입니다. `saved`만으로 재방문을 확정하지 않고 GA4의 재방문 사용자·세션 정보와 함께 확인합니다. 다음 기능 이용은 `select_content`의 `result_tab`과 후속 경로의 성공 이벤트로 구분합니다. 핵심 이벤트 합계는 구매나 고유 사용자 수가 아닙니다.
+
+기존 `source` 맞춤 정의는 새 `calc_origin` 데이터를 자동으로 읽지 않습니다. 배포 후 관리 화면의 측정기준 연결을 별도 변경해야 하며, 과거 데이터와 새 데이터는 적용 시점을 구분합니다.
 
 실험 대상 페이지의 계산·공유 등 이벤트에도 같은 실험 매개변수를 붙입니다. 모바일(900px 이하)은 결과 중간의 중복 운세 메뉴를 숨기고, 위로 스크롤하면 기존 로고·주요 메뉴를 다시 표시합니다. 아래로 스크롤하면 헤더가 숨고 키보드 포커스가 들어오면 다시 나타납니다.
 

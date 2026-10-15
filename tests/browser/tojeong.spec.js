@@ -106,7 +106,9 @@ test('올해 연도 주소는 /tojeong/으로 이동 · 자기 괘 해설만 받
   await expect(page.locator('.tojeong-code')).toHaveText(code);
   expect(data).toEqual([`/data/tojeong/${code}.json`]);
   await expect(page.locator('.result-share [data-share="copy"]')).toBeVisible();
-  const href = await page.locator('.result-share [data-share="x"]').getAttribute('href');
+  await page.evaluate(() => { window.shareOpened = []; window.open = (...args) => { window.shareOpened.push(args); return null; }; });
+  await page.locator('.result-share [data-share="x"]').click();
+  const href = await page.evaluate(() => window.shareOpened[0][0]);
   expect(decodeURIComponent(decodeURIComponent(href))).toContain(`k=tojeong&n=검증&y=${todayKST().y}&g=${code}`);
   await page.goto(`/share/?k=tojeong&n=검증&y=${todayKST().y}&g=${code}`);
   await expect(page.locator('.sc-big')).toHaveText(`${code}괘`);

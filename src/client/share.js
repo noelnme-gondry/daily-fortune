@@ -26,8 +26,8 @@ export function resultShareHtml() {
     ${KAKAO_KEY ? '<button class="sbtn kakao" type="button" data-share="kakao">카카오톡</button>' : ''}
     ${navigator.share ? '<button class="sbtn" type="button" data-share="native">공유하기</button>' : ''}
     <button class="sbtn" type="button" data-share="copy">링크 복사</button>
-    <a class="sbtn" data-share="x" aria-label="X에 공유" target="_blank" rel="noopener"></a>
-    <a class="sbtn" data-share="facebook" target="_blank" rel="noopener">페이스북</a>
+    <button class="sbtn" type="button" data-share="x" aria-label="X에 공유"></button>
+    <button class="sbtn" type="button" data-share="facebook">페이스북</button>
     <button class="sbtn strong" type="button" data-share="image">이미지 저장</button>
     <span class="toast" role="status" aria-live="polite"></span>
   </section>
@@ -38,10 +38,15 @@ export function resultShareHtml() {
 export function wireShare(el, opts) {
   el.querySelectorAll('[data-share]').forEach((button) => { if (!button.querySelector('svg')) button.insertAdjacentHTML('afterbegin', uiIcon(button.dataset.share)); });
   const say = (m) => { const t = el.querySelector('.toast'); if (t) t.textContent = m; };
-  const x = el.querySelector('[data-share="x"]');
-  if (x) x.href = `https://twitter.com/intent/tweet?text=${enc(opts.title)}&url=${enc(opts.url)}`;
-  const fb = el.querySelector('[data-share="facebook"]');
-  if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${enc(opts.url)}`;
+  const socialUrls = {
+    x: `https://twitter.com/intent/tweet?text=${enc(opts.title)}&url=${enc(opts.url)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${enc(opts.url)}`,
+  };
+  // 공개 페이지 링크는 유지하되, 개인 결과 URL은 GA 자동 이탈 클릭 수집 대상인 href에 넣지 않는다.
+  for (const [method, url] of Object.entries(socialUrls)) {
+    const link = el.querySelector(`a[data-share="${method}"]`);
+    if (link) link.href = url;
+  }
   if (KAKAO_KEY) { const k = el.querySelector('[data-share="kakao"]'); if (k) k.hidden = false; }
   if (navigator.share) { const n = el.querySelector('[data-share="native"]'); if (n) n.hidden = false; }
   el.addEventListener('click', async (e) => {
@@ -49,7 +54,11 @@ export function wireShare(el, opts) {
     if (!b) return;
     const method = b.dataset.share;
     track('share', { method, content_type: opts.kind || 'page', item_id: location.pathname });
-    if (method === 'x' || method === 'facebook' || method === 'band') return; // 링크로 새 창
+    if (socialUrls[method] && b.tagName === 'BUTTON') {
+      window.open(socialUrls[method], '_blank', 'noopener,noreferrer');
+      return;
+    }
+    if (method === 'x' || method === 'facebook' || method === 'band') return; // 공개 페이지 링크로 새 창
     e.preventDefault();
     if (method === 'copy') {
       try { await navigator.clipboard.writeText(opts.url); say('링크를 복사했습니다.'); } catch (er) { window.prompt('아래 링크를 복사하세요', opts.url); }

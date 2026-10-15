@@ -504,6 +504,28 @@ select.input { padding-right: 4px; }
 .result .partner-ad, .tojeong-result .partner-ad { padding-bottom: 0; }
 .result .partner-ad-inner, .tojeong-result .partner-ad-inner { padding-inline: 0; }
 
+/* 추가 설명은 기존 광고 뒤에서 읽는다. 표 때문에 페이지 전체가 가로로 밀리지 않게 한다. */
+.search-supplement { display: grid; gap: 32px; padding-bottom: 48px; min-width: 0; }
+.search-supplement > * { min-width: 0; }
+.public-example, .year-guide { max-width: 76ch; }
+.public-example .eyebrow { font-size: 15px; }
+.public-example .table-wrap { min-width: 0; }
+.public-example .grid-table { font-size: 15px; }
+.public-example .grid-table th, .public-example .grid-table td { padding: 9px 10px; }
+.public-example .example-pillars { min-width: 480px; }
+.example-pillars th, .example-pillars td { white-space: nowrap; }
+.example-pillars th:first-child { position: sticky; left: 0; background: var(--paper); }
+.example-scroll-hint { color: var(--ink-2); font-size: 15px; }
+.year-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.year-option p, .year-option dd { font-size: 16px; line-height: 1.8; }
+.year-option dl { display: grid; gap: 4px; margin: 0; }
+.year-option dt { font-weight: 600; margin-top: 6px; }
+.year-option dd { margin: 0; }
+@media (max-width: 560px) {
+  .year-options { grid-template-columns: minmax(0, 1fr); }
+  .public-example, .year-option { padding: 18px 16px; }
+}
+
 /* 공유 카드 착지 페이지 */
 .share-land { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 28px; align-items: start; }
 @media (max-width: 860px) { .share-land { grid-template-columns: minmax(0, 1fr); } }

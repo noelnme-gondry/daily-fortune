@@ -9,7 +9,7 @@ import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine
 import { chartCard, dayView, weekView, monthView, yearView, lifeView, compatView, manseView, storyView, rankView } from './views.js';
 import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, characterCode, SHARE_KINDS, cleanName } from '../site/share-codec.js';
-import { track } from './analytics.js';
+import { track, trackInputStart } from './analytics.js';
 import { birthTimeOptions, normalizeBranch, branchOfTime } from '../domain/birth-time.js';
 import { compatMatchesShell, mountCompatMatches } from './compat-matches-view.js';
 import { mountRankLeaders } from './rank-leaders-view.js';
@@ -126,6 +126,7 @@ function shareFor(mode, res, ca, cb, today, yr) {
 export async function mount(root) {
   const mode = root.dataset.tool;
   const form = $('#tool-form', root);
+  trackInputStart(form, mode);
   const out = $('#result', root);
   const today = todayKST();
   const pair = mode === 'compatibility';
@@ -196,11 +197,12 @@ export async function mount(root) {
     if (pair) stopMatches = mountCompatMatches($('.compat-matches', out), { a: toEngine(a), b: toEngine(b) }, { a: ca, b: cb }, today);
     root.classList.add('has-result');
     if (share) wireShare($('.result-share', out), share);
-    const ev = { tool: mode, source, has_time: ca.hasTime ? 'yes' : 'no', calendar: a.calendar };
+    const ev = { tool: mode, calc_origin: source };
     track('calc_result', ev);
-    if (mode === 'story') track('story_result', { arc: res.arc.key });
-    if (mode === 'rank') track('rank_result', { tier: res.tier.code, pct_bucket: res.pct <= 1 ? 'top1' : res.pct <= 5 ? 'top5' : res.pct <= 15 ? 'top15' : res.pct <= 50 ? 'top50' : 'bottom50' });
-    if (mode === 'compatibility') track('compat_result', { score_band: res.total >= 85 ? '85+' : res.total >= 75 ? '75-84' : res.total >= 62 ? '62-74' : res.total >= 50 ? '50-61' : '<50' });
+    // 기존 이벤트 이름은 유지하되 개인 결과·등급은 분석 도구로 보내지 않는다.
+    if (mode === 'story') track('story_result');
+    if (mode === 'rank') track('rank_result');
+    if (mode === 'compatibility') track('compat_result');
     return true;
   }
 

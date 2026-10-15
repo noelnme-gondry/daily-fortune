@@ -1,4 +1,4 @@
-# 오행 운세의 검색 포지셔닝
+# make your own day 검색 포지셔닝
 
 2026-10-14 Gondry 요청: **무료가 핵심 강점**이다. 기존 브랜드 이름은 유지하고, 회원가입 없이 점수와 상세 결과까지 무료로 제공한다는 사실을 먼저 알린다. 제목·첫 화면·설명·FAQ를 수정할 때 이 기준을 유지한다.
 
@@ -20,5 +20,13 @@
 SEO는 고유한 제목·설명, 본문, 내부 링크와 크롤링 가능한 페이지를 기본으로 한다. AEO/GEO에서는 질문에 바로 답하는 설명과 FAQ, 계산 근거와 출처가 중요하다. JSON-LD는 화면 내용과 일치시킨다. `llms.txt`는 보조 요약이며 노출·인용을 보장하지 않는다. Google은 AI 검색에 별도 AI 파일이나 특수 구조화 데이터를 요구하지 않는다.
 
 현재 키워드별 검색 노출·클릭·순위와 AI 답변 인용 실적은 미확인이다. 배포 후 Search Console·네이버 서치어드바이저의 실제 데이터로 판단한다. 코드에 문구를 넣었다는 사실을 검색 유입 성과로 보고하지 않는다.
+
+2026-10-15 핵심 페이지의 색인 검사, 공개 계산 예시, 한국 사용자 측정 계약은 [검색 개선 작업 기록](search-audit-2026-10-15/README.md)에 정리했다. 검색 성과와 URL 색인은 구분한다. 공개 예시는 `src/site/public-examples.js`, 연간 기능 비교는 `src/site/year-guide.js`, 시간 미상 설명은 `src/content/calculation-notes.js`에서 관리한다.
+
+## 외부 프로필용 한국어 소개문 초안
+
+make your own day(메이크 유어 오운 데이)는 회원가입 없이 상세 결과까지 무료로 이용하는 한국어 사주·운세 서비스입니다. 생년월일시로 사주 원국과 오늘·월간·신년·평생 운세, 궁합을 계산하며, 만세력과 별도 작괘 방식의 토정비결도 제공합니다. 출생 정보는 브라우저에서 처리하고 기기 저장은 선택할 수 있습니다. 계산 기준과 시간 미상 처리, 해석의 한계를 공개하며, 운세 점수를 미래의 성공 확률이나 예측 정확도로 제시하지 않습니다.
+
+공식 주소: https://makeyourownday-fortune.com/ . 위 소개문은 게시 전 초안이다. 운영자 개인의 경력·자격·법적 사업자명은 확인하지 않았으며 새로 추가하지 않는다.
 
 참고: [Google 제목 작성 지침](https://developers.google.com/search/docs/appearance/title-link), [Google AI 검색 지침](https://developers.google.com/search/docs/appearance/ai-features), [무료 접근 여부 구조화 데이터](https://schema.org/isAccessibleForFree).

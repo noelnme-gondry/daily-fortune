@@ -78,13 +78,94 @@ test('화면 폭을 줄여도 배너를 다시 요청하지 않고 지면과 ifr
 
 async function calculateResult(page, path, variant = 'A') {
   await page.goto(path);
-  const tojeong = path === '/tojeong/';
+  const tojeong = path.startsWith('/tojeong/');
   await expect(page.locator(tojeong ? '#tojeong-tool' : '#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('button[type="submit"]').click();
   await expect(page.locator(variant === 'B' ? '#result > .partner-ad:first-child, #tojeong-result > .partner-ad:first-child' : '.result-share + .hint + .partner-ad')).toHaveCount(1);
   await expect(page.locator('[data-share-page]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: '링크 복사', exact: true })).toHaveCount(1);
 }
+
+for (const width of [320, 390, 768, 1024, 1440]) {
+  test(`${width}px 공개 예시·기능 안내는 기존 광고 다음에 읽히고 광고와 본문이 잘리지 않는다`, async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-10-15T12:00:00+09:00'));
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of ['/today/', '/manseryeok/', '/year/2027/', '/tojeong/2027/', '/about/', '/tti/2027/', '/manseryeok/2027/']) {
+      await page.goto(path);
+      const slot = page.locator('[data-partner-ad-slot]');
+      await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+      const ad = await page.locator('.partner-ad').boundingBox();
+      const additions = page.locator('#public-example, section[aria-labelledby="year-guide-title"]');
+      if (await additions.count()) {
+        const firstAddition = await additions.first().boundingBox();
+        expect(firstAddition.y).toBeGreaterThanOrEqual(ad.y + ad.height);
+      }
+      const frame = await slot.locator('iframe').boundingBox();
+      expect(frame.height).toBe(140);
+      expect(frame.width).toBe((await slot.boundingBox()).width);
+      expect(frame.x).toBeGreaterThanOrEqual(0);
+      expect(frame.x + frame.width).toBeLessThanOrEqual(width);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      for (const paragraph of await page.locator('.search-supplement p, .year-options dd').all()) {
+        expect(await paragraph.evaluate((el) => parseFloat(window.getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(15);
+        expect(await paragraph.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+      }
+      if (width <= 390 && path === '/year/2027/') {
+        const cards = await page.locator('.year-option').all();
+        expect(cards).toHaveLength(4);
+        expect((await cards[1].boundingBox()).y).toBeGreaterThan((await cards[0].boundingBox()).y);
+      }
+      if (width <= 390 && path === '/manseryeok/') {
+        const table = page.getByRole('region', { name: '가상 사례 원국 상세 표' });
+        await table.focus();
+        await page.keyboard.press('ArrowRight');
+        await expect.poll(() => table.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+      }
+    }
+  });
+}
+
+for (const variant of ['A', 'B']) {
+  test(`320px 새 예시가 있는 계산기의 ${variant} 광고는 재계산·복원 때 한 개로 유지된다`, async ({ page }) => {
+    await page.addInitScript(({ key, variant }) => localStorage.setItem(key, variant), { key: AD_POSITION_EXPERIMENT.storageKey, variant });
+    await page.setViewportSize({ width: 320, height: 900 });
+    for (const path of ['/manseryeok/', '/year/2027/', '/tojeong/2027/']) {
+      await calculateResult(page, path, variant);
+      const slot = page.locator('[data-partner-ad-slot]');
+      await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+      await slot.evaluate((el) => el.setAttribute('data-test-instance', 'original'));
+      const result = page.locator('#result, #tojeong-result');
+      const slotBox = await slot.boundingBox(), frameBox = await slot.locator('iframe').boundingBox();
+      expect(frameBox.width).toBe((await result.boundingBox()).width);
+      expect(frameBox.height).toBe(140);
+      expect(frameBox.x).toBe(slotBox.x);
+      if (variant === 'B') await expect(slot).toBeInViewport({ ratio: 1 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+      await page.locator('button[type="submit"]').click();
+      await expect(slot).toHaveAttribute('data-test-instance', 'original');
+      expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
+      await page.reload();
+      await expect(page.locator(variant === 'B' ? '#result > .partner-ad:first-child, #tojeong-result > .partner-ad:first-child' : '.result-share + .hint + .partner-ad')).toHaveCount(1);
+    }
+  });
+}
+
+test('띠별 부분 이동에서도 해당 연도 안내만 갱신하고 기존 광고를 유지한다', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-10-15T12:00:00+09:00'));
+  await page.goto('/tti/2027/');
+  await page.locator('[data-partner-ad-slot]').evaluate((el) => el.setAttribute('data-test-instance', 'original'));
+  for (const path of ['/tti/2026/', '/tti/today/', '/tti/2027/']) {
+    await page.locator(`.tti-nav a[href="${path}"]`).click();
+    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await expect(page.locator('[data-partner-ad-slot]')).toHaveAttribute('data-test-instance', 'original');
+    if (path === '/tti/today/') await expect(page.locator('.search-supplement')).toHaveCount(0);
+    else {
+      await expect(page.locator('main + .partner-ad + .search-supplement #year-guide-title')).toContainText(path.slice(5, 9));
+      await expect(page.locator('.search-supplement')).toHaveCount(1);
+    }
+  }
+  expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
+});
 
 for (const width of [390, 1440]) {
   test(`${width}px에서 운세·궁합·캐릭터·랭킹·토정비결 광고는 결과 공유 바로 아래에 한 개만 유지된다`, async ({ page }) => {

@@ -7,6 +7,7 @@ import { hero, bandChip, dayBox, ttiDayList } from './tools.js';
 import { animalIcon, uiIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
 import { ttiMonthCards } from '../tti-months.js';
+import { yearGuide } from '../year-guide.js';
 
 const yy = (y) => String(y).slice(2);
 const article = (ctx, page) => ({ '@type': 'Article', headline: page.h1 || page.title, description: page.description, inLanguage: 'ko-KR', datePublished: ctx.published, dateModified: ctx.buildDate, author: { '@id': `${ctx.site}/#org` }, publisher: { '@id': `${ctx.site}/#org` }, mainEntityOfPage: { '@id': `${ctx.site}${page.path}#webpage` }, image: `${ctx.site}/og-default.png` });
@@ -26,6 +27,7 @@ export function yearIndex(y, ctx) {
     path: `/tti/${y}/`, title: `${y}년 띠별 운세 — ${pillarLabel(yp)}년 12띠 신년운세`, h1: `${y}년 띠별 운세`,
     description: `${y}년 ${pillarLabel(yp)}년 12띠 신년운세. 쥐띠부터 돼지띠까지 띠별 점수와 총운, 출생 연도별 운세, 좋은 달과 조심할 달, ${y}년 삼재 띠를 정리했습니다.`,
     crumbs: [['띠별 운세', '/tti/'], [`${y}년`, `/tti/${y}/`]], section: '/tti/', ogType: 'article',
+    supplement: yearGuide(y, ctx, `/tti/${y}/`),
   };
   page.ld = [article(ctx, page), { '@type': 'ItemList', name: `${y}년 띠별 운세`, itemListElement: rows.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: `${y}년 ${r.animal}띠 운세`, url: `${ctx.site}/tti/${y}/${ANIMAL_SLUG[r.tti]}/` })) }];
   page.body = `<article class="article">${hero(page.h1, lead, `${pillarLabel(yp)}년`)}
@@ -67,7 +69,7 @@ export function animalYear(t, y, ctx) {
     <section class="cats-static">${r.cats.map((c) => `<article class="cat"><div class="cat-top"><h3>${c.name}</h3>${bandChip(c.score)}<div class="track"><i style="width:${c.score}%"></i></div><span class="num">${c.score}</span></div><p>${esc(c.text)}</p></article>`).join('')}</section>
     <section class="cohort-picker box card"><h2>내 출생 연도로 보기</h2><label for="tti-birth-year">출생 연도<select class="input" id="tti-birth-year" data-cohort data-tti="${t}" data-year="${y}"><option value="">${r.animal}띠 공통 운세</option>${cohorts.map((c) => `<option value="${c.birthYear}">${c.birthYear}년생 · ${c.pillarText}</option>`).join('')}</select></label><p data-cohort-text aria-live="polite">출생 연도를 선택하면 해당 연생의 해석과 월별 점수만 보여드립니다.</p><p class="hint">위 총운·분야별 해석은 띠 공통입니다. 띠는 입춘 기준이므로 1월~2월 초 출생은 앞 띠일 수 있습니다. 개인 원국 전체를 반영한 결과는 사주 운세에서 확인하세요.</p></section>
     <section class="box-sec"><h2>${y}년 1~12월 운세</h2><p class="hint">각 달 15일의 월운 65% + 연간 점수 35%에 출생 연도의 천간 관계를 반영합니다. 월별 점수는 이 사이트의 해석 규칙이며 통계적 예측값이 아닙니다.</p><div class="monthly-flow" data-monthly-flow>${ttiMonthCards(ttiMonths(t, y))}</div>${cohortData(t, y, r)}</section>
-    <p class="cta"><a class="btn" href="/year/${y}/">내 사주로 ${y}년 운세 정확히 보기</a></p>
+    <p class="cta"><a class="btn" href="/year/${y}/">내 사주로 ${y}년 운세 보기</a></p>
     ${faqBlock(faq)}
     <nav class="chips" aria-label="다른 띠">${ANIMAL.map((n, i) => `<a class="chip${i === t ? ' on' : ''}" href="/tti/${y}/${ANIMAL_SLUG[i]}/">${animalIcon(i)}${n}띠</a>`).join('')}</nav>
     <p class="updated">최종 업데이트 ${ctx.buildDate} · <a href="/about/">계산 방법</a></p></article>`;
