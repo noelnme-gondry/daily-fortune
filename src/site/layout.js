@@ -60,9 +60,9 @@ export function graph(page, ctx) {
 }
 
 function gaSnippet(id, page) {
-  // page_location에서 # 뒤와 쿼리(이름 등)를 지우고 utm·광고 클릭 ID만 남긴다
+  // 현재 URL과 이전 페이지의 공유 결과 쿼리를 제거한다. 캠페인 키는 표준 이름만 허용한다.
   return `<script async src="https://www.googletagmanager.com/gtag/js?id=${id}"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());(function(){var u=new URL(location.href),k=new URLSearchParams();u.searchParams.forEach(function(v,n){if(/^(utm_|gclid$|fbclid$)/.test(n))k.set(n,v)});var q=k.toString();gtag('config','${id}',{page_location:u.origin+u.pathname+(q?'?'+q:''),page_title:${JSON.stringify(page.gaTitle || '')}||document.title});})();</script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());(function(){var u=new URL(location.href),k=new URLSearchParams(),ref='';u.searchParams.forEach(function(v,n){if(/^(utm_(source|medium|campaign|id|term|content)|gclid|fbclid)$/.test(n))k.set(n,v)});try{var r=new URL(document.referrer);ref=r.origin+r.pathname}catch(e){}var q=k.toString();gtag('config','${id}',{page_location:u.origin+u.pathname+(q?'?'+q:''),page_referrer:ref,page_title:${JSON.stringify(page.gaTitle || '')}||document.title});})();</script>
 `;
 }
 export function adSlot(ctx, name) {
@@ -145,6 +145,7 @@ ${ads ? adSlot(ctx, 'bottom') : ''}
 ${page.share === false ? '' : shareBar(page, url)}
 </main>
 ${partnerAdSlot(page)}
+${page.supplement ? `<aside class="search-supplement wrap" aria-label="계산 예시와 이용 안내">${page.supplement}</aside>` : ''}
 <footer class="site-foot">
   <div class="wrap">
     <div class="foot-groups">${foot}</div>

@@ -23,10 +23,9 @@
 - [ ] Railway Variables에 `GA_MEASUREMENT_ID` 입력 → 재배포
 - [ ] GA4 **실시간** 보고서에서 `page_view`, `calc_result` 들어오는지 확인
 - [ ] **관리 → 맞춤 정의**에서 이벤트 범위 측정기준 등록
-  - [ ] `tool`, `source`, `has_time`, `calendar`
-  - [ ] `arc`, `tier`, `pct_bucket`, `score_band`
+  - [ ] `tool`, `calc_origin` (과거 `source`에서 전환 시 적용일 기록)
   - [ ] `method`, `content_type`, `item_id`, `tip`, `question`
-- [ ] **관리 → 이벤트**에서 `calc_result`, `share`를 주요 이벤트(전환)로 표시
+- [ ] **관리 → 이벤트**의 기존 수정 규칙·핵심 이벤트 확인 (`calc_result → fortune_view`가 적용되어 있으면 수신 이벤트명 기준). 핵심 이벤트를 구매로 해석하지 않기
 - [ ] (선택) 데이터 보관 기간 14개월로 변경
 - 이벤트 전체 목록: README의 "GA4 이벤트" 표
 

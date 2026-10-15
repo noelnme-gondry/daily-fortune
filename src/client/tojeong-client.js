@@ -4,11 +4,12 @@ import { tojeongHeadline } from '../content/tojeong.js';
 import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, cleanName } from '../site/share-codec.js';
 import { load, save, removeSaved, sessionLoad, sessionSave } from './profile.js';
-import { track } from './analytics.js';
+import { track, trackInputStart } from './analytics.js';
 import { renderResultWithPartnerAd } from './partner-ad.js';
 
 export async function mountTojeong(root) {
   const form = root.querySelector('form'), out = root.querySelector('#tojeong-result');
+  trackInputStart(form, 'tojeong');
   const field = (id) => form.querySelector(`#tj-${id}`);
   const persist = field('save'), status = field('storage-status');
   const targetYear = Number(root.dataset.year);
@@ -46,7 +47,7 @@ export async function mountTojeong(root) {
       renderResultWithPartnerAd(out, tojeongView(result, r, p.name) + resultShareHtml());
       wireShare(out.querySelector('.result-share'), shareFor(result, r, p.name));
       field('error').hidden = true;
-      track('calc_result', { tool: 'tojeong', source, calendar: p.calendar });
+      track('calc_result', { tool: 'tojeong', calc_origin: source });
       return true;
     } catch {
       if (token === latest) showError('토정비결 해설을 불러오지 못했습니다. 네트워크 연결을 확인한 뒤 다시 시도해 주세요.');

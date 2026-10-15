@@ -15,6 +15,9 @@ export function initTtiNavigation() {
       if (!content) throw new Error('띠별 운세 페이지가 아닙니다.');
       if (controller.signal.aborted) return;
       document.querySelector('[data-tti-content]').replaceWith(content);
+      document.querySelector('.search-supplement')?.remove();
+      const supplement = next.querySelector('.search-supplement');
+      if (supplement) document.querySelector('.site-foot').before(supplement);
       document.querySelector('.crumbs')?.replaceWith(next.querySelector('.crumbs'));
       const share = next.querySelector('[data-share-page]');
       if (share) { document.querySelector('[data-share-page]')?.replaceWith(share); initPageShare(); }
