@@ -724,6 +724,8 @@ test('작은 화면 캐릭터 상세 · 툴팁 경계 · 키보드 포커스', a
   await ready(page, '/life-story/');
   await calculateExact(page);
   const info = page.getByRole('button', { name: '용신 설명', exact: true });
+  // 결과로 이동하는 부드러운 스크롤이 끝나고 버튼 위치가 안정된 뒤 포커스한다.
+  await info.scrollIntoViewIfNeeded();
   await info.focus();
   const tooltip = page.locator('.tip.show');
   await expect(tooltip).toBeVisible();
