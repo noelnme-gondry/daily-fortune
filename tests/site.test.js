@@ -69,6 +69,20 @@ test('JSON-LD는 유효하고 이동 경로·FAQ가 화면과 일치한다', () 
   assert.ok(home['@graph'].some((n) => n['@type'] === 'WebSite'));
 });
 
+test('연도별 만세력 Dataset 설명은 Google 길이 기준을 충족하고 본문과 일치한다', () => {
+  // https://developers.google.com/search/docs/appearance/structured-data/dataset#dataset
+  for (const [path, html] of pages.filter(([path]) => /^\/manseryeok\/\d{4}\/$/.test(path))) {
+    const ld = JSON.parse(head(html, /<script type="application\/ld\+json">(.*?)<\/script>/s));
+    const datasets = ld['@graph'].filter((node) => node['@type'] === 'Dataset');
+    assert.equal(datasets.length, 1, path);
+    const description = datasets[0].description;
+    const length = [...description].length;
+    assert.ok(length >= 50 && length <= 5000, `${path}: Dataset 설명 ${length}자`);
+    const visible = html.replace(/<script[\s\S]*?<\/script>/g, '');
+    assert.ok(visible.includes(description), `${path}: Dataset 설명이 본문에 없음`);
+  }
+});
+
 test('sitemap·robots·rss·llms.txt', () => {
   const sm = site.sitemap();
   assert.equal((sm.match(/<loc>/g) || []).length, site.routes.length);
