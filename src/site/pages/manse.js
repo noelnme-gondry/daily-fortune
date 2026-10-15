@@ -11,7 +11,7 @@ export function manseYear(y, ctx) {
   return {
     path: `/manseryeok/${y}/`, title: c.title, description: `${y}년(${pillarLabel(yearPillar(y))}년) 만세력. 24절기 절입 시각과 월별 월건, 날짜별 일진과 음력을 확인하세요.`,
     crumbs: [['만세력', '/manseryeok/'], [`${y}년`, `/manseryeok/${y}/`]], section: '/manseryeok/', ogType: 'article',
-    ld: [{ '@type': 'Dataset', name: `${y}년 만세력`, description: `${y}년 날짜별 간지·음력·24절기`, inLanguage: 'ko-KR', creator: { '@id': `${ctx.site}/#org` }, temporalCoverage: `${y}-01-01/${y}-12-31`, isAccessibleForFree: true, license: `${ctx.site}/about/` }],
+    ld: [{ '@type': 'Dataset', name: `${y}년 만세력`, description: c.lead, inLanguage: 'ko-KR', creator: { '@id': `${ctx.site}/#org` }, temporalCoverage: `${y}-01-01/${y}-12-31`, isAccessibleForFree: true, license: `${ctx.site}/about/` }],
     supplement: yearGuide(y, ctx, `/manseryeok/${y}/`),
     body: `${hero(c.h1, c.lead, `${pillarLabel(yearPillar(y))}년 · ${ANIMAL[yearPillar(y).b]}띠`)}
       <section class="box-sec"><div class="sec-head"><h2>${y}년 24절기 절입 시각 (한국 표준시)</h2></div><div class="table-wrap"><table class="grid-table"><thead><tr><th scope="col">절기</th><th scope="col">날짜</th><th scope="col">시각</th></tr></thead><tbody>${terms.map((t) => `<tr><th scope="row">${t.name}</th><td>${t.date.m}월 ${t.date.d}일 (${DOW_K[dow(t.date)]})</td><td class="num">${t.time}</td></tr>`).join('')}</tbody></table></div></section>
