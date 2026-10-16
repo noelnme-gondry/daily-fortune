@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createSite } from '../src/site/render.js';
 import { BRAND } from '../src/content/brand.js';
+import { withLanguage } from '../src/i18n/runtime.js';
 
 const SITE = 'https://unse.example';
 const site = createSite({ site: SITE, assets: { css: '/assets/s.css', js: '/assets/m.js', tool: '/assets/t.js' }, now: Date.UTC(2026, 9, 14, 3) });
@@ -39,12 +40,13 @@ test('새 브랜드가 홈·전체 페이지의 검색 정보·설치 이름에 
   assert.equal(head(home, /<title>(.*?)<\/title>/), `${BRAND.name} | ${BRAND.descriptor}`);
   assert.ok(home.includes(`<h1>${BRAND.name}</h1>`));
   for (const [path, html] of pages) {
-    assert.equal(head(html, /<meta property="og:site_name" content="(.*?)">/), BRAND.name, path);
-    if (path !== '/') assert.ok(head(html, /<title>(.*?)<\/title>/).endsWith(` | ${BRAND.name}`), path);
+    const brand = withLanguage(path.startsWith('/en/') ? 'en' : 'ko', () => ({ name: BRAND.name, alt: BRAND.alt }));
+    assert.equal(head(html, /<meta property="og:site_name" content="(.*?)">/), brand.name, path);
+    if (!['/', '/en/'].includes(path)) assert.ok(head(html, /<title>(.*?)<\/title>/).endsWith(` | ${brand.name}`), path);
     const ld = JSON.parse(head(html, /<script type="application\/ld\+json">(.*?)<\/script>/s));
     for (const node of ld['@graph'].filter((n) => ['WebSite', 'Organization'].includes(n['@type']))) {
-      assert.equal(node.name, BRAND.name, path);
-      assert.equal(node.alternateName, BRAND.alt, path);
+      assert.equal(node.name, brand.name, path);
+      assert.equal(node.alternateName, brand.alt, path);
     }
     assert.ok(html.includes(`src="${BRAND.logo}"`), path);
     assert.ok(!html.includes('오행 운세'), `${path}: 이전 브랜드명이 남아 있음`);
@@ -61,7 +63,7 @@ test('JSON-LD는 유효하고 이동 경로·FAQ가 화면과 일치한다', () 
     const ld = JSON.parse(head(html, /<script type="application\/ld\+json">(.*?)<\/script>/s));
     const types = ld['@graph'].map((n) => n['@type']);
     assert.ok(types.includes('Organization'), path);
-    if (path !== '/') assert.ok(types.includes('BreadcrumbList'), path);
+    if (!['/', '/en/'].includes(path)) assert.ok(types.includes('BreadcrumbList'), path);
     const faq = ld['@graph'].find((n) => n['@type'] === 'FAQPage');
     if (faq) for (const q of faq.mainEntity) assert.ok(html.includes(q.name.replace(/&/g, '&amp;')), `${path}: FAQ 질문이 화면에 없음 — ${q.name}`);
   }

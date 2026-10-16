@@ -1,3 +1,4 @@
+import { tr } from '../i18n/runtime.js';
 // 사주 원국 세우기: 년·월주는 절기 기준(UTC+8 라이브러리 시각으로 환산), 일·시주는 동경 127.5° 평균태양시 기준.
 import {
   STEM_EL, BR_EL, BR_MAIN, HIDDEN, DOHWA, YEOKMA, HWAGAE, GWIIN, MUNCHANG, YANGIN, GWEGANG, BAEKHO,
@@ -14,15 +15,15 @@ export function buildChart(input) {
   let birth = { y: +input.y, m: +input.m, d: +input.d };
   if (input.calendar === 'lunar') {
     const s = solarOfLunar(birth.y, birth.m, birth.d, input.leap);
-    if (!s) throw new ChartInputError('존재하지 않는 음력 날짜입니다.');
+    if (!s) throw new ChartInputError(tr('존재하지 않는 음력 날짜입니다.', 'This lunar date does not exist.'));
     birth = s;
   }
-  if (!(birth.y >= 1900 && birth.y <= 2050)) throw new ChartInputError('1900~2050년 사이의 날짜만 계산할 수 있습니다.');
+  if (!(birth.y >= 1900 && birth.y <= 2050)) throw new ChartInputError(tr('1900~2050년 사이의 날짜만 계산할 수 있습니다.', 'Only dates from 1900 through 2050 can be calculated.'));
   const { off, dst } = utcOffset(birth);
   // 시진만 고른 경우: 그 날짜의 시계 기준 시진 구간 가운데 시각으로 바꿔 정확한 시각과 같은 보정을 거친다.
   const branchMode = input.timeBranch != null && input.timeBranch !== '';
   const selected = branchMode ? resolveBirthTime(input.timeBranch, off) : null;
-  if (branchMode && !selected) throw new ChartInputError('태어난 시진을 선택해 주세요.');
+  if (branchMode && !selected) throw new ChartInputError(tr('태어난 시진을 선택해 주세요.', 'Select your birth time interval.'));
   const time = selected ? selected.time : input.time;
   const hasTime = typeof time === 'string' && /^\d{1,2}:\d{2}$/.test(time);
   const [hh, mi] = hasTime ? time.split(':').map(Number) : [12, 0];
@@ -44,7 +45,7 @@ export function buildChart(input) {
 
   return {
     ...a, input, birth, hasTime, dst: hasTime && dst, name: (input.name || '').trim(),
-    timeLabel: !hasTime ? '시간 모름' : selected ? selected.label : time,
+    timeLabel: !hasTime ? tr('시간 모름', 'Time unknown') : selected ? selected.label : time,
     lunarText: lunarText(birth, true), daeun,
   };
 }

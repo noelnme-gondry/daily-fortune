@@ -24,6 +24,8 @@ GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint →
 
 브랜드 이름과 문구는 `src/content/brand.js`, 승인된 해 로고 원본은 `assets/brand/sun-logo.png`에서 관리합니다. 변경 후 `node scripts/gen-brand.mjs`로 로고·파비콘·홈 화면 아이콘·공유 이미지를 다시 만듭니다.
 
+영어판은 `/en/`의 **K-Fortune**으로 제공합니다. 브라우저 우선 언어에 따른 자동 연결, 수동 선택, 번역 데이터 및 검증 방법은 [영어판 운영 안내](docs/k-fortune-en.md)를 확인하세요. 영어 공유 이미지·manifest는 `node scripts/gen-english-brand.mjs`로 생성합니다.
+
 ### 환경 변수
 
 `.env.example`에 전체 목록과 설명이 있습니다. Railway에서는 서비스 → **Variables**에 같은 이름으로 넣습니다.

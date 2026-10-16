@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import { defineConfig } from 'vite';
+import { handleLanguage } from './src/site/language-middleware.js';
 
 // 개발 서버: 페이지 HTML을 운영과 같은 렌더러(src/site/render.js)로 즉석 생성한다.
 const TEXT_ROUTES = {
@@ -28,6 +29,7 @@ function sitePages() {
             res.setHeader('Content-Type', `${type}; charset=utf-8`);
             return res.end(site[fn]());
           }
+          if (handleLanguage(req, res, site)) return;
           if (!path.endsWith('/')) {
             res.statusCode = 301;
             res.setHeader('Location', `${path}/${url.search}`);
@@ -36,12 +38,13 @@ function sitePages() {
           const moved = site.redirect(path);
           if (moved) {
             res.statusCode = 301;
-            res.setHeader('Location', moved);
+            res.setHeader('Location', `${moved}${url.search}`);
             return res.end();
           }
-          let html = path === '/share/' ? site.renderShare(url.searchParams) : site.render(path);
+          const lang = path.startsWith('/en/') ? 'en' : 'ko';
+          let html = path === '/share/' || path === '/en/share/' ? site.renderShare(url.searchParams, lang) : site.render(path);
           res.statusCode = html ? 200 : 404;
-          html = await server.transformIndexHtml(req.url, html || site.notFound());
+          html = await server.transformIndexHtml(req.url, html || site.notFound(lang));
           res.setHeader('Content-Type', 'text/html; charset=utf-8');
           res.end(html);
         } catch (e) {
@@ -56,22 +59,23 @@ function sitePages() {
 // 토정비결 해설: 브라우저는 144괘 전체 대신 자기 괘 하나(/data/tojeong/{괘}.json)만 받는다.
 // 원본은 src/content/tojeong-144.json 하나로 두고, 개발 서버는 즉석 응답·빌드는 괘별 파일로 내보낸다.
 function tojeongData() {
-  const file = new URL('./src/content/tojeong-144.json', import.meta.url);
-  const read = () => JSON.parse(fs.readFileSync(file, 'utf8'));
+  const read = (language = 'ko') => JSON.parse(fs.readFileSync(new URL(`./src/content/tojeong-144${language === 'en' ? '.en' : ''}.json`, import.meta.url), 'utf8'));
   return {
     name: 'ohaeng-tojeong-data',
     configureServer(server) {
       server.middlewares.use('/data/tojeong/', (req, res, next) => {
-        const code = /^\/([1-8][1-6][1-3])\.json$/.exec(req.url.split('?')[0])?.[1];
-        const reading = code && read()[code];
+        const match = /^\/(en\/)?([1-8][1-6][1-3])\.json$/.exec(req.url.split('?')[0]);
+        const reading = match && read(match[1] ? 'en' : 'ko')[match[2]];
         if (!reading) return next();
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
         res.end(JSON.stringify(reading));
       });
     },
     generateBundle() {
-      for (const [code, reading] of Object.entries(read())) {
-        this.emitFile({ type: 'asset', fileName: `data/tojeong/${code}.json`, source: JSON.stringify(reading) });
+      for (const language of ['ko', 'en']) {
+        for (const [code, reading] of Object.entries(read(language))) {
+          this.emitFile({ type: 'asset', fileName: `data/tojeong/${language === 'en' ? 'en/' : ''}${code}.json`, source: JSON.stringify(reading) });
+        }
       }
     },
   };

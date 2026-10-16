@@ -1,5 +1,7 @@
+import { bilingual } from '../i18n/runtime.js';
+import * as english from './rank-advice.en.js';
 // 색·방향은 text.element에서 가져온다. 여기에는 실천 예시만 둔다.
-export const ELEMENT_PRACTICE = [
+const ELEMENT_PRACTICE_KO = [
   { item: '초록 메모장 · 작은 화분', action: '배울 일 하나를 정하고 매일 짧게 기록해 보세요.', caution: '새 일을 동시에 벌여 마무리를 놓치는 습관' },
   { item: '따뜻한 책상 조명 · 주황 소품', action: '생각만 해 둔 말을 짧게 정리해 가까운 사람에게 전해 보세요.', caution: '흥분한 상태에서 바로 답장하거나 약속하는 습관' },
   { item: '베이지 수첩 · 도자기 펜꽂이', action: '생활의 기준 시간을 정하고 미뤄 둔 정리를 하나 끝내 보세요.', caution: '익숙한 방식만 고집하며 결정을 미루는 습관' },
@@ -7,7 +9,7 @@ export const ELEMENT_PRACTICE = [
   { item: '남색 노트 · 물병', action: '조용히 생각을 정리할 시간을 두고 상대의 말을 끝까지 들어 보세요.', caution: '고민만 반복하며 작은 실행도 미루는 습관' },
 ];
 
-export const REPAIR_ACTION = {
+const REPAIR_ACTION_KO = {
   balance: ['생활의 쏠림 줄이기', '하루 시간을 일·휴식·사람·배움으로 나눠 한쪽에 몰린 시간을 확인하세요.', '부족한 오행이라는 이유만으로 소품을 잔뜩 사 모으지 마세요.'],
   center: ['내 페이스부터 정하기', '신강·신약에 맞춰 혼자 맡을 일과 도움받을 일을 구분하세요.', '남의 속도에 맞추느라 무리한 약속을 늘리지 마세요.'],
   yong: ['나를 돕는 환경 만들기', '용신·희신의 색이나 작은 소품 하나를 일상 습관의 표시로 써 보세요.', '색과 물건만으로 일이 풀릴 것이라 기대하지 마세요.'],
@@ -16,3 +18,6 @@ export const REPAIR_ACTION = {
   clash: ['마찰을 늦추는 한 박자', '중요한 답장과 결정은 한 번 다시 읽고, 약속은 글로 남겨 보세요.', '감정이 올라온 순간의 단정적인 말과 즉흥적인 변경을 조심하세요.'],
   special: ['강한 기운에 속도 조절', '승부를 걸 일과 쉬어 갈 일을 나누고 결정 전 확인 절차를 두세요.', '기세만으로 밀어붙이거나 무리한 경쟁을 이어 가지 마세요.'],
 };
+
+export const ELEMENT_PRACTICE = bilingual(ELEMENT_PRACTICE_KO, english.ELEMENT_PRACTICE);
+export const REPAIR_ACTION = bilingual(REPAIR_ACTION_KO, english.REPAIR_ACTION);

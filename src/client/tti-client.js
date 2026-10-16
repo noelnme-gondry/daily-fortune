@@ -1,4 +1,5 @@
 // 띠 연도 페이지: 출생 연도를 고르면 서버가 넣어 둔 연생별 월간 흐름을 보여 준다(사주 엔진을 불러오지 않는다).
+import { tr } from '../i18n/runtime.js';
 import { ttiMonthCards } from '../site/tti-months.js';
 import { sessionLoad, load } from './profile.js';
 
@@ -20,7 +21,7 @@ export async function mountTti() {
   function update() {
     const cohort = data.cohorts[select.value];
     document.querySelector('[data-monthly-flow]').innerHTML = ttiMonthCards(cohort ? cohort.months : data.all);
-    text.textContent = cohort ? `${select.value}년생 · 연간 ${cohort.score}점. ${cohort.text}` : '출생 연도를 선택하면 해당 연생의 해석과 월별 점수만 보여드립니다.';
+    text.textContent = cohort ? tr(`${select.value}년생 · 연간 ${cohort.score}점. ${cohort.text}`, `Born ${select.value} · Annual score ${cohort.score}. ${cohort.text}`) : tr("출생 연도를 선택하면 해당 연생의 해석과 월별 점수만 보여드립니다.", "Choose a birth year to see its reading and monthly scores.");
   }
   select.addEventListener('change', () => { touched = true; update(); });
   // 모듈을 불러오는 동안 이미 선택한 값도 반영한다.

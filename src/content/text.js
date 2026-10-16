@@ -1,6 +1,9 @@
 // 운세 해설 문장 데이터베이스. 엔진은 점수·요인만 계산하고, 사람이 읽는 문장은 모두 여기서 고른다.
 // {P}는 기간 주어(오늘은·이번 달은 …), {A:이/가}는 받침에 맞춘 조사 치환이다.
 
+import { bilingual } from '../i18n/runtime.js';
+import english from './text.en.js';
+
 const T = {};
 
 T.catName = {
@@ -504,4 +507,4 @@ T.compat = {
   },
 };
 
-export default T;
+export default bilingual(T, english);

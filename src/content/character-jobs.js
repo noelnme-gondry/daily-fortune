@@ -1,5 +1,7 @@
 // 십신은 직업의 계열이다. 실제 직업·고유 스킬·장비는 계열 아래에서 고른다.
-import { CLASSES, CLASS_STATS } from './story.js';
+import { CLASSES_KO as CLASSES, CLASS_STATS } from './story.js';
+import { bilingual } from '../i18n/runtime.js';
+import { jobEnglish } from './character-jobs.en.js';
 
 // id는 그림과 공유 링크의 영구 식별자이므로 순서 변경과 무관하게 유지한다.
 const EXTRA = {
@@ -79,7 +81,10 @@ const SETBACKS = [
 ];
 
 const FOCUS_BONUS = { drive: [6, 0, -2, -2, 0], wealth: [-2, 6, 0, 0, -2], charm: [0, -2, 6, 0, -2], wisdom: [-2, 0, -2, 6, 0], vital: [0, -2, -2, 0, 6] };
-const entry = (tg, [id, name, focus, skill, effect, desc, quest, art], setback = false) => ({ id, tg, name, focus, skill: [skill, effect], desc, quest, art, setback, stats: CLASS_STATS[tg].map((n, i) => n + FOCUS_BONUS[focus][i]) });
+const entry = (tg, [id, name, focus, skill, effect, desc, quest, art], setback = false) => {
+  const job = { id, tg, name, focus, skill: [skill, effect], desc, quest, art, setback, stats: CLASS_STATS[tg].map((n, i) => n + FOCUS_BONUS[focus][i]) };
+  return bilingual(job, jobEnglish(job));
+};
 const BASE_FOCUS = ['drive', 'drive', 'charm', 'charm', 'wealth', 'wealth', 'drive', 'wisdom', 'wisdom', 'wisdom'];
 export const CHARACTER_JOBS = Object.entries(CLASSES).flatMap(([tg, cls], i) => [
   entry(tg, [cls.icon, cls.name, BASE_FOCUS[i], ...cls.skill, cls.desc, cls.quest, '']),

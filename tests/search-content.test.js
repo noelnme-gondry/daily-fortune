@@ -12,7 +12,8 @@ const site = createSite({ site: origin, assets: { js: '/app.js', css: '/app.css'
 const core = ['/today/', '/manseryeok/', '/year/2027/', '/tojeong/2027/', '/about/'];
 
 test('핵심 5개는 초기 HTML·자기 canonical·색인 허용·사이트맵과 일관된 브랜드를 제공한다', () => {
-  assert.equal(site.routes.length, 202, '유사 페이지를 추가하지 않는다');
+  assert.equal(site.routes.filter((r) => !r.lang).length, 202, '기존 한국어 경로를 유지한다');
+  assert.equal(site.routes.filter((r) => r.lang === 'en').length, 202, '각 경로에 대응하는 영어판을 제공한다');
   for (const path of core) {
     const html = site.render(path);
     assert.ok(html.includes(`<link rel="canonical" href="${origin}${path}">`));

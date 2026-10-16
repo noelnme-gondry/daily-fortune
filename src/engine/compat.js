@@ -1,12 +1,14 @@
+import { tr, isEnglish, bilingual } from '../i18n/runtime.js';
+import { term, animalName, elementName } from '../i18n/terms.js';
 // 궁합: 일간·일지·띠·월지 관계, 오행 보완, 강약 균형으로 평생 궁합을 매기고 결혼·자녀 시기와 길일을 고른다.
 import T from '../content/text.js';
 import {
-  ANIMAL, EL_K, EL_H, STEM_EL, BR_EL, fill, josa, clamp, toUTC, fromUTC, dow, DAY_MS, fmtDate,
+  EL_H, STEM_EL, BR_EL, fill, josa, clamp, toUTC, fromUTC, dow, DAY_MS, fmtDate,
   elRel, stemHe, branchRels, relKey, pillarLabel,
 } from './core.js';
 import { dayPillar, lunarText } from './calendar.js';
 import { year } from './fortune.js';
-import { yearSignals } from './lifetime.js';
+import { yearSignals, signalLabel } from './lifetime.js';
 
 const DAY_REL_W = { '합': 3, '삼합': 2, '같음': 0.5, '없음': 0, '충': -3, '원진': -2.5, '형': -2, '해': -1.2, '파': -1 };
 const YEAR_REL_W = { '합': 1.5, '삼합': 1.2, '같음': 0.3, '없음': 0, '충': -1.5, '원진': -1.2, '형': -1, '해': -0.6, '파': -0.5 };
@@ -14,9 +16,11 @@ const MONTH_REL_W = { '합': 1, '삼합': 0.8, '같음': 0.3, '없음': 0, '충'
 // [평균, 표준편차] — 무작위 원국 200쌍에서 측정
 const COMP_CAL = { personality: [1.45, 1.59], love: [0.81, 1.85], talk: [0.68, 1.1], money: [0.21, 0.98], family: [0.06, 1.46], total: [1.46, 1.78] };
 const compScore = (raw, k) => { const [m, sd] = COMP_CAL[k]; return clamp(Math.round(64 + 34 * Math.tanh((raw - m) / (2.6 * sd))), 20, 99); };
-const CAT_NAMES = { personality: '성격', love: '애정', talk: '소통', money: '경제', family: '가정·자녀' };
-export const COMPAT_CATEGORIES = [['total', '종합'], ...Object.entries(CAT_NAMES)];
-export const COMPAT_HEADLINES = ['천생연분에 가까운 인연', '서로를 키워 주는 좋은 인연', '노력할수록 깊어지는 인연', '차이를 이해해야 하는 인연', '서로를 배워 가야 하는 인연'];
+const CAT_NAMES_KO = { personality: '성격', love: '애정', talk: '소통', money: '경제', family: '가정·자녀' };
+const CAT_NAMES_EN = { personality: 'Personality', love: 'Love', talk: 'Communication', money: 'Finances', family: 'Family & children' };
+const CAT_NAMES = bilingual(CAT_NAMES_KO, CAT_NAMES_EN);
+export const COMPAT_CATEGORIES = bilingual([['total', '종합'], ...Object.entries(CAT_NAMES_KO)], [['total', 'Overall'], ...Object.entries(CAT_NAMES_EN)]);
+export const COMPAT_HEADLINES = bilingual(['천생연분에 가까운 인연', '서로를 키워 주는 좋은 인연', '노력할수록 깊어지는 인연', '차이를 이해해야 하는 인연', '서로를 배워 가야 하는 인연'], ['A naturally close connection', 'A connection that helps you both grow', 'A bond that deepens with effort', 'A connection that calls for understanding differences', 'A connection built by learning about each other']);
 
 function compatBasis(a, b) {
   const eA = STEM_EL[a.dm], eB = STEM_EL[b.dm];
@@ -67,13 +71,26 @@ export function compatScores(a, b) {
 // 추천 카드용 근거: 실제 두 원국의 관계와 오행 비중만 설명한다.
 export function compatReasons(a, b) {
   const s = compatBasis(a, b);
+  if (isEnglish()) {
+    const relation = (label, key) => `${label}: ${key === '없음' ? 'no major combination or clash' : term(key).toLowerCase()}`;
+    const dm = { 간합: 'The two Day Masters form a stem combination.', 비화: 'The two Day Masters share an element.', 생AB: 'The reference Day Master generates the suggested Day Master’s element.', 생BA: 'The suggested Day Master generates the reference Day Master’s element.', 극AB: 'The reference Day Master controls the suggested Day Master’s element.', 극BA: 'The suggested Day Master controls the reference Day Master’s element.' };
+    const reasons = {
+      personality: [dm[s.dmKey], `Day Master strength: reference ${term(a.strengthLabel)} · suggested ${term(b.strengthLabel)}`],
+      love: [relation('Day branches', s.dayKey), s.dmKey === '간합' ? 'The stem combination adds to the love score.' : dm[s.dmKey]],
+      talk: [relation('Month branches', s.monthKey), s.sangA && s.sangB ? 'Multiple Hurting Officers in both charts reduce the communication score.' : dm[s.dmKey]],
+      money: [`The reference chart’s useful element, ${elementName(a.roles.yong)}, makes up ${Math.round(s.sB[a.roles.yong] * 100)}% of the suggested chart.`, `The suggested chart’s useful element, ${elementName(b.roles.yong)}, makes up ${Math.round(s.sA[b.roles.yong] * 100)}% of the reference chart.`],
+      family: [relation('Year branches', s.yearKey), a.pillars.hour && b.pillars.hour ? relation('Hour branches', relKey(a.pillars.hour.b, b.pillars.hour.b)) : 'Hour-branch relationships are excluded when either birth time is unknown.'],
+    };
+    reasons.total = s.cats.slice().sort((x, y) => y.score - x.score).slice(0, 2).map((c) => `${c.name} ${c.score} · ${reasons[c.key][0]}`);
+    return reasons;
+  }
   const relation = (label, key) => `${label} ${key === '없음' ? '주요 합·충 관계 없음' : key === '같음' ? '같은 지지' : key}`;
   const dm = { 간합: '두 일간이 천간합을 이룹니다.', 비화: '두 일간의 오행이 같습니다.', 생AB: '기준 인물의 일간이 추천 사주의 일간을 생합니다.', 생BA: '추천 사주의 일간이 기준 인물의 일간을 생합니다.', 극AB: '기준 인물의 일간이 추천 사주의 일간을 극합니다.', 극BA: '추천 사주의 일간이 기준 인물의 일간을 극합니다.' };
   const reasons = {
     personality: [dm[s.dmKey], `일간 강약: 기준 ${a.strengthLabel} · 추천 ${b.strengthLabel}`],
     love: [relation('두 일지:', s.dayKey), s.dmKey === '간합' ? '일간의 천간합이 애정 점수에 가산됩니다.' : dm[s.dmKey]],
     talk: [relation('두 월지:', s.monthKey), s.sangA && s.sangB ? '두 사주 모두 상관이 많아 소통 점수에 감점이 있습니다.' : dm[s.dmKey]],
-    money: [`기준 인물의 용신 ${EL_K[a.roles.yong]} 기운이 추천 사주에서 ${Math.round(s.sB[a.roles.yong] * 100)}%를 차지합니다.`, `추천 사주의 용신 ${EL_K[b.roles.yong]} 기운이 기준 인물에서 ${Math.round(s.sA[b.roles.yong] * 100)}%를 차지합니다.`],
+    money: [`기준 인물의 용신 ${elementName(a.roles.yong)} 기운이 추천 사주에서 ${Math.round(s.sB[a.roles.yong] * 100)}%를 차지합니다.`, `추천 사주의 용신 ${elementName(b.roles.yong)} 기운이 기준 인물에서 ${Math.round(s.sA[b.roles.yong] * 100)}%를 차지합니다.`],
     family: [relation('두 년지:', s.yearKey), a.pillars.hour && b.pillars.hour ? relation('두 시지:', relKey(a.pillars.hour.b, b.pillars.hour.b)) : '출생 시간을 모르는 쪽은 시지 관계를 제외합니다.'],
   };
   reasons.total = s.cats.slice().sort((x, y) => y.score - x.score).slice(0, 2).map((c) => `${c.name} ${c.score}점 · ${reasons[c.key][0]}`);
@@ -81,20 +98,20 @@ export function compatReasons(a, b) {
 }
 
 export function compat(a, b, today) {
-  const nameA = a.name || '나', nameB = b.name || '상대';
+  const nameA = a.name || tr('나', 'You'), nameB = b.name || tr('상대', 'Partner');
   const { total, cats, eA, eB, dmKey, jeongbae, dayKey, yearKey, monthKey, sA, sB, geopA, geopB, sangA, sangB } = compatBasis(a, b);
 
   const lines = [
     fill(T.compat.dm[dmKey], { A: nameA, B: nameB }) + (jeongbae ? T.compat.dm['정배'] : ''),
     T.compat.dayBranch[dayKey],
-    fill(T.compat.yearBranch[yearKey], { a: ANIMAL[a.pillars.year.b], b: ANIMAL[b.pillars.year.b] }),
+    fill(T.compat.yearBranch[yearKey], { a: animalName(a.pillars.year.b), b: animalName(b.pillars.year.b) }),
   ];
-  const elName = (e) => `${EL_K[e]}(${EL_H[e]})`;
+  const elName = (e) => `${elementName(e)}(${EL_H[e]})`;
   const compLine = (X, Y, cX, sY) => {
     const need = cX.roles.yong;
-    if (sY[need] >= 0.24) return `${Y}의 사주에는 ${X}에게 필요한 ${elName(need)} 기운이 넉넉해, 함께 있으면 ${X}의 마음과 운이 안정됩니다.`;
-    if (sY[need] <= 0.08) return `${Y}의 사주에는 ${X}의 용신인 ${elName(need)} 기운이 적어, 기대기보다 각자의 영역을 지켜 주는 관계가 잘 맞습니다.`;
-    return `${josa(Y, '은/는')} ${X}에게 필요한 ${elName(need)} 기운을 적당히 갖고 있어 무리 없이 보완이 됩니다.`;
+    if (sY[need] >= 0.24) return tr(`${Y}의 사주에는 ${X}에게 필요한 ${elName(need)} 기운이 넉넉해, 함께 있으면 ${X}의 마음과 운이 안정됩니다.`, `${Y} has plenty of ${elName(need)}, the element useful to ${X}. Traditionally, this is read as a supportive, stabilizing pairing.`);
+    if (sY[need] <= 0.08) return tr(`${Y}의 사주에는 ${X}의 용신인 ${elName(need)} 기운이 적어, 기대기보다 각자의 영역을 지켜 주는 관계가 잘 맞습니다.`, `${Y} has little ${elName(need)}, the useful element of ${X}. Respecting each other’s space may suit this pattern better than relying heavily on one another.`);
+    return tr(`${josa(Y, '은/는')} ${X}에게 필요한 ${elName(need)} 기운을 적당히 갖고 있어 무리 없이 보완이 됩니다.`, `${Y} has a moderate amount of ${elName(need)}, the element useful to ${X}, suggesting a comfortable level of support.`);
   };
   const complement = [compLine(nameA, nameB, a, sB), compLine(nameB, nameA, b, sA)];
 
@@ -119,7 +136,7 @@ export function compat(a, b, today) {
     if (sA[e] < 0.07 && sB[e] < 0.07) { const E = T.element[e]; pushC('부족', { el: E.name, elh: E.hanja, nature: E.nature, color: E.color[0], season: E.season }); break; }
   }
   if (cautions.length < 3 && eA !== eB) pushC('기본', { X: nameA, Y: nameB, xe: elName(eA), ye: elName(eB) });
-  if (cautions.length < 3) cautions.push({ title: '익숙함 속의 소홀함', text: '관계가 편안해질수록 감사와 칭찬을 말로 표현하는 습관이 궁합을 지켜 줍니다.' });
+  if (cautions.length < 3) cautions.push({ title: tr('익숙함 속의 소홀함', 'Taking familiarity for granted'), text: tr('관계가 편안해질수록 감사와 칭찬을 말로 표현하는 습관이 궁합을 지켜 줍니다.', 'As the relationship becomes comfortable, keep expressing appreciation and encouragement.') });
 
   // 결혼·자녀·재물 시기
   const years = [];
@@ -130,16 +147,16 @@ export function compat(a, b, today) {
     if (branchRels(sa.yp.b, b.pillars.day.b).includes('충')) pen -= 1;
     years.push({ y, yp: sa.yp, sa, sb, marriage: sa.marriage + sb.marriage + pen, money: year(a, y, 'next').cats[1].score + year(b, y, 'next').cats[1].score });
   }
-  const why = (s, n) => (s.length ? `${n}: ${s.join('·')}` : '');
+  const why = (s, n) => (s.length ? `${n}: ${s.map(signalLabel).join('·')}` : '');
   const mYears = years.slice().sort((x, y) => y.marriage - x.marriage || x.y - y.y).slice(0, 3).sort((x, y) => x.y - y.y);
   const bestY = mYears[0]; // 결혼운 상위 3개 해 중 가장 가까운 해
-  const marriageYears = mYears.map((r) => ({ y: r.y, pillar: r.yp, why: [why(r.sa.reasons.marriage, nameA), why(r.sb.reasons.marriage, nameB)].filter(Boolean).join(' / ') || '두 사람의 운이 고르게 받쳐 주는 해' }));
+  const marriageYears = mYears.map((r) => ({ y: r.y, pillar: r.yp, why: [why(r.sa.reasons.marriage, nameA), why(r.sb.reasons.marriage, nameB)].filter(Boolean).join(' / ') || tr('두 사람의 운이 고르게 받쳐 주는 해', 'A year with relatively even support in both readings') }));
   const cand = [];
   for (let y = bestY.y; y <= bestY.y + 10; y++) { const sa = yearSignals(a, y), sb = yearSignals(b, y); cand.push({ y, yp: sa.yp, sa, sb, child: sa.child + sb.child }); }
   const childYears = cand.sort((x, y) => y.child - x.child || x.y - y.y).slice(0, 3).sort((x, y) => x.y - y.y)
-    .map((r) => ({ y: r.y, pillar: r.yp, why: [why(r.sa.reasons.child, nameA), why(r.sb.reasons.child, nameB)].filter(Boolean).join(' / ') || '가정운이 안정되는 해' }));
+    .map((r) => ({ y: r.y, pillar: r.yp, why: [why(r.sa.reasons.child, nameA), why(r.sb.reasons.child, nameB)].filter(Boolean).join(' / ') || tr('가정운이 안정되는 해', 'A year with a steady family theme') }));
   const moneyYears = years.slice().sort((x, y) => y.money - x.money || x.y - y.y).slice(0, 2).sort((x, y) => x.y - y.y)
-    .map((r) => ({ y: r.y, pillar: r.yp, why: `두 사람 금전운 평균 ${Math.round(r.money / 2)}점` }));
+    .map((r) => ({ y: r.y, pillar: r.yp, why: tr(`두 사람 금전운 평균 ${Math.round(r.money / 2)}점`, `Average money score: ${Math.round(r.money / 2)}`) }));
 
   // 결혼 길일: 결혼운이 강한 가장 가까운 해의 주말 중 두 사람 일지·띠와 충돌이 없는 날
   const dScore = (c, p) => {

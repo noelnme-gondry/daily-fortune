@@ -1,8 +1,10 @@
+import { isEnglish, tr } from '../i18n/runtime.js';
+import { term, stemName, branchName, elementName, weekdayName } from '../i18n/terms.js';
 // 기간 운세: 기간의 간지(일진·월운·세운·대운)가 원국과 맺는 관계를 7개 분야 점수와 해설로 바꾼다.
 import T from '../content/text.js';
 import {
-  STEM_H, STEM_K, BR_H, BR_K, EL_K, EL_H, STEM_EL, BR_EL, BR_MAIN, STAGES, STAGE_W,
-  pick, fill, josa, clamp, addDays, dow, daysIn, DOW_K, fmtDate, fmtShort,
+  STEM_H, BR_H, EL_H, STEM_EL, BR_EL, BR_MAIN, STAGES, STAGE_W,
+  pick, fill, josa, clamp, addDays, dow, daysIn, fmtDate, fmtShort,
   tenGod, stageOf, branchRels, stemHe, stemChung, pillarLabel, brHours,
 } from './core.js';
 import { dayPillar, monthPillar, yearPillar, yearPillarOfDate, lunarText } from './calendar.js';
@@ -124,20 +126,20 @@ export function catText(c, cat, m, score, P, key, used) {
   if (band === 'high' || band === 'good') {
     const main = pos || posG;
     if (main) parts.push(factorText(c, cat, main[0], 1));
-    if (neg && neg[1] < -0.6 && fresh(neg)) parts.push('다만 ' + factorText(c, cat, neg[0], -1));
+    if (neg && neg[1] < -0.6 && fresh(neg)) parts.push(tr('다만 ', 'However, ') + factorText(c, cat, neg[0], -1));
   } else {
     const main = neg || negG;
     if (main) parts.push(factorText(c, cat, main[0], -1));
-    if (pos && pos[1] > 0.6 && fresh(pos)) parts.push('그래도 ' + factorText(c, cat, pos[0], 1));
+    if (pos && pos[1] > 0.6 && fresh(pos)) parts.push(tr('그래도 ', 'Even so, ') + factorText(c, cat, pos[0], 1));
   }
   let adv = pick(C.advice[band], key + cat + 'A');
-  if (cat === 'health' && (band === 'low' || band === 'mid')) adv += ` 특히 ${T.element[c.roles.gi].organ} 쪽을 살피세요.`;
+  if (cat === 'health' && (band === 'low' || band === 'mid')) adv += tr(` 특히 ${T.element[c.roles.gi].organ} 쪽을 살피세요.`, ` Traditional associations here concern the ${T.element[c.roles.gi].organ}.`);
   parts.push(adv);
   return parts.join(' ');
 }
 function favSentence(c, L) {
   const row = T.fav.find(([th]) => L >= th);
-  return fill(row[1], { yong: `${EL_K[c.roles.yong]}(${EL_H[c.roles.yong]})`, gi: `${EL_K[c.roles.gi]}(${EL_H[c.roles.gi]})` });
+  return fill(row[1], { yong: `${elementName(c.roles.yong)}(${EL_H[c.roles.yong]})`, gi: `${elementName(c.roles.gi)}(${EL_H[c.roles.gi]})` });
 }
 function strongestSpecial(comb) {
   const tot = new Map();
@@ -150,17 +152,17 @@ export function headline(sc, unit) {
   const idx = sc.cats.map((s, i) => [s, i]);
   if (sc.overall >= 58) {
     const top = idx.slice().sort((a, b) => b[0] - a[0])[0][1];
-    return `${T.headTop[CATS[top]]} ${unit}`;
+    return tr(`${T.headTop[CATS[top]]} ${unit}`, `${unit}: ${T.headTop[CATS[top]]}`);
   }
   const low = idx.slice().sort((a, b) => a[0] - b[0])[0][1];
-  return `${T.headLow[CATS[low]]} ${unit}`;
+  return tr(`${T.headLow[CATS[low]]} ${unit}`, `${unit}: ${T.headLow[CATS[low]]}`);
 }
 const LUCKY_BR = [[3], [5, 6], [4, 7, 10], [8, 9], [11]];
 function lucky(c, key) {
   const el = pick([0, 0, 1], key + 'lucky') ? c.roles.hee : c.roles.yong;
   const E = T.element[el];
   const b = pick(LUCKY_BR[el], key + 'lt');
-  return { el, color: pick(E.color, key + 'lc'), number: pick(E.number, key + 'ln'), dir: E.dir, time: `${BR_K[b]}시 ${brHours(b)}` };
+  return { el, color: pick(E.color, key + 'lc'), number: pick(E.number, key + 'ln'), dir: E.dir, time: tr(`${branchName(b)}시 ${brHours(b)}`, `${branchName(b)} hour ${brHours(b)}`) };
 }
 function buildReport(c, comb, kind, ctx) {
   const sc = scoresOf(comb, kind);
@@ -174,7 +176,7 @@ function buildReport(c, comb, kind, ctx) {
   const sp = strongestSpecial(comb);
   if (sp) lines.push(sp);
   const top = ranked[0], low = ranked[ranked.length - 1];
-  lines.push(`${top.name}(${top.score}점)이 가장 돋보이고, ${josa(`${low.name}(${low.score}점)`, '은/는')} 한 번 더 살피는 편이 좋습니다.`);
+  lines.push(tr(`${top.name}(${top.score}점)이 가장 돋보이고, ${josa(`${low.name}(${low.score}점)`, '은/는')} 한 번 더 살피는 편이 좋습니다.`, `${top.name} (${top.score}) stands out most, while ${low.name} (${low.score}) deserves extra attention.`));
   return {
     kind, key: ctx.key, label: ctx.label,
     overall: { score: sc.overall, headline: headline(sc, ctx.unit), text: lines.join(' ') },
@@ -182,8 +184,14 @@ function buildReport(c, comb, kind, ctx) {
   };
 }
 function introFor(c, ev, first) {
-  const dmName = `${STEM_K[c.dm]}${EL_K[STEM_EL[c.dm]]}`;
-  const s = `${STEM_K[ev.p.s]}(${STEM_H[ev.p.s]})`, b = `${BR_K[ev.p.b]}(${BR_H[ev.p.b]})`;
+  const dmName = `${stemName(c.dm)}${tr('', ' ')}${elementName(STEM_EL[c.dm])}`;
+  const s = `${stemName(ev.p.s)}(${STEM_H[ev.p.s]})`, b = `${branchName(ev.p.b)}(${BR_H[ev.p.b]})`;
+  if (isEnglish()) {
+    const relation = ev.tgS === ev.tgB
+      ? `The stem ${s} and branch ${b} both represent ${term(ev.tgB)}.`
+      : `The stem ${s} represents ${term(ev.tgS)}, and the branch ${b} represents ${term(ev.tgB)}.`;
+    return `${first} Your Day Master is ${dmName}. ${relation} ${term(ev.tgB)} symbolizes ${T.tgMeaning[ev.tgB]}.`;
+  }
   const tg = ev.tgS === ev.tgB
     ? `천간 ${josa(s, '과/와')} 지지 ${b} 모두 ${josa(ev.tgB, '이/가')} 됩니다.`
     : `천간 ${josa(s, '은/는')} ${ev.tgS}, 지지 ${josa(b, '은/는')} ${josa(ev.tgB, '이/가')} 됩니다.`;
@@ -197,12 +205,12 @@ function dayComb(c, o) {
 }
 export function day(c, o, which = 'today') {
   const { dEv, comb } = dayComb(c, o);
-  const word = which === 'tomorrow' ? '내일' : '오늘';
+  const word = which === 'tomorrow' ? tr('내일', 'Tomorrow') : tr('오늘', 'Today');
   const r = buildReport(c, comb, 'day', {
-    key: `d${o.y}-${o.m}-${o.d}`, P: `${word}은`, unit: '날', label: fmtDate(o),
-    intro: introFor(c, dEv, `${word}은 ${pillarLabel(dEv.p)}일입니다.`),
+    key: `d${o.y}-${o.m}-${o.d}`, P: tr(`${word}은`, word), unit: tr('날', 'Day'), label: fmtDate(o),
+    intro: introFor(c, dEv, tr(`${word}은 ${pillarLabel(dEv.p)}일입니다.`, `${word} is a ${pillarLabel(dEv.p)} day.`)),
   });
-  r.date = o; r.pillar = dEv.p; r.pillarText = `${pillarLabel(dEv.p)}일`; r.lunar = lunarText(o);
+  r.date = o; r.pillar = dEv.p; r.pillarText = tr(`${pillarLabel(dEv.p)}일`, `${pillarLabel(dEv.p)} day`); r.lunar = lunarText(o);
   return r;
 }
 export function week(c, o) {
@@ -213,7 +221,7 @@ export function week(c, o) {
     const d = addDays(start, i);
     const { dEv, comb } = dayComb(c, d);
     const sc = scoresOf(comb, 'day');
-    days.push({ date: d, label: DOW_K[dow(d)], short: fmtShort(d), pillar: dEv.p, pillarText: pillarLabel(dEv.p), score: sc.overall, cats: sc.cats });
+    days.push({ date: d, label: weekdayName(dow(d)), short: fmtShort(d), pillar: dEv.p, pillarText: pillarLabel(dEv.p), score: sc.overall, cats: sc.cats });
     parts.push([comb, 1 / 7]);
   }
   const comb = combine(parts);
@@ -221,8 +229,8 @@ export function week(c, o) {
   const worst = days.slice().sort((a, b) => a.score - b.score)[0];
   const end = addDays(start, 6);
   const r = buildReport(c, comb, 'week', {
-    key: `w${start.y}-${start.m}-${start.d}`, P: '이번 주는', unit: '한 주', label: `${fmtShort(start)} ~ ${fmtShort(end)}`,
-    intro: `이번 주 일곱 날 가운데 ${best.label}요일(${best.short}, ${best.pillarText}일)의 기운이 가장 좋고, ${worst.label}요일(${worst.short})은 한 템포 쉬어 가는 편이 좋습니다.`,
+    key: `w${start.y}-${start.m}-${start.d}`, P: tr('이번 주는', 'This week'), unit: tr('한 주', 'Week'), label: `${fmtShort(start)} ~ ${fmtShort(end)}`,
+    intro: tr(`이번 주 일곱 날 가운데 ${best.label}요일(${best.short}, ${best.pillarText}일)의 기운이 가장 좋고, ${worst.label}요일(${worst.short})은 한 템포 쉬어 가는 편이 좋습니다.`, `Of the seven days this week, ${best.label} (${best.short}, ${best.pillarText}) has the strongest reading. Allow a slower pace on ${worst.label} (${worst.short}).`),
   });
   r.start = start; r.days = days;
   r.bestByCat = CATS.map((cat, i) => { const b = days.slice().sort((x, y) => y.cats[i] - x.cats[i])[0]; return { cat, name: T.catName[cat], day: b.label, short: b.short }; });
@@ -242,10 +250,10 @@ export function month(c, y, m) {
   }
   const comb = combine([[mEv, 0.6], [combine(dParts), 0.25], [evalPillar(c, yearPillarOfDate({ y, m, d: 15 })), 0.15]]);
   const r = buildReport(c, comb, 'month', {
-    key: `m${y}-${m}`, P: '이번 달은', unit: '한 달', label: `${y}년 ${m}월`,
-    intro: introFor(c, mEv, `이번 달은 ${pillarLabel(mp)}월입니다.`),
+    key: `m${y}-${m}`, P: tr('이번 달은', 'This month'), unit: tr('한 달', 'Month'), label: tr(`${y}년 ${m}월`, `${y}-${String(m).padStart(2, '0')}`),
+    intro: introFor(c, mEv, tr(`이번 달은 ${pillarLabel(mp)}월입니다.`, `This is a ${pillarLabel(mp)} month.`)),
   });
-  r.pillar = mp; r.pillarText = `${pillarLabel(mp)}월`; r.days = days;
+  r.pillar = mp; r.pillarText = tr(`${pillarLabel(mp)}월`, `${pillarLabel(mp)} month`); r.days = days;
   const sorted = days.slice().sort((a, b) => b.score - a.score || a.date.d - b.date.d);
   r.goodDays = sorted.slice(0, 4).sort((a, b) => a.date.d - b.date.d);
   r.badDays = sorted.slice(-3).sort((a, b) => a.date.d - b.date.d);
@@ -258,10 +266,10 @@ export function year(c, y, which = 'this') {
   const parts = [[yEv, dy ? 0.68 : 1]];
   if (dy) parts.push([evalPillar(c, dy), 0.32]);
   const comb = combine(parts);
-  let intro = introFor(c, yEv, `${y}년은 ${pillarLabel(yp)}년입니다.`);
-  if (dy) intro += ` 이 해는 ${dy.age}세부터 이어지는 ${pillarLabel(dy)} 대운(${tenGod(c.dm, dy.s)}·${tenGod(c.dm, BR_MAIN[dy.b])})의 영향 아래 있습니다.`;
-  const r = buildReport(c, comb, 'year', { key: `y${y}`, P: which === 'next' ? '내년에는' : `${y}년에는`, unit: '한 해', label: `${y}년`, intro });
-  r.year = y; r.pillar = yp; r.pillarText = `${pillarLabel(yp)}년`; r.daeun = dy;
+  let intro = introFor(c, yEv, tr(`${y}년은 ${pillarLabel(yp)}년입니다.`, `${y} is a ${pillarLabel(yp)} year.`));
+  if (dy) intro += tr(` 이 해는 ${dy.age}세부터 이어지는 ${pillarLabel(dy)} 대운(${tenGod(c.dm, dy.s)}·${tenGod(c.dm, BR_MAIN[dy.b])})의 영향 아래 있습니다.`, ` This year falls within the ${pillarLabel(dy)} major luck cycle that begins at age ${dy.age}, associated with ${term(tenGod(c.dm, dy.s))} and ${term(tenGod(c.dm, BR_MAIN[dy.b]))}.`);
+  const r = buildReport(c, comb, 'year', { key: `y${y}`, P: isEnglish() ? `In ${y}` : which === 'next' ? '내년에는' : `${y}년에는`, unit: tr('한 해', 'Year'), label: tr(`${y}년`, String(y)), intro });
+  r.year = y; r.pillar = yp; r.pillarText = tr(`${pillarLabel(yp)}년`, `${pillarLabel(yp)} year`); r.daeun = dy;
   return r;
 }
 const firstTwo = (s) => s.split(/(?<=\.)\s+/).slice(0, 2).join(' ');
@@ -279,8 +287,8 @@ export function yearMonths(c, y) {
     out.push({
       m, pillar: mp, pillarText: pillarLabel(mp), tgS: mEv.tgS, tgB: mEv.tgB, score: sc.overall,
       cats: CATS.map((cat, i) => ({ key: cat, name: T.catName[cat], score: sc.cats[i] })),
-      headline: headline(sc, '달'),
-      text: firstTwo(catText(c, top[0], comb.acc[top[2]], top[1], `${m}월은`, key)),
+      headline: headline(sc, tr('달', 'Month')),
+      text: firstTwo(catText(c, top[0], comb.acc[top[2]], top[1], tr(`${m}월은`, `In month ${m}`), key)),
       best: { name: T.catName[top[0]], score: top[1] },
       worst: low[1] < 50 ? { name: T.catName[low[0]], score: low[1] } : null,
     });

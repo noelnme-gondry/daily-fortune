@@ -1,7 +1,9 @@
+import { bilingual, isEnglish } from '../i18n/runtime.js';
+import { term, elementName } from '../i18n/terms.js';
 // 사주 랭킹: 원국 자체의 "균형·조화·길신"을 점수로 매기고, 가능한 모든 사주(4기둥 518,400가지, 시간 모름 3기둥 43,200가지)
 // 분포표에서 순위를 찾는다. 대운·성별과 무관하게 여덟 글자만으로 계산한다.
 import {
-  EL_K, EL_H, GWIIN, LIUHE, branchRels, stemHe, stemChung, josa, hongran, cheonhui,
+  EL_H, GWIIN, LIUHE, branchRels, stemHe, stemChung, josa, hongran, cheonhui,
 } from './core.js';
 
 const POS_KO = { year: '년지', month: '월지', day: '일지', hour: '시지' };
@@ -10,10 +12,10 @@ const clamp01 = (x) => Math.max(0, Math.min(1, x));
 const peak = (x, c, w) => Math.max(0, 1 - Math.abs(x - c) / w);
 const r1 = (x) => Math.round(x * 10) / 10;
 
-export const RANK_CATS = [
+const RANK_CATS_KO = [
   ['wealth', '재물'], ['honor', '명예·직장'], ['charm', '인기·매력'], ['health', '건강·균형'], ['wisdom', '지혜·학업'],
 ];
-export const TIERS = [
+const TIERS_KO = [
   [1, 'S+', '천하제일 사주', '만 명 중 백 명 안에 드는 드문 균형과 길신을 갖췄습니다.'],
   [5, 'S', '왕후장상 사주', '조화와 길신이 뛰어나 타고난 그릇이 큰 사주입니다.'],
   [15, 'A', '귀인 사주', '도와주는 기운이 많아 사람과 운의 덕을 보는 사주입니다.'],
@@ -24,10 +26,27 @@ export const TIERS = [
 ];
 
 // 원국 점수. parts는 항목별 점수, notes는 근거 문장 재료
-export const PARTS = [
+const PARTS_KO = [
   ['balance', '오행 균형', 25], ['center', '일간 강약', 20], ['yong', '용신의 힘', 15], ['gil', '길신', 15],
   ['harmony', '조화(합)', 15], ['clash', '충돌(충·형)', 0], ['special', '특수 신살', 3],
 ];
+export const RANK_CATS = bilingual(RANK_CATS_KO, [
+  'Wealth', 'Recognition & career', 'Popularity & charm', 'Wellbeing & balance', 'Wisdom & study',
+].map((name, i) => [RANK_CATS_KO[i][0], name]));
+export const TIERS = bilingual(TIERS_KO, [
+  ['Exceptional Balance', 'A rare combination of balance and helpful stars, within the top 100 of 10,000 charts in this model.'],
+  ['Distinguished Chart', 'Strong harmony and helpful stars give this chart a favorable structure in the model.'],
+  ['Supported Chart', 'Several supportive themes emphasize help through people and circumstances.'],
+  ['Fortunate Chart', 'Clear strengths and relatively few major imbalances give this chart a steady structure.'],
+  ['Even-Tempered Chart', 'Favorable and challenging features are fairly mixed, with steady effort emphasized.'],
+  ['Growth through Practice', 'Working with the chart’s more uneven elements is a central theme.'],
+  ['The Comeback Story', 'A more uneven structure highlights the possibility of pronounced shifts when supportive cycles arrive.'],
+].map((text, i) => [...TIERS_KO[i].slice(0, 2), ...text]));
+export const PARTS = bilingual(PARTS_KO, [
+  'Element balance', 'Day Master strength', 'Useful element support', 'Helpful stars',
+  'Harmony (combinations)', 'Friction (clashes & penalties)', 'Special stars',
+].map((name, i) => [PARTS_KO[i][0], name, PARTS_KO[i][2]]));
+
 export function rankScore(a) {
   const pos = a.positions;
   const P = pos.map((k) => ({ k, ...a.pillars[k] }));
@@ -102,7 +121,7 @@ export function rankScore(a) {
 
 // 근거: 항목별 점수를 전체 사주 평균과 비교해 높거나 낮은 이유를 문장으로
 export function rankReasons(s, avg) {
-  const el = (e) => `${EL_K[e]}(${EL_H[e]})`;
+  const el = (e) => `${elementName(e)}(${EL_H[e]})`;
   const { notes: n, ctx } = s;
   const text = {
     balance: (up) => (up ? '오행이 고르게 퍼져 기운의 균형이 좋습니다.' : n.lack.length ? `${n.lack.map(el).join('·')} 기운이 없어 오행이 한쪽으로 기울었습니다.` : '일부 오행에 힘이 몰려 있습니다.'),
@@ -113,6 +132,27 @@ export function rankReasons(s, avg) {
     clash: (up) => (up ? '원국 안에 충·형이 적어 안정적입니다.' : `${n.clash.join(', ')}으로 변동과 마찰이 생기기 쉽습니다.`),
     special: () => `${n.special.join(', ')}의 강한 기운이 있습니다.`,
   };
+  if (isEnglish()) {
+    const note = (value) => {
+      const count = /^천을귀인 (\d+)개$/.exec(value);
+      if (count) return `Noble Helper × ${count[1]}`;
+      const pair = /^(년지|월지|일지|시지|년간|월간|일간|시간)·(년지|월지|일지|시지|년간|월간|일간|시간) (육합|천간합|충|형|원진|천간충)$/.exec(value);
+      const pos = { 년간: 'Year stem', 월간: 'Month stem', 일간: 'Day stem', 시간: 'Hour stem' };
+      const rel = { 육합: 'six-combination', 천간합: 'stem combination', 충: 'clash', 형: 'penalty', 원진: 'friction', 천간충: 'stem clash' };
+      if (pair) return `${pos[pair[1]] || term(pair[1])} / ${pos[pair[2]] || term(pair[2])}: ${rel[pair[3]]}`;
+      if (value === '지지 삼합 완성') return 'Complete branch trine';
+      return value.replace(/(괴강살|양인살|백호살)/g, (star) => term(star)) === value ? term(value) : value.replace(/(괴강살|양인살|백호살)/g, (star) => term(star));
+    };
+    Object.assign(text, {
+      balance: (up) => up ? 'The Five Elements are spread relatively evenly.' : n.lack.length ? `${n.lack.map(el).join(', ')} is absent from the visible characters, making the element pattern less even.` : 'Some elements hold a larger share of the chart’s energy.',
+      center: (up) => up ? (ctx.strengthLabel === '중화' ? 'The Day Master is balanced, giving it a steady position across different cycles.' : `The Day Master is classified as ${term(ctx.strengthLabel).toLowerCase()}, without a large imbalance.`) : `The chart has a ${term(ctx.strengthLabel).toLowerCase()}; traditional interpretation favors cycles that ${ctx.strong ? 'channel excess energy' : 'provide support'}.`,
+      yong: (up) => up ? `The useful element ${el(ctx.yong)} and supporting element ${el(ctx.hee)} are well represented in the natal chart.` : `The useful element ${el(ctx.yong)} and supporting element ${el(ctx.hee)} have limited presence, leaving more support to incoming cycles.`,
+      gil: (up) => n.gil.length ? `${n.gil.map(note).join(', ')} ${up ? 'provide several supportive features' : 'provide some basic support'}.` : 'Helpful stars such as Noble Helper and Scholar Star are limited.',
+      harmony: () => n.harmony.length ? `${n.harmony.map(note).join('; ')} connect the chart’s characters through supportive combinations.` : 'Few branch combinations are present, so the elements operate more separately.',
+      clash: (up) => up ? 'Few clashes and penalties make the natal structure relatively stable.' : `${n.clash.map(note).join('; ')} highlight themes of change and friction.`,
+      special: () => `${n.special.map(note).join(', ')} add strong special-star themes.`,
+    });
+  }
   return PARTS.map(([k, name]) => {
     const pts = Math.round((s.parts[k] - avg[k]) * 10) / 10;
     if (k === 'special' && !n.special.length) return null;

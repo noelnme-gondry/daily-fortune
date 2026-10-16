@@ -1,5 +1,6 @@
 // 결과 이미지 카드(1080×1350 PNG)를 캔버스로 그린다. 인스타그램 스토리·메신저 공유용.
 import { BRAND } from '../content/brand.js';
+import { tr, isEnglish } from '../i18n/runtime.js';
 const C = { bg: '#eceee9', paper: '#f8f9f5', ink: '#1a1d21', ink2: '#535a61', line: '#d2d6ce', accent: '#2b3a8f', seal: '#b4362b' };
 const DISPLAY = 'Hahmlet, "Noto Serif KR", serif';
 const BODY = '"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
@@ -46,16 +47,26 @@ export async function drawCard(data) {
   y += 70;
   let size = 132;
   ctx.font = `700 ${size}px ${DISPLAY}`;
-  while (ctx.measureText(data.big).width > maxW && size > 64) { size -= 6; ctx.font = `700 ${size}px ${DISPLAY}`; }
+  while (ctx.measureText(data.big).width > maxW && size > (isEnglish() ? 32 : 64)) { size -= 6; ctx.font = `700 ${size}px ${DISPLAY}`; }
   ctx.fillStyle = C.accent; ctx.fillText(data.big, x, y);
   y += 96;
-  ctx.fillStyle = C.ink; ctx.font = `700 54px ${DISPLAY}`;
-  for (const l of wrap(ctx, data.title, maxW).slice(0, 3)) { ctx.fillText(l, x, y); y += 74; }
+  ctx.fillStyle = C.ink; ctx.font = `700 ${isEnglish() ? 46 : 54}px ${DISPLAY}`;
+  for (const l of wrap(ctx, data.title, maxW).slice(0, 3)) { ctx.fillText(l, x, y); y += isEnglish() ? 62 : 74; }
   if (data.lines && data.lines.length) {
     y += 30;
     ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + maxW, y); ctx.stroke();
     y += 70;
+    const rowGap = Math.min(70, (H - M - 170 - y) / Math.max(1, data.lines.slice(0, 4).length - 1));
     for (const [k, v] of data.lines.slice(0, 4)) {
+      if (isEnglish()) {
+        const column = 290;
+        ctx.fillStyle = C.ink2; ctx.font = `500 28px ${BODY}`;
+        ctx.fillText(k, x, y, column - 24);
+        ctx.fillStyle = C.ink; ctx.font = `600 32px ${BODY}`;
+        ctx.fillText(v, x + column, y, maxW - column);
+        y += rowGap;
+        continue;
+      }
       ctx.fillStyle = C.ink2; ctx.font = `500 36px ${BODY}`; ctx.fillText(k, x, y);
       ctx.fillStyle = C.ink; ctx.font = `600 40px ${BODY}`;
       const vl = wrap(ctx, v, maxW - 200);
@@ -68,6 +79,7 @@ export async function drawCard(data) {
   ctx.font = `400 24px ${BODY}`;
   ctx.fillText(location.host, x, H - M - 42);
   ctx.fillStyle = C.seal; ctx.font = `600 32px ${BODY}`;
-  ctx.fillText('나도 해 보기 →', x + maxW - ctx.measureText('나도 해 보기 →').width, H - M - 70);
+  const cta = tr('나도 해 보기 →', 'Try your reading →');
+  ctx.fillText(cta, x + maxW - ctx.measureText(cta).width, H - M - 70);
   return new Promise((res) => cv.toBlob(res, 'image/png'));
 }

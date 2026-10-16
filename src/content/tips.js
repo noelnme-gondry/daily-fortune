@@ -1,5 +1,6 @@
 // 정보 아이콘(ⓘ)에 마우스를 올리면 보이는 설명. 서버 HTML과 브라우저 결과 화면이 함께 쓴다.
-export const TIPS = {
+import { bilingual } from '../i18n/runtime.js';
+export const TIPS = bilingual({
   chart: '태어난 해·달·날·시를 각각 위 글자(천간)와 아래 글자(지지) 두 글자로 적은 표입니다. 오른쪽부터 년주(어린 시절·조상), 월주(부모·사회), 일주(나와 배우자), 시주(자녀·말년)를 뜻하고, 파랗게 강조된 일주의 위 글자가 "나"입니다.',
   sipsin: '십신은 "나(일간)"와 다른 글자의 관계를 부르는 이름입니다. 비견·겁재는 나와 같은 기운, 식신·상관은 내가 만드는 재능, 편재·정재는 재물, 편관·정관은 직장·명예, 편인·정인은 배움·도움을 뜻합니다.',
   stem: '천간(위 글자)은 하늘의 기운으로 겉으로 드러나는 성향입니다. 글자 색은 오행입니다 — 목 초록, 화 빨강, 토 노랑, 금 회색, 수 남색.',
@@ -17,4 +18,22 @@ export const TIPS = {
   rankScore: '사주 점수는 여덟 글자만으로 오행 균형(25), 일간 강약(20), 용신의 힘(15), 길신(15), 합(15), 충·형 감점, 특수 신살을 더한 값입니다. 운의 흐름(대운)과 노력은 포함하지 않습니다.',
   rankPct: '가능한 모든 사주(4기둥 518,400가지, 시간을 모르면 3기둥 43,200가지)를 같은 규칙으로 계산해 내 점수보다 높은 사주가 몇 개인지 센 순위입니다.',
   stats: '각 시기의 분야 점수를 게임 능력치로 바꿉니다. 50 + (분야 점수 − 60) × 2.2에 직업 보정을 더하고 1~99로 제한합니다. 실제 능력이나 성공 확률을 뜻하지 않습니다.',
-};
+}, {
+  chart: 'Each birth year, month, day and hour has an upper character (heavenly stem) and lower character (earthly branch). From right to left: year, month, day and hour. The highlighted upper character in the day pillar is the Day Master, representing you.',
+  sipsin: 'The Ten Gods describe relationships to the Day Master. Companion and Rival represent peers; Eating God and Hurting Officer, expression; Wealth signs, resources; Officer signs, responsibility; Resource signs, learning and support.',
+  stem: 'Heavenly stems are the upper characters, representing outward tendencies. Colors show elements: green Wood, red Fire, yellow Earth, gray Metal and navy Water.',
+  branch: 'Earthly branches are the lower characters, linked to zodiac animals, months and two-hour periods. They symbolize inner tendencies and everyday surroundings.',
+  hidden: 'Hidden stems are heavenly stems contained within earthly branches, used to describe less visible qualities and potential.',
+  stage: 'The twelve life stages describe the Day Master’s symbolic energy in each branch through a life-cycle metaphor. Stage names are not medical predictions.',
+  elements: 'The visible characters are counted by Wood, Fire, Earth, Metal and Water. A zero means that element is absent from the visible characters, not necessarily from hidden stems.',
+  strength: 'Day Master strength measures the share of peer and resource energy supporting the self. Strong and weak describe balance within this system, not whether a person is good or bad.',
+  roles: 'The useful element is selected to balance the chart; supportive elements help it, while challenging elements work against that balance. Associated colors, directions and numbers are traditional symbolism.',
+  extras: 'The day pillar represents the birth day. Symbolic stars name specific character patterns, such as Peach Blossom for charm or Traveling Horse for movement. Major decade cycles change every ten years.',
+  ilJin: 'The day cycle is one of the sixty stem-branch pairs. Daily fortune compares it with the natal chart.',
+  wolGeon: 'The month cycle is the month’s stem-branch pair. It changes at a solar term, not on the first of the calendar month.',
+  seCha: 'The annual cycle is the year’s stem-branch pair. In this service, the year and zodiac change at Beginning of Spring, around February 4.',
+  term: 'The twenty-four solar terms divide the Sun’s annual path. All displayed times use Korean standard time.',
+  rankScore: 'The natal score combines element balance (25), Day Master strength (20), useful elements (15), auspicious signs (15), combinations (15), clash and punishment deductions, and special symbols. It excludes decade cycles and personal effort.',
+  rankPct: 'All 518,400 four-pillar combinations, or 43,200 three-pillar combinations when time is unknown, use the same scoring rules. Rank counts how many have a higher score.',
+  stats: 'Game stats use 50 + (area score − 60) × 2.2 plus a job adjustment, capped at 1–99. They do not measure actual ability or success probability.',
+});

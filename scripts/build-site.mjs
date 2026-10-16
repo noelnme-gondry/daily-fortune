@@ -27,4 +27,6 @@ write('llms.txt', site.llms());
 write('llms-full.txt', site.llmsFull());
 if (site.adsTxt()) write('ads.txt', site.adsTxt());
 write('share/index.html', site.renderShare(null));
+write('en/share/index.html', site.renderShare(null, 'en'));
+write('en/404.html', site.notFound('en'));
 console.log(`✓ ${n}개 페이지와 sitemap.xml·robots.txt·rss.xml·llms.txt 생성 (${url})`);

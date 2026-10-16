@@ -9,8 +9,8 @@ test('공통 광고 지면은 모든 일반 페이지의 본문 뒤·푸터 앞�
     const html = site.render(path);
     const count = (html.match(/data-partner-ad-slot="common"/g) || []).length;
     assert.equal(count, 1, path);
-    assert.match(html, /<\/main>\s*<aside class="partner-ad" aria-label="광고">[\s\S]*?<\/aside>\s*<footer class="site-foot">/, path);
-    assert.match(html, /이 배너는 쿠팡 파트너스 활동의 일환으로/, `${path}: 수수료 고지`);
+    assert.match(html, /<\/main>\s*<aside class="partner-ad" aria-label="(?:광고|Advertisement)">[\s\S]*?<\/aside>\s*<footer class="site-foot">/, path);
+    assert.match(html, path.startsWith('/en/') ? /We may earn a commission/ : /이 배너는 쿠팡 파트너스 활동의 일환으로/, `${path}: 수수료 고지`);
     assert.match(html, /data-partner-ad-config="[^"]*&quot;id&quot;:1039151/, `${path}: 발급 배너 설정`);
   }
 });

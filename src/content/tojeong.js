@@ -1,6 +1,7 @@
 import { BRAND } from './brand.js';
+import { bilingual } from '../i18n/runtime.js';
 
-export const TOJEONG = {
+export const TOJEONG = bilingual({
   title: '무료 토정비결 — 올해 총운과 12개월 월별 풀이',
   h1: '무료 토정비결',
   description: '토정비결을 무료로 확인하세요. 생년월일로 144괘 중 나의 괘를 구해 총운과 음력 1~12월 풀이를 보여 드립니다. 양력·음력·윤달 입력을 지원합니다.',
@@ -16,7 +17,21 @@ export const TOJEONG = {
     { q: '토정비결의 월별 운세는 양력 기준인가요?', a: '음력 1~12월 기준입니다. 한 해의 범위는 해당 연도 설날부터 다음 설날 전날까지이며, 윤달은 같은 월의 풀이를 함께 읽습니다.' },
     { q: '다른 사이트와 괘가 다를 수 있나요?', a: '네. 음력 출생 연도로 세는나이를 구하고, 보는 해의 음력 생월 날수와 월건수로 중괘를 구하는 방식을 사용합니다. 윤달과 생일 30일의 처리, 판본에 따라 결과가 달라질 수 있어 계산에 사용한 수를 결과에 공개합니다.' },
   ],
-};
+}, {
+  title: 'Free Tojeong reading — annual outlook and all 12 lunar months',
+  h1: 'Free Tojeong reading',
+  description: 'Explore Tojeong Bigyeol for free. Your birth date selects one of 144 readings, with an annual outlook and guidance for all 12 lunar months. Solar, lunar, and leap-month birthdays are supported.',
+  lead: 'A year of stories found through your birth date. Read the annual outlook and the flow of twelve lunar months in the 144 Tojeong readings. Every interpretation, including opportunities and cautions, is free.',
+  convention: 'A leap-month birthday is treated as the regular month with the same number. If the target year has no day 30 in that month, day 29 is used. These are this site’s date conventions; other editions may produce a different reading.',
+  readingNote: 'This is an English translation of a publicly available Korean interpretation. Favorable and unfavorable signs in this traditional text are neither certain future events nor probabilities.',
+  editionNote: 'The provider describes this edition as a modern-spelling revision, made in 1998, of materials in a private collection. Bibliographic details of those materials and expert review are unverified. K-Fortune has not compared all 144 readings with historical source texts.',
+  faq: [
+    { q: 'Are the monthly Tojeong readings also free?', a: 'Yes. The annual outlook and all twelve lunar-month readings are available without registration or payment.' },
+    { q: 'How does this differ from a Saju annual reading?', a: 'A Saju annual reading calculates relationships between the natal Four Pillars, annual influences, and ten-year cycles. Tojeong uses your lunar birth date and numbers for the target year to calculate upper, middle, and lower numbers, then looks up the corresponding interpretation. Birth time and gender are not used.' },
+    { q: 'Do the monthly readings follow the solar calendar?', a: 'No. They follow lunar months 1–12. The year runs from Lunar New Year to the day before the following Lunar New Year. A leap month uses the reading for the regular month with the same number.' },
+    { q: 'Can another website give me a different reading?', a: 'Yes. Here, traditional counting age is based on the lunar birth year, and the middle number uses the length and month value of the lunar birth month in the target year. Leap-month handling, birthdays on day 30, and the edition used can change the result. We show the numbers used in your calculation.' },
+  ],
+});
 
 // 공유 카드 제목: 총운의 첫 문장(괘사의 첫 구절)
 export const tojeongHeadline = (reading) => String(reading?.chongun || '').split(/(?<=[.!?])\s+/)[0].trim().slice(0, 80);

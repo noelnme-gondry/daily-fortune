@@ -17,7 +17,7 @@ async function enter(page) {
 const events = (page) => page.evaluate(() => window.searchEvents.filter((e) => e[0] === 'event'));
 
 test('자바스크립트 없이 가상 예시와 연간 기능 이동을 읽고 모바일에서 탐색할 수 있다', async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  const context = await browser.newContext({ locale: 'ko-KR', javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   await context.route('https://**/*', (route) => route.abort());
   const page = await context.newPage();
   try {

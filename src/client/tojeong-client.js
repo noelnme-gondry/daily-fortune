@@ -6,6 +6,19 @@ import { shareUrl, cleanName } from '../site/share-codec.js';
 import { load, save, removeSaved, sessionLoad, sessionSave } from './profile.js';
 import { track, trackInputStart } from './analytics.js';
 import { renderResultWithPartnerAd } from './partner-ad.js';
+import { isEnglish, tr } from '../i18n/runtime.js';
+
+const inputError = (message) => tr(message, ({
+  '간지를 확인할 수 없습니다.': 'The stem–branch designation could not be identified.',
+  '달력 종류와 생년월일을 확인해 주세요.': 'Check the calendar type and your birth date.',
+  '존재하지 않는 날짜입니다. 양력·음력과 윤달 여부를 확인해 주세요.': 'This date does not exist. Check the solar/lunar calendar and leap-month setting.',
+  '괘를 계산할 수 있는 날짜와 수가 아닙니다.': 'The date or values are not valid for a Tojeong calculation.',
+  '태어난 음력 연도보다 앞선 해의 운세는 계산할 수 없습니다.': 'The target year cannot be earlier than your lunar birth year.',
+  '이 해의 음력 날짜를 확인할 수 없습니다.': 'Lunar dates for this year could not be identified.',
+  '음력 한 해의 범위를 확인할 수 없습니다.': 'The date range of this lunar year could not be identified.',
+})[message] || (/현재 음력 자료로 계산할 수 있는 해는 (\d+)~(\d+)년입니다\./.test(message)
+  ? message.replace(/현재 음력 자료로 계산할 수 있는 해는 (\d+)~(\d+)년입니다\./, 'Available lunar calendar data supports years $1–$2.')
+  : 'The Tojeong reading could not be calculated. Check your entries.'));
 
 export async function mountTojeong(root) {
   const form = root.querySelector('form'), out = root.querySelector('#tojeong-result');
@@ -27,11 +40,12 @@ export async function mountTojeong(root) {
   // 해설은 자기 괘 하나만 받는다(vite.config.js의 tojeongData). 같은 괘는 다시 받지 않는다.
   const readings = new Map();
   const reading = (code) => {
-    if (!readings.has(code)) {
-      readings.set(code, fetch(`/data/tojeong/${code}.json`).then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
-        .catch((e) => { readings.delete(code); throw e; }));
+    const key = `${isEnglish() ? 'en/' : ''}${code}`;
+    if (!readings.has(key)) {
+      readings.set(key, fetch(`/data/tojeong/${key}.json`).then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+        .catch((e) => { readings.delete(key); throw e; }));
     }
-    return readings.get(code);
+    return readings.get(key);
   };
   const showError = (message) => { field('error').textContent = message; field('error').hidden = false; renderResultWithPartnerAd(out, ''); };
   let latest = 0;
@@ -39,7 +53,7 @@ export async function mountTojeong(root) {
     const token = ++latest;
     let result;
     try { result = calculateTojeong(p, targetYear); }
-    catch (e) { showError(e instanceof TojeongInputError ? e.message : '토정비결을 계산하지 못했습니다. 입력을 확인해 주세요.'); return false; }
+    catch (e) { showError(e instanceof TojeongInputError ? inputError(e.message) : tr('토정비결을 계산하지 못했습니다. 입력을 확인해 주세요.', 'The Tojeong reading could not be calculated. Check your entries.')); return false; }
     out.setAttribute('aria-busy', 'true');
     try {
       const r = await reading(result.code);
@@ -50,7 +64,7 @@ export async function mountTojeong(root) {
       track('calc_result', { tool: 'tojeong', calc_origin: source });
       return true;
     } catch {
-      if (token === latest) showError('토정비결 해설을 불러오지 못했습니다. 네트워크 연결을 확인한 뒤 다시 시도해 주세요.');
+      if (token === latest) showError(tr('토정비결 해설을 불러오지 못했습니다. 네트워크 연결을 확인한 뒤 다시 시도해 주세요.', 'The Tojeong reading could not be loaded. Check your network connection and try again.'));
       return false;
     } finally {
       if (token === latest) out.removeAttribute('aria-busy');
@@ -70,17 +84,17 @@ export async function mountTojeong(root) {
     if (!(await render(p, 'form'))) return;
     const temporary = sessionSave('tojeong', p);
     if (persist.checked) {
-      try { await save('tojeong', p); status.textContent = '토정비결 생일을 이 기기에 저장했습니다.'; }
-      catch { status.textContent = '기기 저장에 실패했습니다. 결과는 계산되었지만 다음 방문에 복원되지 않을 수 있습니다.'; }
-    } else status.textContent = temporary ? '현재 탭에만 임시로 유지됩니다. 기존 기기 저장본은 삭제 버튼으로 지울 수 있습니다.' : '이 브라우저에서는 저장할 수 없습니다. 현재 화면에서 결과를 확인하세요.';
+      try { await save('tojeong', p); status.textContent = tr('토정비결 생일을 이 기기에 저장했습니다.', 'Your Tojeong birth date has been saved on this device.'); }
+      catch { status.textContent = tr('기기 저장에 실패했습니다. 결과는 계산되었지만 다음 방문에 복원되지 않을 수 있습니다.', 'The result was calculated, but could not be saved on this device. It may not be restored on your next visit.'); }
+    } else status.textContent = temporary ? tr('현재 탭에만 임시로 유지됩니다. 기존 기기 저장본은 삭제 버튼으로 지울 수 있습니다.', 'Kept temporarily in this tab only. Use the delete button to remove an older copy saved on this device.') : tr('이 브라우저에서는 저장할 수 없습니다. 현재 화면에서 결과를 확인하세요.', 'This browser cannot save your information. You can still read your result on this screen.');
     out.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
   form.querySelector('[data-tojeong-delete]').addEventListener('click', async () => {
     try {
       await removeSaved('tojeong'); persist.checked = false;
       try { sessionStorage.removeItem('ohaeng:tojeong-save'); } catch { /* 접근 제한 */ }
-      status.textContent = '저장된 토정비결 정보를 삭제했습니다.';
-    } catch { status.textContent = '삭제에 실패했습니다. 저장소 접근을 허용한 뒤 다시 시도해 주세요.'; }
+      status.textContent = tr('저장된 토정비결 정보를 삭제했습니다.', 'Your saved Tojeong information has been deleted.');
+    } catch { status.textContent = tr('삭제에 실패했습니다. 저장소 접근을 허용한 뒤 다시 시도해 주세요.', 'Deletion failed. Allow storage access and try again.'); }
   });
   out.addEventListener('click', (e) => {
     const button = e.target.closest('[data-tojeong-month]');
@@ -94,25 +108,25 @@ export async function mountTojeong(root) {
   form.inert = true;
   let stored, shared;
   try { stored = await load('tojeong'); shared = await load('a'); }
-  catch { status.textContent = '저장소를 불러오지 못했습니다. 저장 없이 계산할 수 있습니다.'; }
+  catch { status.textContent = tr('저장소를 불러오지 못했습니다. 저장 없이 계산할 수 있습니다.', 'Saved information could not be loaded. You can calculate a reading without saving.'); }
   finally { form.inert = false; }
   persist.checked = !!stored;
   try { const preference = sessionStorage.getItem('ohaeng:tojeong-save'); if (preference !== null) persist.checked = preference === 'true'; } catch { /* 접근 제한 */ }
   const own = sessionLoad('tojeong') || stored;
   const p = own || sessionLoad('a') || shared;
-  if (p && !own) status.textContent += ' 저장된 사주 생일을 불러왔으며, 토정비결 정보는 별도로 저장합니다.';
+  if (p && !own) status.textContent += tr(' 저장된 사주 생일을 불러왔으며, 토정비결 정보는 별도로 저장합니다.', ' Your saved Saju birth date was loaded. Tojeong information is saved separately.');
   root.dataset.ready = 'true';
   if (p) { fill(p); await render(p, 'saved'); }
 }
 
 const ymd = (d) => `${d.y}.${d.m}.${d.d}`;
 function shareFor(result, reading, name) {
-  const n = cleanName(name), who = n ? `${n}님` : '나';
+  const n = cleanName(name), who = n ? tr(`${n}님`, n) : tr('나', 'My');
   const headline = tojeongHeadline(reading);
   return {
     kind: 'tojeong', url: shareUrl(location.origin, { k: 'tojeong', n, y: result.targetYear, g: result.code }),
-    title: `${who}의 ${result.targetYear}년 토정비결 ${result.code}괘`, text: headline,
-    card: { kicker: `${who}의 ${result.targetYear}년 토정비결`, big: `${result.code}괘`, title: headline,
-      lines: [['상괘 · 중괘 · 하괘', `${result.upper} · ${result.middle} · ${result.lower}`], ['풀이 기간', `${ymd(result.period.start)}~${ymd(result.period.end)}`]] },
+    title: tr(`${who}의 ${result.targetYear}년 토정비결 ${result.code}괘`, `${n ? `${who}’s` : who} ${result.targetYear} Tojeong reading ${result.code}`), text: headline,
+    card: { kicker: tr(`${who}의 ${result.targetYear}년 토정비결`, `${n ? `${who}’s` : who} ${result.targetYear} Tojeong reading`), big: tr(`${result.code}괘`, result.code), title: headline,
+      lines: [[tr('상괘 · 중괘 · 하괘', 'Upper · Middle · Lower'), `${result.upper} · ${result.middle} · ${result.lower}`], [tr('풀이 기간', 'Reading period'), `${ymd(result.period.start)}~${ymd(result.period.end)}`]] },
   };
 }

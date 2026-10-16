@@ -1,5 +1,8 @@
 // 띠별 운세·삼재·띠 궁합 문장. {a}=띠 이름, {Y}=해 이름(예: 병오년)
 
+import { bilingual } from '../i18n/runtime.js';
+import english from './tti.en.js';
+
 const TT = {};
 
 TT.animal = [
@@ -98,4 +101,4 @@ TT.compat = {
   '없음': '{a}띠와 {b}띠는 특별한 합충이 없는 무난한 띠 궁합입니다. 노력하는 만큼 관계가 깊어집니다.',
 };
 
-export default TT;
+export default bilingual(TT, english);

@@ -1,4 +1,5 @@
 // 간지·오행 기초 상수와 순수 함수. 모든 계산은 결정론적이다(난수 없음).
+import { tr } from '../i18n/runtime.js';
 
 export const STEM_H = '甲乙丙丁戊己庚辛壬癸'.split('');
 export const STEM_K = '갑을병정무기경신임계'.split('');
@@ -83,7 +84,7 @@ export const addDays = (o, n) => fromUTC(toUTC(o) + n * DAY_MS);
 export const dow = (o) => new Date(toUTC(o)).getUTCDay();
 export const daysIn = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
 export const DOW_K = ['일', '월', '화', '수', '목', '금', '토'];
-export const fmtDate = (o) => `${o.y}년 ${o.m}월 ${o.d}일 (${DOW_K[dow(o)]})`;
+export const fmtDate = (o) => tr(`${o.y}년 ${o.m}월 ${o.d}일 (${DOW_K[dow(o)]})`, `${o.y}-${String(o.m).padStart(2, '0')}-${String(o.d).padStart(2, '0')} (${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dow(o)]})`);
 export const fmtShort = (o) => `${o.m}/${o.d}`;
 export const isoDate = (o) => `${o.y}-${String(o.m).padStart(2, '0')}-${String(o.d).padStart(2, '0')}`;
 export const parseISO = (s) => { const [y, m, d] = String(s).split('-').map(Number); return { y, m, d }; };
@@ -127,7 +128,7 @@ export const stemChung = (a, b) => Math.abs(a - b) === 6 && Math.min(a, b) <= 3;
 export const gz = (str) => ({ s: STEM_H.indexOf(str[0]), b: BR_H.indexOf(str[1]) });
 export const pillarKo = (p) => `${STEM_K[p.s]}${BR_K[p.b]}`;
 export const pillarH = (p) => `${STEM_H[p.s]}${BR_H[p.b]}`;
-export const pillarLabel = (p) => `${pillarKo(p)}(${pillarH(p)})`;
+export const pillarLabel = (p) => tr(`${pillarKo(p)}(${pillarH(p)})`, `${STEM_SLUG[p.s]}-${BR_SLUG[p.b]} (${pillarH(p)})`);
 export const elLabel = (e) => `${EL_K[e]}(${EL_H[e]})`;
 // 60갑자 순번 ↔ 기둥
 export const sexagenary = (n) => ({ s: n % 10, b: n % 12 });
