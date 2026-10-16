@@ -2,6 +2,7 @@
 import LJ from 'lunar-javascript';
 import KoreanLunarCalendar from 'korean-lunar-calendar';
 import { gz, toUTC, DAY_MS, isoDate } from './core.js';
+import { tr } from '../i18n/runtime.js';
 
 const { Solar } = LJ;
 export { Solar };
@@ -46,7 +47,7 @@ export function lunarOf(o) {
 export const lunarText = (o, withYear = false) => {
   const l = lunarOf(o);
   if (!l) return '';
-  return `음력 ${withYear ? `${l.y}년 ` : ''}${l.leap ? '윤' : ''}${l.m}월 ${l.d}일`;
+  return tr(`음력 ${withYear ? `${l.y}년 ` : ''}${l.leap ? '윤' : ''}${l.m}월 ${l.d}일`, `Lunar ${withYear ? `${l.y}, ` : ''}${l.leap ? 'leap ' : ''}month ${l.m}, day ${l.d}`);
 };
 // 한국 음력 → 양력. 존재하지 않는 날짜(없는 윤달, 30일이 없는 달)는 null
 export function solarOfLunar(y, m, d, leap) {

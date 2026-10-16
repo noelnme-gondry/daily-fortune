@@ -14,9 +14,11 @@ import * as info from './pages/info.js';
 import { tojeongPage } from './pages/tojeong.js';
 import { sharePage } from './pages/share.js';
 import { config } from './config.js';
+import { withLanguage } from '../i18n/runtime.js';
+import { languagePath } from './locale.js';
 
 // 콘텐츠(백과·도구 문구)를 마지막으로 고친 날. 해설을 손보면 함께 올린다.
-export const CONTENT_UPDATED = '2026-10-15';
+export const CONTENT_UPDATED = '2026-10-16';
 export const PUBLISHED = '2026-10-14';
 
 function routeTable(ctx) {
@@ -77,13 +79,15 @@ function routeTable(ctx) {
 export function createSite({ site, assets, now = Date.now() }) {
   const today = todayKST(now);
   const ctx = { site, assets, today, todayISO: isoDate(today), buildDate: CONTENT_UPDATED, published: PUBLISHED, cfg: config() };
-  const routes = routeTable(ctx);
+  const originalRoutes = routeTable(ctx);
+  ctx.paths = new Set([...originalRoutes.map((r) => r.path), '/share/']);
+  const routes = [...originalRoutes, ...originalRoutes.map((r) => ({ ...r, path: languagePath(r.path, 'en'), lang: 'en' }))];
   const byPath = new Map(routes.map((r) => [r.path, r]));
   const pageCache = new Map();
   const page = (path) => {
     if (!pageCache.has(path)) {
       const r = byPath.get(path);
-      const p = r.fn(ctx);
+      const p = withLanguage(r.lang || 'ko', () => r.fn({ ...ctx, lang: r.lang || 'ko' }));
       if (r.daily) p.modified = ctx.todayISO;
       pageCache.set(path, p);
     }
@@ -92,7 +96,7 @@ export function createSite({ site, assets, now = Date.now() }) {
   const lastmod = (r) => (r.daily ? ctx.todayISO : CONTENT_UPDATED);
 
   // 같은 내용을 두 주소로 두지 않는다: 올해 연도의 토정비결 주소는 /tojeong/으로 보낸다.
-  const redirects = new Map([[`/tojeong/${ctx.today.y}/`, '/tojeong/']]);
+  const redirects = new Map([[`/tojeong/${ctx.today.y}/`, '/tojeong/'], [`/en/tojeong/${ctx.today.y}/`, '/en/tojeong/']]);
   return {
     ctx, routes,
     has: (path) => byPath.has(path),
@@ -100,14 +104,18 @@ export function createSite({ site, assets, now = Date.now() }) {
     page,
     render(path) {
       if (!byPath.has(path)) return null;
-      return layout(page(path), ctx);
+      const lang = byPath.get(path).lang || 'ko';
+      return withLanguage(lang, () => layout(page(path), { ...ctx, lang }));
     },
-    notFound: () => layout(info.notFound(), ctx),
+    notFound: (lang = 'ko') => withLanguage(lang, () => layout(info.notFound(), { ...ctx, lang })),
     // 공유 카드: 쿼리마다 달라 캐시하지 않는다
-    renderShare(searchParams) {
-      const p = sharePage(searchParams, ctx);
-      if (searchParams && [...searchParams.keys()].length) p.ogPath = `/share/?${searchParams.toString()}`;
-      return layout(p, ctx);
+    renderShare(searchParams, lang = 'ko') {
+      return withLanguage(lang, () => {
+        const localized = { ...ctx, lang };
+        const p = sharePage(searchParams, localized);
+        if (searchParams && [...searchParams.keys()].length) p.ogPath = `/share/?${searchParams.toString()}`;
+        return layout(p, localized);
+      });
     },
     adsTxt() {
       const a = ctx.cfg.adsense;
@@ -122,7 +130,7 @@ export function createSite({ site, assets, now = Date.now() }) {
       return `# ${SITE.name} — 검색엔진과 AI 답변 엔진의 수집을 모두 허용합니다\nUser-agent: *\nAllow: /\n\n${bots.map((b) => `User-agent: ${b}\nAllow: /`).join('\n\n')}\n\nSitemap: ${site}/sitemap.xml\n`;
     },
     rss() {
-      const items = routes.filter((r) => r.feed).map((r) => {
+      const items = routes.filter((r) => r.feed && !r.lang).map((r) => {
         const p = page(r.path);
         return `    <item><title>${esc(p.title)}</title><link>${site}${r.path}</link><guid isPermaLink="true">${site}${r.path}</guid><description>${esc(p.description)}</description><pubDate>${new Date(`${PUBLISHED}T09:00:00+09:00`).toUTCString()}</pubDate></item>`;
       }).join('\n');
@@ -146,6 +154,7 @@ function llmsTxt(ctx, routes, page) {
 ${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일시와 성별로 사주 원국(년주·월주·일주·시주)을 세우고, 기간의 간지(일진·월운·세운·대운)가 원국과 맺는 십신·합충형·12운성·신살·용신 관계를 0~100점 점수와 해설로 바꿉니다. 같은 입력이면 항상 같은 결과가 나오며(난수 미사용), 계산은 사용자의 브라우저에서 이루어집니다. 계산 규칙은 ${site}/about/ 에 공개되어 있습니다.
 
 주요 사실:
+- 영어판 K-Fortune: ${site}/en/ — 동일한 기능·계산으로 영어 화면과 결과 해설을 제공합니다. 브라우저 기본 언어가 한국어가 아니면 영어판으로 연결되며, 직접 선택한 언어를 우선합니다.
 - 이용 요금: ${FREE_ACCESS.description}
 - 무료 토정비결은 음력 생년월일로 144괘를 구해 총운과 음력 12개월 한글 해설을 모두 제공합니다. 생시·성별을 사용하지 않으며 사주 신년운세와 별도 계산입니다. ${site}/tojeong/
 - 년주는 입춘, 월주는 절기 절입 시각으로 바뀝니다. 시주는 동경 127.5° 평균태양시로 정하며, 현행 한국 표준시(UTC+9)·서머타임 미적용 기준으로 30분을 뺍니다. 이 기준에서 밤 11시 30분부터 다음 날 자시이며, 과거 표준시·서머타임 기간에는 경계가 달라집니다. 출생지별 진태양시는 계산하지 않습니다.

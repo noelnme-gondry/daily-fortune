@@ -1,6 +1,8 @@
+import { bilingual } from '../i18n/runtime.js';
+import * as english from './story.en.js';
 // "사주로 본 내 인생은?" 캐릭터 데이터. 시기별 주도 십신 → 직업(클래스), 대운 점수 → 수식어, 신살 → 스킬.
 
-export const CLASSES = {
+const CLASSES_KO = {
   '비견': { name: '독립 전사', icon: 'shield', desc: '누구에게도 기대지 않고 제 힘으로 길을 여는 전사입니다.', skill: ['자립의 방패', '어떤 상황에서도 스스로 버티는 힘'], quest: '혼자 다 짊어지지 말고 믿을 동료 한 명을 곁에 두세요.' },
   '겁재': { name: '승부사 검객', icon: 'sword', desc: '경쟁이 붙을수록 눈빛이 살아나는 승부사입니다.', skill: ['역전의 일격', '불리한 판을 한 번에 뒤집는 배짱'], quest: '이기는 것보다 지키는 것이 중요한 순간을 구분하세요.' },
   '식신': { name: '풍요의 음유시인', icon: 'lute', desc: '먹고 즐기고 만들어 내는 재능으로 주변을 행복하게 만듭니다.', skill: ['풍요의 노래', '재능이 그대로 복이 되는 힘'], quest: '즐거움에 꾸준함을 더하면 재능이 재산이 됩니다.' },
@@ -12,13 +14,13 @@ export const CLASSES = {
   '편인': { name: '은둔의 연금술사', icon: 'flask', desc: '남들이 보지 못하는 것을 꿰뚫어 특별한 것을 만들어 냅니다.', skill: ['영감의 연성', '엉뚱한 생각을 보물로 바꾸는 직관'], quest: '혼자만의 연구실 문을 가끔은 활짝 열어 두세요.' },
   '정인': { name: '지혜의 현자', icon: 'book', desc: '배우고 품어 주는 힘으로 사람들이 찾아오는 현자입니다.', skill: ['배움의 축복', '공부와 문서가 술술 풀리는 힘'], quest: '아는 것을 행동으로 옮기는 순간 지혜가 완성됩니다.' },
 };
-export const ADJ = {
+const ADJ_KO = {
   high: ['전설의', '황금기의'],
   good: ['떠오르는', '빛나는'],
   mid: ['길 위의', '수련 중인'],
   low: ['때를 기다리는', '시련을 견디는'],
 };
-export const SKILL_BY_SS = {
+const SKILL_BY_SS_KO = {
   '천을귀인': ['구원자 소환', '막다른 길에서 도움을 청할 동료를 찾습니다.'],
   '역마살': ['순간이동', '이동·출장·이사로 판을 바꾸는 능력이 있습니다.'],
   '도화살': ['매혹의 미소', '사람의 마음을 끌어당기는 매력이 빛납니다.'],
@@ -28,12 +30,12 @@ export const SKILL_BY_SS = {
   '괴강살': ['카리스마 폭발', '무리를 이끄는 압도적인 존재감이 있습니다.'],
   '백호살': ['호랑이의 기백', '강한 기운으로 어려움을 정면으로 뚫습니다.'],
 };
-export const STAGES = {
+const STAGES_KO = {
   early: { label: '초반', title: '초반 인생', ages: '0~29세', root: '년주와 월주는 타고난 뿌리와 자라 온 환경을 뜻합니다.' },
   mid: { label: '중반', title: '중반 인생', ages: '30~59세', root: '일주는 나 자신이 주인공이 되어 사회에서 꽃피는 시기를 뜻합니다.' },
   late: { label: '후반', title: '후반 인생', ages: '60세~', root: '시주는 결실을 거두고 다음 세대에게 물려주는 시기를 뜻합니다.' },
 };
-export const STAGE_BAND = {
+const STAGE_BAND_KO = {
   early: {
     high: '어린 시절과 청년기에 운이 활짝 열려 있어 일찍부터 두각을 나타냅니다.',
     good: '배우고 성장하는 시기에 순풍이 불어 좋은 기반을 다집니다.',
@@ -53,7 +55,7 @@ export const STAGE_BAND = {
     low: '쌓아 둔 자원을 꺼내 쓰고 활동의 폭을 줄여야 하는 장면입니다. 과거의 방식에 고집을 부리면 부담이 더 커질 수 있습니다.',
   },
 };
-export const ARCS = {
+const ARCS_KO = {
   triple: { name: '평생 순풍형', desc: '초반·중반·후반 모두 운이 받쳐 주는 드문 흐름입니다. 다만 순풍에 기대 노력을 멈추지 않는 것이 관건입니다.' },
   late: { name: '대기만성형', desc: '시간이 지날수록 운이 커지는 흐름입니다. 젊을 때의 고생이 뒤에 큰 열매로 돌아옵니다.' },
   early: { name: '선행 질주형', desc: '일찍 운이 열려 젊어서 빛나는 흐름입니다. 전성기에 쌓은 것을 후반까지 지키는 것이 숙제입니다.' },
@@ -62,17 +64,17 @@ export const ARCS = {
   steady: { name: '꾸준한 항해형', desc: '큰 굴곡 없이 고르게 흘러가는 흐름입니다. 안정 속에서 작은 성취를 꾸준히 쌓는 것이 강점입니다.' },
   wave: { name: '파도 타는 모험가형', desc: '오르내림이 뚜렷한 흐름입니다. 좋은 때와 쉬어 갈 때를 알면 누구보다 멀리 갑니다.' },
 };
-export const STAT_NAMES = [['drive', '추진력'], ['wealth', '재력'], ['charm', '매력'], ['wisdom', '지혜'], ['vital', '체력']];
+const STAT_NAMES_KO = [['drive', '추진력'], ['wealth', '재력'], ['charm', '매력'], ['wisdom', '지혜'], ['vital', '체력']];
 // 게임 전용 직업 특성. 실제 운세 점수·랭킹에는 적용하지 않는다.
 export const CLASS_STATS = {
   비견: [12, -6, -8, -4, 10], 겁재: [16, -10, 4, -8, 6], 식신: [-4, 4, 10, -6, 12],
   상관: [4, -4, 16, 6, -10], 편재: [6, 16, 4, -8, -6], 정재: [-4, 18, -8, 4, 0],
   편관: [18, -6, -8, -2, 8], 정관: [10, 2, 0, 8, -4], 편인: [-8, -4, -6, 18, 4], 정인: [-6, 0, 4, 14, 4],
 };
-export const CHAPTERS = ['첫 모험', '수련의 문', '세상으로', '나만의 무대', '선택의 갈림길', '깊어지는 실력', '두 번째 모험', '지혜의 정원', '이어지는 이야기'];
+const CHAPTERS_KO = ['첫 모험', '수련의 문', '세상으로', '나만의 무대', '선택의 갈림길', '깊어지는 실력', '두 번째 모험', '지혜의 정원', '이어지는 이야기'];
 
 // 게임 서사의 난관. 각 분야 점수가 낮을 때만 표시한다.
-export const CHAPTER_HAZARDS = {
+const CHAPTER_HAZARDS_KO = {
   career: ['임무 실패와 평가 하락', '성급하게 맡은 임무를 끝내지 못해 보상을 놓치는 장면입니다. 무리한 약속과 책임 떠안기를 조심하세요.'],
   money: ['빈 지갑과 손해 보는 거래', '물건은 팔리지 않고 장비값만 나가 주머니가 비어 가는 장면입니다. 큰 판을 벌이기보다 새는 돈부터 막으세요.'],
   love: ['엇갈린 마음과 멀어지는 인연', '기다리던 답장이 오지 않고 작은 오해가 쌓이는 장면입니다. 상대의 마음을 단정하거나 관계를 재촉하지 마세요.'],
@@ -81,7 +83,7 @@ export const CHAPTER_HAZARDS = {
   social: ['동료와의 다툼과 신뢰 손상', '날카로운 말 한마디에 파티가 흩어지는 장면입니다. 자존심을 앞세우기보다 약속과 말투를 점검하세요.'],
   study: ['시험 낙방과 놓친 서류', '밤새 준비한 시험에서 고배를 마시거나 중요한 문서를 놓치는 장면입니다. 준비 범위와 제출 조건을 다시 확인하세요.'],
 };
-export const CHAPTER_CAUTIONS = {
+const CHAPTER_CAUTIONS_KO = {
   career: ['늘어지는 임무와 엇갈린 평가', '끝낸 줄 알았던 임무에 수정 요청이 돌아오는 장면입니다. 일의 범위와 마감 기준을 미리 맞추세요.'],
   money: ['거래 조건의 함정', '싸게 산 장비에 수리비가 더 붙는 장면입니다. 작은 추가 비용까지 살펴보고 지출을 정하세요.'],
   love: ['서로 다른 속도', '한쪽은 서두르고 다른 쪽은 기다리려는 장면입니다. 확인하지 않은 기대를 상대에게 떠넘기지 마세요.'],
@@ -90,3 +92,15 @@ export const CHAPTER_CAUTIONS = {
   social: ['사소한 말의 가시', '농담으로 한 말이 동료에게 다르게 들리는 장면입니다. 어색함을 방치하지 말고 차분히 풀어 보세요.'],
   study: ['빠뜨린 한 문제', '알던 내용도 서두르다 놓치는 장면입니다. 새로 외울 양보다 복습과 문서 점검에 시간을 남기세요.'],
 };
+
+export const CLASSES = bilingual(CLASSES_KO, english.CLASSES);
+export const ADJ = bilingual(ADJ_KO, english.ADJ);
+export const SKILL_BY_SS = bilingual(SKILL_BY_SS_KO, english.SKILL_BY_SS);
+export const STAGES = bilingual(STAGES_KO, english.STAGES);
+export const STAGE_BAND = bilingual(STAGE_BAND_KO, english.STAGE_BAND);
+export const ARCS = bilingual(ARCS_KO, english.ARCS);
+export const STAT_NAMES = bilingual(STAT_NAMES_KO, english.STAT_NAMES);
+export const CHAPTERS = bilingual(CHAPTERS_KO, english.CHAPTERS);
+export const CHAPTER_HAZARDS = bilingual(CHAPTER_HAZARDS_KO, english.CHAPTER_HAZARDS);
+export const CHAPTER_CAUTIONS = bilingual(CHAPTER_CAUTIONS_KO, english.CHAPTER_CAUTIONS);
+export { CLASSES_KO };

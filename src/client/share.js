@@ -1,4 +1,5 @@
 // 공유: 페이지 공유 바(모든 페이지)와 결과 공유(카드 주소 + 이미지 저장). 카카오는 키가 있을 때만 켠다.
+import { tr, isEnglish } from '../i18n/runtime.js';
 import { track } from './analytics.js';
 import { uiIcon } from '../site/icons.js';
 import { BRAND } from '../content/brand.js';
@@ -21,17 +22,17 @@ function loadKakao() {
 
 const enc = encodeURIComponent;
 export function resultShareHtml() {
-  return `<section class="share-bar result-share" aria-label="결과 공유">
-    <span class="share-k">결과 공유</span>
-    ${KAKAO_KEY ? '<button class="sbtn kakao" type="button" data-share="kakao">카카오톡</button>' : ''}
-    ${navigator.share ? '<button class="sbtn" type="button" data-share="native">공유하기</button>' : ''}
-    <button class="sbtn" type="button" data-share="copy">링크 복사</button>
-    <button class="sbtn" type="button" data-share="x" aria-label="X에 공유"></button>
-    <button class="sbtn" type="button" data-share="facebook">페이스북</button>
-    <button class="sbtn strong" type="button" data-share="image">이미지 저장</button>
+  return `<section class="share-bar result-share" aria-label="${tr("결과 공유", "Share your result")}">
+    <span class="share-k">${tr("결과 공유", "Share your result")}</span>
+    ${KAKAO_KEY ? `<button class="sbtn kakao" type="button" data-share="kakao">${tr('카카오톡', 'KakaoTalk')}</button>` : ''}
+    ${navigator.share ? `<button class="sbtn" type="button" data-share="native">${tr('공유하기', 'Share')}</button>` : ''}
+    <button class="sbtn" type="button" data-share="copy">${tr("링크 복사", "Copy link")}</button>
+    <button class="sbtn" type="button" data-share="x" aria-label="${tr("X에 공유", "Share on X")}"></button>
+    <button class="sbtn" type="button" data-share="facebook">${tr("페이스북", "Facebook")}</button>
+    <button class="sbtn strong" type="button" data-share="image">${tr("이미지 저장", "Save image")}</button>
     <span class="toast" role="status" aria-live="polite"></span>
   </section>
-  <p class="hint">공유 링크에는 생년월일시가 담기지 않고, 결과 요약(점수·제목·입력한 이름)만 담깁니다.</p>`;
+  <p class="hint">${tr("공유 링크에는 생년월일시가 담기지 않고, 결과 요약(점수·제목·입력한 이름)만 담깁니다.", "Shared links contain only your result summary (score, title and entered name), never your birth date or time.")}</p>`;
 }
 
 // el: 공유 바, opts: { url, title, text, kind, card }
@@ -61,7 +62,7 @@ export function wireShare(el, opts) {
     if (method === 'x' || method === 'facebook' || method === 'band') return; // 공개 페이지 링크로 새 창
     e.preventDefault();
     if (method === 'copy') {
-      try { await navigator.clipboard.writeText(opts.url); say('링크를 복사했습니다.'); } catch (er) { window.prompt('아래 링크를 복사하세요', opts.url); }
+      try { await navigator.clipboard.writeText(opts.url); say(tr("링크를 복사했습니다.", "Link copied.")); } catch (er) { window.prompt(tr("아래 링크를 복사하세요", "Copy the link below"), opts.url); }
     } else if (method === 'native') {
       try { await navigator.share({ title: opts.title, text: opts.text, url: opts.url }); } catch (er) { /* 취소 */ }
     } else if (method === 'kakao') {
@@ -69,12 +70,12 @@ export function wireShare(el, opts) {
         const Kakao = await loadKakao();
         Kakao.Share.sendDefault({
           objectType: 'feed',
-          content: { title: opts.title, description: opts.text || BRAND.descriptor, imageUrl: `${location.origin}${opts.image || '/og-default.png'}?v=sun`, link: { mobileWebUrl: opts.url, webUrl: opts.url } },
-          buttons: [{ title: opts.card ? '결과 보기' : '바로 가기', link: { mobileWebUrl: opts.url, webUrl: opts.url } }],
+          content: { title: opts.title, description: opts.text || BRAND.descriptor, imageUrl: `${location.origin}${isEnglish() ? (opts.image || '/og-default.png').replace(/\.png$/, '-en.png') : (opts.image || '/og-default.png')}?v=sun`, link: { mobileWebUrl: opts.url, webUrl: opts.url } },
+          buttons: [{ title: opts.card ? tr("결과 보기", "View result") : tr("바로 가기", "Open page"), link: { mobileWebUrl: opts.url, webUrl: opts.url } }],
         });
-      } catch (er) { say('카카오톡 공유를 불러오지 못했습니다. 링크 복사를 이용해 주세요.'); }
+      } catch (er) { say(tr("카카오톡 공유를 불러오지 못했습니다. 링크 복사를 이용해 주세요.", "Could not load KakaoTalk sharing. Please copy the link instead.")); }
     } else if (method === 'image' && opts.card) {
-      say('이미지를 만드는 중입니다…');
+      say(tr("이미지를 만드는 중입니다…", "Creating your image…"));
       try {
         const { drawCard } = await import('./card.js');
         const blob = await drawCard(opts.card);
@@ -86,9 +87,9 @@ export function wireShare(el, opts) {
         a.href = URL.createObjectURL(blob); a.download = file.name;
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-        say('이미지를 저장했습니다.');
+        say(tr("이미지를 저장했습니다.", "Image saved."));
         track('share_image', { content_type: opts.kind });
-      } catch (er) { say('이미지를 만들지 못했습니다.'); }
+      } catch (er) { say(tr("이미지를 만들지 못했습니다.", "Could not create the image.")); }
     }
   });
 }

@@ -1,6 +1,7 @@
 import { collapseDisclosures } from './interactions.js';
 import { initPageShare } from './share.js';
 import { initAdSlotTracking } from './partner-ad.js';
+import { updateLanguageLinks } from './language.js';
 let pending;
 export function initTtiNavigation() {
   if (!document.querySelector('.tti-nav')) return;
@@ -22,7 +23,7 @@ export function initTtiNavigation() {
       const share = next.querySelector('[data-share-page]');
       if (share) { document.querySelector('[data-share-page]')?.replaceWith(share); initPageShare(); }
       document.title = next.title;
-      for (const selector of ['link[rel="canonical"]', 'meta[name="description"]', 'meta[property^="og:"]', 'meta[name^="twitter:"]', 'script[type="application/ld+json"]']) {
+      for (const selector of ['link[rel="canonical"]', 'link[rel="alternate"][hreflang]', 'meta[name="description"]', 'meta[property^="og:"]', 'meta[name^="twitter:"]', 'script[type="application/ld+json"]']) {
         const old = [...document.head.querySelectorAll(selector)];
         const replacement = [...next.head.querySelectorAll(selector)];
         old.forEach((n) => n.remove()); replacement.forEach((n) => document.head.append(n));
@@ -36,6 +37,7 @@ export function initTtiNavigation() {
       });
       document.body.dataset.page = new URL(url, location.origin).pathname;
       if (push) history.pushState(null, '', url);
+      updateLanguageLinks();
       initAdSlotTracking();
       collapseDisclosures(content);
       if (content.querySelector('[data-cohort]')) import('./tti-client.js').then((m) => m.mountTti()).catch(() => {});

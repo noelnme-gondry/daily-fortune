@@ -1,3 +1,5 @@
+import { tr, isEnglish } from '../i18n/runtime.js';
+import { term } from '../i18n/terms.js';
 // 사주로 본 내 인생: 0~89세의 아홉 챕터를 각 시기의 기둥과 대운으로 캐릭터화한다.
 import { ADJ, SKILL_BY_SS, STAGES, STAGE_BAND, ARCS, STAT_NAMES, CLASS_STATS, CHAPTERS, CHAPTER_HAZARDS, CHAPTER_CAUTIONS } from '../content/story.js';
 import { CHARACTER_JOBS, SETBACK_JOBS } from '../content/character-jobs.js';
@@ -67,7 +69,7 @@ export function lifeStory(c, today) {
     const adj = pick(ADJ[band], `${key}|${a0}|adj`);
     // 직업 고유 스킬과 신살의 보조 스킬을 별도로 보여 준다.
     const ss = c.natalSS.filter(([, pos]) => natalKeys.includes(pos)).map(([n]) => n).sort((x, y) => SS_ORDER.indexOf(x) - SS_ORDER.indexOf(y));
-    const passive = ss.length && SKILL_BY_SS[ss[0]] ? { name: SKILL_BY_SS[ss[0]][0], desc: SKILL_BY_SS[ss[0]][1], from: ss[0] } : null;
+    const passive = ss.length && SKILL_BY_SS[ss[0]] ? { name: SKILL_BY_SS[ss[0]][0], desc: SKILL_BY_SS[ss[0]][1], from: term(ss[0]) } : null;
     // 스탯 (0~100): 직장→추진력, 금전→재력, 연애·대인→매력, 학업→지혜, 건강→체력
     const cs = sc.cats;
     const rawStats = { drive: cs[0], wealth: cs[1], charm: Math.round((cs[2] + cs[5]) / 2), wisdom: cs[6], vital: cs[4] };
@@ -98,16 +100,16 @@ export function lifeStory(c, today) {
       if (s.move >= 4.5) ev.push({ y, age, kind: '이동·변화', w: s.move });
     }
     const events = ['결혼·인연', '자녀', '이동·변화'].map((k) => ev.filter((e) => e.kind === k).sort((x, y) => y.w - x.w || x.y - y.y)[0]).filter(Boolean)
-      .sort((x, y) => x.y - y.y).map((e) => ({ ...e, past: e.y < today.y }));
-    const dSeg = segs.filter((s) => s.daeun && overlap(a0, a1, s.from, s.to) >= 5).map((s) => `${pillarLabel(s.p).slice(0, 2)} 대운(${s.from}세~)`);
+      .sort((x, y) => x.y - y.y).map((e) => ({ ...e, kind: isEnglish() ? ({ '결혼·인연': 'Marriage & relationships', '자녀': 'Children', '이동·변화': 'Travel & change' })[e.kind] : e.kind, past: e.y < today.y }));
+    const dSeg = segs.filter((s) => s.daeun && overlap(a0, a1, s.from, s.to) >= 5).map((s) => tr(`${pillarLabel(s.p).slice(0, 2)} 대운(${s.from}세~)`, `${pillarLabel(s.p)} cycle (from age ${s.from})`));
     const meta = STAGES[sk];
     const story = [
       `${meta.root} ${STAGE_BAND[sk][band]}`,
-      `제${index + 1}장, ${CHAPTERS[index]}. 이야기 속 당신은 "${adj} ${name}"입니다. ${job.desc}`,
-      dSeg.length ? `이 시기를 지나는 대운은 ${dSeg.join(', ')}이며, 가장 강한 기운은 ${tg}(${T.tgKeyword[tg]})입니다.` : `가장 강한 기운은 ${tg}(${T.tgKeyword[tg]})입니다.`,
+      tr(`제${index + 1}장, ${CHAPTERS[index]}. 이야기 속 당신은 "${adj} ${name}"입니다. ${job.desc}`, `Chapter ${index + 1}: ${CHAPTERS[index]}. In this story, you are the "${adj} ${name}". ${job.desc}`),
+      isEnglish() ? `${dSeg.length ? `Major luck cycles in this chapter: ${dSeg.join(', ')}. ` : ''}The strongest theme is ${term(tg)} (${T.tgKeyword[tg]}).` : dSeg.length ? `이 시기를 지나는 대운은 ${dSeg.join(', ')}이며, 가장 강한 기운은 ${tg}(${T.tgKeyword[tg]})입니다.` : `가장 강한 기운은 ${tg}(${T.tgKeyword[tg]})입니다.`,
     ].join(' ');
     return {
-      key: `decade-${a0}`, label: `${a0}대`, title: CHAPTERS[index], ages: `${a0}~${a1}세`, range: [a0, a1], now: nowAge >= a0 && nowAge <= a1,
+      key: `decade-${a0}`, label: tr(`${a0}대`, a0 === 0 ? 'Ages 0–9' : `${a0}s`), title: CHAPTERS[index], ages: tr(`${a0}~${a1}세`, `Ages ${a0}–${a1}`), range: [a0, a1], now: nowAge >= a0 && nowAge <= a1,
       score, band, tg, character: { adj, name, full: `${adj} ${name}`, icon: job.id, portrait: job.id, focus: job.focus }, skill, passive, stats, rawStats, cautions, years, events, story, quest: job.quest,
     };
   });

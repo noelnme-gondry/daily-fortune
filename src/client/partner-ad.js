@@ -1,3 +1,5 @@
+import { tr } from '../i18n/runtime.js';
+import { localizeClientLinks } from './language.js';
 import { track } from './analytics.js';
 import { adExperimentParams } from './ad-experiment.js';
 
@@ -15,6 +17,7 @@ export function renderResultWithPartnerAd(out, html) {
   resultReady = false;
   const ad = document.querySelector('.partner-ad');
   out.innerHTML = html;
+  localizeClientLinks(out);
   if (!ad) return;
   const share = out.querySelector('.result-share + .hint');
   const experiment = adExperimentParams();
@@ -44,7 +47,7 @@ export function initPartnerAd() {
     try {
       // 공식 g.js의 container 옵션으로 비동기 로드 후에도 지정한 지면에 삽입한다.
       new window.PartnersCoupang.G({ ...JSON.parse(slot.dataset.partnerAdConfig), container: slot });
-      slot.querySelector('iframe')?.setAttribute('title', '쿠팡 파트너스 상품 광고');
+      slot.querySelector('iframe')?.setAttribute('title', tr("쿠팡 파트너스 상품 광고", "Coupang Partners product advertisement"));
       slot.dataset.adState = 'initialized';
     } catch (error) { slot.dataset.adState = 'unavailable'; }
   };

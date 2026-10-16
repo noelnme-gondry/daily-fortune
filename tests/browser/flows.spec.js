@@ -125,7 +125,7 @@ test('평생 주요 시기의 연도를 누르면 실제 점수와 선정 이유
 });
 
 test('모바일에서 주요 시기 상세를 터치로 열고 긴 내용을 가로 넘침 없이 읽는다', async ({ browser }) => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 });
+  const context = await browser.newContext({ locale: 'ko-KR', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 });
   await context.route('https://**/*', (route) => route.abort());
   const page = await context.newPage();
   await ready(page, '/lifetime/');
@@ -197,7 +197,7 @@ test('전체 메뉴는 PC 한 줄·모바일 두 줄이며 위아래 열이 일�
 });
 
 test('모바일에서 펼쳐진 메뉴를 바로 터치해 토정비결까지 이동한다', async ({ browser }) => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 });
+  const context = await browser.newContext({ locale: 'ko-KR', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 });
   await context.route('https://**/*', (route) => route.abort());
   const page = await context.newPage();
   await page.goto('/');

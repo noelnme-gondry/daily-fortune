@@ -1,16 +1,18 @@
+import { tr } from '../i18n/runtime.js';
+import { term } from '../i18n/terms.js';
 import T from '../content/text.js';
 import { ELEMENT_PRACTICE, REPAIR_ACTION } from '../content/rank-advice.js';
 import { rankScore, rankReasons, RANK_CATS } from './rank.js';
 
 export function rankGuidance(chart, rank) {
   const supports = [['용신', chart.roles.yong], ['희신', chart.roles.hee]].map(([role, element]) => ({
-    role, element, name: T.element[element].name, colors: T.element[element].color,
+    role: term(role), element, name: T.element[element].name, colors: T.element[element].color,
     direction: T.element[element].dir, ...ELEMENT_PRACTICE[element],
   }));
   const repairs = rank.reasons.filter((r) => r.pts < 0).sort((a, b) => a.pts - b.pts).map((r) => {
     const [title, action, caution] = REPAIR_ACTION[r.key];
     return { ...r, title, action: r.key === 'center'
-      ? chart.strong ? '역할을 나누고 내 의견을 말하기 전에 상대의 의견을 한 번 더 들어 보세요.' : '혼자 떠안을 일을 줄이고 도움받을 사람과 휴식 시간을 먼저 정하세요.'
+      ? chart.strong ? tr('역할을 나누고 내 의견을 말하기 전에 상대의 의견을 한 번 더 들어 보세요.', 'Share responsibilities and listen once more before stating your own view.') : tr('혼자 떠안을 일을 줄이고 도움받을 사람과 휴식 시간을 먼저 정하세요.', 'Reduce what you take on alone, and decide where to get support and when to rest.')
       : action, caution };
   });
   const gi = chart.roles.gi;

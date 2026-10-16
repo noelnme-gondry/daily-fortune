@@ -1,25 +1,27 @@
+import { bilingual, isEnglish } from '../i18n/runtime.js';
+import * as EN from './en/pages.js';
 // 사이트 문구: 각 페이지의 제목·설명·도입 답변(AEO용 첫 문단)·자주 묻는 질문.
 import { CHARACTER_JOBS, SETBACK_JOBS } from './character-jobs.js';
 import { BRAND } from './brand.js';
 import { UNKNOWN_TIME } from './calculation-notes.js';
 
 // 무료 이용 범위는 첫 화면·FAQ·구조화 데이터·AI용 요약에서 함께 사용합니다.
-export const FREE_ACCESS = {
+export const FREE_ACCESS = bilingual({
   summary: '회원가입 없이 결과까지 무료',
   description: '모든 사주·운세·토정비결·궁합·만세력을 회원가입 없이 무료로 이용할 수 있습니다. 점수와 상세 해설을 보는 데 별도 결제가 필요하지 않습니다.',
   price: '0',
   currency: 'KRW',
-};
-export const FREE_FAQ = { q: '사주와 운세는 상세 결과까지 무료인가요?', a: `네. ${FREE_ACCESS.description}` };
+}, EN.FREE_ACCESS);
+export const FREE_FAQ = bilingual({ q: '사주와 운세는 상세 결과까지 무료인가요?', a: `네. ${FREE_ACCESS.description}` }, EN.FREE_FAQ);
 
-export const SITE = {
+export const SITE = bilingual({
   name: BRAND.name,
   alt: BRAND.alt,
   searchName: `${BRAND.name} | ${BRAND.descriptor}`,
   tagline: FREE_ACCESS.summary,
   description: '생년월일시로 사주 원국과 오늘·월간·신년·평생 운세, 궁합을 계산하는 한국어 서비스입니다. 만세력과 음력 생일로 보는 별도 방식의 토정비결도 제공하며, 회원가입 없이 상세 결과까지 무료입니다.',
   publisher: `${BRAND.name} 편집팀`,
-};
+}, EN.SITE);
 
 const COMMON_FAQ = [
   { q: '같은 생년월일시를 넣으면 결과가 항상 같나요?', a: `네. ${SITE.name}는 난수를 전혀 쓰지 않습니다. 같은 생년월일시·성별·기준 날짜를 넣으면 언제, 어느 기기에서 보더라도 같은 점수와 같은 해설이 나옵니다.` },
@@ -28,7 +30,7 @@ const COMMON_FAQ = [
 ];
 
 // 도구(계산기) 페이지
-export const TOOLS = {
+export const TOOLS = bilingual({
   today: {
     path: '/today/', nav: '오늘의 운세', h1: '오늘의 운세',
     title: '오늘의 운세 무료 보기 — 생년월일로 보는 사주 운세',
@@ -133,9 +135,10 @@ export const TOOLS = {
       ...COMMON_FAQ,
     ],
   },
-};
+}, EN.TOOLS);
 // 연도별 운세 페이지 (빌드 연도와 다음 해)
 export function yearTool(y, rel) {
+  if (isEnglish()) return { path: `/year/${y}/`, ...EN.yearTool(y, rel) };
   return {
     path: `/year/${y}/`, nav: `${y}년 운세`, h1: `${y}년 운세`,
     title: `${y}년 무료 사주 신년운세 — 개인 총운과 월별 점수`,
@@ -150,7 +153,7 @@ export function yearTool(y, rel) {
   };
 }
 
-export const HOME = {
+export const HOME = bilingual({
   title: SITE.searchName,
   h1: SITE.name,
   lead: '오늘의 운세부터 이달의 운세, 신년운세와 평생 사주풀이까지. 생년월일시로 점수와 상세 해설을 무료로 확인하세요. 궁합과 인생 캐릭터도 함께 즐길 수 있습니다.',
@@ -160,9 +163,9 @@ export const HOME = {
     { q: '사주 운세는 어떻게 계산하나요?', a: '태어난 순간의 년·월·일·시 간지로 원국을 세운 뒤, 보고 싶은 기간의 간지(일진·월운·세운·대운)가 원국과 맺는 십신·합충형·12운성·신살·용신 관계를 점수로 바꿉니다. 자세한 규칙은 계산 방법 페이지에 공개되어 있습니다.' },
     ...COMMON_FAQ,
   ],
-};
+}, EN.HOME);
 
-export const ABOUT = {
+export const ABOUT = bilingual({
   title: '서비스 소개 — 사주 계산 방법과 이용 안내',
   h1: `${SITE.name} 소개와 계산 방법`,
   lead: `${SITE.name}(${SITE.alt})는 전통 명리학의 해석을 바탕으로 정한 계산 규칙을 사용하는 한국어 운세 서비스입니다. 같은 입력·대상 날짜·계산 규칙이면 같은 결과를 내며, 사주 원국과 기간 간지의 관계에서 계산된 점수와 근거를 보여 줍니다.`,
@@ -208,14 +211,15 @@ export const ABOUT = {
     { id: 'publisher', h: '서비스명과 콘텐츠 운영', items: [`공식 서비스명은 ${SITE.name}, 한국어 표기는 ${SITE.alt}입니다. 이 사이트의 콘텐츠 작성·편집 표기는 ${SITE.publisher}입니다.`, '회원가입이나 결과 열람 결제는 없습니다. 사용자가 입력한 출생 정보는 브라우저에서 계산하며, 기기 저장은 선택 사항입니다. 광고와 방문 통계의 처리 범위는 개인정보처리방침에 안내합니다.'] },
   ],
   note: '사주 운세는 삶을 돌아보고 계획을 세우는 데 참고하는 콘텐츠입니다. 건강·법률·투자처럼 중요한 결정은 반드시 전문가와 상의하세요.',
-};
+}, EN.ABOUT);
 
-export const PRIVACY = {
+export const PRIVACY = bilingual({
   title: '개인정보처리방침',
   h1: '개인정보처리방침',
   sections: [
     { h: '수집하는 정보', text: '회원가입 없이 브라우저에서 사주를 계산합니다. 이 기기에 저장을 선택하면 IndexedDB에 보관하고, 미선택 입력은 현재 탭의 sessionStorage에 임시 보관합니다. 이전 버전이 자동으로 남긴 localStorage 입력은 다음 방문 때 현재 탭으로만 옮기고 바로 지우며, 사용자가 저장을 선택해야 다시 보관합니다. 저장된 정보 삭제 버튼 또는 브라우저의 사이트 데이터 삭제로 지울 수 있습니다.' },
     { h: '공유 링크', text: '결과 공유 링크와 이미지에는 생년월일시가 담기지 않습니다. 점수·결과 제목과 입력한 이름(최대 10자)만 담기며, 이름을 비우면 이름 없이 공유됩니다. 공유 카드 페이지는 검색엔진에 노출되지 않습니다.' },
+    { h: '언어 선택', text: '한국어 또는 English를 직접 선택하면 그 설정을 fortune-language 쿠키에 1년간 저장합니다. 언어 설정에는 이름이나 생년월일시가 포함되지 않습니다. 저장된 선택이 없으면 브라우저의 기본 언어를 기준으로 한국어 또는 영어 화면을 제공합니다. 브라우저의 사이트 데이터 삭제로 설정을 지울 수 있습니다.' },
     { h: '방문 통계', text: '서비스 개선을 위해 Google Analytics로 방문 페이지와 기능 사용 여부(예: 계산 완료, 공유 버튼 클릭)를 익명으로 집계합니다. 이름과 생년월일시는 전송하지 않으며, 주소의 검색어와 # 뒤 정보도 제외합니다. Google Analytics는 쿠키를 사용하며, 브라우저 설정이나 Google 애널리틱스 차단 부가 기능(https://tools.google.com/dlpage/gaoptout)으로 수집을 거부할 수 있습니다.' },
     { h: '광고와 쿠키', text: '이 사이트는 Google 애드센스 광고를 게재할 수 있습니다. Google을 포함한 제3자 광고 사업자는 쿠키를 사용해 사용자의 이전 방문 기록을 바탕으로 광고를 제공할 수 있습니다. 맞춤 광고는 Google 광고 설정(https://adssettings.google.com)에서 해제할 수 있습니다.' },
     { h: '쿠팡 파트너스 광고', text: '이 사이트는 쿠팡 파트너스 배너를 게재하며, 이를 통한 구매에 따라 일정액의 수수료를 제공받습니다. 배너를 불러올 때 쿠팡 서버에 접속하며 접속 정보와 쿠키 등이 광고 제공과 성과 측정에 이용될 수 있습니다. Google Analytics에는 광고 영역이 화면에 들어왔는지를 집계하며, 이름과 생년월일시는 배너 설정이나 이 이벤트에 넣지 않습니다.' },
@@ -223,9 +227,9 @@ export const PRIVACY = {
     { h: '카카오톡 공유', text: '카카오톡 공유 기능을 사용할 때에는 카카오의 개인정보처리방침이 적용됩니다.' },
     { h: '문의', text: '개인정보와 관련한 문의는 사이트 운영자에게 연락해 주세요.' },
   ],
-};
+}, EN.PRIVACY);
 
-export const TTI_COPY = {
+export const TTI_COPY = bilingual({
   hub: {
     title: '띠별 운세 — 12띠 성격·신년운세·삼재·띠 궁합',
     h1: '띠별 운세',
@@ -255,15 +259,15 @@ export const TTI_COPY = {
     h1: '띠별 오늘의 운세',
     lead: '띠별 오늘의 운세는 오늘의 일진이 각 띠의 지지와 맺는 합·충·원진 관계와 오행의 상생·상극으로 계산합니다. 같은 띠라도 사주 전체에 따라 운이 다르니, 생년월일시로 보는 개인 오늘의 운세와 함께 참고하세요.',
   },
-};
+}, EN.TTI_COPY);
 
 export const MANSE_COPY = {
-  year: (y) => ({
+  year: (y) => isEnglish() ? EN.MANSE_COPY.year(y) : ({
     title: `${y}년 만세력 — 월별 일진·음력·24절기 시각`,
     h1: `${y}년 만세력`,
     lead: `${y}년 만세력은 날짜마다 해당하는 간지(일진)와 한국 음력, 24절기 절입 시각을 정리한 표입니다. ${y}년의 년주는 입춘을 기준으로 바뀌며, 각 달의 월주는 절입일에 바뀝니다.`,
   }),
-  month: (y, m) => ({
+  month: (y, m) => isEnglish() ? EN.MANSE_COPY.month(y, m) : ({
     title: `${y}년 ${m}월 만세력 — 날짜별 일진과 음력, 절기`,
     h1: `${y}년 ${m}월 만세력`,
   }),

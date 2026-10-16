@@ -9,6 +9,7 @@ import { siteUrl } from './src/site/util.js';
 import { readAssets } from './src/site/assets.js';
 import { todayKST, isoDate } from './src/engine/core.js';
 import { BRAND } from './src/content/brand.js';
+import { handleLanguage } from './src/site/language-middleware.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, 'dist');
@@ -60,10 +61,12 @@ app.get(Object.keys(TEXT), (req, res) => {
 });
 
 // 공유 카드: 쿼리마다 다르므로 캐시하지 않는다
-app.get('/share/', (req, res) => {
+app.use((req, res, next) => {
+  if (!handleLanguage(req, res, current().site)) next();
+});
+app.get(['/share/', '/en/share/'], (req, res) => {
   const q = new URLSearchParams(req.originalUrl.split('?')[1] || '');
-  res.set('Cache-Control', 'public, max-age=600');
-  res.type('html').send(current().site.renderShare(q));
+  res.type('html').send(current().site.renderShare(q, req.path.startsWith('/en/') ? 'en' : 'ko'));
 });
 
 app.get(/.*/, (req, res, next) => {
@@ -75,19 +78,19 @@ app.get(/.*/, (req, res, next) => {
   }
   const c = current();
   const moved = c.site.redirect(p);
-  if (moved) return res.redirect(301, moved);
+  if (moved) return res.redirect(301, `${moved}${req.originalUrl.slice(req.path.length)}`);
   let html = c.html.get(p);
   if (!html) {
     html = c.site.render(p);
     if (!html) return next();
     c.html.set(p, html);
   }
-  res.set('Cache-Control', 'public, max-age=300');
+  if (!res.getHeader('Cache-Control')) res.set('Cache-Control', 'public, max-age=300');
   res.type('html').send(html);
 });
 
 // favicon·og 이미지 등 public 파일
 app.use(express.static(dist, { index: false, maxAge: '1d' }));
-app.use((req, res) => res.status(404).type('html').send(current().site.notFound()));
+app.use((req, res) => res.status(404).type('html').send(current().site.notFound(req.path.startsWith('/en/') ? 'en' : 'ko')));
 
 app.listen(PORT, () => console.log(`${BRAND.name} 서버가 ${PORT} 포트에서 실행 중입니다 (${SITE})`));

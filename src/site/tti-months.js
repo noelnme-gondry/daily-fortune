@@ -1,2 +1,4 @@
 import { esc } from './util.js';
-export const ttiMonthCards = (months) => months.map((m) => `<article class="card"><header><h3>${m.m}월</h3><b class="num">${m.score}점</b></header><span class="hint">${m.pillarText}월 · ${m.rel}</span><p>${esc(m.text)}</p></article>`).join('');
+import { tr } from '../i18n/runtime.js';
+import { term } from '../i18n/terms.js';
+export const ttiMonthCards = (months) => months.map((m) => `<article class="card"><header><h3>${tr(`${m.m}월`, `Month ${m.m}`)}</h3><b class="num">${tr(`${m.score}점`, `${m.score} points`)}</b></header><span class="hint">${m.pillarText}${tr('월', '')} · ${term(m.rel)}</span><p>${esc(m.text)}</p></article>`).join('');
