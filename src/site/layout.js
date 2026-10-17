@@ -147,8 +147,10 @@ ${page.noindex ? '' : `<link rel="alternate" hreflang="ko" href="${attr(`${ctx.s
 <meta name="twitter:image" content="${img}">
 ${page.ogType === 'article' ? `<meta property="article:modified_time" content="${page.modified || ctx.buildDate}">\n` : ''}${cfg.naverVerify ? `<meta name="naver-site-verification" content="${attr(cfg.naverVerify)}">\n` : ''}${cfg.googleVerify ? `<meta name="google-site-verification" content="${attr(cfg.googleVerify)}">\n` : ''}<meta name="theme-color" content="#2b3a8f" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#101318" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="/favicon.svg?v=sun" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png?v=sun" type="image/png" sizes="32x32">
+<link rel="icon" href="/favicon.ico?v=sun2" sizes="16x16 32x32 48x48">
+<link rel="icon" href="/favicon.svg?v=sun2" type="image/svg+xml">
+<link rel="icon" href="/favicon-48.png?v=sun2" type="image/png" sizes="48x48">
+<link rel="icon" href="/favicon-32.png?v=sun2" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=sun">
 <link rel="manifest" href="${ctx.lang === 'en' ? '/en' : ''}/site.webmanifest?v=sun">
 <link rel="preconnect" href="https://fonts.googleapis.com">

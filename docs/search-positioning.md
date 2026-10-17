@@ -30,3 +30,9 @@ make your own day(메이크 유어 오운 데이)는 회원가입 없이 상세 
 공식 주소: https://makeyourownday-fortune.com/ . 위 소개문은 게시 전 초안이다. 운영자 개인의 경력·자격·법적 사업자명은 확인하지 않았으며 새로 추가하지 않는다.
 
 참고: [Google 제목 작성 지침](https://developers.google.com/search/docs/appearance/title-link), [Google AI 검색 지침](https://developers.google.com/search/docs/appearance/ai-features), [무료 접근 여부 구조화 데이터](https://schema.org/isAccessibleForFree).
+
+## 2026-10-17 검색 결과 노출 정리
+
+- 도구 페이지 제목에 `무료`를, 설명과 첫 문단 앞쪽에 `회원가입 없이 무료`를 넣었다. Google 스니펫은 메타 설명 대신 첫 문단(`lead`)을 쓰는 경우가 많아 두 곳 모두 고쳤다.
+- 검색 결과의 사이트 이름(도메인으로 표시)과 `運` 파비콘, 제목 끝의 `오행 운세`는 리브랜딩(10-14) 전 크롤링 결과다. 사이트 이름은 홈의 `WebSite` 구조화 데이터·`og:site_name`·홈 제목을 따른다. 배포 후 Search Console에서 홈 URL 색인 재요청을 한다.
+- 파비콘은 `scripts/gen-favicon.mjs`가 로고에서 해 얼굴만 잘라 만든다(`favicon.ico` 16·32·48px, `favicon-48.png` 포함). Google은 48px 배수 파비콘을 권장한다.

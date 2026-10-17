@@ -17,7 +17,7 @@ const article = (ctx, page) => ({ '@type': 'Article', headline: page.h1 || page.
 
 export function hub(ctx) {
   const page = today(ctx);
-  return { ...page, path: '/tti/', title: siteText('띠별 운세 — 오늘의 12띠 운세와 신년운세'), description: siteText('띠별 운세의 시작은 오늘의 운세입니다. 동물 아이콘으로 내 띠를 고르고 오늘 해석, 올해·내년의 월별 운세, 삼재와 띠 궁합을 확인하세요.'), crumbs: [[siteText('띠별 운세'), '/tti/']] };
+  return { ...page, path: '/tti/', title: siteText('무료 띠별 운세 — 오늘의 12띠 운세와 신년운세'), description: siteText('회원가입 없이 무료로 보는 띠별 운세. 띠별 운세의 시작은 오늘의 운세입니다. 동물 아이콘으로 내 띠를 고르고 오늘 해석, 올해·내년의 월별 운세, 삼재와 띠 궁합을 확인하세요.'), crumbs: [[siteText('띠별 운세'), '/tti/']] };
 }
 
 export function yearIndex(y, ctx) {
@@ -123,7 +123,7 @@ export function today(ctx) {
   const o = ctx.today;
   const c = TTI_COPY.today;
   return {
-    path: '/tti/today/', title: `${siteText("띠별 오늘의 운세 (")}${o.m}${siteText("월 ")}${o.d}${siteText("일) — 12띠 오늘 운세")}`, h1: c.h1, section: '/tti/',
+    path: '/tti/today/', title: `${siteText("무료 띠별 오늘의 운세 (")}${o.m}${siteText("월 ")}${o.d}${siteText("일) — 12띠 오늘 운세")}`, h1: c.h1, section: '/tti/',
     description: `${fmtDate(o)}${siteText(" 띠별 오늘의 운세. 쥐띠·소띠·호랑이띠·토끼띠·용띠·뱀띠·말띠·양띠·원숭이띠·닭띠·개띠·돼지띠의 오늘 점수와 해설, 행운의 색과 숫자를 확인하세요.")}`,
     crumbs: [[siteText('띠별 운세'), '/tti/'], [siteText('오늘의 운세'), '/tti/today/']], daily: true,
     body: `${hero(`${c.h1} · ${o.m}${siteText("월 ")}${o.d}${siteText("일")}`, c.lead)}${dayBox(o, siteText('오늘'))}${ttiDayList(o)}<p class="cta"><a class="btn" href="/today/">${siteText("내 사주로 오늘의 운세 보기")}</a></p>`,
