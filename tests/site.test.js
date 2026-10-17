@@ -37,12 +37,13 @@ test('제목·설명은 페이지마다 고유하고 canonical이 자기 주소�
 
 test('새 브랜드가 홈·전체 페이지의 검색 정보·설치 이름에 일관되게 적용된다', () => {
   const home = site.render('/');
-  assert.equal(head(home, /<title>(.*?)<\/title>/), `${BRAND.name} | ${BRAND.descriptor}`);
+  assert.equal(head(home, /<title>(.*?)<\/title>/), `${BRAND.descriptor} | ${BRAND.name}`);
   assert.ok(home.includes(`<h1>${BRAND.name}</h1>`));
   for (const [path, html] of pages) {
     const brand = withLanguage(path.startsWith('/en/') ? 'en' : 'ko', () => ({ name: BRAND.name, alt: BRAND.alt }));
     assert.equal(head(html, /<meta property="og:site_name" content="(.*?)">/), brand.name, path);
-    if (!['/', '/en/'].includes(path)) assert.ok(head(html, /<title>(.*?)<\/title>/).endsWith(` | ${brand.name}`), path);
+    // 한국어 하위 페이지 제목은 브랜드를 붙이지 않고, 영어 하위 페이지는 기존처럼 붙인다.
+    if (!['/', '/en/'].includes(path)) assert.equal(head(html, /<title>(.*?)<\/title>/).endsWith(` | ${brand.name}`), path.startsWith('/en/'), path);
     const ld = JSON.parse(head(html, /<script type="application\/ld\+json">(.*?)<\/script>/s));
     for (const node of ld['@graph'].filter((n) => ['WebSite', 'Organization'].includes(n['@type']))) {
       assert.equal(node.name, brand.name, path);

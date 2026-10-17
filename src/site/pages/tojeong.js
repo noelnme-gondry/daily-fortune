@@ -51,7 +51,7 @@ function yearTable(y) {
 export function tojeongPage(ctx, year) {
   const y = year ?? ctx.today.y, path = tojeongPath(ctx, y), next = y > ctx.today.y;
   const { ganji } = tojeongYearTable(y);
-  const title = next ? tr(`${y}년 토정비결 — 내년 총운과 12개월 월별 풀이 미리 보기`, `${y} Tojeong — preview next year and all 12 lunar months`) : tr(`${y}년 ${TOJEONG.title}`, `${y} ${TOJEONG.title}`);
+  const title = next ? tr(`[무료] ${y}년 토정비결 — 내년 총운과 12개월 월별 풀이 미리 보기`, `${y} Tojeong — preview next year and all 12 lunar months`) : tr(TOJEONG.title.replace('] ', `] ${y}년 `), `${y} ${TOJEONG.title}`);
   const description = next
     ? tr(`${y}년 ${ko(ganji)}년 토정비결을 미리 확인하세요. 생년월일로 144괘 중 나의 괘를 구해 내년 총운과 음력 1~12월 풀이를 보여 드리고, ${y}년 작괘 기준표도 함께 싣습니다.`, `Preview your ${y} (${ganji}) Tojeong reading. Your birth date selects one of 144 readings with next year’s annual outlook and all 12 lunar months, alongside the ${y} calculation reference.`)
     : tr(`${y}년 ${ko(ganji)}년 ${TOJEONG.description}`, `${y} (${ganji}). ${TOJEONG.description}`);

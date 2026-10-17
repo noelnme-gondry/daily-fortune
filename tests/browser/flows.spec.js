@@ -552,7 +552,7 @@ test('올해·내년 띠별 표의 아이콘·이름·점수 정렬과 좁은 �
 
 test('새 브랜드와 해 로고가 홈·모바일·공유 페이지에 표시되고 파비콘을 읽을 수 있다', async ({ page }) => {
   await ready(page, '/');
-  await expect(page).toHaveTitle(`${BRAND.name} | ${BRAND.descriptor}`);
+  await expect(page).toHaveTitle(`${BRAND.descriptor} | ${BRAND.name}`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(BRAND.name);
   await expect(page.getByRole('link', { name: `${BRAND.name} 홈`, exact: true })).toBeVisible();
   const logo = page.locator('.brand-logo');
