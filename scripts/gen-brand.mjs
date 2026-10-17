@@ -1,4 +1,4 @@
-// 승인된 원본을 그대로 축소해 웹 로고·파비콘·공유 이미지를 만든다.
+// 승인된 원본을 그대로 축소해 웹 로고·홈 화면 아이콘·공유 이미지를 만든다. 파비콘은 gen-favicon.mjs.
 // 재생성: node scripts/gen-brand.mjs
 import fs from 'node:fs/promises';
 import sharp from 'sharp';
@@ -8,13 +8,12 @@ const source = new URL('../assets/brand/sun-logo.png', import.meta.url);
 const publicDir = new URL('../public/', import.meta.url);
 await fs.mkdir(new URL('brand/', publicDir), { recursive: true });
 for (const [file, size] of [
-  ['brand/logo-128.png', 128], ['favicon-32.png', 32],
+  ['brand/logo-128.png', 128],
   ['apple-touch-icon.png', 180], ['icon-192.png', 192], ['icon-512.png', 512],
 ]) {
   await sharp(source.pathname).resize(size, size).png().toFile(new URL(file, publicDir).pathname);
 }
-const favicon = await sharp(source.pathname).resize(96, 96).png().toBuffer();
-await fs.writeFile(new URL('favicon.svg', publicDir), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><image width="96" height="96" href="data:image/png;base64,${favicon.toString('base64')}"/></svg>\n`);
+await import('./gen-favicon.mjs');
 
 const manifestFile = new URL('site.webmanifest', publicDir);
 const manifest = JSON.parse(await fs.readFile(manifestFile, 'utf8'));
