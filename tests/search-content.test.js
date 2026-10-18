@@ -5,7 +5,8 @@ import { createSite } from '../src/site/render.js';
 import { EXAMPLE_INPUT } from '../src/site/public-examples.js';
 import { UNKNOWN_TIME } from '../src/content/calculation-notes.js';
 import { SITE } from '../src/content/pages.js';
-import { buildChart, year, yearMonths, pillarKo, pillarLabel } from '../src/engine/index.js';
+import { buildChart, day, addDays, isoDate, year, yearMonths, pillarKo, pillarLabel } from '../src/engine/index.js';
+import { withLanguage } from '../src/i18n/runtime.js';
 
 const origin = 'https://makeyourownday-fortune.com';
 const site = createSite({ site: origin, assets: { js: '/app.js', css: '/app.css' }, now: Date.UTC(2026, 9, 15, 3) });
@@ -59,6 +60,34 @@ test('시간 미상은 시주를 제외하며 전체 점수가 달라짐을 설�
   const before = buildChart({ ...input, time: '10:30' });
   const unknown = buildChart({ ...input, time: null });
   assert.notDeepEqual(before.pillars.year, unknown.pillars.year);
+});
+
+test('오늘·내일의 공개 예시는 해당 날짜의 실제 개인 운세와 같고 한국 날짜 경계를 따른다', () => {
+  const beforeMidnight = Date.UTC(2026, 11, 31, 14, 59);
+  for (const now of [beforeMidnight, beforeMidnight + 60_000]) {
+    const s = createSite({ site: origin, assets: {}, now });
+    for (const lang of ['ko', 'en']) {
+      withLanguage(lang, () => {
+        const c = buildChart({ ...EXAMPLE_INPUT });
+        for (const mode of ['today', 'tomorrow']) {
+          const date = mode === 'today' ? s.ctx.today : addDays(s.ctx.today, 1);
+          const result = day(c, date, mode);
+          const path = `${lang === 'en' ? '/en' : ''}/${mode}/`;
+          const html = s.render(path);
+          assert.ok(html.includes(`data-example-date="${isoDate(date)}"`), path);
+          assert.ok(html.includes(`<b data-example-overall>${result.overall.score}${lang === 'en' ? ' points' : '점'}</b>`), path);
+          for (const cat of result.cats) {
+            assert.ok(html.includes(`<th scope="row">${cat.name}</th><td>${cat.score}${lang === 'en' ? ' points' : '점'}</td>`), path);
+          }
+          assert.ok(html.includes(result.overall.text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')), path);
+          assert.ok(html.includes('href="#public-example"'), path);
+          assert.ok(html.includes('href="#tool" data-ga-cta="public_example"'), path);
+          assert.ok(html.includes(lang === 'en' ? 'Scores are neither success probabilities' : '점수는 성공 확률이나 예측 정확도가 아닙니다'), path);
+          assert.ok(html.indexOf('class="partner-ad"') < html.indexOf('id="public-example"'), path);
+        }
+      });
+    }
+  }
 });
 
 test('공개 설명을 추가해도 수동 AdSense와 공통 배너의 기존 본문 순서는 유지한다', () => {

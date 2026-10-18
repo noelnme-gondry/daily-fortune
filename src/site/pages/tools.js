@@ -1,4 +1,5 @@
 import { weekdayName, elementName, animalName } from '../../i18n/terms.js';
+import { tr } from '../../i18n/runtime.js';
 import { siteText, displayPillar, siteValue } from '../copy.js';
 // 계산기(도구) 페이지와 홈. 폼과 설명·FAQ는 서버에서 그리고, 결과는 브라우저에서 계산한다.
 import { HOME, TOOLS, SITE, FREE_ACCESS, FREE_FAQ, yearTool } from '../../content/pages.js';
@@ -12,7 +13,7 @@ import { ttiDailyDetail } from '../tti-detail.js';
 import { TIPS } from '../../content/tips.js';
 import { adSlot } from '../layout.js';
 import { birthTimeOptions } from '../../domain/birth-time.js';
-import { manseExample, yearExample } from '../public-examples.js';
+import { dayExample, manseExample, yearExample } from '../public-examples.js';
 import { yearGuide } from '../year-guide.js';
 
 const BAND = (s) => (s >= 75 ? ['high', siteText('대길')] : s >= 60 ? ['good', siteText('길')] : s >= 45 ? ['mid', siteText('평')] : ['low', siteText('주의')]);
@@ -147,7 +148,7 @@ function toolPage(key, ctx, opts = {}) {
     path: t.path, title: t.title, description: t.desc, crumbs: opts.crumbs || [[t.nav, t.path]], section: t.path,
     tool: true, share: false, ld: [webApp(t, ctx), faqLd(faq)],
     supplement: `${opts.example || ''}${opts.guide || ''}`,
-    body: `${hero(t.h1, t.lead, FREE_ACCESS.summary)}${top}${toolBlock(mode, ctx, opts)}${adSlot(ctx, 'inline')}<div class="info-panels">${disclosure('tool-method', siteText('계산 방법과 점수 기준'), howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', siteText('관련 운세와 더 알아보기'), extraAfter) : ''}${disclosure('tool-faq', siteText('자주 묻는 질문'), faqBlock(faq), 'help')}${disclosure('tool-related', siteText('다른 운세 둘러보기'), relatedFor(t.path, ctx))}</div>`,
+    body: `${hero(t.h1, t.lead, FREE_ACCESS.summary)}${top}${['today', 'tomorrow'].includes(mode) ? `<p class="note"><a href="#public-example">${tr('결과 예시와 읽는 법', 'See a worked example and reading guide')}</a></p>` : ''}${toolBlock(mode, ctx, opts)}${adSlot(ctx, 'inline')}<div class="info-panels">${disclosure('tool-method', siteText('계산 방법과 점수 기준'), howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', siteText('관련 운세와 더 알아보기'), extraAfter) : ''}${disclosure('tool-faq', siteText('자주 묻는 질문'), faqBlock(faq), 'help')}${disclosure('tool-related', siteText('다른 운세 둘러보기'), relatedFor(t.path, ctx))}</div>`,
   };
 }
 
@@ -156,6 +157,7 @@ export function today(ctx) {
   const o = ctx.today;
   return toolPage('today', ctx, {
     top: dayBox(o, siteText('오늘')),
+    example: dayExample(o, 'today'),
     after: `<section class="box-sec"><div class="sec-head"><h2>${o.m}${siteText("월 ")}${o.d}${siteText("일 띠별 오늘의 운세")}</h2><a href="/tti/today/">${siteText("전체 보기")}</a></div>${ttiDayList(o, { short: true })}</section>`,
   });
 }
@@ -163,6 +165,7 @@ export function tomorrow(ctx) {
   const o = addDays(ctx.today, 1);
   return toolPage('tomorrow', ctx, {
     top: dayBox(o, siteText('내일')),
+    example: dayExample(o, 'tomorrow'),
     after: `<section class="box-sec"><div class="sec-head"><h2>${o.m}${siteText("월 ")}${o.d}${siteText("일 띠별 운세 미리 보기")}</h2></div>${ttiDayList(o, { short: true, tomorrow: true })}</section>`,
   });
 }
