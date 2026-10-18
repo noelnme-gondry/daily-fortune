@@ -47,7 +47,8 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       const slot = page.locator('[data-partner-ad-slot="common"]');
       await expect(slot).toHaveCount(1);
       await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
-      await expect(page.locator('main + .partner-ad + .site-foot')).toBeVisible();
+      // 공개 예시는 광고와 푸터 사이에 올 수 있지만, 광고는 계속 main 바로 다음이다.
+      await expect(page.locator('main + .partner-ad')).toBeVisible();
       const box = await slot.boundingBox();
       const expectedWidth = Math.min(width, 1160) - 32;
       expect(box.width).toBe(expectedWidth);
@@ -129,7 +130,7 @@ for (const variant of ['A', 'B']) {
   test(`320px 새 예시가 있는 계산기의 ${variant} 광고는 재계산·복원 때 한 개로 유지된다`, async ({ page }) => {
     await page.addInitScript(({ key, variant }) => localStorage.setItem(key, variant), { key: AD_POSITION_EXPERIMENT.storageKey, variant });
     await page.setViewportSize({ width: 320, height: 900 });
-    for (const path of ['/manseryeok/', '/year/2027/', '/tojeong/2027/']) {
+    for (const path of ['/today/', '/tomorrow/', '/manseryeok/', '/year/2027/', '/tojeong/2027/']) {
       await calculateResult(page, path, variant);
       const slot = page.locator('[data-partner-ad-slot]');
       await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
