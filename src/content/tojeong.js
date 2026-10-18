@@ -2,7 +2,7 @@ import { BRAND } from './brand.js';
 import { bilingual } from '../i18n/runtime.js';
 
 export const TOJEONG = bilingual({
-  title: '무료 토정비결 — 올해 총운과 12개월 월별 풀이',
+  title: '[무료] 토정비결 — 올해 총운과 12개월 월별 풀이',
   h1: '무료 토정비결',
   description: '토정비결을 무료로 확인하세요. 생년월일로 144괘 중 나의 괘를 구해 총운과 음력 1~12월 풀이를 보여 드립니다. 양력·음력·윤달 입력을 지원합니다.',
   lead: '생년월일로 찾는 한 해의 이야기. 144괘에 담긴 총운과 음력 열두 달의 흐름을 읽어 보세요. 좋은 흐름과 조심할 대목까지, 모든 해설을 무료로 볼 수 있습니다.',

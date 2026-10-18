@@ -112,7 +112,8 @@ function shareBar(page, url) {
 export function layout(page, ctx) {
   const url = abs(ctx, page.canonicalPath || page.path);
   const ogUrl = page.ogPath ? abs(ctx, page.ogPath) : url;
-  const title = page.path === '/' ? page.title : `${page.title} | ${BRAND.name}`;
+  // 한국어 검색 결과는 사이트 이름을 제목 위에 따로 보여 주므로 제목 끝에 브랜드를 반복하지 않는다.
+  const title = page.path === '/' || ctx.lang !== 'en' ? page.title : `${page.title} | ${BRAND.name}`;
   const image = page.ogImage || '/og-default.png';
   const img = `${ctx.site}${ctx.lang === 'en' ? image.replace(/\.png$/, '-en.png') : image}?v=sun`;
   const cfg = ctx.cfg;

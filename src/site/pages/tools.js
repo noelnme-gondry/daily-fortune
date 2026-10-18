@@ -195,7 +195,7 @@ export function yearPage(y, ctx) {
 export function yearHub(ctx) {
   const ys = [ctx.today.y, ctx.today.y + 1];
   return {
-    path: '/year/', title: siteText('무료 신년운세 — 올해·내년 사주 총운과 월별 운세'), description: `${siteText('회원가입 없이 무료로 보는 ')}${ys.join(siteText('년·'))}${siteText("년 신년운세. 내 사주와 세운·대운으로 계산한 연간 총운과 분야별 점수, 1~12월 월별 운세를 연도별로 확인하세요. 토정비결과의 차이도 안내합니다.")}`,
+    path: '/year/', title: siteText('[무료] 신년운세 — 올해·내년 사주 총운과 월별 운세'), description: `${siteText('회원가입 없이 무료로 보는 ')}${ys.join(siteText('년·'))}${siteText("년 신년운세. 내 사주와 세운·대운으로 계산한 연간 총운과 분야별 점수, 1~12월 월별 운세를 연도별로 확인하세요. 토정비결과의 차이도 안내합니다.")}`,
     crumbs: [[siteText('신년운세'), '/year/']], section: '/year/',
     body: `${hero(siteText('무료 신년운세'), siteText('신년운세는 그 해의 간지(세운)가 내 사주 원국과 맺는 관계로 한 해의 흐름을 봅니다. 연도를 골라 총운과 1~12월 월별 운세를 확인하세요.'), FREE_ACCESS.summary)}<div class="cards">${ys.map((y) => `<a class="card link-card" href="/year/${y}/"><b>${y}${siteText("년 운세")}</b><span>${pillarLabel(yearPillar(y))}${siteText("년 · ")}${animalName(yearPillar(y).b)}${siteText("띠 해")}</span></a>`).join('')}</div><p class="note">${siteText("이곳의 신년운세는 사주 방식으로 계산합니다. 144괘로 한 해를 읽으려면 ")}<a href="/tojeong/">${siteText("무료 토정비결")}</a>${siteText("을 이용하세요. ")}<a href="/about/#tojeong">${siteText("두 방식의 차이")}</a>${siteText("도 확인할 수 있습니다.")}</p>`,
   };
