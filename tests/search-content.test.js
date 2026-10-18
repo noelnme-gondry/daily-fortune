@@ -7,6 +7,8 @@ import { UNKNOWN_TIME } from '../src/content/calculation-notes.js';
 import { SITE } from '../src/content/pages.js';
 import { buildChart, day, addDays, isoDate, year, yearMonths, pillarKo, pillarLabel } from '../src/engine/index.js';
 import { withLanguage } from '../src/i18n/runtime.js';
+import { siteValue } from '../src/site/copy.js';
+import { esc } from '../src/site/util.js';
 
 const origin = 'https://makeyourownday-fortune.com';
 const site = createSite({ site: origin, assets: { js: '/app.js', css: '/app.css' }, now: Date.UTC(2026, 9, 15, 3) });
@@ -68,6 +70,32 @@ test('만세력 경계 사례는 두 입력의 엔진값과 달라진 모든 기
     assert.ok(html.includes(`href="${lang === 'en' ? '/en' : ''}/about/#birth-rules"`));
     assert.match(html, lang === 'en' ? /do not move the birth date forward/ : /날짜를 다음 날로 바꾸지 않습니다/);
   });
+});
+
+test('월별 비교의 점수·십신·강점·해설은 현재·다음 연도의 기존 월별 결과에서 나온다', () => {
+  for (const currentYear of [2026, 2027]) {
+    const s = createSite({ site: origin, assets: {}, now: Date.UTC(currentYear, 9, 15, 3) });
+    for (const y of [currentYear, currentYear + 1]) for (const lang of ['ko', 'en']) withLanguage(lang, () => {
+      const prefix = lang === 'en' ? '/en' : '', points = lang === 'en' ? ' points' : '점';
+      const html = s.render(`${prefix}/year/${y}/`);
+      const months = yearMonths(buildChart({ ...EXAMPLE_INPUT }), y).filter((m) => [5, 11].includes(m.m));
+      assert.equal((html.match(/data-example-month=/g) || []).length, 2);
+      for (const m of months) {
+        const section = html.match(new RegExp(`<section[^>]*data-example-month="${m.m}"[\\s\\S]*?</section>`))[0];
+        assert.ok(section.includes(m.pillarText));
+        assert.ok(section.includes(`data-month-score>${m.score}${points}</b>`));
+        assert.ok(section.includes(`data-month-best>${m.best.name} ${m.best.score}${points}</b>`));
+        assert.ok(section.includes(`<p data-month-explanation>${esc(m.text)}</p>`));
+        for (const tg of [m.tgS, m.tgB]) assert.ok(section.includes(`>${siteValue(tg)}</a>`));
+        for (const [, href] of section.matchAll(/href="([^"]+)"/g)) {
+          assert.ok(href.startsWith(`${prefix}/saju/sipsin/`));
+          assert.ok(s.routes.some((r) => r.path === href), href);
+        }
+        if (lang === 'en') assert.doesNotMatch(section, /[가-힣]/);
+      }
+      assert.match(html, lang === 'en' ? /not everyone’s best or worst months/ : /모든 사람의 최고·최저 월을 뜻하지 않습니다/);
+    });
+  }
 });
 
 test('시간 미상은 시주를 제외하며 전체 점수가 달라짐을 설명한다', () => {

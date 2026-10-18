@@ -528,6 +528,7 @@ select.input { padding-right: 4px; }
 .public-example .table-wrap { min-width: 0; }
 .example-boundary { min-width: 0; display: grid; gap: 14px; }
 .example-boundary h3 { font-size: 17px; }
+.example-month { min-width: 0; display: grid; gap: 14px; padding-block: 14px; border-block-start: 1px solid var(--line); }
 .public-example .grid-table { font-size: 15px; }
 .public-example .grid-table th, .public-example .grid-table td { padding: 9px 10px; }
 .public-example .example-pillars { min-width: 480px; }
