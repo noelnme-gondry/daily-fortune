@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { EXAMPLE_INPUT, MANSE_BOUNDARIES } from '../../src/site/public-examples.js';
 import { buildChart, day, year, yearMonths, pillarH } from '../../src/engine/index.js';
+import { withLanguage } from '../../src/i18n/runtime.js';
 
 test.beforeEach(async ({ context, page }) => {
   await context.route('https://**/*', (route) => route.abort());
@@ -59,6 +60,65 @@ test('KR/EN 만세력 경계의 네 입력은 직접 계산한 원국과 일치�
       await expect(page.locator('#a-d')).toHaveValue(String(input.d));
     }
     await page.locator('[data-delete-profile]').click();
+  }
+});
+
+test('KR/EN 월별 비교는 JS 없이 모바일에서 읽고 실제 백과로 이동할 수 있다', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'ko-KR', javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  await context.route('https://**/*', (route) => route.abort());
+  const page = await context.newPage();
+  try {
+    for (const prefix of ['', '/en']) for (const y of [2026, 2027]) {
+      await page.goto(`http://127.0.0.1:4176${prefix}/year/${y}/`);
+      await expect(page.locator('[data-example-month]')).toHaveCount(2);
+      for (const m of [5, 11]) {
+        const section = page.locator(`[data-example-month="${m}"]`);
+        const heading = await section.getAttribute('aria-labelledby');
+        await expect(section.locator(`#${heading}`)).toHaveCount(1);
+        await expect(page.locator(`#${heading}`)).toHaveCount(1);
+        await expect(section.locator('[data-month-explanation]')).not.toBeEmpty();
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+      const termLink = page.locator('[data-example-month="5"] a').first();
+      const href = await termLink.getAttribute('href');
+      const termName = await termLink.textContent();
+      await termLink.click();
+      await expect(page).toHaveURL(new RegExp(`${href}$`));
+      await expect(page.locator('h1')).toContainText(termName);
+    }
+  } finally { await context.close(); }
+});
+
+test('KR/EN 월별 공개 해설은 직접 계산·재계산·저장 복원 결과와 같다', async ({ page }) => {
+  for (const prefix of ['', '/en']) for (const y of [2026, 2027]) {
+    const lang = prefix ? 'en' : 'ko', points = prefix ? ' points' : '점';
+    const months = withLanguage(lang, () => yearMonths(buildChart({ ...EXAMPLE_INPUT }), y));
+    await page.goto(`${prefix}/year/${y}/`);
+    expect((await events(page)).filter((e) => e[1] === 'calc_result')).toHaveLength(0);
+    await page.locator('[data-ga-cta="public_example"]').click();
+    await enter(page);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      await page.locator('#tool-form button[type="submit"]').click();
+      await expect(page.locator('#result .mcard-top .num')).toHaveText(months.map((m) => String(m.score)));
+      for (const m of months.filter((m) => [5, 11].includes(m.m))) {
+        const example = page.locator(`[data-example-month="${m.m}"]`);
+        await expect(example.locator('[data-month-score]')).toHaveText(`${m.score}${points}`);
+        await expect(example.locator('[data-month-best]')).toHaveText(`${m.best.name} ${m.best.score}${points}`);
+        await expect(example.locator('[data-month-explanation]')).toHaveText(m.text);
+        const result = page.locator('#result .mcard').nth(m.m - 1);
+        await expect(result.locator('p')).toHaveText(m.text);
+        await expect(result.locator('.chip').first()).toContainText(`${m.best.name} ${m.best.score}`);
+      }
+    }
+    const logged = await events(page);
+    expect(logged.filter((e) => e[1] === 'calc_start')).toHaveLength(1);
+    expect(logged.filter((e) => e[1] === 'calc_result').map((e) => e[2].calc_origin)).toEqual(['form', 'form']);
+    expect(JSON.stringify(logged)).not.toMatch(/가상비밀|1990|14:30|score_band/);
+    await page.reload();
+    await expect(page.locator('#result .mcard-top .num')).toHaveText(months.map((m) => String(m.score)));
+    await expect.poll(async () => (await events(page)).filter((e) => e[1] === 'calc_result').map((e) => e[2].calc_origin)).toEqual(['saved']);
+    await page.locator('[data-delete-profile]').click();
+    await expect(page.locator('[data-storage-status]')).toContainText(prefix ? 'Deleted' : '삭제했습니다');
   }
 });
 

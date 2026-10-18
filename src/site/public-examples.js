@@ -3,7 +3,7 @@ import { tr } from '../i18n/runtime.js';
 import { siteText, siteValue } from './copy.js';
 // 공개 설명에만 쓰는 가상 입력. 개인 저장소·요청 매개변수를 읽지 않는다.
 // 결과를 전사하지 않고 실제 계산기와 같은 엔진으로 HTML을 생성한다.
-import { buildChart, day, isoDate, year, yearMonths, pillarLabel } from '../engine/index.js';
+import { buildChart, day, isoDate, year, yearMonths, pillarLabel, TG, TG_SLUG } from '../engine/index.js';
 import { UNKNOWN_TIME } from '../content/calculation-notes.js';
 import { esc } from './util.js';
 
@@ -61,16 +61,31 @@ export function manseExample() {
     <h3>${siteText("같은 생일에 시간을 모른다면")}</h3><p>${siteText("시간 모름으로 다시 계산하면 ")}${unknown.cols.map((p) => `${siteValue(p.label)} ${pillarLabel(p)}`).join(' · ')}${siteText("이며 시주는 없습니다. 겉글자는 ")}${unknown.counts.reduce((a, b) => a + b, 0)}${siteText("개입니다.")}</p><p>${esc(UNKNOWN_TIME.summary)}</p>${end()}`;
 }
 
+function yearMonthExample(m, y) {
+  const points = tr('점', ' points');
+  const tenGodLink = (tg) => `<a href="/saju/sipsin/${TG_SLUG[TG.indexOf(tg)]}/">${siteValue(tg)}</a>`;
+  return `<section class="example-month" data-example-month="${m.m}" aria-labelledby="example-month-${m.m}-title">
+    <h4 id="example-month-${m.m}-title">${tr(`${y}년 ${m.m}월`, `${y} · Month ${m.m}`)}</h4>
+    <p>${tr('대표 월주: ', 'Reference month pillar: ')}${m.pillarText}<br>${tr('천간·지지 십신: ', 'Stem and branch Ten Gods: ')}${tenGodLink(m.tgS)} · ${tenGodLink(m.tgB)}</p>
+    <p>${tr('종합 ', 'Overall: ')}<b data-month-score>${m.score}${points}</b> · ${tr('이 달에서 상대적으로 높은 분야: ', 'Highest-scoring area within this month: ')}<b data-month-best>${m.best.name} ${m.best.score}${points}</b></p>
+    <p data-month-explanation>${esc(m.text)}</p></section>`;
+}
+
 export function yearExample(y, ctx) {
   const c = buildChart({ ...EXAMPLE_INPUT });
   const which = y === ctx.today.y + 1 ? 'next' : 'this';
   const r = year(c, y, which), months = yearMonths(c, y);
   const unknown = year(buildChart({ ...EXAMPLE_INPUT, time: null }), y, which);
+  const comparison = months.filter((m) => [5, 11].includes(m.m));
   return `${start(`${y}${siteText("년 신년운세 계산 예시")}`)}
     <h3>${siteText("실제 계산 결과")}</h3><p>${siteText("대상 연도: ")}${y}${siteText("년 · 세운 ")}${pillarLabel(r.pillar)}${r.daeun ? `${siteText(" · 대운 ")}${pillarLabel(r.daeun)}` : ''}${siteText(". 종합 점수는 ")}<b data-example-overall>${r.overall.score}${siteText("점")}</b>${siteText("입니다.")}</p>
     <div class="table-wrap"><table class="grid-table"><caption>${siteText("가상 사례의 ")}${y}${siteText("년 분야별 점수")}</caption><thead><tr><th scope="col">${siteText("분야")}</th><th scope="col">${siteText("점수")}</th></tr></thead><tbody>${r.cats.map((cat) => `<tr><th scope="row">${cat.name}</th><td>${cat.score}${siteText("점")}</td></tr>`).join('')}</tbody></table></div>
     <p>${siteText("계산된 총운 해설: ")}${esc(r.overall.text)}</p>
     <div class="table-wrap"><table class="grid-table"><caption>${siteText("가상 사례의 ")}${y}${siteText("년 월별 점수")}</caption><thead><tr><th scope="col">${siteText("월")}</th><th scope="col">${siteText("대표 월주")}</th><th scope="col">${siteText("점수")}</th></tr></thead><tbody>${months.map((m) => `<tr><th scope="row">${m.m}${siteText("월")}</th><td>${pillarLabel(m.pillar)}</td><td>${m.score}${siteText("점")}</td></tr>`).join('')}</tbody></table></div>
     <h3>${siteText("읽는 방법")}</h3><p>${siteText("이 사례의 연간 점수는 세운 68%와 대운 32%를 합친 뒤 환산한 값입니다. 월별 점수는 각 달 15일의 절기 월주 65%와 그날의 년주 35%로 별도 계산하므로, 열두 달 점수의 단순 평균이 연간 점수가 되지는 않습니다. 입춘 전인 1월에는 전년도 년주가 반영됩니다.")}</p>
+    <h3>${tr('두 달의 점수와 해설을 함께 읽기', 'Read two months side by side')}</h3>
+    <p>${tr('같은 가상 입력의 5월과 11월을 비교해 보세요. 설명을 위해 고른 두 달이며, 모든 사람의 최고·최저 월을 뜻하지 않습니다. 종합 점수와 그 달에서 상대적으로 높은 분야를 함께 읽으면 분야별 차이를 확인할 수 있습니다.', 'Compare May and November for the same fictional birth details. These months were chosen to illustrate the reading; they are not everyone’s best or worst months. Read the overall score alongside the highest-scoring area within each month to see how the areas differ.')}</p>
+    ${comparison.map((m) => yearMonthExample(m, y)).join('')}
+    <p>${tr('십신은 일간과 월주의 관계를 이해하는 맥락입니다. 위 해설은 기존 월별 계산 결과이며, 특정 십신 하나 때문에 몇 점이 증가하거나 감소했다고 분해한 값은 아닙니다.', 'The Ten Gods describe how the month pillar relates to the Day Master. The explanations above come from the existing monthly calculation; they do not assign a specific point increase or decrease to a single Ten God.')}</p>
     <h3>${siteText("시간 모름으로 바꾸면")}</h3><p>${siteText("나머지 입력을 유지하고 시간 모름을 선택하면 이 사례의 종합 점수는 ")}${unknown.overall.score}${siteText("점입니다. 시주를 제외하면 전체 오행과 관계 계산이 달라질 수 있어, 영향이 자녀운·말년운에만 한정되지 않습니다.")}</p><p>${esc(UNKNOWN_TIME.summary)}</p>${end()}`;
 }
