@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { EXAMPLE_INPUT } from '../../src/site/public-examples.js';
+import { EXAMPLE_INPUT, MANSE_BOUNDARIES } from '../../src/site/public-examples.js';
 import { buildChart, day, year, yearMonths, pillarH } from '../../src/engine/index.js';
 
 test.beforeEach(async ({ context, page }) => {
@@ -8,13 +8,59 @@ test.beforeEach(async ({ context, page }) => {
   await context.addInitScript(() => { window.searchEvents = []; window.gtag = (...args) => window.searchEvents.push(args); });
 });
 
-async function enter(page) {
+async function enter(page, input = EXAMPLE_INPUT) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').fill('가상비밀');
-  for (const key of ['y', 'm', 'd']) await page.locator(`#a-${key}`).selectOption(String(EXAMPLE_INPUT[key]));
-  await page.locator('#a-time').fill(EXAMPLE_INPUT.time);
+  for (const key of ['y', 'm', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
+  await page.locator('#a-time').fill(input.time);
 }
 const events = (page) => page.evaluate(() => window.searchEvents.filter((e) => e[0] === 'event'));
+
+test('KR/EN 만세력 경계 표는 JS 없이 390px에서 탐색하고 유효한 ARIA 대상을 갖는다', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'ko-KR', javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  await context.route('https://**/*', (route) => route.abort());
+  const page = await context.newPage();
+  try {
+    for (const prefix of ['', '/en']) {
+      await page.goto(`http://127.0.0.1:4176${prefix}/manseryeok/`);
+      for (const { id } of MANSE_BOUNDARIES) {
+        const section = page.locator(`[data-boundary="${id}"]`);
+        await expect(section.locator('tbody tr')).toHaveCount(4);
+        await expect(section.locator('[data-changed="true"]')).toHaveCount(id === 'ipchun' ? 3 : 2);
+        const region = section.getByRole('region');
+        await region.focus();
+        await region.press('ArrowRight');
+        await expect.poll(() => region.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+      }
+      expect(await page.evaluate(() => {
+        const root = document.querySelector('#public-example');
+        const ids = [...document.querySelectorAll('[id]')].map((el) => el.id);
+        return [...root.querySelectorAll('[aria-labelledby], [aria-describedby]')].every((el) =>
+          ['aria-labelledby', 'aria-describedby'].every((attr) => (el.getAttribute(attr) || '').split(' ').filter(Boolean).every((id) => ids.filter((other) => other === id).length === 1)));
+      })).toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+      await page.locator('[data-ga-cta="public_example"]').click();
+      await expect(page).toHaveURL(/#tool$/);
+    }
+  } finally { await context.close(); }
+});
+
+test('KR/EN 만세력 경계의 네 입력은 직접 계산한 원국과 일치한다', async ({ page }) => {
+  for (const prefix of ['', '/en']) {
+    await page.goto(`${prefix}/manseryeok/`);
+    await page.locator('[data-ga-cta="public_example"]').click();
+    for (const { input, times } of MANSE_BOUNDARIES) for (const time of times) {
+      const birth = { ...input, time }, c = buildChart(birth);
+      await enter(page, birth);
+      await page.locator('#tool-form button[type="submit"]').click();
+      const chars = await page.locator('#result .pillar-table .char').evaluateAll((nodes) => nodes.map((n) => n.firstChild.textContent));
+      expect(chars.slice(0, 4).join('')).toBe(c.cols.slice().reverse().map((p) => pillarH(p)[0]).join(''));
+      expect(chars.slice(4).join('')).toBe(c.cols.slice().reverse().map((p) => pillarH(p)[1]).join(''));
+      await expect(page.locator('#a-d')).toHaveValue(String(input.d));
+    }
+    await page.locator('[data-delete-profile]').click();
+  }
+});
 
 test('자바스크립트 없이 가상 예시와 연간 기능 이동을 읽고 모바일에서 탐색할 수 있다', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'ko-KR', javaScriptEnabled: false, viewport: { width: 390, height: 844 } });

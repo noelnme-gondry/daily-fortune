@@ -8,6 +8,10 @@ import { UNKNOWN_TIME } from '../content/calculation-notes.js';
 import { esc } from './util.js';
 
 export const EXAMPLE_INPUT = Object.freeze({ gender: 'M', calendar: 'solar', y: 1990, m: 5, d: 17, time: '14:30' });
+export const MANSE_BOUNDARIES = Object.freeze([
+  { id: 'ipchun', input: { gender: 'M', calendar: 'solar', y: 1990, m: 2, d: 4 }, times: ['10:30', '11:30'] },
+  { id: 'night', input: { gender: 'M', calendar: 'solar', y: 1999, m: 12, d: 31 }, times: ['23:20', '23:40'] },
+]);
 const inputText = (p) => `${p.calendar === 'solar' ? siteText('양력') : siteText('음력')} ${p.y}${siteText("년 ")}${p.m}${siteText("월 ")}${p.d}${siteText("일, ")}${p.time || siteText('시간 모름')}, ${p.gender === 'M' ? siteText('남성') : siteText('여성')}`;
 const start = (title, date) => `<section class="card box public-example" id="public-example" aria-labelledby="example-title"${date ? ` data-example-date="${isoDate(date)}"` : ''}><p class="eyebrow">${siteText("실제 엔진으로 계산한 가상 사례")}</p><h2 id="example-title">${title}</h2><p>${siteText("이 사례는 기능 설명을 위해 정한 가상의 입력이며 실존 인물이나 이용자의 저장 정보가 아닙니다.")}</p><h3>${siteText("입력 예시")}</h3><p>${inputText(EXAMPLE_INPUT)}${siteText(". 출생 당시 한국 시계 시각을 입력한 사례입니다.")}</p>`;
 const end = () => `<h3>${siteText("해석의 한계")}</h3><p>${siteText("간지와 점수는 이 서비스의 계산 규칙에 따른 결과입니다. 성격이나 미래 사건이 사실로 확인되었다는 뜻이 아니며, 점수는 성공 확률이나 예측 정확도가 아닙니다.")}</p><p><a href="/about/#birth-rules">${siteText("입력·시간 경계 기준")}</a> · <a href="/about/#limits">${siteText("검증 범위와 해석의 한계")}</a></p><p class="cta"><a class="btn" href="#tool" data-ga-cta="public_example">${siteText("내 정보로 직접 이용하기")}</a></p></section>`;
@@ -27,6 +31,25 @@ export function dayExample(date, which) {
     <p><a href="/manseryeok/">${tr('내 사주 원국 확인하기', 'Check my natal chart')}</a> · <a href="${which === 'tomorrow' ? '/today/' : '/tomorrow/'}">${which === 'tomorrow' ? tr('오늘의 운세와 비교하기', 'Compare with today’s fortune') : tr('내일의 운세도 확인하기', 'Explore tomorrow’s fortune')}</a></p>${end()}`;
 }
 
+function manseBoundaryExample({ id, input, times }) {
+  const [before, after] = times.map((time) => buildChart({ ...input, time }));
+  const title = id === 'ipchun'
+    ? tr('입춘 전후에는 어떤 기둥이 달라질까요?', 'Which pillars change across the start of spring?')
+    : tr('같은 날짜의 밤 11시 30분 전후는 어떻게 다를까요?', 'What changes across 23:30 on the same date?');
+  const explanation = id === 'ipchun'
+    ? tr('년주는 입춘 절입 시각, 월주는 매달 절입 시각을 기준으로 바뀝니다. 이 가상 사례에서는 입춘과 시진 경계를 함께 지나므로 년주·월주·시주가 달라지고 일주는 같습니다.', 'The year pillar changes at the start of spring (Ipchun), and the month pillar changes at a solar-term boundary. This fictional pair crosses both Ipchun and an hour-period boundary, so the year, month and hour pillars change while the day pillar stays the same.')
+    : tr('이 서비스는 동경 127.5° 평균태양시를 기준으로 계산합니다. 현행 한국 표준시·서머타임 미적용에서는 30분을 보정해 23:30부터 다음 날의 일주와 자시를 적용합니다. 두 입력 모두 출생 당시 시계의 날짜와 시각을 그대로 넣으며, 날짜를 다음 날로 바꾸지 않습니다. 과거 표준시·서머타임이나 출생지별 진태양시를 쓰는 방식과는 조건이 다를 수 있습니다.', 'This service uses mean solar time at 127.5°E. Under current Korean Standard Time without daylight saving, it applies a 30-minute correction and uses the next day pillar and Rat hour from 23:30. Enter the original clock date and time for both examples; do not move the birth date forward. Historical time zones, daylight saving and methods using location-specific apparent solar time can have different boundaries.');
+  return `<section class="example-boundary" data-boundary="${id}" aria-labelledby="example-${id}-title">
+    <h3 id="example-${id}-title">${title}</h3>
+    <p>${tr('가상 입력 A: ', 'Fictional input A: ')}${inputText({ ...input, time: times[0] })}<br>${tr('가상 입력 B: ', 'Fictional input B: ')}${inputText({ ...input, time: times[1] })}</p>
+    <p>${explanation}</p>
+    <p class="example-scroll-hint" id="example-${id}-hint">${tr('좁은 화면에서는 표를 좌우로 밀어 두 입력과 변경 여부를 비교하세요.', 'On narrow screens, scroll the table sideways to compare both inputs and the changes.')}</p>
+    <div class="table-wrap" tabindex="0" role="region" aria-labelledby="example-${id}-title" aria-describedby="example-${id}-hint"><table class="grid-table example-pillars"><caption>${title}</caption><thead><tr><th scope="col">${siteText('기둥')}</th><th scope="col">A · ${times[0]}</th><th scope="col">B · ${times[1]}</th><th scope="col">${tr('비교', 'Comparison')}</th></tr></thead><tbody>${before.cols.map((p, i) => {
+    const q = after.cols[i], changed = p.s !== q.s || p.b !== q.b;
+    return `<tr data-changed="${changed}"><th scope="row">${siteValue(p.label)}</th><td>${pillarLabel(p)}</td><td>${pillarLabel(q)}</td><td>${changed ? `<strong>${tr('변경', 'Changed')}</strong>` : tr('같음', 'Same')}</td></tr>`;
+  }).join('')}</tbody></table></div></section>`;
+}
+
 export function manseExample() {
   const c = buildChart({ ...EXAMPLE_INPUT });
   const unknown = buildChart({ ...EXAMPLE_INPUT, time: null });
@@ -34,6 +57,7 @@ export function manseExample() {
     <h3>${siteText("실제 계산 결과")}</h3><p>${c.cols.map((p) => `${siteValue(p.label)} ${pillarLabel(p)}`).join(' · ')}${siteText("입니다.")}</p><p class="example-scroll-hint" id="example-scroll-hint">${siteText("좁은 화면에서는 표를 좌우로 밀어 십신과 12운성을 확인하세요.")}</p><div class="table-wrap" tabindex="0" role="region" aria-label="${siteText("가상 사례 원국 상세 표")}" aria-describedby="example-scroll-hint"><table class="grid-table example-pillars"><caption>${siteText("가상 사례의 사주 원국")}</caption><thead><tr><th scope="col">${siteText("기둥")}</th><th scope="col">${siteText("간지")}</th><th scope="col">${siteText("천간 십신")}</th><th scope="col">${siteText("지지 십신")}</th><th scope="col">${siteText("12운성")}</th></tr></thead><tbody>${c.cols.map((p) => `<tr><th scope="row">${siteValue(p.label)}</th><td>${pillarLabel(p)}</td><td>${siteValue(p.tgS)}</td><td>${siteValue(p.tgB)}</td><td>${siteValue(p.stage)}</td></tr>`).join('')}</tbody></table></div>
     <p>${siteText("겉글자의 오행 개수: ")}${c.counts.map((n, i) => `${elementName(i)} ${siteValue(n)}${siteText("개")}`).join(' · ')}.</p>
     <h3>${siteText("읽는 방법")}</h3><p>${siteText("년주·월주·일주·시주는 출생 년·월·일·시의 간지입니다. 일주의 천간을 일간이라 하고, 십신은 일간과 다른 글자의 관계를 나타냅니다. 오행 개수는 겉글자를 센 값으로, 지장간과 월지 가중치를 반영하는 강약·용신 계산과 구분합니다.")}</p>
+    ${MANSE_BOUNDARIES.map(manseBoundaryExample).join('')}
     <h3>${siteText("같은 생일에 시간을 모른다면")}</h3><p>${siteText("시간 모름으로 다시 계산하면 ")}${unknown.cols.map((p) => `${siteValue(p.label)} ${pillarLabel(p)}`).join(' · ')}${siteText("이며 시주는 없습니다. 겉글자는 ")}${unknown.counts.reduce((a, b) => a + b, 0)}${siteText("개입니다.")}</p><p>${esc(UNKNOWN_TIME.summary)}</p>${end()}`;
 }
 
