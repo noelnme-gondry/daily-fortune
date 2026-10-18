@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { createSite } from '../src/site/render.js';
-import { EXAMPLE_INPUT } from '../src/site/public-examples.js';
+import { EXAMPLE_INPUT, MANSE_BOUNDARIES } from '../src/site/public-examples.js';
 import { UNKNOWN_TIME } from '../src/content/calculation-notes.js';
 import { SITE } from '../src/content/pages.js';
 import { buildChart, day, addDays, isoDate, year, yearMonths, pillarKo, pillarLabel } from '../src/engine/index.js';
@@ -43,6 +43,31 @@ test('공개 가상 사례의 원국·연간·월별 값은 변경 전 엔진 �
     for (const heading of ['입력 예시', '실제 계산 결과', '읽는 방법', '해석의 한계']) assert.ok(html.includes(`<h3>${heading}</h3>`));
     assert.match(html, /href="#tool" data-ga-cta="public_example"/);
   }
+});
+
+test('만세력 경계 사례는 두 입력의 엔진값과 달라진 모든 기둥을 KR/EN 초기 HTML에 표시한다', () => {
+  const golden = [
+    [['기사', '정축', '경자', '신사'], ['경오', '무인', '경자', '임오']],
+    [['기묘', '병자', '정사', '신해'], ['기묘', '병자', '무오', '임자']],
+  ];
+  for (const lang of ['ko', 'en']) withLanguage(lang, () => {
+    const html = site.render(`${lang === 'en' ? '/en' : ''}/manseryeok/`);
+    MANSE_BOUNDARIES.forEach(({ id, input, times }, n) => {
+      const charts = times.map((time) => buildChart({ ...input, time }));
+      assert.deepEqual(charts.map((c) => c.cols.map(pillarKo)), golden[n]);
+      const section = html.match(new RegExp(`<section[^>]*data-boundary="${id}"[\\s\\S]*?</section>`))[0];
+      charts[0].cols.forEach((p, i) => {
+        const q = charts[1].cols[i], changed = p.s !== q.s || p.b !== q.b;
+        assert.ok(section.includes(`<td>${pillarLabel(p)}</td><td>${pillarLabel(q)}</td>`));
+        assert.equal((section.match(/data-changed="true"/g) || []).length, n === 0 ? 3 : 2);
+        assert.ok(section.includes(`data-changed="${changed}"`));
+      });
+      for (const time of times) assert.ok(section.includes(time));
+      assert.ok(section.includes(`aria-describedby="example-${id}-hint"`));
+    });
+    assert.ok(html.includes(`href="${lang === 'en' ? '/en' : ''}/about/#birth-rules"`));
+    assert.match(html, lang === 'en' ? /do not move the birth date forward/ : /날짜를 다음 날로 바꾸지 않습니다/);
+  });
 });
 
 test('시간 미상은 시주를 제외하며 전체 점수가 달라짐을 설명한다', () => {
