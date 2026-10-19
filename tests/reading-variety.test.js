@@ -52,8 +52,8 @@ test('같은 날짜의 띠 해설은 띠 이름을 빼도 문단 전체가 중�
 
 test('같은 일진이 60일 뒤 돌아와도 띠별 활용 예시가 그대로 반복되지 않는다', () => {
   for (let t = 0; t < 12; t++) for (let d = 0; d < 60; d++) {
-    const first = ttiDay(t, addDays(START, d)).text.split('.')[0];
-    const later = ttiDay(t, addDays(START, d + 60)).text.split('.')[0];
+    const first = ttiDay(t, addDays(START, d)).advice;
+    const later = ttiDay(t, addDays(START, d + 60)).advice;
     assert.notEqual(first, later, `${t}번 띠 · ${d}일 뒤`);
   }
 });
