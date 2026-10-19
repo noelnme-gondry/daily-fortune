@@ -657,6 +657,10 @@ p, li { text-wrap: pretty; }
 .tti-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .tti-detail-head { display: flex; gap: 16px; align-items: center; }
 .tti-detail-head .animal-icon { width: 80px; height: 80px; }
+.tti-reading-text { display: grid; gap: 14px; margin-block: 16px; }
+.tti-reading-basis { margin-block: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+.tti-reading-basis > summary { cursor: pointer; font-weight: 600; }
+.tti-reading-basis[open] > summary { margin-bottom: 14px; }
 .tti-factors { display: grid; gap: 14px; }
 .tti-factors section { padding: 16px; background: var(--sunk); border-radius: 12px; }
 .tti-factors h3 { font-size: 17px; }

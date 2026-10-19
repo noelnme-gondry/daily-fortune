@@ -1,6 +1,8 @@
 import { hash, toUTC, DAY_MS } from '../engine/core.js';
 import { tr } from '../i18n/runtime.js';
 import { READING_ACTIONS, SHORT_READING_LABELS, ZODIAC_RELATION, ELEMENT_THEME } from '../content/reading-actions.js';
+import { READING_HEADLINES } from '../content/reading-headlines.js';
+import { zodiacOutlook } from './zodiac-outlook.js';
 
 const localized = (pair) => tr(...pair);
 const FACTOR_THEME = {
@@ -30,21 +32,32 @@ export function readingHeadlines(kind) {
   const rhythms = kind === 'week' ? Object.keys(SHORT_READING_LABELS).filter((key) => key !== 'day')
     : kind === 'today' || kind === 'tomorrow' ? ['day'] : [];
   const actions = Object.values(READING_ACTIONS).flat();
-  return rhythms.flatMap((rhythm) => actions.map((row) => readingHeadline(localized(row[2]), rhythm)));
+  const titles = Object.values(READING_HEADLINES).flat(2).map(localized);
+  return [
+    // 기존에 발급한 공유 링크의 짧은 주제명도 계속 인식한다.
+    ...rhythms.flatMap((rhythm) => actions.map((row) => readingHeadline(localized(row[2]), rhythm))),
+    ...rhythms.flatMap((rhythm) => titles.map((title) => rhythm === 'day' ? title : readingHeadline(title, rhythm))),
+  ];
 }
 
 // 날짜·주차의 순번으로 후보를 순환한다. 조회 이력이나 난수에 의존하지 않는다.
 // 한국어·영어는 같은 id를 선택하며, 문구 선택이 점수 계산에 들어가지 않는다.
-export function readingAction(cat, score, { factor, cycle = 0, identity = '', offset = 0 } = {}) {
+export function readingAction(cat, score, { factor, cycle = 0, identity = '', offset = 0, headlineOffset = 0 } = {}) {
   const all = READING_ACTIONS[cat];
   const theme = factorTheme(factor);
   const matching = theme ? all.filter((row) => row[1].includes(theme)) : all;
   const candidates = matching.length ? matching : all;
   // 12지·60갑자 주기와 2/6개 문구의 순환이 겹쳐 같은 장면에 고정되는 것을 방지한다.
   const rotation = cycle + Math.floor(cycle / 12);
-  const index = ((hash(`${identity}|${cat}|${factor || ''}`) + rotation + offset) % candidates.length + candidates.length) % candidates.length;
+  const position = hash(`${identity}|${cat}|${factor || ''}`) + rotation + offset;
+  const index = ((position % candidates.length) + candidates.length) % candidates.length;
   const [id, , title, active, careful] = candidates[index];
-  return { id: `${cat}-${id}`, title: localized(title), text: localized(score >= 60 ? active : careful) };
+  const actionId = `${cat}-${id}`;
+  const titles = READING_HEADLINES[actionId][score >= 60 ? 0 : 1];
+  // 주제가 한 바퀴 돈 다음 제목의 상황을 바꿔, 같은 나머지 연산에 고정되지 않게 한다.
+  const turn = Math.floor(position / candidates.length) + headlineOffset;
+  const variant = ((turn % titles.length) + titles.length) % titles.length;
+  return { id: actionId, title: localized(title), headline: localized(titles[variant]), text: localized(score >= 60 ? active : careful) };
 }
 
 export function weekRhythm(days, catIndex = null) {
@@ -86,8 +99,9 @@ export function zodiacElementText(e, es) {
     : tr(`지지의 오행은 ${branch}, 천간의 오행은 ${stem}을 함께 살피게 합니다.`, `The branch element emphasizes ${branch}, alongside ${stem} from the stem element.`);
 }
 
-export function zodiacReading({ rel, e, es, score, cycle, offset = 0, identity = '' }) {
+export function zodiacReading({ rel, e, es, score, cycle, offset = 0, headlineOffset = 0, identity = '' }) {
   const focus = zodiacFocus(rel, e, es);
-  const action = readingAction(focus, score, { cycle, offset, identity });
-  return { ...action, text: `${action.text} ${zodiacRelationText(rel)} ${zodiacElementText(e, es)}` };
+  const action = readingAction(focus, score, { cycle, offset, headlineOffset, identity });
+  const { outlook, caution } = zodiacOutlook({ rel, e, es, score });
+  return { ...action, outlook, advice: action.text, caution, text: `${outlook} ${action.text} ${caution}` };
 }

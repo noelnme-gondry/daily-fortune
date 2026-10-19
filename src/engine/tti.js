@@ -9,6 +9,7 @@ import {
 import { yearPillar, monthPillar, dayPillar } from './calendar.js';
 import { bandOf } from './fortune.js';
 import { readingAction, readingCycle, zodiacReading, zodiacRelationText, zodiacElementText } from '../domain/reading.js';
+import { zodiacCategoryOutlook, zodiacYearSummary } from '../domain/zodiac-outlook.js';
 
 const REL_W = { '합': 14, '삼합': 10, '같음': -3, '없음': 0, '충': -14, '형': -8, '원진': -8, '해': -5, '파': -4 };
 const ELEM_W = [2, -2, 4, -5, 6];
@@ -54,21 +55,20 @@ export function ttiYear(tti, y) {
     health: base + (rel === '충' || rel === '형' ? -6 : 0) + (sj ? -4 : 0) + (e === 4 ? 4 : 0),
   };
   const score = clamp(Math.round(base), 28, 95);
-  const P = tr(`${y}년에는`, `In ${y}`);
   const context = { cycle: y, offset: sceneOffset(tti, yp), identity: `zodiac-year|${rel}|${e}|${es}` };
   const cats = Object.entries(raw).map(([cat, v]) => {
     const s = clamp(Math.round(v), 25, 96);
     const factor = cat === 'love' && (dohwa || hong) ? '도화' : cat === 'move' && yeokma ? '역마'
       : rel === '없음' || rel === '같음' ? ['비견', '식신', '정재', '정관', '정인'][e] : rel;
     const action = readingAction(cat, s, { ...context, factor });
-    return { key: cat, name: T.catName[cat], score: s, text: tr(`${P} 살펴볼 주제는 ‘${action.title}’입니다. ${action.text}`, `${P}, consider ${action.title.toLowerCase()}. ${action.text}`) };
+    return { key: cat, name: T.catName[cat], score: s, text: `${zodiacCategoryOutlook(cat, s)} ${action.text}` };
   });
-  const a = animalName(tti), Y = tr(`${pillarLabel(yp).slice(0, 2)}년`, `${pillarLabel(yp)} year`);
-  const parts = [fill(TT.yearRel[rel], { a, Y }), fill(TT.yearElem[e], { a })];
-  if (sj) parts.push(tr(`${a}띠에게 ${y}년은 ${TT.samjae[sj.idx]}`, `For ${a}, ${y} is ${TT.samjae[sj.idx]}`));
-  if (dohwa) parts.push(tr('도화가 드는 해라 이성의 관심과 인기가 높아집니다.', 'Peach Blossom highlights romantic attention and popularity.'));
-  if (yeokma) parts.push(tr('역마가 드는 해라 이동·출장·이사 등 움직임이 많습니다.', 'Travel Horse highlights trips, moving and changes of place.'));
-  if (hong) parts.push(tr('홍란·천희가 드는 해라 연애와 혼사에 경사가 생기기 쉽습니다.', 'Red Matchmaker and Heavenly Joy highlight happy relationship and marriage themes.'));
+  const a = animalName(tti);
+  const basis = [zodiacRelationText(rel), zodiacElementText(e, es)];
+  if (sj) basis.push(tr(`${sj.name}에 해당해 종합·재물·건강 점수에 감점을 반영했습니다.`, `${sj.name} is reflected as a reduction in the overall, money and wellbeing scores.`));
+  if (dohwa) basis.push(tr('도화를 애정 점수의 가점 요인으로 반영했습니다.', 'Peach Blossom contributes positively to the love score.'));
+  if (yeokma) basis.push(tr('역마를 이동 점수의 가점 요인으로 반영했습니다.', 'Travel Horse contributes positively to the travel score.'));
+  if (hong) basis.push(tr('홍란·천희를 애정 점수의 가점 요인으로 반영했습니다.', 'Red Matchmaker or Heavenly Joy contributes positively to the love score.'));
   const good = [], caution = [];
   for (let m = 1; m <= 12; m++) {
     const r = relKey(monthPillar({ y, m, d: 15 }).b, tti);
@@ -88,27 +88,43 @@ export function ttiYear(tti, y) {
     cohorts.push({ birthYear: by, pillar: bp, pillarText: pillarLabel(bp), age, tg, score: clamp(Math.round(base + COHORT_W[tg]), 25, 96), text: `${TT.cohort[tg]} ${focus}` });
   }
   const focus = zodiacReading({ rel, e, es, score, ...context });
-  const headline = tr(`한 해의 초점 · ${focus.title}`, `Annual focus · ${focus.title}`);
+  const headline = focus.headline;
   return {
     tti, animal: a, year: y, pillar: yp, pillarText: pillarLabel(yp), rel, samjae: sj, score, headline,
-    summary: parts.join(' '), cats, goodMonths: good, cautionMonths: caution,
+    summary: zodiacYearSummary(cats), basis: basis.join(' '), cats, goodMonths: good, cautionMonths: caution,
     lucky: { el: luckyEl, color: E.color.join('·'), number: E.number.join('·'), dir: E.dir }, cohorts,
   };
 }
 
-export function ttiDay(tti, o) {
-  const dp = dayPillar(o);
+function ttiDayState(tti, dp, mp) {
   const rel = relKey(dp.b, tti);
   const e = elRel(BR_EL[tti], BR_EL[dp.b]);
   const es = elRel(BR_EL[tti], STEM_EL[dp.s]);
-  const mrel = relKey(monthPillar(o).b, tti);
+  const mrel = relKey(mp.b, tti);
   const score = clamp(Math.round(60 + REL_W[rel] * 0.95 + ELEM_W[e] * 0.9 + ELEM_W[es] * 0.5 + REL_W[mrel] * 0.25), 22, 97);
+  return { rel, e, es, score };
+}
+
+export function ttiDay(tti, o) {
+  const dp = dayPillar(o), mp = monthPillar(o), cycle = readingCycle(o);
+  const state = ttiDayState(tti, dp, mp);
+  const { rel, score } = state;
+  const context = { ...state, cycle, offset: sceneOffset(tti, dp), identity: 'zodiac-day' };
+  const action = zodiacReading(context);
+  // 서로 다른 합충도 같은 행동 주제를 고를 수 있다. 같은 날짜·주제·점수대의
+  // 앞선 띠 수만큼 제목만 순환하여 목록에서 제목이 겹치지 않게 한다.
+  let headlineOffset = 0;
+  for (let t = 0; t < tti; t++) {
+    const otherState = ttiDayState(t, dp, mp);
+    const other = zodiacReading({ ...otherState, cycle, offset: sceneOffset(t, dp), identity: 'zodiac-day' });
+    if (other.id === action.id && (otherState.score >= 60) === (score >= 60)) headlineOffset++;
+  }
   const key = `ttid${tti}|${o.y}-${o.m}-${o.d}`;
   const a = animalName(tti);
   const band = bandOf(score);
-  const { text } = zodiacReading({ rel, e, es, score, cycle: readingCycle(o), offset: sceneOffset(tti, dp), identity: 'zodiac-day' });
+  const { text, headline, outlook, advice, caution } = zodiacReading({ ...context, headlineOffset });
   const E = T.element[(BR_EL[tti] + 4) % 5];
-  return { tti, animal: a, score, band, rel, text, color: pick(E.color, key + 'c'), number: pick(E.number, key + 'n') };
+  return { tti, animal: a, score, band, rel, headline, outlook, advice, caution, text, color: pick(E.color, key + 'c'), number: pick(E.number, key + 'n') };
 }
 
 // 일별 총점과 같은 요인을 상세 화면에 그대로 공개한다.

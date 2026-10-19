@@ -189,7 +189,7 @@ function buildReport(c, comb, kind, ctx) {
       used.set(counter[0], (used.get(counter[0]) || 0) + 1);
     }
     if (ctx.previous) parts.push(dayChangeText(sc.cats[i], ctx.previous.cats[i]));
-    return { ...base, focus: action.title, actionId: action.id, text: parts.join(' ') };
+    return { ...base, focus: action.headline, actionId: action.id, text: parts.join(' ') };
   });
   const ranked = cats.slice().sort((a, b) => b.score - a.score);
   const lines = [];
@@ -203,7 +203,7 @@ function buildReport(c, comb, kind, ctx) {
   lines.push(tr(`${top.name}(${top.score}점)이 가장 돋보이고, ${josa(`${low.name}(${low.score}점)`, '은/는')} 한 번 더 살피는 편이 좋습니다.`, `${top.name} (${top.score}) stands out most, while ${low.name} (${low.score}) deserves extra attention.`));
   const focus = sc.overall >= 58 ? top : low;
   const title = shortPeriod
-    ? readingHeadline(focus.focus, ctx.days ? weekRhythm(ctx.days).kind : 'day')
+    ? ctx.days ? readingHeadline(focus.focus, weekRhythm(ctx.days).kind) : focus.focus
     : headline(sc, ctx.unit);
   return {
     kind, key: ctx.key, label: ctx.label,
