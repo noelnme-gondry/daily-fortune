@@ -10,13 +10,17 @@ import { JOB_BY_ID } from '../../content/character-jobs.js';
 import { READINGS } from '../../content/tojeong-readings.js';
 import { tojeongHeadline } from '../../content/tojeong.js';
 import { TOJEONG_RANGE } from '../../domain/tojeong.js';
+import { readingHeadlines } from '../../domain/reading.js';
 import { TG, sexagenary, iljuSlug, pillarH, COMPAT_HEADLINES, TIERS, parseISO } from '../../engine/index.js';
 import { SHARE_KINDS, cleanName, ADJ_FLAT } from '../share-codec.js';
 import { esc } from '../util.js';
 
 const UNITS = { today: '날', tomorrow: '날', week: '한 주', month: '한 달', year: '한 해' };
 const EN_UNITS = { today: 'Day', tomorrow: 'Day', week: 'Week', month: 'Month', year: 'Year' };
-const headlinesFor = (kind, lang) => withLanguage(lang, () => [...Object.values(T.headTop), ...Object.values(T.headLow)].map((h) => lang === 'en' ? `${EN_UNITS[kind]}: ${h}` : `${h} ${UNITS[kind]}`));
+const headlinesFor = (kind, lang) => withLanguage(lang, () => [
+  ...[...Object.values(T.headTop), ...Object.values(T.headLow)].map((h) => lang === 'en' ? `${EN_UNITS[kind]}: ${h}` : `${h} ${UNITS[kind]}`),
+  ...readingHeadlines(kind),
+]);
 // Validate both languages, then display the corresponding approved headline.
 function localizedHeadline(value, valuesFor) {
   const ko = valuesFor('ko'), en = valuesFor('en');

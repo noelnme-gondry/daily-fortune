@@ -9,6 +9,7 @@ import {
 } from './core.js';
 import { dayPillar, monthPillar, yearPillar, yearPillarOfDate, lunarText } from './calendar.js';
 import { daeunAt } from './chart.js';
+import { readingAction, readingCycle, readingHeadline, dayChangeText, weekRhythm } from '../domain/reading.js';
 
 export const CATS = ['career', 'money', 'love', 'move', 'health', 'social', 'study'];
 const CAT_W = [1, 1, 1, 0.6, 0.9, 0.8, 0.6];
@@ -168,18 +169,45 @@ function buildReport(c, comb, kind, ctx) {
   const sc = scoresOf(comb, kind);
   const key = c.key + '|' + ctx.key;
   const used = new Map();
-  const cats = CATS.map((cat, i) => ({ key: cat, name: T.catName[cat], score: sc.cats[i], text: catText(c, cat, comb.acc[i], sc.cats[i], ctx.P, key, used) }));
+  const shortPeriod = kind === 'day' || kind === 'week';
+  const cats = CATS.map((cat, i) => {
+    const base = { key: cat, name: T.catName[cat], score: sc.cats[i] };
+    if (!shortPeriod) return { ...base, text: catText(c, cat, comb.acc[i], sc.cats[i], ctx.P, key, used) };
+    // 일간 해설은 매일 달라지는 일진의 요인을 먼저 읽는다. 월·년 배경에 가려지지 않게 한다.
+    const { pos, neg, posG, negG } = topFactors(c, cat, ctx.dayFactors?.[i] || comb.acc[i]);
+    const positive = sc.cats[i] >= 60;
+    // 요약 점수대에 해당하는 요인이 없더라도 실제 존재하는 반대 요인을 설명한다.
+    const main = positive ? pos || posG || neg || negG : neg || negG || pos || posG;
+    const action = readingAction(cat, sc.cats[i], { factor: main?.[0], cycle: ctx.cycle, identity: c.key });
+    const parts = [];
+    if (ctx.days) parts.push(weekRhythm(ctx.days, i).text);
+    parts.push(action.text);
+    if (main) parts.push((ctx.dayFactors ? tr('일진에서는 ', 'In the day pillar: ') : '') + factorText(c, cat, main[0], main[1]));
+    const counter = main?.[1] > 0 ? neg : pos;
+    if (counter && Math.abs(counter[1]) > 0.6 && (used.get(counter[0]) || 0) < 2) {
+      parts.push(tr('함께 살필 점은 다음과 같습니다. ', 'Also consider: ') + factorText(c, cat, counter[0], counter[1]));
+      used.set(counter[0], (used.get(counter[0]) || 0) + 1);
+    }
+    if (ctx.previous) parts.push(dayChangeText(sc.cats[i], ctx.previous.cats[i]));
+    return { ...base, focus: action.title, actionId: action.id, text: parts.join(' ') };
+  });
   const ranked = cats.slice().sort((a, b) => b.score - a.score);
   const lines = [];
   if (ctx.intro) lines.push(ctx.intro);
-  lines.push(favSentence(c, comb.L));
-  const sp = strongestSpecial(comb);
-  if (sp) lines.push(sp);
+  if (!shortPeriod) {
+    lines.push(favSentence(c, comb.L));
+    const sp = strongestSpecial(comb);
+    if (sp) lines.push(sp);
+  }
   const top = ranked[0], low = ranked[ranked.length - 1];
   lines.push(tr(`${top.name}(${top.score}점)이 가장 돋보이고, ${josa(`${low.name}(${low.score}점)`, '은/는')} 한 번 더 살피는 편이 좋습니다.`, `${top.name} (${top.score}) stands out most, while ${low.name} (${low.score}) deserves extra attention.`));
+  const focus = sc.overall >= 58 ? top : low;
+  const title = shortPeriod
+    ? readingHeadline(focus.focus, ctx.days ? weekRhythm(ctx.days).kind : 'day')
+    : headline(sc, ctx.unit);
   return {
     kind, key: ctx.key, label: ctx.label,
-    overall: { score: sc.overall, headline: headline(sc, ctx.unit), text: lines.join(' ') },
+    overall: { score: sc.overall, headline: title, text: lines.join(' ') },
     cats, lucky: lucky(c, key),
   };
 }
@@ -205,9 +233,11 @@ function dayComb(c, o) {
 }
 export function day(c, o, which = 'today') {
   const { dEv, comb } = dayComb(c, o);
+  const previous = scoresOf(dayComb(c, addDays(o, -1)).comb, 'day');
   const word = which === 'tomorrow' ? tr('내일', 'Tomorrow') : tr('오늘', 'Today');
   const r = buildReport(c, comb, 'day', {
     key: `d${o.y}-${o.m}-${o.d}`, P: tr(`${word}은`, word), unit: tr('날', 'Day'), label: fmtDate(o),
+    cycle: readingCycle(o), dayFactors: dEv.acc, previous,
     intro: introFor(c, dEv, tr(`${word}은 ${pillarLabel(dEv.p)}일입니다.`, `${word} is a ${pillarLabel(dEv.p)} day.`)),
   });
   r.date = o; r.pillar = dEv.p; r.pillarText = tr(`${pillarLabel(dEv.p)}일`, `${pillarLabel(dEv.p)} day`); r.lunar = lunarText(o);
@@ -225,12 +255,10 @@ export function week(c, o) {
     parts.push([comb, 1 / 7]);
   }
   const comb = combine(parts);
-  const best = days.slice().sort((a, b) => b.score - a.score)[0];
-  const worst = days.slice().sort((a, b) => a.score - b.score)[0];
   const end = addDays(start, 6);
   const r = buildReport(c, comb, 'week', {
     key: `w${start.y}-${start.m}-${start.d}`, P: tr('이번 주는', 'This week'), unit: tr('한 주', 'Week'), label: `${fmtShort(start)} ~ ${fmtShort(end)}`,
-    intro: tr(`이번 주 일곱 날 가운데 ${best.label}요일(${best.short}, ${best.pillarText}일)의 기운이 가장 좋고, ${worst.label}요일(${worst.short})은 한 템포 쉬어 가는 편이 좋습니다.`, `Of the seven days this week, ${best.label} (${best.short}, ${best.pillarText}) has the strongest reading. Allow a slower pace on ${worst.label} (${worst.short}).`),
+    cycle: readingCycle(start, 'week'), days, intro: weekRhythm(days).text,
   });
   r.start = start; r.days = days;
   r.bestByCat = CATS.map((cat, i) => { const b = days.slice().sort((x, y) => y.cats[i] - x.cats[i])[0]; return { cat, name: T.catName[cat], day: b.label, short: b.short }; });
