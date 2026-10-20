@@ -1,3 +1,4 @@
+import { completeProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { todayKST } from '../../src/engine/core.js';
 import { buildChart, lifetime, month, year, sajuRank } from '../../src/engine/index.js';
@@ -24,8 +25,9 @@ async function calculate(page, persist = false) {
   await page.locator('input[name="a-tmode"][value="branch"]').check();
   await page.locator('#a-branch').selectOption('3');
   await page.locator('#save-device').setChecked(persist);
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('#result .chart-card')).toBeVisible();
+  await expect(page.locator('#result .chart-card')).toBeAttached();
 }
 async function calculateExact(page) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
@@ -37,8 +39,9 @@ async function calculateExact(page) {
   await page.locator('#a-notime').uncheck();
   await page.locator('input[name="a-tmode"][value="exact"]').check();
   await page.locator('#a-time').fill('03:40');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('#result .chart-card, #result .report-head').first()).toBeVisible();
+  await expect(page.locator('#result [data-result-summary]').first()).toBeVisible();
 }
 async function saved(page, who = 'a') {
   return page.evaluate((who) => new Promise((resolve, reject) => {
@@ -117,6 +120,7 @@ test('평생 주요 시기의 연도를 누르면 실제 점수와 선정 이유
   await expect(page.getByRole('dialog')).toContainText('건강 점수가 아니라 종합 점수');
   await page.getByRole('button', { name: '닫기', exact: true }).click();
   await page.locator('#a-y').selectOption('1991');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   const updated = buildChart({ gender: 'F', calendar: 'solar', y: 1991, m: 1, d: 28, time: '03:40' });
   const nextYear = lifetime(updated, { y: 2026, m: 10, d: 14 }).events.find((g) => g.key === 'money').items[0].y;
@@ -224,7 +228,7 @@ test('묘시 입력 · 저장 선택 · 새 탭 복원 · 삭제', async ({ page
   await expect(next.locator('#a-name')).toHaveValue('검증');
   await expect(next.locator('#a-branch')).toHaveValue('3');
   await expect(next.locator('#a-branch')).toBeVisible();
-  await expect(next.locator('#result .chart-card')).toBeVisible();
+  await expect(next.locator('#result .chart-card')).toBeAttached();
   await next.locator('[data-delete-profile]').click();
   await expect(next.locator('[data-storage-status]')).toContainText('삭제했습니다');
   expect(await saved(next)).toBeNull();
@@ -343,6 +347,7 @@ test('나쁜 운세 챕터: 몰락 캐릭터와 실패 서사·낮은 분야의 
   await page.locator('#a-d').selectOption('1');
   await page.locator('input[name="a-tmode"][value="branch"]').check();
   await page.locator('#a-branch').selectOption('3');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   const card = page.locator('.chapter-card').nth(4);
   await expect(card).toContainText('시련기 · 흐름 44점');
@@ -372,6 +377,7 @@ test('명예의 전당은 시간 제외 기준으로 고정되고 모든 분야�
   await calculateExact(page);
   for (const kind of ['four', 'three']) {
     await page.locator('#a-notime').setChecked(kind === 'three');
+    await completeProfile(page);
     await page.locator('button[type="submit"]').click();
     for (const [category, rows] of Object.entries(LEADERS.three)) {
       await page.locator('[data-leader-category]').selectOption(category);
@@ -393,6 +399,7 @@ test('명예의 전당은 시간 제외 기준으로 고정되고 모든 분야�
     const before = await page.locator('.leader-button').allTextContents();
     await page.locator('#a-y').selectOption(kind === 'four' ? '1991' : '1992');
     await page.locator(`input[name="a-gender"][value="${kind === 'four' ? 'M' : 'F'}"]`).check();
+    await completeProfile(page);
     await page.locator('button[type="submit"]').click();
     await expect(page.locator('.leader-button')).toHaveText(before);
   }
@@ -423,10 +430,11 @@ test('개인 랭킹은 출생시간을 반영하고 명예의 전당 비교 점�
       await page.locator('input[name="a-tmode"][value="exact"]').check();
       await page.locator('#a-time').fill(time.time);
     }
+    await completeProfile(page);
     await page.locator('button[type="submit"]').click();
     const personal = sajuRank(buildChart({ ...input, ...time }), RANK_TABLE);
     await expect(page.locator('.rank-head .rank-num')).toHaveText(`${personal.rank.toLocaleString('ko-KR')}위`);
-    await expect(page.locator('.rank-head + .box h3 .num')).toHaveText(String(personal.total));
+    await expect(page.locator('.rank-head ~ .box h3 .num')).toHaveText(String(personal.total));
     await expect(page.locator('.rank-leaders > .hint')).toContainText('출생시간을 제외');
     for (const [category, rows] of Object.entries(LEADERS.three)) {
       await page.locator('[data-leader-category]').selectOption(category);
@@ -585,11 +593,12 @@ test('결과 이미지 저장에도 해 로고가 로드되고 PNG가 생성된�
   await ready(page, '/today/');
   await calculateExact(page);
   const logoResponse = page.waitForResponse((r) => r.url().endsWith('/icon-192.png?v=sun') && r.status() === 200);
+  await page.evaluate(() => Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => false }));
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: '이미지 저장', exact: true }).click();
   await logoResponse;
   expect((await download).suggestedFilename()).toBe('make-your-own-day-today.png');
-  await expect(page.locator('#result')).toContainText('이미지를 저장했습니다.');
+  await expect(page.locator('#result')).toContainText('이미지 다운로드를 시작했습니다.');
 });
 
 test('홈의 주요 콘텐츠가 입력 폼 옆에 보이고 첫 영역이 과하게 늘어나지 않는다', async ({ page }) => {
@@ -603,7 +612,8 @@ test('홈의 주요 콘텐츠가 입력 폼 옆에 보이고 첫 영역이 과�
   await expect(page.locator('.home-feature')).toHaveCount(3);
   const name = await page.locator('#a-name').boundingBox();
   const gender = await page.locator('.field-gender .seg').boundingBox();
-  expect(Math.abs(name.y - gender.y)).toBeLessThan(1);
+  expect(name.y).toBeGreaterThan(gender.y);
+  expect((await page.locator('#a-y').boundingBox()).y).toBeLessThan(gender.y);
   for (const width of [320, 768, 1024]) {
     await page.setViewportSize({ width, height: 960 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
@@ -701,6 +711,7 @@ test('홈 입력 전달 · 궁합 두 사람 시진과 시간 모름 · 저장 �
   await ready(page, '/');
   await page.locator('input[name="a-tmode"][value="branch"]').check();
   await page.locator('#a-branch').selectOption('3');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page).toHaveURL(/\/today\/$/);
   await expect(page.locator('.chart-head')).toContainText('묘시');
@@ -709,6 +720,7 @@ test('홈 입력 전달 · 궁합 두 사람 시진과 시간 모름 · 저장 �
   await page.locator('#b-notime').check();
   await expect(page.locator('#b-time')).toBeDisabled();
   await page.locator('#save-device').check();
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#result .report-head')).toBeVisible();
   await expect(page.locator('#result .report-head .hz')).toHaveCount(2);
@@ -723,6 +735,7 @@ test('작은 화면 캐릭터 상세 · 툴팁 경계 · 키보드 포커스', a
   await page.setViewportSize({ width: 320, height: 760 });
   await ready(page, '/life-story/');
   await calculateExact(page);
+  await page.locator('.chart-disclosure > summary').click();
   const info = page.getByRole('button', { name: '용신 설명', exact: true });
   // 결과로 이동하는 부드러운 스크롤이 끝나고 버튼 위치가 안정된 뒤 포커스한다.
   await info.scrollIntoViewIfNeeded();
@@ -746,6 +759,7 @@ test('잘못된 날짜는 저장하지 않고 음력 선택·시진 계산을 �
   await ready(page, '/today/');
   await page.locator('#a-m').selectOption('2'); await page.locator('#a-d').selectOption('31');
   await page.locator('#save-device').check();
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('.form-error')).toContainText('31일이 없습니다');
   expect(await saved(page)).toBeNull();
@@ -754,6 +768,7 @@ test('잘못된 날짜는 저장하지 않고 음력 선택·시진 계산을 �
   await page.locator('input[name="a-tmode"][value="branch"]').check();
   await page.locator('#a-branch').selectOption('n0');
   await expect(page.locator('#a-leap')).toBeEnabled();
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('.chart-head')).toContainText('자시 · 23:30~24:00 (다음 날 일주)');
   await expect(page.locator('[data-storage-status]')).toContainText('이 기기에 저장했습니다');

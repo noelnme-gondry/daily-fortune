@@ -12,18 +12,30 @@ let stopResultTracking;
 let resultReady = false;
 
 // 재계산으로 결과 HTML을 교체해도 기존 광고 지면을 한 개만 유지한다.
-export function renderResultWithPartnerAd(out, html) {
+export function clearResultWithPartnerAd(out) {
+  stopResultTracking?.();
+  stopTracking?.();
+  resultReady = false;
+  const ad = out.querySelector('.partner-ad');
+  if (ad) document.querySelector('main').after(ad);
+  out.replaceChildren();
+}
+export function renderResultWithPartnerAd(out, html, resultParams = {}) {
   stopResultTracking?.();
   resultReady = false;
   const ad = document.querySelector('.partner-ad');
   out.innerHTML = html;
   localizeClientLinks(out);
+  const summary = out.querySelector(':scope > [data-result-summary], :scope > .report-head, :scope > .tojeong-summary, :scope > .chart-card, :scope > .life > .wide') || out.firstElementChild;
+  summary?.setAttribute('data-result-summary', '');
+  const start = summary?.querySelector('[data-result-heading], h2, h3');
+  if (start) stopResultTracking = observeView(start, 'result_view', resultViewedPaths, { measurement_version: '2', ...resultParams }, `${location.pathname}:${resultParams.reading_date || ''}`);
   if (!ad) return;
   const share = out.querySelector('.result-share + .hint');
   const experiment = adExperimentParams();
   if (share) {
     if (experiment.experiment_variant === 'B') out.prepend(ad);
-    else share.after(ad);
+    else summary.after(ad);
     resultReady = true;
     if (experiment.experiment_id) {
       const path = location.pathname;
@@ -31,9 +43,6 @@ export function renderResultWithPartnerAd(out, html) {
         exposedPaths.add(path);
         track('ad_experiment_exposure', { page_path: path });
       }
-      // 큰 결과 카드 전체 대신 첫 제목의 도달을 측정한다. 읽기를 끝냈다는 뜻은 아니다.
-      const start = out.querySelector('h2');
-      if (start) stopResultTracking = observeView(start, 'result_view', resultViewedPaths);
     }
   } else document.querySelector('main').after(ad);
   initAdSlotTracking();
@@ -71,13 +80,13 @@ export function initAdSlotTracking() {
   });
 }
 
-function observeView(target, eventName, seen, params = {}) {
+function observeView(target, eventName, seen, params = {}, viewKey = location.pathname) {
   const path = location.pathname;
-  if (seen.has(path) || !window.IntersectionObserver) return;
+  if (seen.has(viewKey) || !window.IntersectionObserver) return;
   let visible = false;
   const report = () => {
-    if (!visible || document.visibilityState !== 'visible' || seen.has(path)) return;
-    seen.add(path);
+    if (!visible || document.visibilityState !== 'visible' || seen.has(viewKey)) return;
+    seen.add(viewKey);
     track(eventName, {
       ...params,
       page_path: path, page_location: `${location.origin}${path}`, page_title: document.title,

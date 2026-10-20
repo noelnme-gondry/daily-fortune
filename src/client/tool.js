@@ -16,7 +16,10 @@ import { track, trackInputStart } from './analytics.js';
 import { birthTimeOptions, normalizeBranch, branchOfTime } from '../domain/birth-time.js';
 import { compatMatchesShell, mountCompatMatches } from './compat-matches-view.js';
 import { mountRankLeaders } from './rank-leaders-view.js';
-import { renderResultWithPartnerAd } from './partner-ad.js';
+import { renderResultWithPartnerAd, clearResultWithPartnerAd } from './partner-ad.js';
+import { toolNavigation, nextToolsHtml } from '../site/tool-navigation.js';
+import { esc } from '../site/util.js';
+import { refreshPeriodContext } from './period-context.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const sexIdx = (p) => [...Array(60).keys()].find((n) => n % 10 === p.s && n % 12 === p.b);
@@ -36,7 +39,9 @@ function syncTime(form, who, want) {
   if (!f('branch')) return;
   const mode = $(`input[name="${who}-tmode"]:checked`, form).value;
   const noTime = f('notime').checked;
-  const { off, note } = birthTimesFor({ calendar: $(`input[name="${who}-cal"]:checked`, form).value, leap: f('leap').checked, y: +f('y').value, m: +f('m').value, d: +f('d').value });
+  const { off, note } = f('y').value && f('m').value && f('d').value
+    ? birthTimesFor({ calendar: $(`input[name="${who}-cal"]:checked`, form).value, leap: f('leap').checked, y: +f('y').value, m: +f('m').value, d: +f('d').value })
+    : { off: 540, note: '' };
   const opts = birthTimeOptions(off);
   const current = normalizeBranch(want ?? f('branch').value);
   const sameBranch = (v) => v != null && opts.find((o) => o.branch === +String(v).replace(/^[np]/, ''));
@@ -80,12 +85,11 @@ function readForm(form, who) {
     noTime: f('notime').checked,
   };
 }
-const check = (p) => (p.calendar === 'solar' && p.d > daysIn(p.y, p.m) ? tr(`${p.y}년 ${p.m}월에는 ${p.d}일이 없습니다.`, `Day ${p.d} does not exist in ${p.y}-${p.m}.`)
+const check = (p) => (!p.y || !p.m || !p.d ? tr('생년월일을 모두 선택해 주세요.', 'Select your birth year, month and day.')
+  : p.calendar === 'solar' && p.d > daysIn(p.y, p.m) ? tr(`${p.y}년 ${p.m}월에는 ${p.d}일이 없습니다.`, `Day ${p.d} does not exist in ${p.y}-${p.m}.`)
   : !p.noTime && p.timeMode === 'exact' && !/^\d{1,2}:\d{2}$/.test(p.time || '') ? tr("태어난 시각을 입력하거나 ‘시간을 몰라요’를 선택해 주세요.", "Enter a birth time or select “I don’t know the time”.") : '');
 function navTabs(mode, today) {
-  const y = today.y;
-  const items = [['today', '/today/', '오늘'], ['tomorrow', '/tomorrow/', '내일'], ['week', '/week/', '이번 주'], ['month', '/month/', '이번 달'], [`year${y}`, `/year/${y}/`, `${y}년`], [`year${y + 1}`, `/year/${y + 1}/`, `${y + 1}년`], ['lifetime', '/lifetime/', '평생'], ['story', '/life-story/', '인생 캐릭터'], ['rank', '/saju-ranking/', '사주 랭킹'], ['compatibility', '/compatibility/', '궁합'], ['manseryeok', '/manseryeok/', '만세력']];
-  return `<nav class="tabs" aria-label="${tr("다른 운세 보기", "More fortunes")}">${items.map(([k, h, n]) => `<a href="${h}"${k === mode ? ' aria-current="page"' : ''}>${tr(n, term(n).replace(/^(\d{4})년$/, "$1"))}</a>`).join('')}</nav>`;
+  return `<nav class="tabs" aria-label="${tr("다른 운세 보기", "More fortunes")}">${toolNavigation(today).map(t => `<a href="${t.path}"${t.key === mode ? ' aria-current="page"' : ''}>${esc(t.nav)}</a>`).join('')}</nav>`;
 }
 const who = (name) => cleanName(name) ? tr(`${cleanName(name)}님`, cleanName(name)) : tr('나', 'Me');
 const owner = (name) => isEnglish() ? (cleanName(name) ? `${cleanName(name)}’s` : 'My') : `${who(name)}의`;
@@ -133,15 +137,21 @@ function shareFor(mode, res, ca, cb, today, yr) {
 }
 
 export async function mount(root) {
-  const mode = root.dataset.tool;
+  const entryPoint = root.dataset.tool;
+  let originEntry = entryPoint;
+  const mode = entryPoint === 'home' ? 'today' : entryPoint;
   const form = $('#tool-form', root);
-  trackInputStart(form, mode);
+  trackInputStart(form, mode, entryPoint);
   const out = $('#result', root);
-  const today = todayKST();
+  let today = todayKST();
   const pair = mode === 'compatibility';
   const yr = +(root.dataset.year || today.y);
   const tabMode = mode === 'year' ? `year${yr}` : mode;
   let stopMatches;
+  let currentInputs;
+  let currentChart;
+  let selectedDateButton;
+  let submitting = false;
 
   ['a', 'b'].forEach((p) => {
     if (!$(`#${p}-name`, form)) return;
@@ -159,29 +169,48 @@ export async function mount(root) {
     });
   });
 
-  function showError(msg) {
+  function showError(msg, person = 'a') {
     let el = $('.form-error', form);
-    if (!el) { el = document.createElement('p'); el.className = 'form-error'; el.setAttribute('role', 'alert'); $('.form-actions', form).after(el); }
+    if (!el) { el = document.createElement('p'); el.id = 'tool-form-error'; el.className = 'form-error'; el.setAttribute('role', 'alert'); $('.form-actions', form).after(el); }
+    form.querySelectorAll('[aria-invalid]').forEach(input => { input.removeAttribute('aria-invalid'); input.removeAttribute('aria-errormessage'); });
     el.textContent = msg;
     el.hidden = !msg;
-    if (msg) track('form_error', { tool: mode });
+    if (msg) {
+      stopMatches?.();
+      clearResultWithPartnerAd(out);
+      root.classList.remove('has-result');
+      currentInputs = null;
+      const dateInputs = ['y', 'm', 'd'].map(id => $(`#${person}-${id}`, form));
+      const emptyInputs = dateInputs.filter(input => !input.value);
+      const input = readForm(form, person);
+      const invalid = emptyInputs.length ? emptyInputs : check({ ...input, noTime: true })
+        ? dateInputs : !input.noTime && input.timeMode === 'exact' && !input.time ? [$(`#${person}-time`, form)] : dateInputs;
+      for (const input of invalid) { input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-errormessage', el.id); }
+      (invalid.find(input => !input.value) || invalid.at(-1)).focus();
+      track('form_error', { tool: mode, entry_point: originEntry });
+    }
   }
 
   function render(a, b, source) {
+    const fresh = todayKST();
+    const changed = isoDate(fresh) !== root.dataset.date;
+    today = fresh;
+    root.dataset.date = isoDate(today);
+    if (changed) refreshPeriodContext(root, mode, today);
     let ca, cb;
+    let calculatingPerson = 'a';
     try {
       ca = buildChart(toEngine(a));
-      if (pair) cb = buildChart(toEngine(b));
+      if (pair) { calculatingPerson = 'b'; cb = buildChart(toEngine(b)); }
     } catch (e) {
-      showError(e instanceof ChartInputError ? e.message : tr("입력한 날짜를 확인해 주세요.", "Please check the date you entered."));
+      showError(e instanceof ChartInputError ? e.message : tr("입력한 날짜를 확인해 주세요.", "Please check the date you entered."), calculatingPerson);
       return false;
     }
     showError('');
     let html = '';
     let res;
     let leaderRank;
-    if (!pair) html += chartCard(ca, a, today);
-    html += navTabs(tabMode, today);
+    if (mode === 'manseryeok') html += chartCard(ca, a, today);
     if (mode === 'today') { res = day(ca, today, 'today'); html += dayView(res); }
     else if (mode === 'tomorrow') { res = day(ca, addDays(today, 1), 'tomorrow'); html += dayView(res); }
     else if (mode === 'week') { res = week(ca, today); html += weekView(res, today); }
@@ -197,16 +226,22 @@ export async function mount(root) {
       leaderRank = sajuRank(buildChart(toEngine({ ...a, noTime: true })), RANK_TABLE);
       html += rankView(res, ca, leaderRank);
     }
+    if (!pair && mode !== 'manseryeok') html += `<details class="chart-disclosure"><summary>${tr('내 사주 원국과 오행 자세히', 'Explore your birth chart and Five Elements')}</summary>${chartCard(ca, a, today)}</details>`;
+    html += nextToolsHtml(mode, today) + navTabs(tabMode, today);
+    html += `<div class="result-actions"><button type="button" class="link-btn" data-edit-profile>${tr('입력 정보 수정·저장', 'Edit or save your details')}</button><span class="hint">${tr('이 기기에 저장하면 다음 방문에 바로 볼 수 있어요.', 'Save on this device for quicker access next time.')}</span></div>`;
     const share = shareFor(mode, res, ca, cb, today, yr);
     if (share) html += resultShareHtml();
     if (pair) html += compatMatchesShell(ca, cb);
     stopMatches?.();
-    renderResultWithPartnerAd(out, html);
+    const readingDate = isoDate(res?.date || today);
+    renderResultWithPartnerAd(out, html, { tool: mode, calc_origin: source, reading_date: readingDate });
+    currentInputs = { a, b };
+    currentChart = ca;
     if (mode === 'rank') mountRankLeaders($('.rank-leaders', out), leaderRank);
     if (pair) stopMatches = mountCompatMatches($('.compat-matches', out), { a: toEngine(a), b: toEngine(b) }, { a: ca, b: cb }, today);
     root.classList.add('has-result');
     if (share) wireShare($('.result-share', out), share);
-    const ev = { tool: mode, calc_origin: source };
+    const ev = { tool: mode, calc_origin: source, entry_point: originEntry, reading_date: readingDate };
     track('calc_result', ev);
     // 기존 이벤트 이름은 유지하되 개인 결과·등급은 분석 도구로 보내지 않는다.
     if (mode === 'story') track('story_result');
@@ -232,10 +267,56 @@ export async function mount(root) {
   fillForm(form, 'a', a0);
   if (pair) fillForm(form, 'b', b0);
   for (const p of pair ? ['a', 'b'] : ['a']) syncTime(form, p);
-  if (mode !== 'home' && a0 && (!pair || b0)) render(a0, b0, 'saved');
+  let restoreOrigin = sessionLoad('a') ? 'session_restore' : savedA ? 'device_restore' : 'legacy_restore';
+  try {
+    const handoff = JSON.parse(sessionStorage.getItem('myod:calc-handoff'));
+    sessionStorage.removeItem('myod:calc-handoff');
+    if (handoff?.path === location.pathname && Date.now() - handoff.at >= 0 && Date.now() - handoff.at < 60000) { restoreOrigin = 'form'; originEntry = 'home'; }
+  } catch { /* 분석용 출처 전달 실패는 계산을 막지 않는다. */ }
+  if (entryPoint !== 'home' && a0 && (!pair || b0)) render(a0, b0, restoreOrigin);
+  const savedEntry = $('[data-saved-entry]', root);
+  if (savedEntry && a0) {
+    savedEntry.hidden = false;
+    $('[data-saved-summary]', savedEntry).textContent = tr(`저장한 생일: ${a0.y}.${a0.m}.${a0.d} · 정보가 맞는지 확인해 주세요.`, `Saved birth date: ${a0.y}.${a0.m}.${a0.d}. Check that these details are yours.`);
+    $('[data-saved-result]', savedEntry).addEventListener('click', () => {
+      track('saved_result_open', { tool: mode });
+      if (render(a0, null, restoreOrigin)) out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+  root.addEventListener('click', event => {
+    if (event.target.closest('[data-edit-profile]')) {
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('#a-y', form).focus({ preventScroll: true });
+    }
+    const dateButton = event.target.closest('[data-reading-date]');
+    if (dateButton && currentChart) {
+      const [y, m, d] = dateButton.dataset.readingDate.split('-').map(Number);
+      const panel = $('#calendar-day-detail', out);
+      selectedDateButton = dateButton;
+      out.querySelectorAll('[data-reading-date]').forEach(button => button.setAttribute('aria-pressed', String(button === dateButton)));
+      panel.innerHTML = `<button type="button" class="link-btn" data-close-day>${tr('날짜 상세 닫기', 'Close daily detail')}</button>${dayView(day(currentChart, { y, m, d }))}`;
+      panel.hidden = false;
+      panel.focus({ preventScroll: true });
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      track('calendar_day_open', { tool: mode });
+    }
+    if (event.target.closest('[data-close-day]')) {
+      $('#calendar-day-detail', out).hidden = true;
+      selectedDateButton?.setAttribute('aria-pressed', 'false');
+      selectedDateButton?.focus();
+    }
+  });
+  const checkDate = () => {
+    const detail = $('#calendar-day-detail', out);
+    if (document.visibilityState !== 'visible' || submitting || !currentInputs || document.querySelector('dialog[open]') || (detail && !detail.hidden)) return;
+    if (isoDate(todayKST()) !== root.dataset.date) render(currentInputs.a, currentInputs.b, 'date_refresh');
+  };
+  document.addEventListener('visibilitychange', checkDate);
+  window.addEventListener('pageshow', checkDate);
+  window.addEventListener('focus', checkDate);
 
   $('[data-delete-profile]', form).addEventListener('click', async () => {
-    try { await removeSaved(); persist.checked = false; try { sessionStorage.removeItem('ohaeng:save-device'); } catch { /* 접근 제한 */ } storageStatus.textContent = tr("이 기기의 나·상대 저장 정보를 삭제했습니다. 화면의 입력은 다음 이동까지만 남습니다.", "Deleted both saved profiles from this device. The current form remains until you leave this page."); }
+    try { await removeSaved(); persist.checked = false; if (savedEntry) savedEntry.hidden = true; try { sessionStorage.removeItem('ohaeng:save-device'); } catch { /* 접근 제한 */ } storageStatus.textContent = tr("이 기기의 나·상대 저장 정보를 삭제했습니다. 토정비결 정보는 유지됩니다. 화면의 입력은 다음 이동까지만 남습니다.", "Deleted both saved saju profiles. Your Tojeong details are unchanged. The current form remains until you leave this page."); }
     catch { storageStatus.textContent = tr("삭제에 실패했습니다. 저장소 접근을 허용한 뒤 다시 시도해 주세요.", "Could not delete saved details. Allow browser storage and try again."); }
   });
   async function remember(a, b) {
@@ -249,21 +330,28 @@ export async function mount(root) {
   }
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (submitting) return;
     const a = readForm(form, 'a');
     const b = pair ? readForm(form, 'b') : null;
-    const err = check(a) || (b && check(b));
-    if (err) { showError(err); return; }
-    track('calc_submit', { tool: mode });
-    if (mode === 'home') {
+    const errA = check(a), errB = b && check(b);
+    if (errA || errB) { showError(errA || errB, errA ? 'a' : 'b'); return; }
+    track('calc_submit', { tool: mode, entry_point: originEntry });
+    submitting = true;
+    try {
+    if (entryPoint === 'home') {
       try { buildChart(toEngine(a)); } catch (er) { showError(er.message || tr("입력한 날짜를 확인해 주세요.", "Please check the date you entered.")); return; }
-      if (await remember(a)) location.href = languagePath('/today/', isEnglish() ? 'en' : 'ko');
-      else showError(tr("저장에 실패했습니다. 기기 저장 선택을 해제하고 다시 계산하거나 오늘의 운세 페이지에서 직접 입력해 주세요.", "Could not save your details. Turn off device saving and try again, or enter them directly on the Daily Fortune page."));
+      if (await remember(a)) {
+        const path = languagePath('/today/', isEnglish() ? 'en' : 'ko');
+        try { sessionStorage.setItem('myod:calc-handoff', JSON.stringify({ path, at: Date.now() })); } catch { /* 접근 제한 */ }
+        location.href = path;
+      } else if (render(a, null, 'form')) out.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
     if (render(a, b, 'form')) {
       await remember(a, b);
       out.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    } finally { submitting = false; }
   });
   root.dataset.ready = 'true';
 }

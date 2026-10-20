@@ -4,13 +4,13 @@ let assignment;
 let tool;
 
 export function initAdExperiment() {
-  const root = document.querySelector('#tool:not([data-tool="home"]), #tojeong-tool');
+  const root = document.querySelector('#tool, #tojeong-tool');
   if (assignment || !root || !document.querySelector('[data-partner-ad-slot]')) return;
   assignment = assignAdVariant([
     { scope: 'browser', open: () => window.localStorage },
     { scope: 'session', open: () => window.sessionStorage },
   ]);
-  tool = root.dataset.tool || 'tojeong';
+  tool = root.dataset.tool === 'home' ? 'today' : root.dataset.tool || 'tojeong';
   root.dataset.adVariant = assignment.variant;
 }
 

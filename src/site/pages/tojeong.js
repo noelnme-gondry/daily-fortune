@@ -8,17 +8,17 @@ import { isEnglish, tr } from '../../i18n/runtime.js';
 
 function birthForm(ctx) {
   const years = Array.from({ length: Math.min(ctx.today.y, TOJEONG_RANGE.max) - TOJEONG_RANGE.min + 1 }, (_, i) => Math.min(ctx.today.y, TOJEONG_RANGE.max) - i);
-  const options = (values, selected, suffix) => values.map((n) => `<option value="${n}"${n === selected ? ' selected' : ''}>${n}${suffix}</option>`).join('');
+  const options = (values, suffix) => values.map((n) => `<option value="${n}">${n}${suffix}</option>`).join('');
   return `<form class="pform card" id="tojeong-form" novalidate>
     <h2 class="form-title">${tr('내 토정비결 보기', 'Get your Tojeong reading')}</h2>
     <p class="hint">${tr('태어난 시간과 성별은 필요하지 않습니다.', 'Birth time and gender are not needed.')}</p>
-    <div class="field"><label for="tj-name">${tr('이름 (선택)', 'Name (optional)')}</label><input class="input" id="tj-name" maxlength="12" autocomplete="off" placeholder="${tr('결과에 표시할 이름', 'Name to show on your result')}"></div>
     <fieldset class="field"><legend>${tr('생일 달력', 'Birth-date calendar')}</legend><div class="seg"><label><input type="radio" name="tj-calendar" value="solar" checked><span>${tr('양력', 'Solar')}</span></label><label><input type="radio" name="tj-calendar" value="lunar"><span>${tr('음력', 'Lunar')}</span></label></div></fieldset>
     <fieldset class="field"><legend>${tr('생년월일', 'Birth date')}</legend><div class="ymd">
-      <select class="input" id="tj-y" aria-label="${tr('태어난 해', 'Birth year')}">${options(years, 1990, tr('년', ''))}</select>
-      <select class="input" id="tj-m" aria-label="${tr('태어난 달', 'Birth month')}">${options(Array.from({ length: 12 }, (_, i) => i + 1), 1, tr('월', ''))}</select>
-      <select class="input" id="tj-d" aria-label="${tr('태어난 날', 'Birth day')}">${options(Array.from({ length: 31 }, (_, i) => i + 1), 1, tr('일', ''))}</select>
+      <select class="input" id="tj-y" required aria-label="${tr('태어난 해', 'Birth year')}"><option value="">${tr('연도', 'Year')}</option>${options(years, tr('년', ''))}</select>
+      <select class="input" id="tj-m" required aria-label="${tr('태어난 달', 'Birth month')}"><option value="">${tr('월', 'Month')}</option>${options(Array.from({ length: 12 }, (_, i) => i + 1), tr('월', ''))}</select>
+      <select class="input" id="tj-d" required aria-label="${tr('태어난 날', 'Birth day')}"><option value="">${tr('일', 'Day')}</option>${options(Array.from({ length: 31 }, (_, i) => i + 1), tr('일', ''))}</select>
     </div><label class="check"><input type="checkbox" id="tj-leap" disabled> ${tr('음력 윤달에 태어났어요', 'I was born in a lunar leap month')}</label></fieldset>
+    <div class="field"><label for="tj-name">${tr('이름 (선택)', 'Name (optional)')}</label><input class="input" id="tj-name" maxlength="12" autocomplete="off" placeholder="${tr('결과에 표시할 이름', 'Name to show on your result')}"></div>
     <div class="form-actions"><button class="btn" type="submit">${tr('무료 토정비결 보기', 'See my free Tojeong reading')}</button></div>
     <p class="form-error" role="alert" id="tj-error" hidden></p>
     <div class="storage-options"><label class="check"><input type="checkbox" id="tj-save"> ${tr('이 기기에 저장', 'Save on this device')}</label><button class="link-btn" type="button" data-tojeong-delete>${tr('저장된 토정비결 정보 삭제', 'Delete saved Tojeong information')}</button><p class="hint" id="tj-storage-status" role="status">${tr('생일은 서버로 보내지 않습니다. 저장을 선택하면 이 기기에 보관합니다.', 'Your birth date is not sent to a server. If you choose to save it, it stays on this device.')}</p></div>

@@ -1,20 +1,21 @@
-import { weekdayName, elementName, animalName } from '../../i18n/terms.js';
+import { elementName, animalName } from '../../i18n/terms.js';
 import { tr } from '../../i18n/runtime.js';
-import { siteText, displayPillar, siteValue } from '../copy.js';
+import { siteText, siteValue } from '../copy.js';
 // 계산기(도구) 페이지와 홈. 폼과 설명·FAQ는 서버에서 그리고, 결과는 브라우저에서 계산한다.
 import { HOME, TOOLS, SITE, FREE_ACCESS, FREE_FAQ, yearTool } from '../../content/pages.js';
 import {
-  ANIMAL_SLUG, EL_H, STEM_EL, BR_EL, addDays, dow, fmtDate, fmtShort, pillarLabel, pillarH,
-  dayPillar, monthPillar, yearPillar, yearPillarOfDate, lunarText, solarTerms, ttiDay, ttiYear, samjaeYear, toUTC,
+  ANIMAL_SLUG, EL_H, STEM_EL, BR_EL, addDays, pillarLabel,
+  yearPillar, ttiDay, ttiYear, samjaeYear,
 } from '../../engine/index.js';
-import { esc, faqBlock, faqLd, tip, disclosure } from '../util.js';
+import { esc, faqBlock, faqLd, disclosure } from '../util.js';
 import { animalIcon, uiIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
-import { TIPS } from '../../content/tips.js';
 import { adSlot } from '../layout.js';
 import { birthTimeOptions } from '../../domain/birth-time.js';
 import { dayExample, manseExample, yearExample } from '../public-examples.js';
 import { yearGuide } from '../year-guide.js';
+import { nextTools } from '../tool-navigation.js';
+import { dayBox, weekBox, monthBox } from '../period-boxes.js';
 
 const BAND = (s) => (s >= 75 ? ['high', siteText('대길')] : s >= 60 ? ['good', siteText('길')] : s >= 45 ? ['mid', siteText('평')] : ['low', siteText('주의')]);
 export const bandChip = (s) => { const [k, n] = BAND(s); return `<span class="band band-${k}">${siteValue(n)}</span>`; };
@@ -22,27 +23,27 @@ export const bandChip = (s) => { const [k, n] = BAND(s); return `<span class="ba
 /* ── 입력 폼 ───────────────────────────── */
 function personFields(p, ctx, legend) {
   const ys = [];
-  for (let y = ctx.today.y; y >= 1930; y--) ys.push(`<option value="${y}"${y === 1990 ? ' selected' : ''}>${y}${siteText("년")}</option>`);
+  for (let y = ctx.today.y; y >= 1930; y--) ys.push(`<option value="${y}">${y}${siteText("년")}</option>`);
   const ms = [...Array(12).keys()].map((i) => `<option value="${i + 1}">${i + 1}${siteText("월")}</option>`).join('');
   const ds = [...Array(31).keys()].map((i) => `<option value="${i + 1}">${i + 1}${siteText("일")}</option>`).join('');
   return `<fieldset class="person" data-person="${p}">
     ${legend ? `<legend class="person-legend">${esc(legend)}</legend>` : ''}
-    <div class="field field-name"><label for="${p}-name">${siteText("이름 (선택)")}</label><input class="input" id="${p}-name" maxlength="12" autocomplete="off" placeholder="${siteText("결과에 표시할 이름")}"></div>
+    <fieldset class="field field-birth"><legend>${siteText("생년월일")}</legend>
+      <div class="seg"><label><input type="radio" name="${p}-cal" value="solar" checked><span>${siteText("양력")}</span></label><label><input type="radio" name="${p}-cal" value="lunar"><span>${siteText("음력")}</span></label></div>
+      <div class="ymd"><select class="input" id="${p}-y" aria-label="${siteText("태어난 해")}" required><option value="">${tr('연도', 'Year')}</option>${ys.join('')}</select><select class="input" id="${p}-m" aria-label="${siteText("태어난 달")}" required><option value="">${tr('월', 'Month')}</option>${ms}</select><select class="input" id="${p}-d" aria-label="${siteText("태어난 날")}" required><option value="">${tr('일', 'Day')}</option>${ds}</select></div>
+      <label class="check"><input type="checkbox" id="${p}-leap" disabled>${siteText(" 음력 윤달")}</label>
+    </fieldset>
     <fieldset class="field field-gender"><legend>${siteText("성별")}</legend>
       <div class="seg"><label><input type="radio" name="${p}-gender" value="F"><span>${siteText("여성")}</span></label><label><input type="radio" name="${p}-gender" value="M" checked><span>${siteText("남성")}</span></label></div>
     </fieldset>
-    <fieldset class="field field-birth"><legend>${siteText("생년월일")}</legend>
-      <div class="seg"><label><input type="radio" name="${p}-cal" value="solar" checked><span>${siteText("양력")}</span></label><label><input type="radio" name="${p}-cal" value="lunar"><span>${siteText("음력")}</span></label></div>
-      <div class="ymd"><select class="input" id="${p}-y" aria-label="${siteText("태어난 해")}">${ys.join('')}</select><select class="input" id="${p}-m" aria-label="${siteText("태어난 달")}">${ms}</select><select class="input" id="${p}-d" aria-label="${siteText("태어난 날")}">${ds}</select></div>
-      <label class="check"><input type="checkbox" id="${p}-leap" disabled>${siteText(" 음력 윤달")}</label>
-    </fieldset>
     <fieldset class="field field-time"><legend>${siteText("태어난 시각")}</legend>
       <div class="seg seg-time"><label><input type="radio" name="${p}-tmode" value="exact" checked><span>${siteText("시각 입력")}</span></label><label><input type="radio" name="${p}-tmode" value="branch"><span>${siteText("시진만 알아요")}</span></label></div>
-      <input class="input" type="time" id="${p}-time" value="12:00" aria-label="${siteText("태어난 시각")}" aria-describedby="${p}-time-hint">
+      <input class="input" type="time" id="${p}-time" aria-label="${siteText("태어난 시각")}" aria-describedby="${p}-time-hint">
       <select class="input" id="${p}-branch" aria-label="${siteText("태어난 시진")}" aria-describedby="${p}-time-hint" hidden>${birthTimeOptions().map((t) => `<option value="${t.value}"${t.value === '6' ? ' selected' : ''}>${t.label}</option>`).join('')}</select>
       <label class="check"><input type="checkbox" id="${p}-notime">${siteText(" 시간을 몰라요")}</label>
       <p class="hint" id="${p}-time-hint" data-time-hint>${siteText("출생 당시 시계 시각 그대로 넣으세요. 30분 보정과 서머타임은 자동으로 계산합니다.")}</p>
     </fieldset>
+    <div class="field field-name"><label for="${p}-name">${siteText("이름 (선택)")}</label><input class="input" id="${p}-name" maxlength="12" autocomplete="off" placeholder="${siteText("결과에 표시할 이름")}"></div>
   </fieldset>`;
 }
 const HINT = () => siteText('<div class="storage-options"><label class="check"><input type="checkbox" id="save-device"> 이 기기에 저장</label><button class="link-btn" type="button" data-delete-profile>저장된 정보 삭제</button><p class="hint" data-storage-status role="status">저장을 선택하면 다음 방문에도 불러옵니다. 미선택 시 현재 탭에서만 임시로 유지됩니다.</p></div><p class="hint">입력한 생년월일은 서버로 전송되지 않습니다.</p>');
@@ -55,44 +56,16 @@ export function toolBlock(mode, ctx, extra = {}) {
     ? `<form class="pform card pair-form" id="tool-form" novalidate><h2 class="form-title">${siteText("두 사람의 사주 입력")}</h2><div class="pair-grid">${personFields('a', ctx, siteText('나'))}${personFields('b', ctx, siteText('상대'))}</div><div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT()}</form>`
     : `<form class="pform card" id="tool-form" novalidate><h2 class="form-title">${siteText("내 사주 입력")}</h2>${personFields('a', ctx)}<div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT()}</form>`;
   const empty = `<div class="result" id="result" aria-live="polite">${mode === 'home' ? '' : siteText('<div class="result-empty card"><p><b>생년월일시를 입력하면 결과가 여기에 나타납니다.</b></p><p class="muted">이 기기에 저장을 선택하면 다음 방문에도 입력 정보를 불러올 수 있습니다.</p><noscript><p>운세 계산은 브라우저에서 이루어지므로 자바스크립트를 켜 주세요.</p></noscript></div>')}</div>`;
-  return `<section class="tool ${pair ? 'tool-pair' : ''} ${mode === 'home' ? 'tool-home' : ''}" id="tool" ${data} aria-label="${siteText("운세 계산기")}">${form}${empty}</section>`;
+  const saved = mode === 'home' ? `<section class="saved-entry card" data-saved-entry hidden><div><h2>${tr('오늘은 어떤 하루일까요?', 'What does today hold?')}</h2><p class="hint" data-saved-summary></p></div><button class="btn" type="button" data-saved-result>${tr('저장한 정보로 오늘 운세 보기', 'See today with saved details')}</button><button class="link-btn" type="button" data-edit-profile>${tr('입력 정보 확인·수정', 'Review or edit details')}</button></section>` : '';
+  return `<section class="tool ${pair ? 'tool-pair' : ''} ${mode === 'home' ? 'tool-home' : ''}" id="tool" ${data} aria-label="${siteText("운세 계산기")}">${saved}${form}${empty}</section>`;
 }
 
 /* ── 날짜 정보 상자 ───────────────────────────── */
-function nextTerm(o) {
-  const terms = [...solarTerms(o.y), ...solarTerms(o.y + 1)];
-  return terms.find((t) => toUTC(t.date) >= toUTC(o));
-}
-export function dayBox(o, label) {
-  const dp = dayPillar(o), mp = monthPillar(o), yp = yearPillarOfDate(o);
-  const nt = nextTerm(o);
-  return `<section class="daybox card" aria-label="${esc(label)}${siteText(" 일진")}">
-    <div class="daybox-main"><span class="daybox-k">${esc(label)}</span><b class="daybox-d">${fmtDate(o)}</b><span class="muted">${lunarText(o)}</span></div>
-    <dl class="daybox-grid">
-      <div><dt>${siteText("일진 ")}${tip(TIPS.ilJin, siteText('일진 설명'))}</dt><dd><span class="hz el-${STEM_EL[dp.s]}">${pillarH(dp)}</span> ${displayPillar(dp)}${siteText("일")}</dd></div>
-      <div><dt>${siteText("월건 ")}${tip(TIPS.wolGeon, siteText('월건 설명'))}</dt><dd><span class="hz">${pillarH(mp)}</span> ${displayPillar(mp)}${siteText("월")}</dd></div>
-      <div><dt>${siteText("세차 ")}${tip(TIPS.seCha, siteText('세차 설명'))}</dt><dd><span class="hz">${pillarH(yp)}</span> ${displayPillar(yp)}${siteText("년")}</dd></div>
-      ${nt ? `<div><dt>${siteText("다음 절기 ")}${tip(TIPS.term, siteText('절기 설명'))}</dt><dd>${siteValue(nt.name)} ${nt.date.m}/${nt.date.d} ${nt.time}</dd></div>` : ''}
-    </dl>
-  </section>`;
-}
 // 띠별 오늘의 운세 (서버에서 날짜별로 계산)
 export function ttiDayList(o, opts = {}) {
   const rows = [...Array(12).keys()].map((t) => ttiDay(t, o));
   const items = rows.map((r) => `<li class="tti-row"><a href="/tti/${opts.tomorrow ? 'tomorrow' : 'today'}/${ANIMAL_SLUG[r.tti]}/" class="tti-name" data-dialog="tti-day-${r.tti}" aria-haspopup="dialog" aria-controls="tti-day-${r.tti}">${animalIcon(r.tti)}${siteValue(r.animal)}${siteText("띠")}</a><span class="num tti-score">${r.score}</span>${bandChip(r.score)}${opts.short ? '' : `<p><strong class="tti-reading-headline">${esc(r.headline)}</strong><br>${esc(r.text)} <span class="muted">${siteText("행운의 색 ")}${r.color}${siteText(" · 숫자 ")}${r.number}</span></p>`}</li>`).join('');
   return `<ol class="tti-list${opts.short ? ' short' : ''}">${items}</ol>${rows.map((r) => `<dialog class="character-dialog tti-dialog" id="tti-day-${r.tti}" aria-labelledby="tti-detail-title-${ANIMAL_SLUG[r.tti]}"><div class="dialog-bar"><span>${siteValue(r.animal)}${siteText("띠 일별 운세")}</span><button class="sbtn" type="button" data-close-dialog autofocus>${siteText("닫기 ×")}</button></div><div class="box">${ttiDailyDetail(r.tti, o, opts.tomorrow ? siteText('내일') : siteText('오늘'))}</div></dialog>`).join('')}`;
-}
-
-function weekBox(o) {
-  const start = addDays(o, -((dow(o) + 6) % 7));
-  const cells = [...Array(7).keys()].map((i) => { const d = addDays(start, i); const p = dayPillar(d); return `<li${toUTC(d) === toUTC(o) ? ' class="is-today"' : ''}><span>${weekdayName(dow(d))} ${fmtShort(d)}</span><b class="hz">${pillarH(p)}</b></li>`; }).join('');
-  return `<section class="daybox card" aria-label="${siteText("이번 주 일진")}"><div class="daybox-main"><span class="daybox-k">${siteText("이번 주")}</span><b class="daybox-d">${fmtShort(start)} ~ ${fmtShort(addDays(start, 6))}</b></div><ol class="weekline">${cells}</ol></section>`;
-}
-function monthBox(o) {
-  const mp = monthPillar({ y: o.y, m: o.m, d: 15 });
-  const terms = solarTerms(o.y).filter((t) => t.date.m === o.m);
-  return `<section class="daybox card" aria-label="${siteText("이번 달 월건")}"><div class="daybox-main"><span class="daybox-k">${siteText("이번 달")}</span><b class="daybox-d">${o.y}${siteText("년 ")}${o.m}${siteText("월")}</b></div>
-    <dl class="daybox-grid"><div><dt>${siteText("월건")}</dt><dd><span class="hz el-${STEM_EL[mp.s]}">${pillarH(mp)}</span> ${displayPillar(mp)}${siteText("월")}</dd></div>${terms.map((t) => `<div><dt>${siteValue(t.name)}</dt><dd>${t.date.m}/${t.date.d} ${t.time}</dd></div>`).join('')}<div><dt>${siteText("만세력")}</dt><dd><a href="/manseryeok/${o.y}/${o.m}/">${o.m}${siteText("월 날짜별 일진 보기")}</a></dd></div></dl></section>`;
 }
 
 /* ── 공통 조각 ───────────────────────────── */
@@ -118,23 +91,10 @@ function related(items) {
   return `<section class="related"><h2>${siteText("함께 보면 좋은 운세")}</h2><div class="cards">${items.map(([href, t, d]) => `<a class="card link-card" href="${href}"><b>${esc(t)}</b><span>${esc(d)}</span></a>`).join('')}</div></section>`;
 }
 function relatedFor(path, ctx) {
-  const y = ctx.today.y;
-  const all = [
-    ['/today/', siteText('오늘의 운세'), siteText('오늘 일진과 내 사주의 만남')],
-    ['/tomorrow/', siteText('내일의 운세'), siteText('내일 일정을 미리 준비')],
-    ['/week/', siteText('이번 주 운세'), siteText('요일별 점수와 최고의 요일')],
-    ['/month/', siteText('이달의 운세'), siteText('날짜별 길일 달력')],
-    [`/year/${y}/`, `${y}${siteText("년 운세")}`, siteText('총운과 1~12월 월별 운세')],
-    [`/year/${y + 1}/`, `${y + 1}${siteText("년 운세")}`, siteText('내년 총운과 월별 운세')],
-    ['/lifetime/', siteText('평생 운세'), siteText('기질·대운·결혼 시기')],
-    ['/compatibility/', siteText('사주 궁합'), siteText('평생 궁합과 결혼 길일')],
-    ['/life-story/', siteText('사주로 본 내 인생은?'), siteText('10년 단위 인생 캐릭터')],
-    ['/saju-ranking/', siteText('내 사주 랭킹'), siteText('518,400가지 사주 중 몇 위?')],
-    ['/tti/today/', siteText('띠별 오늘의 운세'), siteText('12띠 오늘 점수')],
-  ];
-  const fun = all.filter(([h]) => h === '/life-story/' || h === '/saju-ranking/');
-  return related([...fun, ...all.filter(([h]) => h !== path && !fun.some(([f]) => f === h))].filter(([h]) => h !== path).slice(0, 6));
+  const mode = path.startsWith('/year/') ? 'year' : Object.keys(TOOLS).find(key => TOOLS[key].path === path);
+  return related(nextTools(mode, ctx.today).map(t => [t.path, t.nav, t.h1]));
 }
+
 function webApp(tool, ctx) {
   return { '@type': 'WebApplication', name: `${SITE.name} ${tool.h1}`, url: `${ctx.site}${tool.path}`, description: tool.desc, applicationCategory: 'LifestyleApplication', operatingSystem: 'Web', inLanguage: siteText('ko-KR'), isAccessibleForFree: true, offers: { '@type': 'Offer', price: FREE_ACCESS.price, priceCurrency: FREE_ACCESS.currency }, publisher: { '@id': `${ctx.site}/#org` } };
 }
@@ -183,7 +143,7 @@ export const rank = (ctx) => toolPage('rank', ctx, {
 });
 export const manseryeok = (ctx) => toolPage('manseryeok', ctx, {
   example: manseExample(),
-  after: `<section class="box-sec"><div class="sec-head"><h2>${siteText("연도별 만세력 표")}</h2></div><div class="cards">${[ctx.today.y, ctx.today.y + 1].map((y) => `<a class="card link-card" href="/manseryeok/${y}/"><b>${y}${siteText("년 만세력")}</b><span>${pillarLabel(yearPillar(y))}${siteText("년 · 월별 일진과 24절기")}</span></a>`).join('')}</div></section>`,
+  after: `<section class="box-sec"><div class="sec-head"><h2>${siteText("연도별 만세력 표")}</h2></div><div class="cards">${[ctx.today.y, ctx.today.y + 1, ...ctx.years.filter(y => y < ctx.today.y).reverse()].map((y) => `<a class="card link-card" href="/manseryeok/${y}/"><b>${y}${siteText("년 만세력")}</b><span>${pillarLabel(yearPillar(y))}${siteText("년 · 월별 일진과 24절기")}</span></a>`).join('')}</div></section>`,
 });
 
 export function yearPage(y, ctx) {
@@ -196,7 +156,7 @@ export function yearPage(y, ctx) {
   return toolPage('year', ctx, { tool: t, mode: 'year', year: y, top, example: yearExample(y, ctx), guide: yearGuide(y, ctx, t.path), crumbs: [[siteText('신년운세'), '/year/'], [`${y}${siteText("년 운세")}`, t.path]] });
 }
 export function yearHub(ctx) {
-  const ys = [ctx.today.y, ctx.today.y + 1];
+  const ys = [ctx.today.y, ctx.today.y + 1, ...ctx.years.filter(y => y < ctx.today.y).reverse()];
   return {
     path: '/year/', title: siteText('[무료] 신년운세 — 올해·내년 사주 총운과 월별 운세'), description: `${siteText('회원가입 없이 무료로 보는 ')}${ys.join(siteText('년·'))}${siteText("년 신년운세. 내 사주와 세운·대운으로 계산한 연간 총운과 분야별 점수, 1~12월 월별 운세를 연도별로 확인하세요. 토정비결과의 차이도 안내합니다.")}`,
     crumbs: [[siteText('신년운세'), '/year/']], section: '/year/',
@@ -230,6 +190,7 @@ export function home(ctx) {
     <section class="home-hero">
       <div class="home-discovery"><div class="home-intro"><p class="eyebrow">${esc(SITE.tagline)}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
         <section class="box-sec fun-sec"><div class="sec-head"><h2>${siteText("재미로 보는 사주")}</h2></div><div class="home-features">${fun.map(([h, t, d], i) => `<a class="card home-feature" href="${h}">${i === 0 ? '<img src="/characters/384/ranger.webp" width="72" height="72" alt="">' : `<span class="home-feature-icon">${uiIcon(i === 1 ? 'trophy' : 'book')}</span>`}<span><b>${siteValue(t)}</b><small>${d}</small></span>${uiIcon('arrow')}</a>`).join('')}</div></section>
+        <nav class="reading-guides" aria-label="${tr('처음 읽는 분을 위한 안내', 'Guides for your first reading')}"><a href="/manseryeok/#public-example" data-ga-cta="reading_guide"><b>${tr('태어난 시간을 몰라도 볼 수 있나요?', 'Can I read my chart without a birth time?')}</b><span>${tr('같은 생일의 원국을 비교해 보세요.', 'Compare the charts for the same birthday.')}</span></a><a href="/year/${y + 1}/#public-example" data-ga-cta="reading_guide"><b>${tr(`${y + 1}년, 달마다 흐름이 다른 이유`, `Why each month of ${y + 1} reads differently`)}</b><span>${tr('월별 점수와 해설을 함께 읽어보세요.', 'Read monthly scores alongside the explanations.')}</span></a></nav>
       </div>
       ${toolBlock('home', ctx)}
     </section>
@@ -254,4 +215,4 @@ export function home(ctx) {
     body,
   };
 }
-export { hero, related };
+export { hero, related, dayBox };

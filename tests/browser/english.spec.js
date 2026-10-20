@@ -1,3 +1,4 @@
+import { completeProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { todayKST } from '../../src/engine/core.js';
 import { calculateTojeong } from '../../src/domain/tojeong.js';
@@ -12,8 +13,9 @@ async function calculate(page) {
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
   await page.locator('#a-time').fill('03:40');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('#result .chart-card, #result .report-head').first()).toBeVisible();
+  await expect(page.locator('#result [data-result-summary]').first()).toBeVisible();
 }
 
 test('browser language redirects matching paths, preserves queries and remembers manual Korean', async ({ page, request }) => {
@@ -76,13 +78,15 @@ test('English home input, result sharing and locale switch preserve the selected
   await page.goto('/en/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').fill('Alex');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page).toHaveURL(/\/en\/today\/$/);
   await expect(page.locator('#result .report-head')).toBeVisible();
+  await page.evaluate(() => Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => false }));
   const download = page.waitForEvent('download');
   await page.locator('[data-share="image"]').click();
   expect((await download).suggestedFilename()).toBe('K-Fortune-today.png');
-  await expect(page.locator('.result-share .toast')).toHaveText('Image saved.');
+  await expect(page.locator('.result-share .toast')).toHaveText('Image download started.');
   await page.evaluate(() => { window.shareOpened = []; window.open = (...args) => window.shareOpened.push(args); });
   await page.locator('[data-share="x"]').click();
   const social = await page.evaluate(() => window.shareOpened[0][0]);
@@ -122,6 +126,7 @@ test('English Tojeong fetches only its reading, shows all months and retains the
   await page.locator('#tj-y').selectOption('1993');
   await page.locator('#tj-m').selectOption('6');
   await page.locator('#tj-d').selectOption('21');
+  await completeProfile(page);
   await page.locator('#tojeong-tool button[type="submit"]').click();
   const code = calculateTojeong({ calendar: 'solar', y: 1993, m: 6, d: 21 }, todayKST().y).code;
   await expect(page.locator('.tojeong-code')).toHaveText(code);

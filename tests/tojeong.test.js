@@ -104,7 +104,7 @@ test('토정비결: 공개 진입·SEO·무료 FAQ·새해 경로가 연결된�
   assert.ok(site.llmsFull().includes('무료 토정비결'));
   const next = createSite({ site: 'https://unse.example', assets: { css: '/a.css', js: '/a.js' }, now: Date.UTC(2026, 11, 31, 15) });
   assert.ok(next.has('/tojeong/2028/'));
-  assert.ok(!next.has('/tojeong/2026/') && !next.has('/tojeong/2027/'));
+  assert.ok(next.has('/tojeong/2026/') && !next.has('/tojeong/2027/'));
   assert.equal(next.redirect('/tojeong/2027/'), '/tojeong/');
   assert.ok(next.render('/tojeong/').includes('data-year="2027"'));
 });

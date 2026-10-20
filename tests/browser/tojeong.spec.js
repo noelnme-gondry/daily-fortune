@@ -1,3 +1,4 @@
+import { completeProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { todayKST } from '../../src/engine/core.js';
 import { calculateTojeong } from '../../src/domain/tojeong.js';
@@ -22,6 +23,7 @@ test('홈에서 무료 토정비결 진입 · 12개월 키보드 선택 · 내�
   await expect(page.locator('#tojeong-tool')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('input[type="time"], #a-time, input[name="a-gender"]')).toHaveCount(0);
   await enter(page);
+  await completeProfile(page);
   await page.getByRole('button', { name: '무료 토정비결 보기', exact: true }).click();
   await expect(page.locator('.tojeong-code')).toHaveText(calculateTojeong({ calendar: 'solar', y: 1993, m: 6, d: 21 }, todayKST().y).code);
   await expect(page.locator('[data-tojeong-month]')).toHaveCount(12);
@@ -50,11 +52,13 @@ test('토정비결 기기 저장·다른 탭 복원·삭제는 사주 저장본�
   await page.locator('input[name="a-tmode"][value="branch"]').check();
   await page.locator('#a-branch').selectOption('3');
   await page.locator('#save-device').check();
+  await completeProfile(page);
   await page.getByRole('button', { name: '오늘의 운세 보기', exact: true }).click();
   await expect(page.locator('[data-storage-status]')).toContainText('이 기기에 저장했습니다');
   await ready(page);
   await enter(page);
   await page.locator('#tj-save').check();
+  await completeProfile(page);
   await page.getByRole('button', { name: '무료 토정비결 보기', exact: true }).click();
   await expect(page.locator('#tj-storage-status')).toContainText('이 기기에 저장했습니다');
   const next = await context.newPage();
@@ -82,11 +86,13 @@ test('토정비결의 윤달 조정 표시 · 잘못된 날짜 거부 · 저장 
   await page.locator('input[name="tj-calendar"][value="lunar"]').check();
   await page.locator('#tj-leap').check();
   await page.locator('#tj-save').check();
+  await completeProfile(page);
   await page.getByRole('button', { name: '무료 토정비결 보기', exact: true }).click();
   await expect(page.locator('.tojeong-summary')).toContainText('윤달 생일을 같은 월의 평달로');
   await expect(page.locator('#tj-storage-status')).toContainText('기기 저장에 실패');
   await page.locator('#tj-y').selectOption('2021');
   await page.locator('#tj-m').selectOption('4');
+  await completeProfile(page);
   await page.getByRole('button', { name: '무료 토정비결 보기', exact: true }).click();
   await expect(page.locator('#tj-error')).toContainText('존재하지 않는 날짜');
   await expect(page.locator('.tojeong-code')).toHaveCount(0);
@@ -101,6 +107,7 @@ test('올해 연도 주소는 /tojeong/으로 이동 · 자기 괘 해설만 받
   await ready(page, '/tojeong/');
   await expect(page.locator('.tojeong-year-table')).toContainText(`${todayKST().y}년 토정비결 작괘 기준표`);
   await enter(page);
+  await completeProfile(page);
   await page.getByRole('button', { name: '무료 토정비결 보기', exact: true }).click();
   const code = calculateTojeong({ calendar: 'solar', y: 1993, m: 6, d: 21 }, todayKST().y).code;
   await expect(page.locator('.tojeong-code')).toHaveText(code);

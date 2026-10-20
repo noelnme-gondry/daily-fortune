@@ -1,3 +1,5 @@
+import { completeProfile } from './helpers/profile.js';
+import { isoDate, todayKST } from '../../src/engine/core.js';
 import { test, expect } from '@playwright/test';
 import { AD_POSITION_EXPERIMENT } from '../../src/domain/ad-experiment.js';
 
@@ -28,6 +30,7 @@ test('B는 계산 결과 첫 부분에 광고를 두고 결과로 이동할 때 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/today/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#result > .partner-ad:first-child')).toHaveCount(1);
   await expect(page.locator('[data-partner-ad-slot]')).toBeInViewport({ ratio: 1 });
@@ -36,7 +39,7 @@ test('B는 계산 결과 첫 부분에 광고를 두고 결과로 이동할 때 
     const headerBottom = await page.locator('.site-head').evaluate((el) => el.getBoundingClientRect().bottom);
     return slot.y >= Math.max(0, headerBottom);
   }).toBe(true);
-  await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(0);
+  await expect(page.locator('[data-result-summary] + .partner-ad, .chart-card + .partner-ad, .tojeong-summary + .partner-ad, .story-hero + .partner-ad, .rank-hero + .partner-ad')).toHaveCount(0);
 });
 
 for (const width of [320, 390, 768, 1024, 1440]) {
@@ -81,8 +84,9 @@ async function calculateResult(page, path, variant = 'A') {
   await page.goto(path);
   const tojeong = path.startsWith('/tojeong/');
   await expect(page.locator(tojeong ? '#tojeong-tool' : '#tool')).toHaveAttribute('data-ready', 'true');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator(variant === 'B' ? '#result > .partner-ad:first-child, #tojeong-result > .partner-ad:first-child' : '.result-share + .hint + .partner-ad')).toHaveCount(1);
+  await expect(page.locator(variant === 'B' ? '#result > .partner-ad:first-child, #tojeong-result > .partner-ad:first-child' : '[data-result-summary] + .partner-ad, .chart-card + .partner-ad, .tojeong-summary + .partner-ad, .story-hero + .partner-ad, .rank-hero + .partner-ad')).toHaveCount(1);
   await expect(page.locator('[data-share-page]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: '링크 복사', exact: true })).toHaveCount(1);
 }
@@ -142,11 +146,12 @@ for (const variant of ['A', 'B']) {
       expect(frameBox.x).toBe(slotBox.x);
       if (variant === 'B') await expect(slot).toBeInViewport({ ratio: 1 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+      await completeProfile(page);
       await page.locator('button[type="submit"]').click();
       await expect(slot).toHaveAttribute('data-test-instance', 'original');
       expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
       await page.reload();
-      await expect(page.locator(variant === 'B' ? '#result > .partner-ad:first-child, #tojeong-result > .partner-ad:first-child' : '.result-share + .hint + .partner-ad')).toHaveCount(1);
+      await expect(page.locator(variant === 'B' ? '#result > .partner-ad:first-child, #tojeong-result > .partner-ad:first-child' : '[data-result-summary] + .partner-ad, .chart-card + .partner-ad, .tojeong-summary + .partner-ad, .story-hero + .partner-ad, .rank-hero + .partner-ad')).toHaveCount(1);
     }
   });
 }
@@ -169,7 +174,7 @@ test('띠별 부분 이동에서도 해당 연도 안내만 갱신하고 기존 
 });
 
 for (const width of [390, 1440]) {
-  test(`${width}px에서 운세·궁합·캐릭터·랭킹·토정비결 광고는 결과 공유 바로 아래에 한 개만 유지된다`, async ({ page }) => {
+  test(`${width}px에서 운세·궁합·캐릭터·랭킹·토정비결 광고는 결과 요약 바로 아래에 한 개만 유지된다`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     for (const path of ['/today/', '/compatibility/', '/life-story/', '/saju-ranking/', '/tojeong/']) {
       await calculateResult(page, path);
@@ -183,11 +188,12 @@ for (const width of [390, 1440]) {
       expect(box.height).toBe(140);
       expect((await slot.locator('iframe').boundingBox()).width).toBe(box.width);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
-      if (path === '/compatibility/') await expect(page.locator('.partner-ad + .compat-matches')).toHaveCount(1);
+      if (path === '/compatibility/') await expect(page.locator('.compat-matches')).toHaveCount(1);
       await slot.evaluate((el) => el.setAttribute('data-test-instance', 'original'));
       await page.locator(path === '/tojeong/' ? '#tj-d' : '#a-d').selectOption('2');
+      await completeProfile(page);
       await page.locator('button[type="submit"]').click();
-      await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+      await expect(page.locator('[data-result-summary] + .partner-ad, .chart-card + .partner-ad, .tojeong-summary + .partner-ad, .story-hero + .partner-ad, .rank-hero + .partner-ad')).toHaveCount(1);
       await expect(page.locator('[data-share-page]')).toHaveCount(0);
       await expect(slot).toHaveCount(1);
       await expect(slot).toHaveAttribute('data-test-instance', 'original');
@@ -197,17 +203,18 @@ for (const width of [390, 1440]) {
   });
 }
 
-test('저장된 결과 복원에도 공유 아래에 배너를 놓고, 이동한 위치에서 노출 이벤트를 한 번 측정한다', async ({ page }) => {
+test('저장된 결과 복원에도 요약 아래에 배너를 놓고, 이동한 위치에서 노출 이벤트를 한 번 측정한다', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await calculateResult(page, '/today/');
   await expect(page.locator('[data-storage-status]')).toContainText('현재 탭에만');
   await page.reload();
-  await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+  await expect(page.locator('[data-result-summary] + .partner-ad, .chart-card + .partner-ad, .tojeong-summary + .partner-ad, .story-hero + .partner-ad, .rank-hero + .partner-ad')).toHaveCount(1);
   expect(await slotEvents(page)).toHaveLength(0);
   await showFraction(page, 0.4);
   expect(await slotEvents(page)).toHaveLength(0);
   await showFraction(page, 0.6);
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await showFraction(page, 0.8);
   expect(await slotEvents(page)).toHaveLength(1);
@@ -226,6 +233,7 @@ for (const width of [390, 1440]) {
       expect((await slot.boundingBox()).width).toBe((await result.boundingBox()).width);
       await slot.evaluate((el) => el.setAttribute('data-test-instance', 'original'));
       await page.locator(path === '/tojeong/' ? '#tj-d' : '#a-d').selectOption('2');
+      await completeProfile(page);
       await page.locator('button[type="submit"]').click();
       await expect(result.locator(':scope > .partner-ad:first-child')).toHaveCount(1);
       await expect(slot).toHaveAttribute('data-test-instance', 'original');
@@ -247,6 +255,8 @@ test('A/B 배정은 새 문서 이동에도 유지되고 일반 페이지는 실
   await page.goto('/tojeong/');
   await expect(page.locator('#tojeong-tool')).toHaveAttribute('data-ad-variant', 'B');
   await page.goto('/');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ad-variant', 'B');
+  await page.goto('/about/');
   await expect(page.locator('[data-ad-variant]')).toHaveCount(0);
   await showFraction(page, 0.8);
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
@@ -257,6 +267,7 @@ test('홈에서 계산해 오늘의 운세로 진입해도 저장된 B 배정으
   await page.addInitScript((key) => localStorage.setItem(key, 'B'), AD_POSITION_EXPERIMENT.storageKey);
   await page.goto('/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page).toHaveURL(/\/today\/$/);
   await expect(page.locator('#result > .partner-ad:first-child')).toHaveCount(1);
@@ -274,9 +285,10 @@ test('브라우저·탭 저장이 모두 막혀도 같은 문서의 B 배정과 
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   for (const day of ['2', '3']) {
     await page.locator('#a-d').selectOption(day);
+    await completeProfile(page);
     await page.locator('button[type="submit"]').click();
     await expect(page.locator('#result > .partner-ad:first-child')).toHaveCount(1);
-    await expect(page.locator('#result .chart-card')).toBeVisible();
+    await expect(page.locator('#result .chart-card')).toBeAttached();
   }
   expect(await page.evaluate(() => window.adEvents.find((e) => e[1] === 'ad_experiment_exposure')?.[2])).toMatchObject({ experiment_variant: 'B', assignment_scope: 'page' });
   expect(errors).toEqual([]);
@@ -291,12 +303,14 @@ for (const variant of ['A', 'B']) {
     await showFraction(page, 0.8);
     expect(await slotEvents(page)).toHaveLength(0);
     expect(await page.evaluate(() => window.adEvents.filter((e) => e[1] === 'ad_experiment_exposure'))).toHaveLength(0);
+    await completeProfile(page);
     await page.locator('button[type="submit"]').click();
-    await expect(page.locator('#result .chart-card')).toBeVisible();
+    await expect(page.locator('#result .chart-card')).toBeAttached();
     await expect.poll(() => page.evaluate(() => window.adEvents.filter((e) => e[1] === 'result_view').length)).toBe(1);
     await showFraction(page, 0.8);
     await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
     await page.getByRole('button', { name: '링크 복사', exact: true }).click();
+    await completeProfile(page);
     await page.locator('button[type="submit"]').click();
     await showFraction(page, 0.8);
     const events = await page.evaluate(() => window.adEvents);
@@ -317,14 +331,16 @@ test('토정비결 결과를 오류로 비웠다가 다시 계산해도 광고�
   await slot.evaluate((el) => el.setAttribute('data-test-instance', 'original'));
   await page.locator('#tj-m').selectOption('2');
   await page.locator('#tj-d').selectOption('31');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#tj-error')).toBeVisible();
   await expect(page.locator('.result-share')).toHaveCount(0);
   await expect(page.locator('main + .partner-ad')).toHaveCount(1);
   await expect(slot).toHaveAttribute('data-test-instance', 'original');
   await page.locator('#tj-d').selectOption('1');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('.result-share + .hint + .partner-ad')).toHaveCount(1);
+  await expect(page.locator('[data-result-summary] + .partner-ad, .chart-card + .partner-ad, .tojeong-summary + .partner-ad, .story-hero + .partner-ad, .rank-hero + .partner-ad')).toHaveCount(1);
   await expect(slot).toHaveCount(1);
   await expect(slot).toHaveAttribute('data-test-instance', 'original');
   expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
@@ -365,7 +381,7 @@ test('발급 코드로 한 번만 초기화하고 절반 이상 노출 시 개�
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
   const event = (await slotEvents(page))[0];
   expect(event.slice(0, 2)).toEqual(['event', 'ad_slot_view']);
-  expect(event[2]).toEqual({ ad_provider: 'coupang', ad_slot: 'common', page_path: '/tti/', page_location: 'http://127.0.0.1:4176/tti/', page_title: await page.title() });
+  expect(event[2]).toEqual({ measurement_version: '2', usage_date: isoDate(todayKST()), ad_provider: 'coupang', ad_slot: 'common', page_path: '/tti/', page_location: 'http://127.0.0.1:4176/tti/', page_title: await page.title() });
   expect(JSON.stringify(event)).not.toContain('private');
   await showFraction(page, 0);
   await showFraction(page, 0.8);
@@ -411,8 +427,9 @@ test('광고 로드 실패·GA 미설정에서도 운세를 계산하고 공유�
   await page.goto('/today/');
   await expect(page.locator('[data-partner-ad-slot]')).toHaveAttribute('data-ad-state', 'unavailable');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('#result .chart-card')).toBeVisible();
+  await expect(page.locator('#result .chart-card')).toBeAttached();
   await showFraction(page, 0.6);
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
   await page.evaluate(() => { delete window.gtag; });
@@ -421,8 +438,9 @@ test('광고 로드 실패·GA 미설정에서도 운세를 계산하고 공유�
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
   await page.locator('#a-notime').check();
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('#result .chart-card')).toBeVisible();
+  await expect(page.locator('#result .chart-card')).toBeAttached();
   await page.goto('/share/');
   await expect(page.locator('[data-partner-ad-slot]')).toHaveCount(0);
   await page.goto('/not-a-page/');

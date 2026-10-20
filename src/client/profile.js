@@ -51,8 +51,10 @@ export async function save(who, p) {
   try { localStorage.removeItem(KEY[who]); } catch { /* 이전 저장소 접근 제한 */ }
 }
 export async function removeSaved(who) {
-  await transact('readwrite', (s) => who ? s.delete(who) : s.clear());
-  for (const key of who ? [KEY[who]] : Object.values(KEY)) {
+  const people = who ? [who] : ['a', 'b'];
+  // 사주의 나·상대 삭제는 별도 토정비결 입력을 건드리지 않는다.
+  await transact('readwrite', (s) => { for (const person of people) s.delete(person); });
+  for (const key of people.map(person => KEY[person])) {
     try { localStorage.removeItem(key); } catch { /* 접근 제한 */ }
     try { sessionStorage.removeItem(key); } catch { /* 접근 제한 */ }
   }

@@ -1,3 +1,4 @@
+import { completeProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { buildChart, day, week, ttiDay, ttiMonths, todayKST, isoDate, addDays } from '../../src/engine/index.js';
 import { withLanguage } from '../../src/i18n/runtime.js';
@@ -23,6 +24,7 @@ for (const lang of ['ko', 'en']) {
       await page.locator('#a-notime').uncheck();
       await page.locator('input[name="a-tmode"][value="exact"]').check();
       await page.locator('#a-time').fill('03:40');
+      await completeProfile(page);
       await page.locator('button[type="submit"]').click();
       const expected = withLanguage(lang, () => mode === 'week' ? week(c, today) : day(c, mode === 'tomorrow' ? addDays(today, 1) : today, mode));
       await expect(page.locator('#result .report-head h2')).toHaveText(expected.overall.headline);

@@ -55,16 +55,23 @@ export function wireShare(el, opts) {
     if (!b) return;
     const method = b.dataset.share;
     track('share', { method, content_type: opts.kind || 'page', item_id: location.pathname });
+    const outcome = (status, completionType) => track(`share_${status}`, {
+      method, content_type: opts.kind || 'page', item_id: location.pathname,
+      ...(completionType ? { completion_type: completionType } : {}),
+    });
     if (socialUrls[method] && b.tagName === 'BUTTON') {
       window.open(socialUrls[method], '_blank', 'noopener,noreferrer');
+      outcome('handoff', 'external_window');
       return;
     }
-    if (method === 'x' || method === 'facebook' || method === 'band') return; // 공개 페이지 링크로 새 창
+    if (method === 'x' || method === 'facebook' || method === 'band') { outcome('handoff', 'external_link'); return; }
     e.preventDefault();
     if (method === 'copy') {
-      try { await navigator.clipboard.writeText(opts.url); say(tr("링크를 복사했습니다.", "Link copied.")); } catch (er) { window.prompt(tr("아래 링크를 복사하세요", "Copy the link below"), opts.url); }
+      try { await navigator.clipboard.writeText(opts.url); say(tr("링크를 복사했습니다.", "Link copied.")); outcome('complete', 'clipboard'); }
+      catch (er) { outcome('failed'); window.prompt(tr("아래 링크를 복사하세요", "Copy the link below"), opts.url); }
     } else if (method === 'native') {
-      try { await navigator.share({ title: opts.title, text: opts.text, url: opts.url }); } catch (er) { /* 취소 */ }
+      try { await navigator.share({ title: opts.title, text: opts.text, url: opts.url }); outcome('complete', 'native_api'); }
+      catch (er) { outcome(er.name === 'AbortError' ? 'cancel' : 'failed'); }
     } else if (method === 'kakao') {
       try {
         const Kakao = await loadKakao();
@@ -73,7 +80,8 @@ export function wireShare(el, opts) {
           content: { title: opts.title, description: opts.text || BRAND.descriptor, imageUrl: `${location.origin}${isEnglish() ? (opts.image || '/og-default.png').replace(/\.png$/, '-en.png') : (opts.image || '/og-default.png')}?v=sun`, link: { mobileWebUrl: opts.url, webUrl: opts.url } },
           buttons: [{ title: opts.card ? tr("결과 보기", "View result") : tr("바로 가기", "Open page"), link: { mobileWebUrl: opts.url, webUrl: opts.url } }],
         });
-      } catch (er) { say(tr("카카오톡 공유를 불러오지 못했습니다. 링크 복사를 이용해 주세요.", "Could not load KakaoTalk sharing. Please copy the link instead.")); }
+        outcome('handoff', 'kakao_sdk');
+      } catch (er) { outcome('failed'); say(tr("카카오톡 공유를 불러오지 못했습니다. 링크 복사를 이용해 주세요.", "Could not load KakaoTalk sharing. Please copy the link instead.")); }
     } else if (method === 'image' && opts.card) {
       say(tr("이미지를 만드는 중입니다…", "Creating your image…"));
       try {
@@ -81,15 +89,17 @@ export function wireShare(el, opts) {
         const blob = await drawCard(opts.card);
         const file = new File([blob], `${BRAND.name.replaceAll(' ', '-')}-${opts.kind || 'result'}.png`, { type: 'image/png' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try { await navigator.share({ files: [file], title: opts.title }); say(''); return; } catch (er) { /* 취소 시 저장으로 */ }
+          try { await navigator.share({ files: [file], title: opts.title }); say(''); outcome('complete', 'native_file_api'); return; }
+          catch (er) { if (er.name === 'AbortError') { outcome('cancel'); say(''); return; } }
         }
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob); a.download = file.name;
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-        say(tr("이미지를 저장했습니다.", "Image saved."));
+        say(tr("이미지 다운로드를 시작했습니다.", "Image download started."));
+        outcome('handoff', 'download_started');
         track('share_image', { content_type: opts.kind });
-      } catch (er) { say(tr("이미지를 만들지 못했습니다.", "Could not create the image.")); }
+      } catch (er) { outcome('failed'); say(tr("이미지를 만들지 못했습니다.", "Could not create the image.")); }
     }
   });
 }
