@@ -16,14 +16,16 @@ import { sharePage } from './pages/share.js';
 import { config } from './config.js';
 import { withLanguage } from '../i18n/runtime.js';
 import { languagePath } from './locale.js';
+import { CONTENT_BASE_DATE, LATEST_CONTENT_DATE, contentModified, retainedYears } from './content-revisions.js';
+import { tr } from '../i18n/runtime.js';
 
 // 콘텐츠(백과·도구 문구)를 마지막으로 고친 날. 해설을 손보면 함께 올린다.
-export const CONTENT_UPDATED = '2026-10-16';
+export const CONTENT_UPDATED = LATEST_CONTENT_DATE;
 export const PUBLISHED = '2026-10-14';
 
 function routeTable(ctx) {
   const y = ctx.today.y;
-  const years = [y, y + 1];
+  const years = ctx.years;
   const R = [];
   const add = (path, fn, o = {}) => R.push({ path, fn, priority: o.p ?? 0.6, changefreq: o.cf ?? 'monthly', daily: !!o.daily, feed: !!o.feed });
   add('/', tools.home, { p: 1, cf: 'daily', daily: true });
@@ -34,7 +36,7 @@ function routeTable(ctx) {
   add('/year/', tools.yearHub, { p: 0.7 });
   for (const yr of years) add(`/year/${yr}/`, (c) => tools.yearPage(yr, c), { p: 0.9 });
   add('/tojeong/', tojeongPage, { p: 0.9 });
-  add(`/tojeong/${y + 1}/`, (c) => tojeongPage(c, y + 1), { p: 0.8 });
+  for (const yr of years.filter(yr => yr !== y)) add(`/tojeong/${yr}/`, (c) => tojeongPage(c, yr), { p: 0.8 });
   add('/lifetime/', tools.lifetime, { p: 0.9 });
   add('/compatibility/', tools.compatibility, { p: 0.9 });
   add('/life-story/', tools.story, { p: 0.9 });
@@ -78,7 +80,7 @@ function routeTable(ctx) {
 
 export function createSite({ site, assets, now = Date.now() }) {
   const today = todayKST(now);
-  const ctx = { site, assets, today, todayISO: isoDate(today), buildDate: CONTENT_UPDATED, published: PUBLISHED, cfg: config() };
+  const ctx = { site, assets, today, years: retainedYears(today.y), todayISO: isoDate(today), buildDate: CONTENT_BASE_DATE, published: PUBLISHED, cfg: config() };
   const originalRoutes = routeTable(ctx);
   ctx.paths = new Set([...originalRoutes.map((r) => r.path), '/share/']);
   const routes = [...originalRoutes, ...originalRoutes.map((r) => ({ ...r, path: languagePath(r.path, 'en'), lang: 'en' }))];
@@ -87,13 +89,22 @@ export function createSite({ site, assets, now = Date.now() }) {
   const page = (path) => {
     if (!pageCache.has(path)) {
       const r = byPath.get(path);
-      const p = withLanguage(r.lang || 'ko', () => r.fn({ ...ctx, lang: r.lang || 'ko' }));
-      if (r.daily) p.modified = ctx.todayISO;
+      const p = withLanguage(r.lang || 'ko', () => {
+        const result = r.fn({ ...ctx, lang: r.lang || 'ko', buildDate: r.daily ? ctx.todayISO : contentModified(r.path) });
+        const base = r.path.replace(/^\/en(?=\/)/, '');
+        const archive = /^\/(year|manseryeok|tti|tojeong)\/(\d{4})\//.exec(base);
+        if (archive && Number(archive[2]) < today.y) {
+          const current = archive[1] === 'tojeong' ? '/tojeong/' : base.replace(`/${archive[2]}/`, `/${today.y}/`);
+          result.body = `<aside class="archive-note note"><p>${tr(`${archive[2]}년 자료입니다. 해당 연도의 날짜와 해설을 그대로 보존합니다.`, `This is the ${archive[2]} archive. Dates and readings retain their original year.`)} <a href="${current}">${tr(`${today.y}년 보기`, `View ${today.y}`)}</a></p></aside>` + result.body;
+        }
+        return result;
+      });
+      p.modified = r.daily ? ctx.todayISO : contentModified(r.path);
       pageCache.set(path, p);
     }
     return pageCache.get(path);
   };
-  const lastmod = (r) => (r.daily ? ctx.todayISO : CONTENT_UPDATED);
+  const lastmod = (r) => (r.daily ? ctx.todayISO : contentModified(r.path));
 
   // 같은 내용을 두 주소로 두지 않는다: 올해 연도의 토정비결 주소는 /tojeong/으로 보낸다.
   const redirects = new Map([[`/tojeong/${ctx.today.y}/`, '/tojeong/'], [`/en/tojeong/${ctx.today.y}/`, '/en/tojeong/']]);

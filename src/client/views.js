@@ -61,7 +61,9 @@ export function chartCard(c, profile, today) {
 
 /* ── 공통 리포트 ───────────────────────────── */
 export function reportHead(r, when) {
-  return `<section class="report-head card">${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2>${esc(r.overall.headline)}</h2><p>${esc(r.overall.text)}</p></div></section>`;
+  const low = [...r.cats].sort((a, b) => a.score - b.score)[0];
+  const lead = low?.text?.split(/(?<=[.!?])\s+/)[0] || r.overall.text;
+  return `<section class="report-head card" data-result-summary>${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2 data-result-heading>${esc(r.overall.headline)}</h2><p>${esc(lead)}</p><details class="reading-basis"><summary>${tr('이 흐름이 나온 이유', 'How this reading was calculated')}</summary><p>${esc(r.overall.text)}</p></details><p class="score-note">${tr('점수는 이 서비스의 계산 기준이며, 성공 확률을 뜻하지 않습니다.', 'Scores reflect this service’s calculation rules, not a probability of success.')}</p></div></section>`;
 }
 export function catList(cats, withText = true) {
   return `<section class="cats">${cats.map((c) => `<article class="cat"><div class="cat-top"><h3>${c.name}</h3>${band(c.score)}<div class="track"><i style="width:${c.score}%"></i></div><span class="num">${c.score}</span></div>${withText && c.text ? `<p>${esc(c.text)}</p>` : ''}</article>`).join('')}</section>`;
@@ -76,20 +78,21 @@ export function dayView(r) {
 }
 export function weekView(r, today) {
   const best = Math.max(...r.days.map((d) => d.score));
-  const strip = r.days.map((d) => `<div class="wd${d.score === best ? ' best' : ''}${same(d.date, today) ? ' today' : ''}"><span class="d">${d.label} ${d.short}</span><span class="p">${hz(d.pillar)}</span><span class="bar"><i style="height:${d.score}%"></i></span><b>${d.score}</b></div>`).join('');
+  const strip = r.days.map((d) => `<button type="button" data-reading-date="${isoDate(d.date)}" aria-controls="calendar-day-detail" aria-pressed="false" aria-label="${esc(d.short)} ${d.score}${tr('점 상세', ' points, details')}" class="wd${d.score === best ? ' best' : ''}${same(d.date, today) ? ' today' : ''}"><span class="d">${d.label} ${d.short}</span><span class="p">${hz(d.pillar)}</span><span class="bar"><i style="height:${d.score}%"></i></span><b>${d.score}</b></button>`).join('');
   return reportHead(r, `<span>${r.label}</span>`) +
     `<section class="box card"><div class="box-head"><h3>${tr('요일별 흐름', 'Your week at a glance')}</h3><span class="muted">${tr('빨간 테두리 = 오늘', 'Red outline = today')}</span></div><div class="week">${strip}</div><div class="chips">${r.bestByCat.map((b) => `<span class="chip"><em>${b.name}</em>${b.day}${tr('요일', '')}</span>`).join('')}</div></section>` +
-    catList(r.cats) + luckyRow(r.lucky);
+    calendarDetail() + catList(r.cats) + luckyRow(r.lucky);
 }
+const calendarDetail = () => `<section class="calendar-day-detail" id="calendar-day-detail" role="region" aria-label="${tr('선택한 날짜의 운세', 'Reading for the selected date')}" tabindex="-1" hidden></section>`;
 export function monthView(r, today) {
   const lead = (r.days[0].dow + 6) % 7;
   const cells = [1, 2, 3, 4, 5, 6, 0].map((d) => `<div class="h">${weekdayName(d)}</div>`).join('') + '<div class="c blank"></div>'.repeat(lead) +
-    r.days.map((d) => { const s = Math.max(0, Math.round((d.score - 30) * 1.25)); return `<div class="c${s > 52 ? ' hot' : ''}${same(d.date, today) ? ' today' : ''}" style="--s:${Math.min(85, s)}" title="${d.date.m}/${d.date.d} ${d.score}${tr("점", " pts")}"><span class="dn">${d.date.d}</span><span class="ps">${hz(d.pillar)}</span><b class="day-score" aria-label="${tr("종합", "Overall")} ${d.score}${tr("점", " pts")}">${d.score}${tr("점", " pts")}</b></div>`; }).join('');
+    r.days.map((d) => { const s = Math.max(0, Math.round((d.score - 30) * 1.25)); return `<button type="button" data-reading-date="${isoDate(d.date)}" aria-controls="calendar-day-detail" aria-pressed="false" class="c${s > 52 ? ' hot' : ''}${same(d.date, today) ? ' today' : ''}" style="--s:${Math.min(85, s)}" aria-label="${d.date.m}/${d.date.d} ${d.score}${tr("점 상세", " points, details")}"><span class="dn">${d.date.d}</span><span class="ps">${hz(d.pillar)}</span><b class="day-score" aria-label="${tr("종합", "Overall")} ${d.score}${tr("점", " pts")}">${d.score}${tr("점", " pts")}</b></button>`; }).join('');
   const dl = (arr) => arr.map((d) => `<span class="chip"><b class="num">${d.date.m}/${d.date.d}</b> ${hz(d.pillar)} · ${d.score}${tr("점", " pts")}</span>`).join('');
   return reportHead(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}月</span>`) +
     `<section class="box card"><div class="box-head"><h3>${tr("날짜별 기운", "Daily scores")}</h3><span class="legend">${tr("낮음", "Low")} <i style="background:var(--paper)"></i><i style="background:color-mix(in srgb, var(--accent) 45%, var(--paper))"></i><i style="background:color-mix(in srgb, var(--accent) 85%, var(--paper))"></i> ${tr("높음", "High")}</span></div><div class="cal">${cells}</div>
       <div class="split"><div><h4>${tr("힘을 쓰기 좋은 날", "Days to make progress")}</h4><div class="chips">${dl(r.goodDays)}</div></div><div><h4>${tr("조심할 날", "Days to take care")}</h4><div class="chips">${dl(r.badDays)}</div></div></div></section>` +
-    catList(r.cats) + luckyRow(r.lucky);
+    calendarDetail() + catList(r.cats) + luckyRow(r.lucky);
 }
 function ymChart(months, curM) {
   const W = 600, H = 200, L = 30, R = 8, Tp = 20, B = 26;

@@ -1,3 +1,4 @@
+import { completeProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { EXAMPLE_INPUT, MANSE_BOUNDARIES } from '../../src/site/public-examples.js';
 import { buildChart, day, year, yearMonths, pillarH } from '../../src/engine/index.js';
@@ -53,6 +54,7 @@ test('KR/EN 만세력 경계의 네 입력은 직접 계산한 원국과 일치�
     for (const { input, times } of MANSE_BOUNDARIES) for (const time of times) {
       const birth = { ...input, time }, c = buildChart(birth);
       await enter(page, birth);
+      await completeProfile(page);
       await page.locator('#tool-form button[type="submit"]').click();
       const chars = await page.locator('#result .pillar-table .char').evaluateAll((nodes) => nodes.map((n) => n.firstChild.textContent));
       expect(chars.slice(0, 4).join('')).toBe(c.cols.slice().reverse().map((p) => pillarH(p)[0]).join(''));
@@ -98,6 +100,7 @@ test('KR/EN 월별 공개 해설은 직접 계산·재계산·저장 복원 결�
     await page.locator('[data-ga-cta="public_example"]').click();
     await enter(page);
     for (let attempt = 0; attempt < 2; attempt++) {
+      await completeProfile(page);
       await page.locator('#tool-form button[type="submit"]').click();
       await expect(page.locator('#result .mcard-top .num')).toHaveText(months.map((m) => String(m.score)));
       for (const m of months.filter((m) => [5, 11].includes(m.m))) {
@@ -116,7 +119,7 @@ test('KR/EN 월별 공개 해설은 직접 계산·재계산·저장 복원 결�
     expect(JSON.stringify(logged)).not.toMatch(/가상비밀|1990|14:30|score_band/);
     await page.reload();
     await expect(page.locator('#result .mcard-top .num')).toHaveText(months.map((m) => String(m.score)));
-    await expect.poll(async () => (await events(page)).filter((e) => e[1] === 'calc_result').map((e) => e[2].calc_origin)).toEqual(['saved']);
+    await expect.poll(async () => (await events(page)).filter((e) => e[1] === 'calc_result').map((e) => e[2].calc_origin)).toEqual(['session_restore']);
     await page.locator('[data-delete-profile]').click();
     await expect(page.locator('[data-storage-status]')).toContainText(prefix ? 'Deleted' : '삭제했습니다');
   }
@@ -159,6 +162,7 @@ test('오늘·내일 공개 예시에서 직접 계산하면 같은 점수가 �
     await expect(page).toHaveURL(/#public-example$/);
     await page.getByRole('link', { name: '내 정보로 직접 이용하기', exact: true }).click();
     await enter(page);
+    await completeProfile(page);
     await page.locator('#tool-form button[type="submit"]').click();
     await expect(page.locator('#result .ring')).toHaveAttribute('aria-label', `종합 ${expected.overall.score}점`);
     await expect(example.locator('[data-example-overall]')).toHaveText(`${expected.overall.score}점`);
@@ -176,10 +180,12 @@ test('공개 예시 → 직접 입력 → 2027년 결과 → 다음 기능에서
   expect((await events(page)).filter((e) => e[1] === 'calc_result')).toHaveLength(0);
   await page.getByRole('link', { name: '내 정보로 직접 이용하기' }).click();
   await enter(page);
+  await completeProfile(page);
   await page.locator('#tool-form button[type="submit"]').click();
   await expect(page.locator('#result .ring')).toHaveAttribute('aria-label', '종합 58점');
   await expect(page.locator('#result .mcard-top .num')).toHaveText(yearMonths(c, 2027).map((m) => String(m.score)));
   await page.locator('#a-notime').check();
+  await completeProfile(page);
   await page.locator('#tool-form button[type="submit"]').click();
   await expect(page.locator('#result .ring')).toHaveAttribute('aria-label', '종합 62점');
   await expect(page.locator('#result .pillar-table')).toContainText('시간 모름');
@@ -192,13 +198,14 @@ test('공개 예시 → 직접 입력 → 2027년 결과 → 다음 기능에서
   await expect(page.locator('#result .pillar-table')).toContainText('시간 모름');
   const next = await events(page);
   expect(next.filter((e) => e[1] === 'calc_start')).toHaveLength(0);
-  expect(next.find((e) => e[1] === 'calc_result')[2]).toMatchObject({ tool: 'manseryeok', calc_origin: 'saved' });
+  expect(next.find((e) => e[1] === 'calc_result')[2]).toMatchObject({ tool: 'manseryeok', calc_origin: 'session_restore' });
   expect(next.find((e) => e[1] === 'calc_result')[2]).not.toHaveProperty('source');
 });
 
 test('만세력 예시와 사용자 원국 일치, 실패한 음력 윤달은 성공 이벤트를 내지 않는다', async ({ page }) => {
   await page.goto('/manseryeok/');
   await enter(page);
+  await completeProfile(page);
   await page.locator('#tool-form button[type="submit"]').click();
   const c = buildChart({ ...EXAMPLE_INPUT });
   const chars = await page.locator('#result .pillar-table .char').evaluateAll((nodes) => nodes.map((n) => n.firstChild.textContent));
@@ -208,6 +215,7 @@ test('만세력 예시와 사용자 원국 일치, 실패한 음력 윤달은 �
   await page.locator('#a-y').selectOption('2021');
   await page.locator('#a-m').selectOption('4');
   await page.locator('#a-leap').check();
+  await completeProfile(page);
   await page.locator('#tool-form button[type="submit"]').click();
   await expect(page.locator('.form-error')).toContainText('존재하지 않는 음력');
   expect((await events(page)).filter((e) => e[1] === 'calc_result')).toHaveLength(1);
@@ -220,6 +228,7 @@ test('토정비결 입력 시작과 해설 생성 성공을 구분하고 개인 
   await page.locator('#tj-y').selectOption('1990');
   await page.locator('#tj-m').selectOption('5');
   await page.locator('#tj-d').selectOption('17');
+  await completeProfile(page);
   await page.locator('#tojeong-form button[type="submit"]').click();
   await expect(page.locator('.tojeong-code')).toBeVisible();
   const logged = await events(page);
@@ -234,6 +243,7 @@ test('캐릭터·랭킹·궁합의 기존 결과 이벤트는 개인 결과 값 
     await page.goto(path);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     await page.evaluate(() => { window.searchEvents = []; });
+    await completeProfile(page);
     await page.locator('#tool-form button[type="submit"]').click();
     await expect(page.locator('#result .report-head')).toBeVisible();
     const logged = (await events(page)).find((e) => e[1] === event);
@@ -245,6 +255,7 @@ test('캐릭터·랭킹·궁합의 기존 결과 이벤트는 개인 결과 값 
 test('결과 공유는 개인 URL을 자동 이탈 클릭 측정용 링크에 남기지 않는다', async ({ page }) => {
   await page.goto('/year/2027/');
   await enter(page);
+  await completeProfile(page);
   await page.locator('#tool-form button[type="submit"]').click();
   await expect(page.locator('#result .report-head')).toBeVisible();
   expect(await page.locator('.result-share a[href]').count()).toBe(0);

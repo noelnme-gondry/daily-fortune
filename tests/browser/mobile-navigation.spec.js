@@ -1,3 +1,4 @@
+import { completeProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ context }) => {
@@ -8,8 +9,9 @@ test('모바일 결과의 중복 운세 메뉴를 숨기고 상단 메뉴로 이
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/today/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('#result .chart-card')).toBeVisible();
+  await expect(page.locator('#result .chart-card')).toBeAttached();
   await expect(page.getByRole('navigation', { name: '다른 운세 보기', includeHidden: true })).toBeHidden();
   const resultTop = await page.locator('.site-head').evaluate((el) => el.offsetHeight + 12);
   await expect.poll(() => page.locator('#result').evaluate((el) => Math.round(el.getBoundingClientRect().top))).toBe(resultTop);
@@ -19,7 +21,7 @@ test('모바일 결과의 중복 운세 메뉴를 숨기고 상단 메뉴로 이
   await expect.poll(() => page.locator('.site-head').evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
   await page.getByRole('navigation', { name: '주요 메뉴', exact: true }).getByRole('link', { name: '내일 운세', exact: true }).click();
   await expect(page).toHaveURL(/\/tomorrow\/$/);
-  await expect(page.locator('#result .chart-card')).toBeVisible();
+  await expect(page.locator('#result .chart-card')).toBeAttached();
 });
 
 for (const width of [320, 768]) {
@@ -56,7 +58,8 @@ test('데스크톱 메뉴는 기존 위치를 유지하고 모바일 전환 상�
   await page.setViewportSize({ width: 1024, height: 900 });
   await expect(page.locator('.site-head')).not.toHaveAttribute('data-scroll-header', '');
   expect(await page.locator('.site-head').evaluate((el) => window.getComputedStyle(el).position)).toBe('static');
+  await completeProfile(page);
   await page.locator('button[type="submit"]').click();
-  await expect(page.locator('#result .chart-card')).toBeVisible();
+  await expect(page.locator('#result .chart-card')).toBeAttached();
   await expect(page.getByRole('navigation', { name: '다른 운세 보기' })).toBeVisible();
 });

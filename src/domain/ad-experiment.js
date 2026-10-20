@@ -1,7 +1,7 @@
 export const AD_POSITION_EXPERIMENT = Object.freeze({
-  id: 'ad_position_v1',
-  storageKey: 'myod:ad-position:v1',
-  placements: Object.freeze({ A: 'after_share', B: 'before_result' }),
+  id: 'ad_position_v2',
+  storageKey: 'myod:ad-position:v2',
+  placements: Object.freeze({ A: 'after_summary', B: 'before_result' }),
 });
 
 // 동일 브라우저에 배정을 유지한다. 저장 차단 시 탭, 마지막으로 현재 문서에만 유지한다.

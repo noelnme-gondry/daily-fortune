@@ -39,7 +39,7 @@ export function manseMonth(y, m, ctx) {
   const prev = m === 1 ? [y - 1, 12] : [y, m - 1];
   const next = m === 12 ? [y + 1, 1] : [y, m + 1];
   const lead = `${y}${siteText("년 ")}${m}${siteText("월의 월건은 ")}${pillarLabel(mp)}${siteText("월")}${terms.length ? `${siteText("이며, ")}${terms.map((t) => `${siteValue(t.name)}${siteText("은 ")}${t.date.d}${siteText("일 ")}${t.time}`).join(', ')}${siteText("에 듭니다")}` : siteText('입니다')}${siteText(". 아래 표는 날짜별 일진(일주)과 한국천문연구원 기준 음력, 그날의 월주를 정리한 것입니다.")}`;
-  const inRange = (yy) => yy === ctx.today.y || yy === ctx.today.y + 1;
+  const inRange = (yy) => ctx.years.includes(yy);
   return {
     path: `/manseryeok/${y}/${m}/`, title: c.title, description: `${y}${siteText("년 ")}${m}${siteText("월 만세력: 날짜별 일진(간지), 음력 날짜, 월건 ")}${pillarLabel(mp)}${terms.length ? `, ${terms.map((t) => siteValue(t.name)).join('·')}${siteText(" 절입 시각")}` : ''}${siteText("을 한 표로 확인하세요.")}`,
     crumbs: [[siteText('만세력'), '/manseryeok/'], [`${y}${siteText("년")}`, `/manseryeok/${y}/`], [`${m}${siteText("월")}`, `/manseryeok/${y}/${m}/`]], section: '/manseryeok/', ogType: 'article',

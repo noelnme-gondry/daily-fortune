@@ -102,7 +102,7 @@ test('날짜가 바뀌는 페이지는 기준 날짜를 반영한다', () => {
   assert.ok(site.render('/tti/today/').includes('10월 14일'));
   const next = createSite({ site: SITE, assets: { css: '/a.css', js: '/a.js' }, now: Date.UTC(2027, 0, 2, 3) });
   assert.ok(next.has('/year/2028/'));
-  assert.ok(!next.has('/year/2026/'));
+  assert.ok(next.has('/year/2026/'));
 });
 
 test('없는 경로는 null이고 404 페이지는 noindex', () => {

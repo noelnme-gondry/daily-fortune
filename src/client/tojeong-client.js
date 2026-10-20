@@ -5,8 +5,9 @@ import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, cleanName } from '../site/share-codec.js';
 import { load, save, removeSaved, sessionLoad, sessionSave } from './profile.js';
 import { track, trackInputStart } from './analytics.js';
-import { renderResultWithPartnerAd } from './partner-ad.js';
+import { renderResultWithPartnerAd, clearResultWithPartnerAd } from './partner-ad.js';
 import { isEnglish, tr } from '../i18n/runtime.js';
+import { todayKST, isoDate } from '../engine/core.js';
 
 const inputError = (message) => tr(message, ({
   '간지를 확인할 수 없습니다.': 'The stem–branch designation could not be identified.',
@@ -47,21 +48,32 @@ export async function mountTojeong(root) {
     }
     return readings.get(key);
   };
-  const showError = (message) => { field('error').textContent = message; field('error').hidden = false; renderResultWithPartnerAd(out, ''); };
+  const showError = (message, inputError = false) => {
+    field('error').textContent = message; field('error').hidden = false; clearResultWithPartnerAd(out);
+    if (inputError) {
+      const inputs = ['y', 'm', 'd'].map(field);
+      for (const input of inputs) { input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-errormessage', 'tj-error'); }
+      (inputs.find(input => !input.value) || inputs[2]).focus();
+    }
+    track('form_error', { tool: 'tojeong', entry_point: 'tojeong' });
+  };
   let latest = 0;
   async function render(p, source) {
     const token = ++latest;
     let result;
+    out.removeAttribute('aria-busy');
+    for (const input of form.querySelectorAll('[aria-invalid]')) { input.removeAttribute('aria-invalid'); input.removeAttribute('aria-errormessage'); }
+    if (!p.y || !p.m || !p.d) { showError(tr('생년월일을 모두 선택해 주세요.', 'Select your birth year, month and day.'), true); return false; }
     try { result = calculateTojeong(p, targetYear); }
-    catch (e) { showError(e instanceof TojeongInputError ? inputError(e.message) : tr('토정비결을 계산하지 못했습니다. 입력을 확인해 주세요.', 'The Tojeong reading could not be calculated. Check your entries.')); return false; }
+    catch (e) { showError(e instanceof TojeongInputError ? inputError(e.message) : tr('토정비결을 계산하지 못했습니다. 입력을 확인해 주세요.', 'The Tojeong reading could not be calculated. Check your entries.'), true); return false; }
     out.setAttribute('aria-busy', 'true');
     try {
       const r = await reading(result.code);
       if (token !== latest) return false;
-      renderResultWithPartnerAd(out, tojeongView(result, r, p.name) + resultShareHtml());
+      renderResultWithPartnerAd(out, tojeongView(result, r, p.name) + resultShareHtml(), { tool: 'tojeong', calc_origin: source, reading_date: isoDate(todayKST()) });
       wireShare(out.querySelector('.result-share'), shareFor(result, r, p.name));
       field('error').hidden = true;
-      track('calc_result', { tool: 'tojeong', calc_origin: source });
+      track('calc_result', { tool: 'tojeong', calc_origin: source, entry_point: 'tojeong', reading_date: isoDate(todayKST()) });
       return true;
     } catch {
       if (token === latest) showError(tr('토정비결 해설을 불러오지 못했습니다. 네트워크 연결을 확인한 뒤 다시 시도해 주세요.', 'The Tojeong reading could not be loaded. Check your network connection and try again.'));
@@ -80,7 +92,7 @@ export async function mountTojeong(root) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const p = read();
-    track('calc_submit', { tool: 'tojeong' });
+    track('calc_submit', { tool: 'tojeong', entry_point: 'tojeong' });
     if (!(await render(p, 'form'))) return;
     const temporary = sessionSave('tojeong', p);
     if (persist.checked) {
@@ -116,7 +128,7 @@ export async function mountTojeong(root) {
   const p = own || sessionLoad('a') || shared;
   if (p && !own) status.textContent += tr(' 저장된 사주 생일을 불러왔으며, 토정비결 정보는 별도로 저장합니다.', ' Your saved Saju birth date was loaded. Tojeong information is saved separately.');
   root.dataset.ready = 'true';
-  if (p) { fill(p); await render(p, 'saved'); }
+  if (p) { fill(p); await render(p, sessionLoad('tojeong') || sessionLoad('a') ? 'session_restore' : 'device_restore'); }
 }
 
 const ymd = (d) => `${d.y}.${d.m}.${d.d}`;
