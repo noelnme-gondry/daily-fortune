@@ -5,7 +5,8 @@ export function updateLanguageLinks() {
   document.querySelectorAll('[data-set-language]').forEach((link) => {
     const url = new URL(location.href);
     url.pathname = languagePath(url.pathname, link.dataset.setLanguage);
-    url.searchParams.set('lang', link.dataset.setLanguage);
+    // ?lang= 주소는 서버가 리디렉션하므로 링크에는 쓰지 않는다. 선택한 언어는 클릭할 때 쿠키로 저장한다.
+    url.searchParams.delete('lang');
     link.href = `${url.pathname}${url.search}${url.hash}`;
   });
 }

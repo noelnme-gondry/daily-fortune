@@ -37,7 +37,7 @@ export function localizedLinks(html, ctx) {
 export function languageRedirect({ path, search = '', cookie = '', acceptLanguage = '', userAgent = '', hasPath }) {
   // An explicit /en/ URL is shareable, including for Korean-language browsers.
   if (path === '/en' || path.startsWith('/en/')) return null;
-  if (/bot|crawler|spider|slurp|facebookexternalhit|bingpreview/i.test(userAgent)) return null;
+  if (/bot|crawler|spider|slurp|google|facebookexternalhit|bingpreview/i.test(userAgent)) return null;
   const language = savedLanguage(cookie) || preferredLanguage(acceptLanguage);
   if (language !== 'en') return null;
   const target = languagePath(path.endsWith('/') ? path : `${path}/`, 'en');
