@@ -166,7 +166,7 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
 <header class="site-head">
   <div class="wrap head-row">
     <a class="brand" href="/" aria-label="${attr(BRAND.name)} ${tr('홈', 'home')}"><img class="brand-logo" src="${BRAND.logo}" alt="" width="48" height="48"><span class="brand-name"><b>${BRAND.name}</b><small>${BRAND.descriptor}</small></span></a>
-    <nav class="language-switch" aria-label="${tr('언어 선택', 'Language')}"><a data-set-language="ko" href="${attr(languagePath(page.path, 'ko'))}?lang=ko" lang="ko"${ctx.lang !== 'en' ? ' aria-current="true"' : ''}>한국어</a><a data-set-language="en" href="${attr(languagePath(page.path, 'en'))}?lang=en" lang="en"${ctx.lang === 'en' ? ' aria-current="true"' : ''}>English</a></nav>
+    <nav class="language-switch" aria-label="${tr('언어 선택', 'Language')}"><a data-set-language="ko" href="${attr(languagePath(page.path, 'ko'))}" hreflang="ko" lang="ko"${ctx.lang !== 'en' ? ' aria-current="true"' : ''}>한국어</a><a data-set-language="en" href="${attr(languagePath(page.path, 'en'))}" hreflang="en" lang="en"${ctx.lang === 'en' ? ' aria-current="true"' : ''}>English</a></nav>
   </div>
   <nav class="gnav" aria-label="${tr('주요 메뉴', 'Main navigation')}"><div class="wrap gnav-row">${nav}</div></nav>
 </header>

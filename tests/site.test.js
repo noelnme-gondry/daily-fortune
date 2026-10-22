@@ -20,6 +20,15 @@ test('모든 경로가 렌더링되고 이상한 값이 없다', () => {
   }
 });
 
+test('내부 링크는 리디렉션되는 주소를 가리키지 않는다', () => {
+  const moved = (href) => /[?&]lang=/.test(href) || !!site.redirect(href.split(/[?#]/)[0])
+    || (!/\.[a-z0-9]+(\?|#|$)/i.test(href) && !href.split(/[?#]/)[0].endsWith('/'));
+  for (const [path, html] of pages) {
+    const bad = [...html.matchAll(/href="(\/[^"]*)"/g)].map((m) => m[1].replace(/&amp;/g, '&')).filter(moved);
+    assert.deepEqual(bad, [], path);
+  }
+});
+
 test('제목·설명은 페이지마다 고유하고 canonical이 자기 주소다', () => {
   const titles = new Set(), descs = new Set();
   for (const [path, html] of pages) {

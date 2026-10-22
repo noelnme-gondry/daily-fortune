@@ -32,6 +32,7 @@ test('automatic redirects preserve campaign queries and allow user preference an
   assert.equal(languageRedirect({ ...request, acceptLanguage: '' }), null);
   assert.equal(languageRedirect({ ...request, path: '/en/today/' }), null);
   assert.equal(languageRedirect({ ...request, userAgent: 'Googlebot' }), null);
+  assert.equal(languageRedirect({ ...request, userAgent: 'Mozilla/5.0 (compatible; Google-InspectionTool/1.0)' }), null);
   assert.equal(languageRedirect({ ...request, path: '/missing/' }), null);
   assert.equal(languageRedirect({ ...request, path: '/assets/app.js' }), null);
 });

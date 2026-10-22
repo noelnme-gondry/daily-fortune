@@ -107,7 +107,7 @@ test('English zodiac soft navigation updates language links, metadata and cohort
   await page.goto('/en/tti/');
   await page.locator('.tti-nav > a').nth(1).click();
   await expect(page).toHaveURL(new RegExp(`/en/tti/${todayKST().y}/`));
-  await expect(page.locator('[data-set-language="ko"]')).toHaveAttribute('href', `/tti/${todayKST().y}/?lang=ko`);
+  await expect(page.locator('[data-set-language="ko"]')).toHaveAttribute('href', `/tti/${todayKST().y}/`);
   await expect(page.locator('link[hreflang="en"]')).toHaveAttribute('href', new RegExp(`/en/tti/${todayKST().y}/$`));
   await page.locator('.zodiac-year-link').first().click();
   await expect(page.locator('[data-cohort]')).toHaveAttribute('data-ready', 'true');
