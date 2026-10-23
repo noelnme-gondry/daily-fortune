@@ -19,7 +19,7 @@ export const SITE = bilingual({
   alt: BRAND.alt,
   searchName: `${BRAND.descriptor} | ${BRAND.name}`,
   tagline: FREE_ACCESS.summary,
-  description: '회원가입 없이 상세 결과까지 모두 무료인 사주·운세 서비스입니다. 생년월일시로 사주 원국과 오늘·월간·신년·평생 운세, 궁합을 계산하고, 만세력과 음력 생일로 보는 별도 방식의 토정비결도 제공합니다.',
+  description: '회원가입 없이 사주·운세·궁합·만세력을 무료로 확인하세요. 생년월일시 기반 운세와 음력 생일로 보는 토정비결을 제공합니다.',
   publisher: `${BRAND.name} 편집팀`,
 }, EN.SITE);
 
