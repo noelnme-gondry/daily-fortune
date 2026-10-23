@@ -19,13 +19,14 @@ test('모바일 결과의 중복 운세 메뉴를 숨기고 상단 메뉴로 이
   await expect.poll(() => page.locator('.site-head').evaluate((el) => el.getBoundingClientRect().bottom)).toBeLessThanOrEqual(1);
   await page.evaluate(() => window.scrollTo(0, 1550));
   await expect.poll(() => page.locator('.site-head').evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
-  await page.getByRole('navigation', { name: '주요 메뉴', exact: true }).getByRole('link', { name: '내일 운세', exact: true }).click();
+  await page.locator('.all-menu summary').click();
+  await page.getByRole('navigation', { name: '전체 메뉴', exact: true }).getByRole('link', { name: '내일 운세', exact: true }).click();
   await expect(page).toHaveURL(/\/tomorrow\/$/);
   await expect(page.locator('#result .chart-card')).toBeAttached();
 });
 
 for (const width of [320, 768]) {
-  test(`${width}px에서 로고와 두 줄 메뉴 전체가 스크롤 방향에 따라 나타나고 숨는다`, async ({ page }) => {
+  test(`${width}px에서 로고와 주요 메뉴가 스크롤 방향에 따라 나타나고 숨는다`, async ({ page }) => {
     if (width === 320) await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/today/');
@@ -61,5 +62,5 @@ test('데스크톱 메뉴는 기존 위치를 유지하고 모바일 전환 상�
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#result .chart-card')).toBeAttached();
-  await expect(page.getByRole('navigation', { name: '다른 운세 보기' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: '다른 운세 보기', includeHidden: true })).toBeHidden();
 });

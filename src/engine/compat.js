@@ -150,11 +150,11 @@ export function compat(a, b, today) {
   const why = (s, n) => (s.length ? `${n}: ${s.map(signalLabel).join('·')}` : '');
   const mYears = years.slice().sort((x, y) => y.marriage - x.marriage || x.y - y.y).slice(0, 3).sort((x, y) => x.y - y.y);
   const bestY = mYears[0]; // 결혼운 상위 3개 해 중 가장 가까운 해
-  const marriageYears = mYears.map((r) => ({ y: r.y, pillar: r.yp, why: [why(r.sa.reasons.marriage, nameA), why(r.sb.reasons.marriage, nameB)].filter(Boolean).join(' / ') || tr('두 사람의 운이 고르게 받쳐 주는 해', 'A year with relatively even support in both readings') }));
+  const marriageYears = mYears.map((r) => ({ y: r.y, pillar: r.yp, signal: r.marriage, why: [why(r.sa.reasons.marriage, nameA), why(r.sb.reasons.marriage, nameB)].filter(Boolean).join(' / ') || tr('두 사람의 운이 고르게 받쳐 주는 해', 'A year with relatively even support in both readings') }));
   const cand = [];
   for (let y = bestY.y; y <= bestY.y + 10; y++) { const sa = yearSignals(a, y), sb = yearSignals(b, y); cand.push({ y, yp: sa.yp, sa, sb, child: sa.child + sb.child }); }
   const childYears = cand.sort((x, y) => y.child - x.child || x.y - y.y).slice(0, 3).sort((x, y) => x.y - y.y)
-    .map((r) => ({ y: r.y, pillar: r.yp, why: [why(r.sa.reasons.child, nameA), why(r.sb.reasons.child, nameB)].filter(Boolean).join(' / ') || tr('가정운이 안정되는 해', 'A year with a steady family theme') }));
+    .map((r) => ({ y: r.y, pillar: r.yp, signal: r.child, why: [why(r.sa.reasons.child, nameA), why(r.sb.reasons.child, nameB)].filter(Boolean).join(' / ') || tr('가정운이 안정되는 해', 'A year with a steady family theme') }));
   const moneyYears = years.slice().sort((x, y) => y.money - x.money || x.y - y.y).slice(0, 2).sort((x, y) => x.y - y.y)
     .map((r) => ({ y: r.y, pillar: r.yp, why: tr(`두 사람 금전운 평균 ${Math.round(r.money / 2)}점`, `Average money score: ${Math.round(r.money / 2)}`) }));
 

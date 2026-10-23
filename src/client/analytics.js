@@ -46,6 +46,7 @@ export function initAutoEvents() {
         }
       }
       else if (a.closest('.tabs')) track('select_content', { content_type: 'result_tab', item_id: href });
+      else if (a.classList.contains('home-feature')) track('select_content', { content_type: 'fun_card', item_id: href });
       else if (a.classList.contains('link-card')) track('select_content', { content_type: a.classList.contains('fun-card') ? 'fun_card' : 'card', item_id: href });
       else if (a.closest('.cta')) track('select_content', { content_type: 'cta', item_id: href });
     }

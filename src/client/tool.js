@@ -1,39 +1,29 @@
 // 계산기 페이지: 폼 ↔ 저장된 입력값 ↔ 결과 렌더링 ↔ 결과 공유
 import {
-  buildChart, birthTimesFor, ChartInputError, day, week, month, year, yearMonths, lifetime, compat, lifeStory, sajuRank,
-  todayKST, addDays, daysIn, isoDate, iljuSlug, pillarKo, pillarLabel, pillarH, josa,
+  buildChart, birthTimesFor, ChartInputError, day, week, month, year, yearMonths,
+  todayKST, addDays, isoDate, iljuSlug, pillarKo, pillarLabel, pillarH, josa,
 } from '../engine/index.js';
-import { tr, bilingual, isEnglish } from '../i18n/runtime.js';
+import { tr, isEnglish } from '../i18n/runtime.js';
 import { term } from '../i18n/terms.js';
 import { languagePath } from '../site/locale.js';
-import RANK_TABLE from '../content/rank-table.js';
 import { ILJU_TAG } from '../content/knowledge.js';
 import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine } from './profile.js';
-import { chartCard, dayView, weekView, monthView, yearView, lifeView, compatView, manseView, storyView, rankView } from './views.js';
+import { chartCard, dayView, weekView, monthView, yearView, manseView } from './views.js';
 import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, characterCode, SHARE_KINDS, cleanName } from '../site/share-codec.js';
 import { track, trackInputStart } from './analytics.js';
 import { birthTimeOptions, normalizeBranch, branchOfTime } from '../domain/birth-time.js';
-import { compatMatchesShell, mountCompatMatches } from './compat-matches-view.js';
-import { mountRankLeaders } from './rank-leaders-view.js';
 import { renderResultWithPartnerAd, clearResultWithPartnerAd } from './partner-ad.js';
 import { toolNavigation, nextToolsHtml } from '../site/tool-navigation.js';
 import { esc } from '../site/util.js';
 import { refreshPeriodContext } from './period-context.js';
+import { birthDateError, BIRTH_TIME_HINT as TIME_HINT } from '../domain/birth-input.js';
+import { wireReadingExplorer } from './reading-explorer.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const sexIdx = (p) => [...Array(60).keys()].find((n) => n % 10 === p.s && n % 12 === p.b);
 
 // 시각 입력 방식(정확한 시각 / 시진)과 날짜에 맞는 시계 기준 시진 구간을 화면에 반영한다.
-const TIME_HINT = bilingual({
-  exact: '출생 당시 시계 시각 그대로 넣으세요. 30분 보정과 서머타임은 자동으로 계산합니다.',
-  branch: '출생 당시 시계 기준 구간입니다.',
-  none: '시주 없이 년·월·일 세 기둥으로 계산합니다.',
-}, {
-  exact: 'Enter the clock time recorded at birth in Korea. The 30-minute adjustment and historical daylight saving are applied automatically. Birth-country and birth-location time conversion is not included.',
-  branch: 'Intervals follow the clock time used at birth in Korea.',
-  none: 'Uses the year, month and day pillars without an hour pillar.',
-});
 function syncTime(form, who, want) {
   const f = (id) => $(`#${who}-${id}`, form);
   if (!f('branch')) return;
@@ -85,9 +75,7 @@ function readForm(form, who) {
     noTime: f('notime').checked,
   };
 }
-const check = (p) => (!p.y || !p.m || !p.d ? tr('생년월일을 모두 선택해 주세요.', 'Select your birth year, month and day.')
-  : p.calendar === 'solar' && p.d > daysIn(p.y, p.m) ? tr(`${p.y}년 ${p.m}월에는 ${p.d}일이 없습니다.`, `Day ${p.d} does not exist in ${p.y}-${p.m}.`)
-  : !p.noTime && p.timeMode === 'exact' && !/^\d{1,2}:\d{2}$/.test(p.time || '') ? tr("태어난 시각을 입력하거나 ‘시간을 몰라요’를 선택해 주세요.", "Enter a birth time or select “I don’t know the time”.") : '');
+const check = (p) => birthDateError(p) || (!p.noTime && p.timeMode === 'exact' && !/^\d{1,2}:\d{2}$/.test(p.time || '') ? tr("태어난 시각을 입력하거나 ‘시간을 몰라요’를 선택해 주세요.", "Enter a birth time or select “I don’t know the time”.") : '');
 function navTabs(mode, today) {
   return `<nav class="tabs" aria-label="${tr("다른 운세 보기", "More fortunes")}">${toolNavigation(today).map(t => `<a href="${t.path}"${t.key === mode ? ' aria-current="page"' : ''}>${esc(t.nav)}</a>`).join('')}</nav>`;
 }
@@ -140,9 +128,14 @@ export async function mount(root) {
   const entryPoint = root.dataset.tool;
   let originEntry = entryPoint;
   const mode = entryPoint === 'home' ? 'today' : entryPoint;
+  const rankTool = mode === 'rank' ? await import('./rank-tool.js') : null;
+  const storyTool = mode === 'story' ? await import('./story-tool.js') : null;
+  const compatTool = mode === 'compatibility' ? await import('./compat-tool.js') : null;
+  const lifeTool = mode === 'lifetime' ? await import('./life-tool.js') : null;
   const form = $('#tool-form', root);
   trackInputStart(form, mode, entryPoint);
   const out = $('#result', root);
+  wireReadingExplorer(out);
   let today = todayKST();
   const pair = mode === 'compatibility';
   const yr = +(root.dataset.year || today.y);
@@ -176,6 +169,8 @@ export async function mount(root) {
     el.textContent = msg;
     el.hidden = !msg;
     if (msg) {
+      form.hidden = false;
+      root.querySelectorAll('[data-edit-profile]').forEach(button => button.setAttribute('aria-expanded', 'true'));
       stopMatches?.();
       clearResultWithPartnerAd(out);
       root.classList.remove('has-result');
@@ -197,6 +192,8 @@ export async function mount(root) {
     today = fresh;
     root.dataset.date = isoDate(today);
     if (changed) refreshPeriodContext(root, mode, today);
+    const errA = check(a), errB = b && check(b);
+    if (errA || errB) { showError(errA || errB, errA ? 'a' : 'b'); return false; }
     let ca, cb;
     let calculatingPerson = 'a';
     try {
@@ -216,29 +213,29 @@ export async function mount(root) {
     else if (mode === 'week') { res = week(ca, today); html += weekView(res, today); }
     else if (mode === 'month') { res = month(ca, today.y, today.m); html += monthView(res, today); }
     else if (mode === 'year') { res = year(ca, yr, yr === today.y + 1 ? 'next' : 'this'); html += yearView(res, yearMonths(ca, yr), today); }
-    else if (mode === 'lifetime') { res = lifetime(ca, today); html += lifeView(res, ca, today); }
-    else if (mode === 'compatibility') { res = compat(ca, cb, today); html += compatView(res, ca, cb, today); }
+    else if (mode === 'lifetime') { res = lifeTool.lifetime(ca, today); html += lifeTool.lifeView(res, ca, today); }
+    else if (mode === 'compatibility') { res = compatTool.compat(ca, cb, today); html += compatTool.compatView(res, ca, cb, today); }
     else if (mode === 'manseryeok') { html += manseView(ca); }
-    else if (mode === 'story') { res = lifeStory(ca, today); html += storyView(res, ca); }
+    else if (mode === 'story') { res = storyTool.lifeStory(ca, today); html += storyTool.storyView(res, ca); }
     else if (mode === 'rank') {
-      res = sajuRank(ca, RANK_TABLE);
+      res = rankTool.sajuRank(ca, rankTool.RANK_TABLE);
       // 밤 자시·절기 경계도 시간 제외 입력과 일치하도록 생년월일에서 다시 계산한다.
-      leaderRank = sajuRank(buildChart(toEngine({ ...a, noTime: true })), RANK_TABLE);
-      html += rankView(res, ca, leaderRank);
+      leaderRank = rankTool.sajuRank(buildChart(toEngine({ ...a, noTime: true })), rankTool.RANK_TABLE);
+      html += rankTool.rankView(res, ca, leaderRank);
     }
-    if (!pair && mode !== 'manseryeok') html += `<details class="chart-disclosure"><summary>${tr('내 사주 원국과 오행 자세히', 'Explore your birth chart and Five Elements')}</summary>${chartCard(ca, a, today)}</details>`;
+    if (!pair && mode !== 'manseryeok') html += `<details class="chart-disclosure"${['today', 'tomorrow'].includes(mode) ? ' open' : ''}><summary>${tr('내 사주 원국과 오행 자세히', 'Explore your birth chart and Five Elements')}</summary>${chartCard(ca, a, today)}</details>`;
     html += nextToolsHtml(mode, today) + navTabs(tabMode, today);
-    html += `<div class="result-actions"><button type="button" class="link-btn" data-edit-profile>${tr('입력 정보 수정·저장', 'Edit or save your details')}</button><span class="hint">${tr('이 기기에 저장하면 다음 방문에 바로 볼 수 있어요.', 'Save on this device for quicker access next time.')}</span></div>`;
+    html += `<div class="result-actions"><button type="button" class="link-btn" data-edit-profile aria-controls="tool-form" aria-expanded="${!form.hidden}">${tr('입력 정보 수정·저장', 'Edit or save your details')}</button><span class="hint">${tr('이 기기에 저장하면 다음 방문에 바로 볼 수 있어요.', 'Save on this device for quicker access next time.')}</span></div>`;
     const share = shareFor(mode, res, ca, cb, today, yr);
     if (share) html += resultShareHtml();
-    if (pair) html += compatMatchesShell(ca, cb);
+    if (pair) html += compatTool.compatMatchesShell(ca, cb);
     stopMatches?.();
     const readingDate = isoDate(res?.date || today);
     renderResultWithPartnerAd(out, html, { tool: mode, calc_origin: source, reading_date: readingDate });
     currentInputs = { a, b };
     currentChart = ca;
-    if (mode === 'rank') mountRankLeaders($('.rank-leaders', out), leaderRank);
-    if (pair) stopMatches = mountCompatMatches($('.compat-matches', out), { a: toEngine(a), b: toEngine(b) }, { a: ca, b: cb }, today);
+    if (mode === 'rank') rankTool.mountRankLeaders($('.rank-leaders', out), leaderRank);
+    if (pair) stopMatches = compatTool.mountCompatMatches($('.compat-matches', out), { a: toEngine(a), b: toEngine(b) }, { a: ca, b: cb }, today);
     root.classList.add('has-result');
     if (share) wireShare($('.result-share', out), share);
     const ev = { tool: mode, calc_origin: source, entry_point: originEntry, reading_date: readingDate };
@@ -275,9 +272,13 @@ export async function mount(root) {
   } catch { /* 분석용 출처 전달 실패는 계산을 막지 않는다. */ }
   if (entryPoint !== 'home' && a0 && (!pair || b0)) render(a0, b0, restoreOrigin);
   const savedEntry = $('[data-saved-entry]', root);
-  if (savedEntry && a0) {
+  if (savedEntry && a0 && !check(a0)) {
     savedEntry.hidden = false;
-    $('[data-saved-summary]', savedEntry).textContent = tr(`저장한 생일: ${a0.y}.${a0.m}.${a0.d} · 정보가 맞는지 확인해 주세요.`, `Saved birth date: ${a0.y}.${a0.m}.${a0.d}. Check that these details are yours.`);
+    form.hidden = true;
+    const calendar = a0.calendar === 'lunar' ? tr('음력', 'Lunar') : tr('양력', 'Solar');
+    const gender = a0.gender === 'F' ? tr('여성', 'Female') : tr('남성', 'Male');
+    const time = a0.noTime ? tr('시간 모름', 'Time unknown') : a0.timeMode === 'branch' ? tr('시진 입력', 'Hour-period input') : a0.time;
+    $('[data-saved-summary]', savedEntry).textContent = `${calendar} ${a0.y}.${a0.m}.${a0.d} · ${gender} · ${time} · ${tr('불러온 정보가 맞는지 확인해 주세요.', 'Check that these restored details are yours.')}`;
     $('[data-saved-result]', savedEntry).addEventListener('click', () => {
       track('saved_result_open', { tool: mode });
       if (render(a0, null, restoreOrigin)) out.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -285,6 +286,8 @@ export async function mount(root) {
   }
   root.addEventListener('click', event => {
     if (event.target.closest('[data-edit-profile]')) {
+      form.hidden = false;
+      root.querySelectorAll('[data-edit-profile]').forEach(button => button.setAttribute('aria-expanded', 'true'));
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
       $('#a-y', form).focus({ preventScroll: true });
     }

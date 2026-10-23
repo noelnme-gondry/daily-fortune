@@ -23,6 +23,9 @@
     "korean-lunar-calendar": "^0.3.6",
     "lunar-javascript": "^1.7.7"
   },
+  "overrides": {
+    "body-parser": "2.4.0"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",

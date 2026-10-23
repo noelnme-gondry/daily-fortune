@@ -28,7 +28,8 @@ for (const lang of ['ko', 'en']) {
       await page.locator('button[type="submit"]').click();
       const expected = withLanguage(lang, () => mode === 'week' ? week(c, today) : day(c, mode === 'tomorrow' ? addDays(today, 1) : today, mode));
       await expect(page.locator('#result .report-head h2')).toHaveText(expected.overall.headline);
-      await expect(page.locator('#result .cats .cat > p')).toHaveText(expected.cats.map((cat) => cat.text));
+      if (mode === 'week') await expect(page.locator('#result .cats .cat > p')).toHaveText(expected.cats.map(cat => cat.text));
+      else await expect(page.locator('#result [data-topic-panel] > p')).toHaveText(expected.cats.map(cat => cat.text));
       await expect(page.locator('#result .cat-top .num')).toHaveText(expected.cats.map((cat) => String(cat.score)));
       if (mode === 'week') await expect(page.locator('#result .week .wd > b')).toHaveText(expected.days.map((d) => String(d.score)));
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);

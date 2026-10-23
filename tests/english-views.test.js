@@ -2,6 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as engine from '../src/engine/index.js';
 import * as views from '../src/client/views.js';
+import { rankView } from '../src/client/rank-tool.js';
+import { storyView } from '../src/client/story-tool.js';
+import { compatView } from '../src/client/compat-tool.js';
+import { lifeView } from '../src/client/life-tool.js';
 import TABLE from '../src/content/rank-table.js';
 import { withLanguage, isEnglish, bilingual } from '../src/i18n/runtime.js';
 import { ADJ } from '../src/content/story.js';
@@ -30,8 +34,8 @@ test('all client result views render English while chart identities remain Korea
     chart: views.chartCard(chart, input, today), day: views.dayView(engine.day(chart, today, 'today')),
     week: views.weekView(engine.week(chart, today), today), month: views.monthView(engine.month(chart, today.y, today.m), today),
     year: views.yearView(engine.year(chart, today.y), engine.yearMonths(chart, today.y), today),
-    lifetime: views.lifeView(engine.lifetime(chart, today), chart, today), compatibility: views.compatView(engine.compat(chart, other, today), chart, other, today),
-    calendar: views.manseView(chart), story: views.storyView(engine.lifeStory(chart, today), chart), rank: views.rankView(rank, chart, leaderRank),
+    lifetime: lifeView(engine.lifetime(chart, today), chart, today), compatibility: compatView(engine.compat(chart, other, today), chart, other, today),
+    calendar: views.manseView(chart), story: storyView(engine.lifeStory(chart, today), chart), rank: rankView(rank, chart, leaderRank),
   };
   for (const [name, html] of Object.entries(rendered)) {
     assert.doesNotMatch(html.replace(/<[^>]*>/g, ' '), /[가-힣]|undefined|NaN|\[object Object\]/, name);

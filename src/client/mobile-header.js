@@ -22,7 +22,7 @@ export function initMobileHeader() {
     const delta = y - previousY;
     previousY = y;
     if (!mobile.matches) return;
-    if (y <= header.offsetHeight || header.contains(document.activeElement)) {
+    if (y <= header.offsetHeight || header.contains(document.activeElement) || header.querySelector('.all-menu[open]')) {
       reveal(); distance = 0; direction = 0; return;
     }
     if (!delta) return;
@@ -38,6 +38,14 @@ export function initMobileHeader() {
     window.requestAnimationFrame(update);
   }, { passive: true });
   header.addEventListener('focusin', reveal);
+  const menu = header.querySelector('.all-menu');
+  menu?.addEventListener('toggle', reveal);
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menu?.open) { menu.open = false; menu.querySelector('summary').focus(); }
+  });
+  document.addEventListener('click', event => {
+    if (menu?.open && !menu.contains(event.target)) menu.open = false;
+  });
   mobile.addEventListener('change', reset);
   window.addEventListener('pageshow', reset);
   if (window.ResizeObserver) new window.ResizeObserver(measure).observe(header);
