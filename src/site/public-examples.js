@@ -1,20 +1,54 @@
-import { elementName } from '../i18n/terms.js';
+import { elementName, term } from '../i18n/terms.js';
 import { tr } from '../i18n/runtime.js';
 import { siteText, siteValue } from './copy.js';
 // 공개 설명에만 쓰는 가상 입력. 개인 저장소·요청 매개변수를 읽지 않는다.
 // 결과를 전사하지 않고 실제 계산기와 같은 엔진으로 HTML을 생성한다.
-import { buildChart, day, isoDate, year, yearMonths, pillarLabel, TG, TG_SLUG } from '../engine/index.js';
+import { buildChart, day, isoDate, year, yearMonths, lifetime, compat, pillarLabel, TG, TG_SLUG } from '../engine/index.js';
 import { UNKNOWN_TIME } from '../content/calculation-notes.js';
 import { esc } from './util.js';
 
 export const EXAMPLE_INPUT = Object.freeze({ gender: 'M', calendar: 'solar', y: 1990, m: 5, d: 17, time: '14:30' });
+export const DEEP_EXAMPLE_INPUT = Object.freeze({ gender: 'F', calendar: 'solar', y: 1990, m: 5, d: 15, time: '14:00' });
+export const PARTNER_EXAMPLE_INPUT = Object.freeze({ gender: 'M', calendar: 'solar', y: 1988, m: 8, d: 2, time: '09:00' });
 export const MANSE_BOUNDARIES = Object.freeze([
   { id: 'ipchun', input: { gender: 'M', calendar: 'solar', y: 1990, m: 2, d: 4 }, times: ['10:30', '11:30'] },
   { id: 'night', input: { gender: 'M', calendar: 'solar', y: 1999, m: 12, d: 31 }, times: ['23:20', '23:40'] },
 ]);
 const inputText = (p) => `${p.calendar === 'solar' ? siteText('양력') : siteText('음력')} ${p.y}${siteText("년 ")}${p.m}${siteText("월 ")}${p.d}${siteText("일, ")}${p.time || siteText('시간 모름')}, ${p.gender === 'M' ? siteText('남성') : siteText('여성')}`;
-const start = (title, date) => `<section class="card box public-example" id="public-example" aria-labelledby="example-title"${date ? ` data-example-date="${isoDate(date)}"` : ''}><p class="eyebrow">${siteText("실제 엔진으로 계산한 가상 사례")}</p><h2 id="example-title">${title}</h2><p>${siteText("이 사례는 기능 설명을 위해 정한 가상의 입력이며 실존 인물이나 이용자의 저장 정보가 아닙니다.")}</p><h3>${siteText("입력 예시")}</h3><p>${inputText(EXAMPLE_INPUT)}${siteText(". 출생 당시 한국 시계 시각을 입력한 사례입니다.")}</p>`;
+const start = (title, date, input = EXAMPLE_INPUT) => `<section class="card box public-example" id="public-example" aria-labelledby="example-title"${date ? ` data-example-date="${isoDate(date)}"` : ''}><p class="eyebrow">${siteText("실제 엔진으로 계산한 가상 사례")}</p><h2 id="example-title">${title}</h2><p>${siteText("이 사례는 기능 설명을 위해 정한 가상의 입력이며 실존 인물이나 이용자의 저장 정보가 아닙니다.")}</p><h3>${siteText("입력 예시")}</h3><p>${inputText(input)}${siteText(". 출생 당시 한국 시계 시각을 입력한 사례입니다.")}</p>`;
 const end = () => `<h3>${siteText("해석의 한계")}</h3><p>${siteText("간지와 점수는 이 서비스의 계산 규칙에 따른 결과입니다. 성격이나 미래 사건이 사실로 확인되었다는 뜻이 아니며, 점수는 성공 확률이나 예측 정확도가 아닙니다.")}</p><p><a href="/about/#birth-rules">${siteText("입력·시간 경계 기준")}</a> · <a href="/about/#limits">${siteText("검증 범위와 해석의 한계")}</a></p><p class="cta"><a class="btn" href="#tool" data-ga-cta="public_example">${siteText("내 정보로 직접 이용하기")}</a></p></section>`;
+
+const deepNav = (mode) => `<nav class="example-nav" aria-label="${tr('공개 결과 예시', 'Worked examples')}"><a href="/lifetime/#public-example"${mode === 'life' ? ' aria-current="page"' : ''}>${tr('평생 운세 예시', 'Lifetime example')}</a><a href="/compatibility/#public-example"${mode === 'compat' ? ' aria-current="page"' : ''}>${tr('궁합 예시', 'Compatibility example')}</a></nav>`;
+function modelScope(date) {
+  return `<p class="note">${tr('계산 기준일', 'Reference date')}: <time datetime="${isoDate(date)}">${isoDate(date)}</time> · ${tr('현재 서비스와 동일한 계산 엔진', 'The same calculation engine as the current service')}</p><h3>${tr('현재 계산이 반영하는 범위', 'Calculation scope')}</h3><ul><li>${tr('한국의 과거 표준시·서머타임과 평균태양시 보정을 반영합니다.', 'Includes historical Korean time zones, daylight saving and mean solar time adjustments.')}</li><li>${tr('강약은 월지·일지 가중치와 비겁·인성 비율을 반영합니다.', 'Day Master strength uses month/day branch weights and Peer/Resource proportions.')}</li><li>${tr('용신은 억부 선호와 계절 보정을 합친 이 서비스의 모델입니다.', 'Useful elements follow this service’s model of strength balancing and seasonal adjustment.')}</li><li>${tr('출생지별 경도·균시차·해외 시간대 변환과 별도 격국·종격 판정은 포함하지 않습니다.', 'Does not include location-specific longitude, equation of time, overseas time-zone conversion or separate special-structure classification.')}</li></ul><p>${esc(UNKNOWN_TIME.summary)}</p><p>${esc(UNKNOWN_TIME.boundary)}</p>`;
+}
+function timeComparison(c, unknown, extraRows = '') {
+  const row = (name, a, b) => `<tr><th scope="row">${name}</th><td>${a}</td><td>${b}</td></tr>`;
+  return `<h3>${tr('같은 생일에 시간을 모른다면', 'The same birthday with an unknown time')}</h3><div class="table-wrap" tabindex="0" role="region" aria-label="${tr('시간 유무에 따른 결과 비교', 'Results with and without a birth time')}"><table><caption>${tr('다른 입력을 유지하고 첫 번째 인물의 시각만 변경했습니다.', 'All other inputs remain the same; only the first person’s birth time changes.')}</caption><thead><tr><th scope="col">${tr('비교 항목', 'Item')}</th><th scope="col">14:00</th><th scope="col">${tr('시간 모름', 'Time unknown')}</th></tr></thead><tbody>${row(tr('원국', 'Pillars'), c.cols.map(pillarLabel).join(' · '), unknown.cols.map(pillarLabel).join(' · '))}${row(tr('겉글자 수', 'Visible characters'), c.counts.reduce((a, b) => a + b, 0), unknown.counts.reduce((a, b) => a + b, 0))}${row(tr('일간 강약', 'Day Master strength'), term(c.strengthLabel), term(unknown.strengthLabel))}${row(tr('용신', 'Useful element'), elementName(c.roles.yong), elementName(unknown.roles.yong))}${extraRows}</tbody></table></div><p class="note">${tr('이 사례의 차이이며, 모든 사람의 결과가 같은 방향으로 변한다는 뜻은 아닙니다.', 'These differences apply to this example; other people’s results may change differently.')}</p>`;
+}
+
+export function lifetimeExample(date) {
+  const c = buildChart({ ...DEEP_EXAMPLE_INPUT });
+  const unknown = buildChart({ ...DEEP_EXAMPLE_INPUT, time: null });
+  const r = lifetime(c, date);
+  return `${start(tr('평생 운세 결과 예시와 읽는 법', 'Lifetime Reading: Worked Example'), null, DEEP_EXAMPLE_INPUT)}${deepNav('life')}
+    <h3>${tr('실제 계산 결과', 'Calculated results')}</h3><p><b>${esc(r.dayMaster.title)}</b> · ${esc(r.dayMaster.image)}</p><p>${esc(r.dayMaster.summary)}</p><p>${esc(r.strength.text)}</p>
+    <div class="table-wrap"><table><caption>${tr('가상 사례의 대운 흐름', 'Ten-year cycles for this fictional example')}</caption><thead><tr><th scope="col">${tr('시작 연도', 'Start year')}</th><th scope="col">${tr('만 나이', 'Age')}</th><th scope="col">${tr('대운', 'Cycle')}</th><th scope="col">${tr('점수', 'Score')}</th></tr></thead><tbody>${r.daeun.map(d => `<tr data-example-cycle="${d.startYear}"><th scope="row">${d.startYear}</th><td>${d.age}</td><td>${pillarLabel(d)}</td><td data-cycle-score>${d.score}</td></tr>`).join('')}</tbody></table></div>
+    <h3>${tr('읽는 방법', 'How to read it')}</h3><p>${tr('일간의 성질, 오행 분포와 강약을 먼저 읽고 10년 단위 대운을 살펴보세요. 대운 점수는 해당 대운과 원국을 기존 분야별 가중치로 비교한 값입니다. 실제 인생의 성취·건강·재산을 측정한 값은 아닙니다.', 'Start with the Day Master, element distribution and strength, then explore the ten-year cycles. Cycle scores compare each cycle with the natal chart using the existing area weights. They do not measure real achievements, health or wealth.')}</p>
+    ${timeComparison(c, unknown)}${modelScope(date)}${end()}`;
+}
+
+export function compatibilityExample(date) {
+  const a = buildChart({ ...DEEP_EXAMPLE_INPUT }), b = buildChart({ ...PARTNER_EXAMPLE_INPUT });
+  const unknown = buildChart({ ...DEEP_EXAMPLE_INPUT, time: null });
+  const r = compat(a, b, date), comparison = compat(unknown, b, date);
+  return `${start(tr('사주 궁합 결과 예시와 읽는 법', 'Saju Compatibility: Worked Example'), null, DEEP_EXAMPLE_INPUT)}<p>${tr('상대 가상 입력: ', 'Fictional partner: ')}${inputText(PARTNER_EXAMPLE_INPUT)}.</p>${deepNav('compat')}
+    <h3>${tr('실제 계산 결과', 'Calculated results')}</h3><p>${tr('종합 궁합', 'Overall compatibility')}: <b data-example-overall>${r.total}${tr('점', ' points')}</b> · ${esc(r.headline)}</p>
+    <div class="table-wrap"><table><caption>${tr('가상 사례의 분야별 궁합', 'Compatibility areas for this fictional pair')}</caption><thead><tr><th scope="col">${tr('분야', 'Area')}</th><th scope="col">${tr('점수', 'Score')}</th></tr></thead><tbody>${r.cats.map(cat => `<tr><th scope="row">${esc(cat.name)}</th><td data-compat-score="${cat.key}">${cat.score}</td></tr>`).join('')}</tbody></table></div>
+    ${r.lines.map(line => `<p>${esc(line)}</p>`).join('')}
+    <h3>${tr('읽는 방법', 'How to read it')}</h3><p>${tr('일간, 일지·월지·년지의 관계와 필요한 오행의 보완을 함께 비교합니다. 분야별 점수를 소통과 생활 방식의 차이를 살피는 질문으로 읽어보세요. 점수는 사랑의 크기나 결혼 성공률을 측정하지 않습니다.', 'The reading compares Day Masters, day/month/year branch relationships and element balance. Use the areas as prompts for discussing communication and everyday habits. Scores do not measure love or the probability of a successful marriage.')}</p>
+    ${timeComparison(a, unknown, `<tr><th scope="row">${tr('종합 궁합', 'Overall compatibility')}</th><td>${r.total}</td><td>${comparison.total}</td></tr>`)}${modelScope(date)}${end()}`;
+}
 
 export function dayExample(date, which) {
   const c = buildChart({ ...EXAMPLE_INPUT });

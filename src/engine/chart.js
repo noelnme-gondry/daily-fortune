@@ -6,6 +6,7 @@ import {
 } from './core.js';
 import { Solar, lunarText, solarOfLunar, utcOffset } from './calendar.js';
 import { resolveBirthTime, offsetNote } from '../domain/birth-time.js';
+import { BIRTH_YEAR_MIN, BIRTH_YEAR_MAX } from '../domain/birth-input.js';
 
 const PILLAR_KO = { year: '년주', month: '월주', day: '일주', hour: '시주' };
 
@@ -18,7 +19,7 @@ export function buildChart(input) {
     if (!s) throw new ChartInputError(tr('존재하지 않는 음력 날짜입니다.', 'This lunar date does not exist.'));
     birth = s;
   }
-  if (!(birth.y >= 1900 && birth.y <= 2050)) throw new ChartInputError(tr('1900~2050년 사이의 날짜만 계산할 수 있습니다.', 'Only dates from 1900 through 2050 can be calculated.'));
+  if (!(birth.y >= BIRTH_YEAR_MIN && birth.y <= BIRTH_YEAR_MAX)) throw new ChartInputError(tr('1900~2050년 사이의 날짜만 계산할 수 있습니다.', 'Only dates from 1900 through 2050 can be calculated.'));
   const { off, dst } = utcOffset(birth);
   // 시진만 고른 경우: 그 날짜의 시계 기준 시진 구간 가운데 시각으로 바꿔 정확한 시각과 같은 보정을 거친다.
   const branchMode = input.timeBranch != null && input.timeBranch !== '';

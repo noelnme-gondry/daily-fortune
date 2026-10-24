@@ -134,7 +134,7 @@ export function catText(c, cat, m, score, P, key, used) {
     if (pos && pos[1] > 0.6 && fresh(pos)) parts.push(tr('그래도 ', 'Even so, ') + factorText(c, cat, pos[0], 1));
   }
   let adv = pick(C.advice[band], key + cat + 'A');
-  if (cat === 'health' && (band === 'low' || band === 'mid')) adv += tr(` 특히 ${T.element[c.roles.gi].organ} 쪽을 살피세요.`, ` Traditional associations here concern the ${T.element[c.roles.gi].organ}.`);
+  if (cat === 'health' && (band === 'low' || band === 'mid')) adv += tr(' 이 점수로 건강 상태나 질환을 판단할 수는 없습니다.', ' This score does not assess health or illness.');
   parts.push(adv);
   return parts.join(' ');
 }
@@ -182,7 +182,7 @@ function buildReport(c, comb, kind, ctx) {
     const parts = [];
     if (ctx.days) parts.push(weekRhythm(ctx.days, i).text);
     parts.push(action.text);
-    if (main) parts.push((ctx.dayFactors ? tr('일진에서는 ', 'In the day pillar: ') : '') + factorText(c, cat, main[0], main[1]));
+    if (main) parts.push((ctx.dayFactors ? tr('일진 해석에서 ', 'In the day pillar: ') : '') + factorText(c, cat, main[0], main[1]));
     const counter = main?.[1] > 0 ? neg : pos;
     if (counter && Math.abs(counter[1]) > 0.6 && (used.get(counter[0]) || 0) < 2) {
       parts.push(tr('함께 살필 점은 다음과 같습니다. ', 'Also consider: ') + factorText(c, cat, counter[0], counter[1]));

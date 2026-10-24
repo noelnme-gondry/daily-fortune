@@ -2,7 +2,7 @@ import { tr, isEnglish } from '../i18n/runtime.js';
 import { term, elementName } from '../i18n/terms.js';
 // 평생 운세: 원국 해석 + 대운 흐름 + 앞으로 15년의 주요 시기.
 import T from '../content/text.js';
-import { EL_H, BR_MAIN, josa, tenGod, branchRels, pillarLabel } from './core.js';
+import { EL_H, BR_MAIN, tenGod, branchRels, pillarLabel } from './core.js';
 import { yearPillar } from './calendar.js';
 import { daeunAt } from './chart.js';
 import { CATS, year, daeunScores } from './fortune.js';
@@ -68,8 +68,8 @@ export function lifetime(c, today) {
   const byWeight = [0, 1, 2, 3, 4].sort((a, b) => c.weights[a] - c.weights[b]);
   const weakEl = byWeight[0], strongEl = byWeight[4];
   const health = [
-    tr(`가장 약한 오행은 ${josa(`${elementName(weakEl)}(${EL_H[weakEl]})`, '으로/로')} ${T.element[weakEl].organ} 건강을 꾸준히 챙겨야 합니다.`, `Your least prominent element is ${elementName(weakEl)} (${EL_H[weakEl]}). Its traditional wellbeing associations concern the ${T.element[weakEl].organ}.`),
-    tr(`가장 강한 오행은 ${elementName(strongEl)}(${EL_H[strongEl]})입니다. 지나친 기운은 ${T.element[strongEl].organ} 쪽의 과열로 나타날 수 있으니 균형을 의식하세요.`, `Your most prominent element is ${elementName(strongEl)} (${EL_H[strongEl]}). Traditional interpretation associates excess with strain around the ${T.element[strongEl].organ}, so the theme is balance.`),
+    tr(`이 원국에서 가장 적게 반영된 오행은 ${elementName(weakEl)}(${EL_H[weakEl]})입니다. 전통적인 균형 해석이며 개인의 장기 기능이나 건강 상태를 판단하지 않습니다.`, `The least prominent element in this chart is ${elementName(weakEl)} (${EL_H[weakEl]}). This is a traditional interpretation of balance and does not assess your health or organ function.`),
+    tr(`가장 많이 반영된 오행은 ${elementName(strongEl)}(${EL_H[strongEl]})입니다. 오행의 많고 적음과 실제 몸 상태는 구분하고, 생활 리듬은 현재 느끼는 피로와 일정을 기준으로 살펴보세요.`, `The most prominent element is ${elementName(strongEl)} (${EL_H[strongEl]}). Element weights do not describe your physical condition. Review your routine using your actual energy and schedule.`),
   ];
 
   const cur = daeunAt(c, today.y);

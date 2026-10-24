@@ -8,6 +8,7 @@ import { track, trackInputStart } from './analytics.js';
 import { renderResultWithPartnerAd, clearResultWithPartnerAd } from './partner-ad.js';
 import { isEnglish, tr } from '../i18n/runtime.js';
 import { todayKST, isoDate } from '../engine/core.js';
+import { birthDateError } from '../domain/birth-input.js';
 
 const inputError = (message) => tr(message, ({
   '간지를 확인할 수 없습니다.': 'The stem–branch designation could not be identified.',
@@ -66,6 +67,8 @@ export async function mountTojeong(root) {
     if (!p.y || !p.m || !p.d) { showError(tr('생년월일을 모두 선택해 주세요.', 'Select your birth year, month and day.'), true); return false; }
     try { result = calculateTojeong(p, targetYear); }
     catch (e) { showError(e instanceof TojeongInputError ? inputError(e.message) : tr('토정비결을 계산하지 못했습니다. 입력을 확인해 주세요.', 'The Tojeong reading could not be calculated. Check your entries.'), true); return false; }
+    const dateError = birthDateError(p);
+    if (dateError) { showError(dateError, true); return false; }
     out.setAttribute('aria-busy', 'true');
     try {
       const r = await reading(result.code);

@@ -194,7 +194,8 @@ test('공개 예시 → 직접 입력 → 2027년 결과 → 다음 기능에서
   expect(first.filter((e) => e[1] === 'calc_start')).toHaveLength(1);
   expect(first.filter((e) => e[1] === 'calc_result').map((e) => e[2].calc_origin)).toEqual(['form', 'form']);
   expect(JSON.stringify(first)).not.toMatch(/가상비밀|1990|14:30|has_time|calendar|score_band|pct_bucket/);
-  await page.locator('#result .tabs a[href="/manseryeok/"]').click();
+  await page.locator('.all-menu summary').click();
+  await page.locator('.menu-panel a[href="/manseryeok/"]').click();
   await expect(page.locator('#result .pillar-table')).toContainText('시간 모름');
   const next = await events(page);
   expect(next.filter((e) => e[1] === 'calc_start')).toHaveLength(0);

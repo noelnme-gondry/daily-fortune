@@ -2,6 +2,7 @@ import { completeProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { todayKST } from '../../src/engine/core.js';
 import { buildChart, lifetime, month, year, sajuRank } from '../../src/engine/index.js';
+import { HOME } from '../../src/content/pages.js';
 import { navItems } from '../../src/site/layout.js';
 import { BRAND } from '../../src/content/brand.js';
 import LEADERS from '../../src/content/rank-leaders.js';
@@ -153,51 +154,38 @@ test('모바일에서 주요 시기 상세를 터치로 열고 긴 내용을 가
   await context.close();
 });
 
-test('전체 메뉴는 PC 한 줄·모바일 두 줄이며 위아래 열이 일치한다', async ({ page }) => {
+test('주요 세 메뉴는 읽기 쉬운 크기를 유지하고 전체 메뉴에 기존 14개 경로가 있다', async ({ page }) => {
   await page.goto('/today/');
   const menu = page.getByRole('navigation', { name: '주요 메뉴', exact: true });
   const controls = menu.getByRole('link');
+  const full = page.getByRole('navigation', { name: '전체 메뉴', exact: true });
   const expected = navItems({ today: todayKST() });
-  await expect(controls).toHaveCount(14);
-  await expect(menu.locator('summary, button, details')).toHaveCount(0);
-  for (const width of [1440, 1145, 1024, 901, 900, 768, 561, 560, 430, 390, 375, 320, 1920]) {
+  await expect(controls).toHaveText(['오늘', '내 사주', '궁합']);
+  await expect(full).toBeHidden();
+  for (const width of [1440, 1024, 900, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 960 });
-    const sizes = await controls.evaluateAll((items) => items.map((el) => {
+    const sizes = await controls.evaluateAll(items => items.map(el => {
       const rect = el.getBoundingClientRect();
-      const text = document.createRange();
-      text.selectNodeContents(el);
-      const label = text.getBoundingClientRect();
-      return { top: rect.top, left: rect.left, right: rect.right, height: rect.height, labelLeft: label.left, labelRight: label.right, lines: text.getClientRects().length };
+      return { left: rect.left, right: rect.right, height: rect.height, font: parseFloat(window.getComputedStyle(el).fontSize) };
     }));
-    expect(new Set(sizes.map((s) => s.top)).size, `${width}px 메뉴 줄 수`).toBe(width <= 900 ? 2 : 1);
-    await expect(controls).toHaveText(expected.map(([, label]) => label));
-    expect(await controls.evaluateAll((links) => links.map((a) => a.getAttribute('href')))).toEqual(expected.map(([path]) => path));
     for (const size of sizes) {
       expect(size.left).toBeGreaterThanOrEqual(0);
-      expect(size.right, `${width}px 메뉴 잘림`).toBeLessThanOrEqual(width);
-      expect(size.height).toBeGreaterThanOrEqual(38);
-      expect(size.lines, `${width}px 메뉴 이름 줄바꿈`).toBe(1);
-      expect(size.labelLeft).toBeGreaterThanOrEqual(size.left);
-      expect(size.labelRight).toBeLessThanOrEqual(size.right);
+      expect(size.right).toBeLessThanOrEqual(width);
+      expect(size.height).toBeGreaterThanOrEqual(48);
+      expect(size.font).toBeGreaterThanOrEqual(14);
     }
-    if (width <= 900) for (let i = 0; i < 7; i++) {
-      expect(sizes[i].top).toBe(sizes[0].top);
-      expect(sizes[i + 7].top).toBe(sizes[7].top);
-      expect(sizes[i].left, `${width}px ${i + 1}열 왼쪽 정렬`).toBeCloseTo(sizes[i + 7].left, 1);
-      expect(sizes[i].right, `${width}px ${i + 1}열 오른쪽 정렬`).toBeCloseTo(sizes[i + 7].right, 1);
-    }
-    expect(await menu.evaluate((el) => el.scrollWidth <= el.clientWidth), `${width}px 메뉴 스크롤`).toBe(true);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), `${width}px 본문 넘침`).toBe(true);
+    await page.locator('.all-menu summary').click();
+    await expect(full.getByRole('link')).toHaveText(expected.map(([, name]) => name));
+    expect(await full.getByRole('link').evaluateAll(links => links.map(a => a.getAttribute('href')))).toEqual(expected.map(([path]) => path));
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    await page.keyboard.press('Escape');
+    await expect(full).toBeHidden();
+    await expect(page.locator('.all-menu summary')).toBeFocused();
   }
-  await page.setViewportSize({ width: 320, height: 800 });
-  await expect(menu.getByRole('link', { name: '오늘의 운세', exact: true })).toHaveAttribute('aria-current', 'page');
-  await controls.first().focus();
-  await page.keyboard.press('Tab');
-  await expect(controls.nth(1)).toBeFocused();
-  await menu.getByRole('link', { name: '사주 백과', exact: true }).focus();
-  await page.keyboard.press('Enter');
+  await page.locator('.all-menu summary').click();
+  await full.getByRole('link', { name: '사주 백과', exact: true }).click();
   await expect(page).toHaveURL(/\/saju\/$/);
-  await expect(menu.getByRole('link', { name: '사주 백과', exact: true })).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('.menu-panel a[href="/saju/"]')).toHaveAttribute('aria-current', 'page');
 });
 
 test('모바일에서 펼쳐진 메뉴를 바로 터치해 토정비결까지 이동한다', async ({ browser }) => {
@@ -205,7 +193,8 @@ test('모바일에서 펼쳐진 메뉴를 바로 터치해 토정비결까지 �
   await context.route('https://**/*', (route) => route.abort());
   const page = await context.newPage();
   await page.goto('/');
-  const menu = page.getByRole('navigation', { name: '주요 메뉴', exact: true });
+  await page.locator('.all-menu summary').tap();
+  const menu = page.getByRole('navigation', { name: '전체 메뉴', exact: true });
   await expect(menu.getByRole('link')).toHaveCount(14);
   await menu.getByRole('link', { name: '무료 토정비결', exact: true }).tap();
   await expect(page).toHaveURL(/\/tojeong\/$/);
@@ -561,7 +550,7 @@ test('올해·내년 띠별 표의 아이콘·이름·점수 정렬과 좁은 �
 test('새 브랜드와 해 로고가 홈·모바일·공유 페이지에 표시되고 파비콘을 읽을 수 있다', async ({ page }) => {
   await ready(page, '/');
   await expect(page).toHaveTitle(`${BRAND.descriptor} | ${BRAND.name}`);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(BRAND.name);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(HOME.h1);
   await expect(page.getByRole('link', { name: `${BRAND.name} 홈`, exact: true })).toBeVisible();
   const logo = page.locator('.brand-logo');
   await expect(logo).toHaveJSProperty('naturalWidth', 128);
@@ -601,14 +590,16 @@ test('결과 이미지 저장에도 해 로고가 로드되고 PNG가 생성된�
   await expect(page.locator('#result')).toContainText('이미지 다운로드를 시작했습니다.');
 });
 
-test('홈의 주요 콘텐츠가 입력 폼 옆에 보이고 첫 영역이 과하게 늘어나지 않는다', async ({ page }) => {
+test('홈의 입력과 목적 탐색이 재미 카드보다 먼저 보인다', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await ready(page, '/');
   const hero = await page.locator('.home-hero').boundingBox();
   const features = await page.locator('.home-features').boundingBox();
   const form = await page.locator('#tool-form').boundingBox();
-  expect(hero.height).toBeLessThan(740);
-  expect(features.y).toBeLessThan(form.y + form.height / 2);
+  expect(hero.height).toBeLessThan(1100);
+  expect(features.y).toBeGreaterThan(form.y + form.height);
+  const purpose = await page.locator('.purpose-list').boundingBox();
+  expect(purpose.x).toBeGreaterThan(form.x);
   await expect(page.locator('.home-feature')).toHaveCount(3);
   const name = await page.locator('#a-name').boundingBox();
   const gender = await page.locator('.field-gender .seg').boundingBox();
