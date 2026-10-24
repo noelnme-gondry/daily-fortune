@@ -117,7 +117,7 @@ export function compat(ctx) {
   };
   page.ld = [article(ctx, page), faqLd(c.faq)];
   page.body = `<article class="article">${hero(c.h1, c.lead)}<div class="table-wrap"><table class="grid-table heat small"><caption>${siteText("세로 띠와 가로 띠가 만나는 칸이 궁합 점수입니다 (100점 만점)")}</caption><thead>${head}</thead><tbody>${rows}</tbody></table></div>
-    <p class="cta"><a class="btn" href="/compatibility/">${siteText("두 사람의 사주 궁합 정확히 보기")}</a></p>${sections}${faqBlock(c.faq)}<p class="updated">${siteText("최종 업데이트 ")}${ctx.buildDate}</p></article>`;
+    <p class="cta"><a class="btn" href="/compatibility/">${tr("두 사람의 전체 사주로 비교하기", "Compare both full charts")}</a></p>${sections}${faqBlock(c.faq)}<p class="updated">${siteText("최종 업데이트 ")}${ctx.buildDate}</p></article>`;
   return page;
 }
 

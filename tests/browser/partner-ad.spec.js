@@ -50,7 +50,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       const slot = page.locator('[data-partner-ad-slot="common"]');
       await expect(slot).toHaveCount(1);
       await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
-      // 공개 예시는 광고와 푸터 사이에 올 수 있지만, 광고는 계속 main 바로 다음이다.
+      // 공개 예시는 main 안에 있고, 공통 광고는 main 바로 다음이다.
       await expect(page.locator('main + .partner-ad')).toBeVisible();
       const box = await slot.boundingBox();
       const expectedWidth = Math.min(width, 1160) - 32;
@@ -92,10 +92,10 @@ async function calculateResult(page, path, variant = 'A') {
 }
 
 for (const width of [320, 390, 768, 1024, 1440]) {
-  test(`${width}px 공개 예시·기능 안내는 기존 광고 다음에 읽히고 광고와 본문이 잘리지 않는다`, async ({ page }) => {
+  test(`${width}px 공개 예시·기능 안내는 광고 앞에 읽히고 광고와 본문이 잘리지 않는다`, async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-10-15T12:00:00+09:00'));
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ['/today/', '/manseryeok/', '/year/2027/', '/tojeong/2027/', '/about/', '/tti/2027/', '/manseryeok/2027/']) {
+    for (const path of ['/today/', '/manseryeok/', '/year/2027/', '/tojeong/2027/', '/tti/2027/', '/manseryeok/2027/']) {
       await page.goto(path);
       const slot = page.locator('[data-partner-ad-slot]');
       await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
@@ -103,7 +103,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       const additions = page.locator('#public-example, section[aria-labelledby="year-guide-title"]');
       if (await additions.count()) {
         const firstAddition = await additions.first().boundingBox();
-        expect(firstAddition.y).toBeGreaterThanOrEqual(ad.y + ad.height);
+        expect(firstAddition.y + firstAddition.height).toBeLessThanOrEqual(ad.y);
       }
       const frame = await slot.locator('iframe').boundingBox();
       expect(frame.height).toBe(140);
@@ -166,7 +166,7 @@ test('띠별 부분 이동에서도 해당 연도 안내만 갱신하고 기존 
     await expect(page.locator('[data-partner-ad-slot]')).toHaveAttribute('data-test-instance', 'original');
     if (path === '/tti/today/') await expect(page.locator('.search-supplement')).toHaveCount(0);
     else {
-      await expect(page.locator('main + .partner-ad + .search-supplement #year-guide-title')).toContainText(path.slice(5, 9));
+      await expect(page.locator('main > .search-supplement #year-guide-title')).toContainText(path.slice(5, 9));
       await expect(page.locator('.search-supplement')).toHaveCount(1);
     }
   }
@@ -257,6 +257,8 @@ test('A/B 배정은 새 문서 이동에도 유지되고 일반 페이지는 실
   await page.goto('/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ad-variant', 'B');
   await page.goto('/about/');
+  await expect(page.locator('[data-ad-variant], [data-partner-ad-slot]')).toHaveCount(0);
+  await page.goto('/tti/');
   await expect(page.locator('[data-ad-variant]')).toHaveCount(0);
   await showFraction(page, 0.8);
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);

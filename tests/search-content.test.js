@@ -15,8 +15,8 @@ const site = createSite({ site: origin, assets: { js: '/app.js', css: '/app.css'
 const core = ['/today/', '/manseryeok/', '/year/2027/', '/tojeong/2027/', '/about/'];
 
 test('핵심 5개는 초기 HTML·자기 canonical·색인 허용·사이트맵과 일관된 브랜드를 제공한다', () => {
-  assert.equal(site.routes.filter((r) => !r.lang).length, 202, '기존 한국어 경로를 유지한다');
-  assert.equal(site.routes.filter((r) => r.lang === 'en').length, 202, '각 경로에 대응하는 영어판을 제공한다');
+  assert.equal(site.routes.filter((r) => !r.lang).length, 209, '기존 한국어 경로와 새 가이드·운영 경로를 제공한다');
+  assert.equal(site.routes.filter((r) => r.lang === 'en').length, 209, '각 경로에 대응하는 영어판을 제공한다');
   for (const path of core) {
     const html = site.render(path);
     assert.ok(html.includes(`<link rel="canonical" href="${origin}${path}">`));
@@ -136,14 +136,14 @@ test('오늘·내일의 공개 예시는 해당 날짜의 실제 개인 운세�
           assert.ok(html.includes('href="#public-example"'), path);
           assert.ok(html.includes('href="#tool" data-ga-cta="public_example"'), path);
           assert.ok(html.includes(lang === 'en' ? 'Scores are neither success probabilities' : '점수는 성공 확률이나 예측 정확도가 아닙니다'), path);
-          assert.ok(html.indexOf('class="partner-ad"') < html.indexOf('id="public-example"'), path);
+          assert.ok(html.indexOf('id="public-example"') < html.indexOf('class="partner-ad"'), path);
         }
       });
     }
   }
 });
 
-test('공개 설명을 추가해도 수동 AdSense와 공통 배너의 기존 본문 순서는 유지한다', () => {
+test('공개 예시와 설명 뒤에 수동 AdSense와 공통 배너를 배치한다', () => {
   const keys = ['ADSENSE_CLIENT', 'ADSENSE_SLOT_INLINE', 'ADSENSE_SLOT_BOTTOM'];
   const previous = keys.map((key) => process.env[key]);
   try {
@@ -156,7 +156,7 @@ test('공개 설명을 추가해도 수동 AdSense와 공통 배너의 기존 �
       const tool = html.indexOf('id="tool"'), inline = html.indexOf('class="ad ad-inline"');
       const info = html.indexOf('class="info-panels"'), bottom = html.indexOf('class="ad ad-bottom"');
       const common = html.indexOf('class="partner-ad"'), example = html.indexOf('id="public-example"');
-      assert.ok(tool < inline && inline < info && info < bottom && bottom < common && common < example);
+      assert.ok(tool < info && info < example && example < inline && inline < bottom && bottom < common);
     }
   } finally {
     keys.forEach((key, i) => { if (previous[i] === undefined) delete process.env[key]; else process.env[key] = previous[i]; });
