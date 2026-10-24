@@ -123,3 +123,5 @@ export function yearExample(y, ctx) {
     <p>${tr('십신은 일간과 월주의 관계를 이해하는 맥락입니다. 위 해설은 기존 월별 계산 결과이며, 특정 십신 하나 때문에 몇 점이 증가하거나 감소했다고 분해한 값은 아닙니다.', 'The Ten Gods describe how the month pillar relates to the Day Master. The explanations above come from the existing monthly calculation; they do not assign a specific point increase or decrease to a single Ten God.')}</p>
     <h3>${siteText("시간 모름으로 바꾸면")}</h3><p>${siteText("나머지 입력을 유지하고 시간 모름을 선택하면 이 사례의 종합 점수는 ")}${unknown.overall.score}${siteText("점입니다. 시주를 제외하면 전체 오행과 관계 계산이 달라질 수 있어, 영향이 자녀운·말년운에만 한정되지 않습니다.")}</p><p>${esc(UNKNOWN_TIME.summary)}</p>${end()}`;
 }
+
+export { start as exampleStart, end as exampleEnd };

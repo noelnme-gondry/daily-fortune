@@ -18,6 +18,8 @@ import { withLanguage } from '../i18n/runtime.js';
 import { languagePath } from './locale.js';
 import { CONTENT_BASE_DATE, LATEST_CONTENT_DATE, contentModified, retainedYears } from './content-revisions.js';
 import { tr } from '../i18n/runtime.js';
+import { READING_GUIDES } from '../content/reading-guides.js';
+import { guidesHub, readingGuide } from './pages/guides.js';
 
 // 콘텐츠(백과·도구 문구)를 마지막으로 고친 날. 해설을 손보면 함께 올린다.
 export const CONTENT_UPDATED = LATEST_CONTENT_DATE;
@@ -74,6 +76,10 @@ function routeTable(ctx) {
   add('/saju/glossary/', saju.glossary, { p: 0.6, feed: true });
   add('/saju/guide/', saju.guide, { p: 0.6, feed: true });
   add('/about/', info.about, { p: 0.4 });
+  add('/guides/', guidesHub, { p: 0.7 });
+  for (const guide of READING_GUIDES) add(`/guides/${guide.slug}/`, c => readingGuide(guide.slug, c), { p: 0.7, feed: true });
+  add('/editorial/', info.editorial, { p: 0.4 });
+  add('/contact/', info.contact, { p: 0.4 });
   add('/privacy/', info.privacy, { p: 0.2, cf: 'yearly' });
   return R;
 }
@@ -90,7 +96,7 @@ export function createSite({ site, assets, now = Date.now() }) {
     if (!pageCache.has(path)) {
       const r = byPath.get(path);
       const p = withLanguage(r.lang || 'ko', () => {
-        const result = r.fn({ ...ctx, lang: r.lang || 'ko', buildDate: r.daily ? ctx.todayISO : contentModified(r.path) });
+        const result = r.fn({ ...ctx, path: r.path, lang: r.lang || 'ko', buildDate: r.daily ? ctx.todayISO : contentModified(r.path) });
         const base = r.path.replace(/^\/en(?=\/)/, '');
         const archive = /^\/(year|manseryeok|tti|tojeong)\/(\d{4})\//.exec(base);
         if (archive && Number(archive[2]) < today.y) {
@@ -143,7 +149,7 @@ export function createSite({ site, assets, now = Date.now() }) {
     rss() {
       const items = routes.filter((r) => r.feed && !r.lang).map((r) => {
         const p = page(r.path);
-        return `    <item><title>${esc(p.title)}</title><link>${site}${r.path}</link><guid isPermaLink="true">${site}${r.path}</guid><description>${esc(p.description)}</description><pubDate>${new Date(`${PUBLISHED}T09:00:00+09:00`).toUTCString()}</pubDate></item>`;
+        return `    <item><title>${esc(p.title)}</title><link>${site}${r.path}</link><guid isPermaLink="true">${site}${r.path}</guid><description>${esc(p.description)}</description><pubDate>${new Date(`${p.published || PUBLISHED}T09:00:00+09:00`).toUTCString()}</pubDate></item>`;
       }).join('\n');
       return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n  <channel>\n    <title>${SITE.name} 사주 백과</title>\n    <link>${site}/saju/</link>\n    <atom:link href="${site}/rss.xml" rel="self" type="application/rss+xml"/>\n    <description>${esc(SITE.description)}</description>\n    <language>ko</language>\n    <lastBuildDate>${new Date(`${CONTENT_UPDATED}T09:00:00+09:00`).toUTCString()}</lastBuildDate>\n${items}\n  </channel>\n</rss>\n`;
     },
@@ -176,6 +182,11 @@ ${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일�
 
 ## 운세 계산기
 ${pick((p) => ['/today/', '/tomorrow/', '/week/', '/month/', `/year/${y}/`, `/year/${y + 1}/`, '/tojeong/', `/tojeong/${y + 1}/`, '/lifetime/', '/compatibility/', '/manseryeok/'].includes(p))}
+
+## 운세 이용 가이드
+${pick((p) => /^\/guides\//.test(p))}
+- [작성·출처 기준](${site}/editorial/): 계산·전통 해석·사용 판본·AI 활용·수정 기준
+- [운영자·문의](${site}/contact/): 콘텐츠 오류와 개인정보 문의
 
 ## 재미로 보는 사주
 ${pick((p) => ['/life-story/', '/saju-ranking/', '/saju/ilju-ranking/'].includes(p))}

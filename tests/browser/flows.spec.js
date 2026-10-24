@@ -195,7 +195,8 @@ test('모바일에서 펼쳐진 메뉴를 바로 터치해 토정비결까지 �
   await page.goto('/');
   await page.locator('.all-menu summary').tap();
   const menu = page.getByRole('navigation', { name: '전체 메뉴', exact: true });
-  await expect(menu.getByRole('link')).toHaveCount(14);
+  await expect(menu.getByRole('link')).toHaveCount(15);
+  await expect(menu.getByRole('link', { name: '운세 이용 가이드', exact: true })).toBeVisible();
   await menu.getByRole('link', { name: '무료 토정비결', exact: true }).tap();
   await expect(page).toHaveURL(/\/tojeong\/$/);
   await expect(page.locator('#tojeong-tool')).toHaveAttribute('data-ready', 'true');

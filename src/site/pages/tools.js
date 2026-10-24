@@ -14,9 +14,11 @@ import { adSlot } from '../layout.js';
 import { birthTimeOptions } from '../../domain/birth-time.js';
 import { BIRTH_YEAR_MIN, BIRTH_TIME_HINT } from '../../domain/birth-input.js';
 import { dayExample, manseExample, yearExample, lifetimeExample, compatibilityExample } from '../public-examples.js';
+import { playExample } from '../play-examples.js';
 import { yearGuide } from '../year-guide.js';
 import { nextTools } from '../tool-navigation.js';
 import { dayBox, weekBox, monthBox } from '../period-boxes.js';
+import { guideLinks, periodExample } from './guides.js';
 
 const BAND = (s) => (s >= 75 ? ['high', siteText('대길')] : s >= 60 ? ['good', siteText('길')] : s >= 45 ? ['mid', siteText('평')] : ['low', siteText('주의')]);
 export const bandChip = (s) => { const [k, n] = BAND(s); return `<span class="band band-${k}">${siteValue(n)}</span>`; };
@@ -108,8 +110,8 @@ function toolPage(key, ctx, opts = {}) {
   return {
     path: t.path, title: t.title, description: t.desc, crumbs: opts.crumbs || [[t.nav, t.path]], section: t.path,
     tool: true, share: false, ld: [webApp(t, ctx), faqLd(faq)],
-    supplement: `${opts.example || ''}${opts.guide || ''}`,
-    body: `${hero(t.h1, t.lead, FREE_ACCESS.summary)}${top}${opts.example ? `<p class="note"><a href="#public-example">${tr('결과 예시와 읽는 법', 'See a worked example and reading guide')}</a></p>` : ''}${toolBlock(mode, ctx, opts)}${adSlot(ctx, 'inline')}<div class="info-panels">${disclosure('tool-method', siteText('계산 방법과 점수 기준'), howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', siteText('관련 운세와 더 알아보기'), extraAfter) : ''}${disclosure('tool-faq', siteText('자주 묻는 질문'), faqBlock(faq), 'help')}${disclosure('tool-related', siteText('다른 운세 둘러보기'), relatedFor(t.path, ctx))}</div>`,
+    supplement: `${opts.example || ''}${opts.guide || ''}${guideLinks()}${adSlot(ctx, 'inline')}`,
+    body: `${hero(t.h1, t.lead, FREE_ACCESS.summary)}${top}${opts.example ? `<p class="note"><a href="#public-example">${tr('결과 예시와 읽는 법', 'See a worked example and reading guide')}</a></p>` : ''}${toolBlock(mode, ctx, opts)}<div class="info-panels">${disclosure('tool-method', siteText('계산 방법과 점수 기준'), howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', siteText('관련 운세와 더 알아보기'), extraAfter) : ''}${disclosure('tool-faq', siteText('자주 묻는 질문'), faqBlock(faq), 'help')}${disclosure('tool-related', siteText('다른 운세 둘러보기'), relatedFor(t.path, ctx))}</div>`,
   };
 }
 
@@ -130,18 +132,20 @@ export function tomorrow(ctx) {
     after: `<section class="box-sec"><div class="sec-head"><h2>${o.m}${siteText("월 ")}${o.d}${siteText("일 띠별 운세 미리 보기")}</h2></div>${ttiDayList(o, { short: true, tomorrow: true })}</section>`,
   });
 }
-export const week = (ctx) => toolPage('week', ctx, { top: weekBox(ctx.today) });
-export const month = (ctx) => toolPage('month', ctx, { top: monthBox(ctx.today) });
+export const week = (ctx) => toolPage('week', ctx, { top: weekBox(ctx.today), example: periodExample('week', ctx.today) });
+export const month = (ctx) => toolPage('month', ctx, { top: monthBox(ctx.today), example: periodExample('month', ctx.today) });
 export const lifetime = (ctx) => toolPage('lifetime', ctx, { example: lifetimeExample(ctx.today) });
 export const compatibility = (ctx) => toolPage('compatibility', ctx, {
   example: compatibilityExample(ctx.today),
-  after: `<section class="prose"><h2>${siteText("띠 궁합만 빠르게 보고 싶다면")}</h2><p>${siteText("태어난 해의 띠만으로 보는 궁합은 ")}<a href="/tti/compatibility/">${siteText("띠 궁합표")}</a>${siteText("에서 12띠 모든 조합을 확인할 수 있습니다. 다만 띠는 여덟 글자 중 한 글자일 뿐이라, 정확한 궁합은 위의 사주 궁합으로 보세요.")}</p></section>`,
+  after: `<section class="prose"><h2>${siteText("띠 궁합만 빠르게 보고 싶다면")}</h2><p>${tr('태어난 해의 지지만 비교하는', 'For a comparison of birth-year branches, see the')} <a href="/tti/compatibility/">${siteText("띠 궁합표")}</a>. ${tr('전체 사주 궁합과 비교 범위가 다르며, 어느 쪽도 관계의 성공률을 뜻하지 않습니다.', 'Its scope differs from a full-chart comparison. Neither measures relationship success rates.')}</p></section>`,
 });
 export const story = (ctx) => toolPage('story', ctx, {
+  example: playExample('story', ctx.today),
   after: `<section class="prose"><h2>${siteText("캐릭터 도감")}</h2><p>${siteText("사주의 십신 열 가지가 캐릭터 직업이 됩니다. 비견은 독립 전사, 겁재는 승부사 검객, 식신은 풍요의 음유시인, 상관은 재치의 이야기꾼, 편재는 대륙의 모험 상인, 정재는 성실한 재무관, 편관은 불굴의 장군, 정관은 명예의 기사, 편인은 은둔의 연금술사, 정인은 지혜의 현자입니다. ")}<a href="/saju/sipsin/">${siteText("십신 뜻 자세히 보기")}</a></p></section>`,
 });
 export const rank = (ctx) => toolPage('rank', ctx, {
-  after: `<section class="prose"><h2>${siteText("60일주 중 가장 점수가 높은 일주는?")}</h2><p>${siteText("모든 사주를 같은 규칙으로 계산해 일주별 평균 점수를 낸 ")}<a href="/saju/ilju-ranking/">${siteText("60일주 랭킹")}</a>${siteText("도 확인해 보세요.")}</p></section>`,
+  example: playExample('rank', ctx.today),
+  after: `<section class="prose"><h2>${siteText("60일주 중 가장 점수가 높은 일주는?")}</h2><p>${tr('서비스가 정한 조합 집합에서 일주별 평균 점수를 비교한', 'Compare average scores within this service’s defined set of combinations in the')} <a href="/saju/ilju-ranking/">${siteText("60일주 랭킹")}</a>. ${tr('실제 사람을 조사한 통계나 개인의 능력 순위가 아닙니다.', 'These are not population statistics or rankings of personal ability.')}</p></section>`,
 });
 export const manseryeok = (ctx) => toolPage('manseryeok', ctx, {
   example: manseExample(),
@@ -198,6 +202,7 @@ export function home(ctx) {
       <nav class="reading-guides" aria-label="${tr('처음 읽는 분을 위한 안내', 'Guides for your first reading')}"><a href="/manseryeok/#public-example" data-ga-cta="reading_guide"><b>${tr('태어난 시간을 몰라도 볼 수 있나요?', 'Can I read my chart without a birth time?')}</b><span>${tr('같은 생일의 원국을 비교해 보세요.', 'Compare the charts for the same birthday.')}</span></a><a href="/year/${y + 1}/#public-example" data-ga-cta="reading_guide"><b>${tr(`${y + 1}년, 달마다 흐름이 다른 이유`, `Why each month of ${y + 1} reads differently`)}</b><span>${tr('월별 점수와 해설을 함께 읽어보세요.', 'Read monthly scores alongside the explanations.')}</span></a></nav>
       </div>
     </section>
+    ${guideLinks()}
     <section class="box-sec fun-sec"><div class="sec-head"><h2>${siteText("재미로 보는 사주")}</h2></div><div class="home-features">${fun.map(([h, t, d], i) => `<a class="card home-feature" href="${h}">${i === 0 ? '<img src="/characters/384/ranger.webp" width="72" height="72" alt="">' : `<span class="home-feature-icon">${uiIcon(i === 1 ? 'trophy' : 'book')}</span>`}<span><b>${siteValue(t)}</b><small>${d}</small></span>${uiIcon('arrow')}</a>`).join('')}</div></section>
     ${dayBox(o, siteText('오늘'))}
     <section class="box-sec"><div class="sec-head"><h2>${siteText("무료로 보는 사주와 운세")}</h2></div><div class="cards home-tools">${cards.map(([h, t, d]) => `<a class="card link-card" href="${h}"><b>${siteValue(t)}</b><span>${d}</span></a>`).join('')}</div></section>

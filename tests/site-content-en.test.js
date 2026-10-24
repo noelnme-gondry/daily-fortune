@@ -24,8 +24,8 @@ test('English encyclopedia, help and page copy cover every displayed value', () 
 
 test('Every English non-Tojeong page renders English text and metadata without truncating pillar names', () => {
   const site = createSite({ site: 'https://fortune.example', assets: {}, now: Date.UTC(2026, 9, 16) });
-  const routes = site.routes.filter((r) => r.lang === 'en' && !r.path.includes('/tojeong/'));
-  assert.equal(routes.length, 200);
+  const routes = site.routes.filter((r) => r.lang === 'en' && !r.path.startsWith('/en/tojeong/'));
+  assert.equal(routes.length, site.routes.filter(r => !r.lang && !r.path.startsWith('/tojeong/')).length);
   for (const route of routes) {
     const page = site.page(route.path);
     englishStrings({ title: page.title, description: page.description, crumbs: page.crumbs, ld: page.ld }, route.path);

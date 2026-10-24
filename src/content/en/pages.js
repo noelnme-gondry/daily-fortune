@@ -1,7 +1,8 @@
+import { PUBLISHER } from '../publisher.js';
 const freeDescription = 'All saju readings, daily fortunes, Tojeong readings, compatibility and calendar tools are free, including scores and detailed explanations. No account or payment is required.';
 export const FREE_ACCESS = { summary: 'Free detailed results, no sign-up', description: freeDescription };
 export const FREE_FAQ = { q: 'Are the detailed readings free too?', a: `Yes. ${freeDescription}` };
-export const SITE = { name: 'K-Fortune', alt: 'K-Fortune', searchName: 'K-Fortune | Korean Saju & Fortune', tagline: FREE_ACCESS.summary, description: 'Explore Korean saju with free natal charts, daily, monthly, annual and lifetime readings, compatibility, the Korean calendar and Tojeong’s 144 readings. No account required.', publisher: 'K-Fortune editorial team' };
+export const SITE = { name: 'K-Fortune', alt: 'K-Fortune', searchName: 'K-Fortune | Korean Saju & Fortune', tagline: FREE_ACCESS.summary, description: 'Explore Korean saju with free natal charts, daily, monthly, annual and lifetime readings, compatibility, the Korean calendar and Tojeong’s 144 readings. No account required.', publisher: PUBLISHER.name };
 const unknownSummary = 'Choosing “Time unknown” excludes the hour pillar, its Ten Gods, hidden stems and life stage, and any relationships involving it. Element balance, strength, the useful element and fortune scores are recalculated from three pillars, so the overall reading may change.';
 const unknownBoundary = 'For unknown birth times, the calculation library uses a noon reference to determine the year, month and day pillars and decade cycles. This does not recover your actual birth time. Near solar-term or date boundaries, the chart and decade-cycle start may differ from a calculation using the actual time.';
 const common = [
@@ -70,7 +71,7 @@ export const PRIVACY = { title: 'Privacy Policy', h1: 'Privacy Policy', sections
   { h: 'Coupang Partners advertising', text: 'This site displays Coupang Partners banners and receives commission on qualifying purchases. Loading a banner connects to Coupang servers; connection information and cookies may be used to serve ads and measure performance. Google Analytics records whether the ad area enters the viewport. Names and birth details are not included in banner settings or this event.' },
   { h: 'Comparing ad positions', text: 'The browser stores an A or B group to compare experiences with different ad placements. If persistent storage is unavailable, the assignment lasts only for the tab or page. Clearing site data removes it. Analytics may receive the group, placement, calculator type and whether the ad or result area was reached. The group contains no name or birth details.' },
   { h: 'KakaoTalk sharing', text: 'Kakao’s privacy policy applies when you use KakaoTalk sharing.' },
-  { h: 'Contact', text: 'Contact the site operator for privacy inquiries.' },
+  { h: 'Contact', text: `For privacy enquiries, contact ${PUBLISHER.name} (${PUBLISHER.email}). You do not need to send your real birth details or name initially.` },
 ] };
 export const TTI_COPY = {
   hub: { title: 'Korean Zodiac — 12 Signs, Fortune & Compatibility', h1: 'Korean Zodiac', lead: 'Your zodiac animal comes from the birth-year branch. Zodiac readings compare that branch with the current day or year through combinations, clashes and the five elements. They are broad readings shared by a sign, rather than individual birth-chart readings. Here, the sign changes at Beginning of Spring, around February 4.' },

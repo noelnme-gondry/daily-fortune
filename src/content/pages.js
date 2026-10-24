@@ -4,6 +4,7 @@ import * as EN from './en/pages.js';
 import { CHARACTER_JOBS, SETBACK_JOBS } from './character-jobs.js';
 import { BRAND } from './brand.js';
 import { UNKNOWN_TIME } from './calculation-notes.js';
+import { PUBLISHER } from './publisher.js';
 
 // 무료 이용 범위는 첫 화면·FAQ·구조화 데이터·AI용 요약에서 함께 사용합니다.
 export const FREE_ACCESS = bilingual({
@@ -20,7 +21,7 @@ export const SITE = bilingual({
   searchName: `${BRAND.descriptor} | ${BRAND.name}`,
   tagline: FREE_ACCESS.summary,
   description: '회원가입 없이 사주·운세·궁합·만세력을 무료로 확인하세요. 생년월일시 기반 운세와 음력 생일로 보는 토정비결을 제공합니다.',
-  publisher: `${BRAND.name} 편집팀`,
+  publisher: PUBLISHER.name,
 }, EN.SITE);
 
 const COMMON_FAQ = [
@@ -225,7 +226,7 @@ export const PRIVACY = bilingual({
     { h: '쿠팡 파트너스 광고', text: '이 사이트는 쿠팡 파트너스 배너를 게재하며, 이를 통한 구매에 따라 일정액의 수수료를 제공받습니다. 배너를 불러올 때 쿠팡 서버에 접속하며 접속 정보와 쿠키 등이 광고 제공과 성과 측정에 이용될 수 있습니다. Google Analytics에는 광고 영역이 화면에 들어왔는지를 집계하며, 이름과 생년월일시는 배너 설정이나 이 이벤트에 넣지 않습니다.' },
     { h: '광고 위치 비교', text: '광고 위치에 따른 이용 경험을 비교하기 위해 브라우저에 A 또는 B 그룹 값을 저장합니다. 브라우저 저장이 제한되면 현재 탭 또는 페이지에서만 유지하며, 사이트 데이터 삭제로 지울 수 있습니다. 방문 통계에는 그룹, 광고 위치, 계산기 종류, 광고와 결과 영역 도달 여부를 전송합니다. 이 그룹 값에 이름이나 생년월일시를 포함하지 않습니다.' },
     { h: '카카오톡 공유', text: '카카오톡 공유 기능을 사용할 때에는 카카오의 개인정보처리방침이 적용됩니다.' },
-    { h: '문의', text: '개인정보와 관련한 문의는 사이트 운영자에게 연락해 주세요.' },
+    { h: '문의', text: `개인정보와 관련한 문의는 ${PUBLISHER.name} (${PUBLISHER.email})으로 보내주세요. 실제 생년월일시나 이름을 먼저 보내지 않아도 됩니다.` },
   ],
 }, EN.PRIVACY);
 

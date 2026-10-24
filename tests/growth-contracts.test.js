@@ -24,7 +24,7 @@ test('새해에도 기존 54개 연도 경로·자기 canonical·양언어 연�
   assert.match(after.render('/year/'), /href="\/year\/2026\/"/);
   assert.match(after.render('/tti/2027/'), /href="\/tti\/2026\/"/);
 });
-test('본문 수정일·JSON-LD·article·sitemap이 일치하며 미수정 백과를 갱신하지 않는다', () => {
+test('본문 수정일·JSON-LD·article·sitemap이 일치하며 편집한 백과와 미수정 콘텐츠의 이력을 구분한다', () => {
   const app = site('2026-10-20T12:00:00+09:00');
   for (const path of ['/saju/sipsin/', '/tti/2027/rat/', '/tojeong/2027/', '/en/tti/2027/rat/']) {
     const date = contentModified(path), html = app.render(path);
@@ -32,7 +32,7 @@ test('본문 수정일·JSON-LD·article·sitemap이 일치하며 미수정 백�
     for (const match of html.matchAll(/"dateModified":"([^"]+)"/g)) assert.equal(match[1], date);
     assert.ok(app.sitemap().includes(`<loc>https://makeyourownday-fortune.com${path}</loc><lastmod>${date}</lastmod>`));
   }
-  assert.equal(contentModified('/saju/sipsin/'), '2026-10-16');
+  assert.equal(contentModified('/saju/sipsin/'), '2026-10-24');
   assert.equal(contentModified('/en/tti/2027/rat/'), '2026-10-20');
   assert.equal(app.page('/today/').modified, '2026-10-20');
 });

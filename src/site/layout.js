@@ -7,6 +7,8 @@ import { ttiNav } from './tti-nav.js';
 import { partnerAdSlot } from './partner-ad.js';
 import { tr } from '../i18n/runtime.js';
 import { languagePath, localizedLinks, localizedHref } from './locale.js';
+import { allowsAds } from './ad-policy.js';
+import { PUBLISHER } from '../content/publisher.js';
 
 const labels = {
   '오늘의 운세': 'Today', '내일 운세': 'Tomorrow', '내일의 운세': 'Tomorrow',
@@ -20,6 +22,7 @@ const labels = {
   '일간 10가지': '10 day masters', '십신': 'Ten Gods', '오행': 'Five Elements', '신살': 'Symbolic stars',
   '12운성': '12 life stages', '사주 용어 사전': 'Saju glossary', '사주 보는 법': 'How to read saju',
   '사이트': 'About', '소개 · 계산 방법': 'About & calculations', '개인정보처리방침': 'Privacy',
+  '운세 이용 가이드': 'Reading guides', '작성·출처 기준': 'Editorial policy', '운영자·문의': 'Contact',
 };
 const label = (text) => tr(text, labels[text] || text.replace(/^(\d{4})년 (운세|띠별 운세|만세력)$/, (_, year, kind) => kind === '운세' ? year : `${year} ${kind === '띠별 운세' ? 'zodiac' : 'calendar'}`));
 
@@ -28,7 +31,7 @@ export function navItems(ctx) {
   return [
     ['/today/', '오늘의 운세'], ['/tomorrow/', '내일 운세'], ['/week/', '주간'], ['/month/', '월간'],
     [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/tojeong/', '무료 토정비결'], ['/life-story/', '내 인생 캐릭터'], ['/saju-ranking/', '사주 랭킹'],
-    ['/compatibility/', '궁합'], ['/tti/', '띠별 운세'], ['/manseryeok/', '만세력'], ['/saju/', '사주 백과'],
+    ['/compatibility/', '궁합'], ['/tti/', '띠별 운세'], ['/manseryeok/', '만세력'], ['/saju/', '사주 백과'], ['/guides/', '운세 이용 가이드'],
   ];
 }
 
@@ -44,7 +47,7 @@ function footerGroups(ctx) {
     ['재미로 보는 사주', [['/life-story/', '사주로 본 내 인생은?'], ['/saju-ranking/', '내 사주 랭킹'], ['/saju/ilju-ranking/', '60일주 랭킹']]],
     ['띠·만세력', [['/tti/', '띠별 운세'], ['/tti/today/', '띠별 오늘의 운세'], [`/tti/${y}/`, `${y}년 띠별 운세`], ['/tti/samjae/', '삼재 띠 계산'], ['/tti/compatibility/', '띠 궁합표'], ['/manseryeok/', '만세력 계산기'], [`/manseryeok/${y}/`, `${y}년 만세력`]]],
     ['사주 백과', [['/saju/ilju/', '60일주'], ['/saju/ilgan/', '일간 10가지'], ['/saju/sipsin/', '십신'], ['/saju/ohaeng/', '오행'], ['/saju/sinsal/', '신살'], ['/saju/12unseong/', '12운성'], ['/saju/glossary/', '사주 용어 사전'], ['/saju/guide/', '사주 보는 법']]],
-    ['사이트', [['/about/', '소개 · 계산 방법'], ['/privacy/', '개인정보처리방침']]],
+    ['사이트', [['/guides/', '운세 이용 가이드'], ['/about/', '소개 · 계산 방법'], ['/editorial/', '작성·출처 기준'], ['/contact/', '운영자·문의'], ['/privacy/', '개인정보처리방침']]],
   ];
 }
 
@@ -56,7 +59,7 @@ function crumbsHtml(crumbs) {
 
 export function graph(page, ctx) {
   const url = abs(ctx, page.canonicalPath || page.path);
-  const org = { '@type': 'Organization', '@id': `${ctx.site}/#org`, name: BRAND.name, alternateName: BRAND.alt, url: `${ctx.site}/`, logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png?v=sun`, width: 512, height: 512 } };
+  const org = { '@type': 'Organization', '@id': `${ctx.site}/#org`, name: BRAND.name, alternateName: BRAND.alt, url: `${ctx.site}/`, parentOrganization: { '@type': 'Organization', name: PUBLISHER.name }, contactPoint: { '@type': 'ContactPoint', email: PUBLISHER.email, contactType: 'customer support', url: `${ctx.site}/contact/` }, logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png?v=sun`, width: 512, height: 512 } };
   const nodes = [org];
   if (page.path === '/') {
     nodes.push({ '@type': 'WebSite', '@id': `${ctx.site}/#website`, url: `${ctx.site}/`, name: BRAND.name, alternateName: BRAND.alt, description: SITE.description, inLanguage: tr('ko-KR', 'en'), isAccessibleForFree: true, publisher: { '@id': `${ctx.site}/#org` } });
@@ -91,7 +94,7 @@ function gaSnippet(id, page) {
 }
 export function adSlot(ctx, name) {
   const a = ctx.cfg.adsense;
-  if (!a || !a.slots[name]) return '';
+  if (!a || !a.slots[name] || !allowsAds({ path: ctx.path || '/' })) return '';
   return `<aside class="ad ad-${name}" aria-label="${tr('광고', 'Advertisement')}"><span class="ad-label">${tr('광고', 'Advertisement')}</span><ins class="adsbygoogle" style="display:block" data-ad-client="${attr(a.client)}" data-ad-slot="${attr(a.slots[name])}" data-ad-format="auto" data-full-width-responsive="true"></ins></aside>`;
 }
 function shareBar(page, url) {
@@ -117,7 +120,7 @@ export function layout(page, ctx) {
   const image = page.ogImage || '/og-default.png';
   const img = `${ctx.site}${ctx.lang === 'en' ? image.replace(/\.png$/, '-en.png') : image}?v=sun`;
   const cfg = ctx.cfg;
-  const ads = cfg.adsense && !page.noAds;
+  const ads = cfg.adsense && allowsAds(page);
   const nav = navHtml(page, ctx);
   const foot = footerGroups(ctx).map(([h, links]) => `<div><h2>${esc(label(h))}</h2><ul>${links.map(([p, n]) => `<li><a href="${p}">${esc(label(n))}</a></li>`).join('')}</ul></div>`).join('');
   const ld = JSON.stringify(graph(page, ctx)).replace(/</g, '\\u003c');
@@ -176,15 +179,16 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
 <main id="main" class="wrap">
 ${crumbsHtml(page.crumbs)}
 ${page.section === '/tti/' ? `${ttiNav(ctx, page.path)}<div class="tti-content" data-tti-content>${page.body}</div>` : page.body}
+${page.supplement ? `<section class="search-supplement" aria-label="${tr('계산 예시와 이용 안내', 'Calculation examples and guidance')}">${page.supplement}</section>` : ''}
 ${ads ? adSlot(ctx, 'bottom') : ''}
 ${page.share === false ? '' : shareBar(page, url)}
 </main>
 ${partnerAdSlot(page)}
-${page.supplement ? `<aside class="search-supplement wrap" aria-label="${tr('계산 예시와 이용 안내', 'Calculation examples and guidance')}">${page.supplement}</aside>` : ''}
 <footer class="site-foot">
   <div class="wrap">
     <div class="foot-groups">${foot}</div>
     <p class="foot-note">${tr(`${BRAND.name}는 생년월일시와 성별만으로 사주 원국을 세우고 운세를 계산합니다. 같은 입력이면 언제나 같은 결과가 나오며, 입력한 정보는 서버로 전송되지 않습니다. 운세는 참고용 콘텐츠입니다.`, `${BRAND.name} uses your birth date, time and gender to calculate a Korean saju reading in your browser. The same inputs produce the same results. Your birth details are not sent to our server. Readings are for reflection and entertainment.`)}</p>
+    <p class="foot-note">${tr('운영', 'Operated by')} ${PUBLISHER.name} · <a href="mailto:${PUBLISHER.email}">${PUBLISHER.email}</a></p>
     <p class="foot-note">© ${ctx.today.y} ${BRAND.name}</p>
   </div>
 </footer>
