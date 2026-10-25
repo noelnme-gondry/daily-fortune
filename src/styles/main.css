@@ -589,6 +589,9 @@ select.input { padding-right: 4px; }
 .reading-guide { max-width: 76ch; }
 .reading-guide .prose { scroll-margin-top: 24px; }
 .reading-guide .table-wrap { min-width: 0; }
+.guide-toc ol, .guide-category-nav ul { padding-left: 22px; display: grid; gap: 8px; }
+.guide-toc, .guide-category-nav { overflow-wrap: anywhere; }
+.guide-category-nav + .box-sec, [id^="category-"] { scroll-margin-top: 24px; }
 .reading-guide p, .reading-guide-cards span, .foot-note a { overflow-wrap: anywhere; }
 .reading-guide-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .editorial-note { border-inline-start: 3px solid var(--line); padding-inline-start: 16px; }

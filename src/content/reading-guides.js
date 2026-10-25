@@ -1,8 +1,11 @@
 import { bilingual } from '../i18n/runtime.js';
+import { FOUNDATION_GUIDES } from './guides-foundations.js';
+import { INTERPRETATION_GUIDES } from './guides-interpretation.js';
+import { EVERYDAY_GUIDES } from './guides-everyday.js';
 export const GUIDE_PUBLISHED = '2026-10-24';
 
-// 경로·제목·목록·관련 링크의 단일 원본. 본문은 site/pages/guides.js에서 렌더링한다.
-export const READING_GUIDES = [
+// 경로·제목·목록·관련 링크의 단일 원본. 기존 계산 가이드와 주제별 본문을 함께 연결한다.
+const CORE_READING_GUIDES = [
   { slug: 'birth-time', copy: bilingual({
     title: '태어난 시간을 모를 때, 어디까지 읽을 수 있나요?',
     description: '출생 시각 미상, 시진 입력, 입춘과 밤 11시 30분 경계를 실제 원국 비교로 설명합니다. 다른 만세력과 결과가 다를 때 확인할 순서도 안내합니다.',
@@ -39,4 +42,9 @@ export const READING_GUIDES = [
     description: 'Calculate a Tojeong code and an annual saju score for the same fictional birthday. Learn about lunar dates, leap months and edition differences.',
     lead: 'Tojeong and annual saju readings can appear to disagree because they use different inputs and rules. Compare both calculations for the same fictional birthday before treating either as a verdict.',
   }) },
+];
+
+export const READING_GUIDES = [
+  ...CORE_READING_GUIDES.map(g => ({ ...g, published: GUIDE_PUBLISHED, category: { 'birth-time': 'input', 'fortune-scores': 'cycles', compatibility: 'life', tojeong: 'cycles' }[g.slug] })),
+  ...FOUNDATION_GUIDES, ...INTERPRETATION_GUIDES, ...EVERYDAY_GUIDES,
 ];

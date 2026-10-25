@@ -51,6 +51,7 @@ export function hub(ctx) {
     ld: [{ '@type': 'ItemList', name: siteText('사주 백과'), itemListElement: secs.map(([h, t], i) => ({ '@type': 'ListItem', position: i + 1, name: t, url: `${ctx.site}${h}` })) }],
     body: `${hero(siteText('사주 백과'), `${siteText("사주(四柱)는 태어난 연·월·일·시를 천간과 지지 여덟 글자로 나타낸 것이고, 명리학은 이 여덟 글자의 오행 관계로 기질과 운의 흐름을 읽는 학문입니다. 사주 백과는 ")}${SITE.name}${siteText("의 계산에 쓰이는 개념을 하나씩 풀어 설명합니다.")}`)}
       <div class="cards">${secs.map(([h, t, d]) => `<a class="card link-card" href="${h}"><b>${siteValue(t)}</b><span>${d}</span></a>`).join('')}</div>
+      <section class="box-sec"><h2>${tr('결과를 읽다가 막히면 질문별 가이드를 찾아보세요', 'Questions while reading a chart?')}</h2><p>${tr('생일·시간 입력, 용신과 대운, 직업·재물·관계의 해석 범위까지 실제 이용 질문으로 설명합니다.', 'Explore birth inputs, useful elements, major cycles and the scope of work, money and relationship readings.')} <a href="/guides/">${tr('주제별 이용 가이드 전체 목록', 'Browse the complete guide index')}</a></p></section>
       <section class="box-sec"><div class="sec-head"><h2>${siteText("60일주 바로 가기")}</h2></div>${iljuGrid()}</section>`,
   };
 }
