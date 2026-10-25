@@ -1,0 +1,188 @@
+import { defineGuide as guide } from './guide-catalog.js';
+
+export const FOUNDATION_GUIDES = [
+  guide('chart-reading', 'start', ['heavenly-stems-branches', 'ten-gods-reading', 'birth-time'], ['/manseryeok/', '/saju/guide/'], 'chart', {
+    title: '만세력 보는 법: 여덟 글자에서 무엇부터 읽을까요?',
+    description: '년주·월주·일주·시주와 일간의 위치를 실제 원국으로 확인하고, 오행·십신·대운을 읽는 순서를 안내합니다.',
+    lead: '만세력을 열었는데 한자 아래에 십신과 신살이 줄줄이 붙어 있으면 어디부터 읽어야 할지 막막합니다. 먼저 생일 입력을 확인한 뒤, 원국과 해석 항목을 나누어 보면 표의 구조가 보입니다.',
+    topics: ['만세력 보는 법', '사주팔자 뜻', '년주·월주·일주·시주', '내 일간 찾기'],
+    sections: [
+      { title: '기둥 이름과 일간의 위치부터 확인합니다', paragraphs: ['사주는 출생 연·월·일·시를 각각 천간과 지지 한 쌍으로 표시한 네 기둥입니다. 네 쌍의 여덟 글자를 팔자라고 합니다. 화면마다 기둥을 나열하는 방향이 다르므로 왼쪽·오른쪽보다 년주·월주·일주·시주라는 표제를 먼저 읽으세요.', '일간은 일주의 위쪽 글자이고 일지는 아래쪽 글자입니다. 일간은 이 서비스가 다른 글자의 십신을 정하는 기준입니다. 태어난 해의 동물인 띠와 일간은 서로 다른 항목입니다.'] },
+      { title: '원국을 기록한 다음 관계를 읽습니다', paragraphs: ['첫째, 달력 종류·윤달·출생 시각을 확인합니다. 둘째, 네 기둥과 일간을 적습니다. 셋째, 겉글자의 오행과 지장간을 구분하고 십신을 읽습니다. 마지막으로 강약·용신과 대운·세운을 봅니다. 신살 이름부터 읽으면 앞 단계의 조건을 놓치기 쉽습니다.', '아래 표는 가상 생일을 실제 엔진에 넣은 결과입니다. 자신의 결과와 비교할 때에는 한자가 같다는 사실과 그 글자에 붙인 해석을 구분하세요. 시간을 모르면 시주는 미상으로 남겨 두며, 나머지 결과에도 경계 시각의 불확실성이 남을 수 있습니다.'] },
+      { title: '표에서 알 수 있는 것과 별도로 확인할 것을 나눕니다', paragraphs: ['같은 입력과 같은 계산 규칙이면 같은 원국을 재현할 수 있습니다. 이 재현성은 성격이나 미래 사건을 맞힌다는 뜻이 아닙니다. 일간 한 글자로 직업·배우자·건강을 결정할 수 없습니다.', '처음에는 원국, 일간, 궁금한 용어 하나만 기록해 보세요. 그런 다음 해당 백과와 계산 방법을 읽고 다시 결과로 돌아오면 어떤 문장이 계산값이고 어떤 문장이 전통적인 해석인지 구별하기 쉽습니다.'] },
+    ],
+    checklist: ['기둥 표제와 일간 위치를 확인했나요?', '달력·윤달·시간 미상 여부를 기록했나요?', '신살보다 원국·오행·십신을 먼저 읽었나요?'],
+  }, {
+    title: 'How to read a saju chart, starting with its eight characters',
+    description: 'Locate the four pillars and Day Master in a calculated chart, then read elements, Ten Gods and major cycles in order.',
+    lead: 'A chart can feel crowded with characters and labels. Separate the birth inputs, the four pillars and the interpretation layers before trying to understand every term.',
+    topics: ['Reading a birth chart', 'Four pillars and eight characters', 'Locating the Day Master', 'Chart reading order'],
+    sections: [
+      { title: 'Find the pillar labels and the Day Master', paragraphs: ['Saju expresses the birth year, month, day and hour as four pairs of a heavenly stem and earthly branch. Together they form eight characters. Chart layouts can run in different directions, so use the pillar labels rather than assuming a left-to-right order.', 'The Day Master is the upper character of the day pillar; the lower character is the day branch. The Day Master is the reference for Ten Gods relationships. It is different from the animal attached to the birth year.'] },
+      { title: 'Record the chart before reading its relationships', paragraphs: ['Check calendar, leap month and time first. Record the pillars and Day Master next. Then distinguish visible elements from hidden stems and read the Ten Gods. Read strength, useful elements and time cycles afterward. Starting with special stars can hide these dependencies.', 'The example below is calculated from fictional inputs. Matching characters and interpreting those characters are separate steps. An unknown time leaves out the hour pillar; dates near a boundary can leave uncertainty in other pillars too.'] },
+      { title: 'Separate reproducible values from personal conclusions', paragraphs: ['The same inputs and rules can reproduce the same pillars. This does not establish accurate personality or event prediction. One Day Master cannot determine a career, partner or health outcome.', 'Start by recording the pillars, Day Master and one term you want to understand. Read its reference entry and return to the chart. This helps separate calculated values from traditional interpretation.'] },
+    ],
+    checklist: ['Locate the pillar labels and Day Master.', 'Record calendar, leap month and time uncertainty.', 'Read elements and Ten Gods before special stars.'],
+  }),
+  guide('heavenly-stems-branches', 'start', ['chart-reading', 'five-elements-balance', 'same-chart'], ['/saju/ilgan/', '/saju/ilju/', '/saju/glossary/'], '', {
+    title: '천간·지지·60갑자: 띠, 일간, 일주는 어떻게 다른가요?',
+    description: '천간 10개와 지지 12개가 60갑자를 이루는 방식, 띠·일간·일주의 차이, 음양오행의 분류를 설명합니다.',
+    lead: '호랑이띠인데 일주 설명에는 다른 동물이 나오면 결과가 틀렸다고 생각하기 쉽습니다. 출생 연도의 지지와 출생한 날의 간지는 서로 다른 주기를 나타냅니다.',
+    topics: ['천간 10개와 지지 12개', '60갑자 원리', '띠와 일주 차이', '음양오행 뜻'],
+    sections: [
+      { title: '천간과 지지는 짝으로 순환합니다', paragraphs: ['천간은 갑·을·병·정·무·기·경·신·임·계, 지지는 자·축·인·묘·진·사·오·미·신·유·술·해입니다. 두 목록을 동시에 한 칸씩 진행하면 갑자에서 시작해 60번 만에 같은 짝으로 돌아옵니다. 10과 12의 가능한 모든 조합 120개를 쓰는 방식이 아닙니다.', '갑자 다음은 을축, 그다음은 병인입니다. 이 짝은 연도뿐 아니라 월·일·시를 표시할 때도 쓰입니다. 같은 갑자라는 이름이라도 어느 기둥을 가리키는지 확인해야 합니다.'] },
+      { title: '띠·일간·일주는 비교 단위가 다릅니다', paragraphs: ['띠는 태어난 해의 지지를 동물로 표시합니다. 일간은 태어난 날의 천간 한 글자이고, 일주는 그날의 천간과 지지 두 글자입니다. 같은 띠인 사람이 모두 같은 일간이나 일주를 갖지는 않습니다.', '60일주 목록은 60종류의 사람을 검증해 분류한 심리검사가 아닙니다. 같은 일주 안에서도 다른 기둥과 입력 시각이 달라지므로 일주 설명을 전체 원국의 판정으로 사용하지 마세요.'] },
+      { title: '음양오행은 전통 분류 체계로 읽습니다', paragraphs: ['천간과 지지는 음양과 목·화·토·금·수로 분류합니다. 여기서 오행은 실제 물질의 함유량이나 몸속 성분을 뜻하지 않습니다. 목이 많다는 문장도 나무와 관련된 직업에 반드시 종사한다는 결론이 아닙니다.', '먼저 내 일간이 어느 오행인지 확인하고, 다른 글자와 상생·상극 관계를 찾아보세요. 여러 층의 분류를 한 단어의 성격표로 축약하지 않는 것이 기본입니다.'] },
+    ],
+    checklist: ['띠는 년지, 일간은 일주의 천간이라는 점을 구별했나요?', '갑자라는 이름이 어느 기둥인지 확인했나요?', '상징적 분류를 실제 성격 검사와 구분했나요?'],
+  }, {
+    title: 'Heavenly stems, earthly branches and the 60-pair cycle',
+    description: 'Understand the ten stems, twelve branches and sexagenary cycle, and distinguish zodiac animal, Day Master and day pillar.',
+    lead: 'Your birth-year animal and your day-pillar animal can differ. They refer to different cycles rather than contradictory results.',
+    topics: ['Ten stems and twelve branches', 'The sexagenary cycle', 'Zodiac versus day pillar', 'Yin, yang and elements'],
+    sections: [
+      { title: 'Stems and branches advance together', paragraphs: ['Ten heavenly stems and twelve earthly branches each advance one position at a time. Starting from Gap-Ja, the same pair returns after 60 steps. This is not a list of all 120 possible combinations.', 'Gap-Ja is followed by Eul-Chuk and Byeong-In. The pairs can label years, months, days and hours, so identify the relevant pillar whenever you encounter a pair.'] },
+      { title: 'Zodiac, Day Master and day pillar use different units', paragraphs: ['A zodiac animal represents the birth-year branch. The Day Master is one stem from the birth day; the day pillar contains both the day stem and branch. Sharing an animal does not establish a shared Day Master.', 'The 60 day pillars are not a validated personality inventory. People with a shared day pillar can have different remaining pillars and birth times. Read the entry as one part of a chart.'] },
+      { title: 'Read yin, yang and elements as traditional classifications', paragraphs: ['Stems and branches are classified by yin/yang and Wood, Fire, Earth, Metal and Water. These are not measurements of bodily substances or material composition. More Wood does not establish a particular occupation.', 'Locate your Day Master’s element before exploring its generating and controlling relationships. Avoid reducing several layers of classification to a single personality label.'] },
+    ],
+    checklist: ['Distinguish year branch, day stem and day pillar.', 'Identify which pillar a pair belongs to.', 'Separate traditional symbolism from personality testing.'],
+  }),
+  guide('solar-lunar', 'input', ['ipchun-boundary', 'birth-time', 'tojeong'], ['/manseryeok/', '/about/#birth-rules'], 'calendar', {
+    title: '사주는 음력인가요, 양력인가요? 윤달 생일 입력법',
+    description: '양력·음력 생일과 윤달을 구별하고, 같은 출생일을 중복 변환하지 않는 입력 순서와 달력 오류 확인법을 정리합니다.',
+    lead: '가족이 기억하는 음력 생일과 주민등록에 적힌 날짜가 다르면 어떤 날짜를 넣어야 할지 고민됩니다. 중요한 것은 달력 이름 자체보다 실제 출생일을 어떤 달력으로 기록했는지입니다.',
+    topics: ['사주 양력 음력 차이', '윤달 생일 입력', '음력 양력 변환', '등록 생일과 실제 생일'],
+    sections: [
+      { title: '알고 있는 날짜의 달력 종류를 선택합니다', paragraphs: ['양력으로 알고 있는 생일은 양력을, 음력으로 알고 있는 생일은 음력을 선택합니다. 이 서비스는 음력 입력을 양력 날짜로 변환한 다음 원국을 계산합니다. 음력 날짜를 직접 양력으로 바꿨다면 변환된 날짜는 양력으로 입력해야 합니다.', '가령 어떤 음력 생일을 변환해 양력 날짜를 얻은 뒤 다시 음력 항목에 넣으면 이중 변환이 됩니다. 숫자가 같은 양력 날짜와 음력 날짜도 보통 같은 날이 아닙니다.'] },
+      { title: '윤달 여부는 월 번호와 별도로 확인합니다', paragraphs: ['같은 해에 같은 월 번호의 평달과 윤달이 있으면 서로 다른 기간입니다. 가족이 “음력 몇 월”이라고만 기억할 때는 윤달인지까지 확인하세요. 선택한 연도에 존재하지 않는 윤달 날짜는 다른 날로 대체해서 해석하면 안 됩니다.', '달력 변환과 토정비결 작괘는 단계가 다릅니다. 이 사이트의 사주 원국은 실제 음력 날짜를 변환하지만 토정비결의 윤달 작괘에는 별도 규칙이 있으므로 토정비결 가이드도 함께 확인하세요.'] },
+      { title: '등록 날짜보다 실제 기록의 근거를 정리합니다', paragraphs: ['실제 생일과 신고된 날짜가 다르다고 알고 있다면 어떤 자료로 실제 출생일을 확인했는지 기록하세요. 문서마다 날짜가 다르거나 기억만 남아 있다면 그 불확실성을 지우지 말고 후보를 따로 비교합니다.', '입력 후 결과의 양력 날짜와 음력 표기를 다시 대조하세요. 같은 실제 출생일, 같은 시각과 설정이라면 양력으로 입력하든 해당 음력으로 입력하든 원국이 일치해야 합니다. 일치하지 않으면 해석보다 입력 검토가 먼저입니다.'] },
+    ],
+    checklist: ['변환 전 날짜와 변환 후 날짜의 달력 종류를 구별했나요?', '음력 생일의 윤달 여부를 확인했나요?', '결과에 표시된 양력·음력 날짜를 대조했나요?'],
+  }, {
+    title: 'Solar or lunar birthday? Entering leap-month dates correctly',
+    description: 'Choose the calendar of the birthday you actually know, check leap months and avoid converting the same date twice.',
+    lead: 'A family’s lunar birthday and a registered date can differ. Start by identifying what calendar each record uses and which record describes the actual birth.',
+    topics: ['Solar versus lunar inputs', 'Leap-month birthdays', 'Calendar conversion', 'Registered versus actual birth date'],
+    sections: [
+      { title: 'Select the calendar of the date you know', paragraphs: ['Choose solar for a known solar date and lunar for a known lunar date. This service converts lunar inputs before calculating the pillars. If you have already converted a lunar birthday, enter the resulting date as solar.', 'Entering a converted solar date in the lunar field converts it again. Identical written numbers in the two calendars generally do not describe the same day.'] },
+      { title: 'Check leap-month status separately', paragraphs: ['A regular month and a leap month with the same number are different periods. Ask whether a remembered lunar birthday was in a leap month. Do not replace a nonexistent leap-month date with an arbitrary valid date.', 'Calendar conversion and Tojeong code generation are different stages. Saju converts the actual lunar date; this site’s Tojeong calculation uses a separate leap-month convention described in its own guide.'] },
+      { title: 'Keep the evidence for the actual birth date', paragraphs: ['If the registered birthday differs from the actual birthday, record the source of the actual date. When records disagree, preserve the uncertainty and compare candidate inputs separately.', 'Compare the displayed solar and lunar dates after calculation. Equivalent dates with the same time and settings should produce matching pillars. If they do not, check inputs before interpretation.'] },
+    ],
+    checklist: ['Distinguish the original calendar from the converted one.', 'Check lunar leap-month status.', 'Compare the displayed dates after calculation.'],
+  }),
+  guide('ipchun-boundary', 'input', ['solar-lunar', 'birth-time', 'annual-monthly'], ['/manseryeok/#public-example', '/tti/'], 'ipchun', {
+    title: '입춘 전후 사주와 띠가 달라지는 이유: 절입 기준',
+    description: '1월 1일·설날·입춘의 차이, 월주가 바뀌는 절입 시각, 입춘 출생자의 년주·월주 확인 순서를 설명합니다.',
+    lead: '같은 해에 태어났는데 만세력에서는 전년 간지가 나오기도 합니다. 사주에서 쓰는 해와 달의 경계가 일상 달력의 1월 1일이나 매월 초하루와 같지 않기 때문입니다.',
+    topics: ['입춘 전 출생 띠', '사주 새해 기준', '월주 절입', '절기 당일 출생'],
+    sections: [
+      { title: '사주 년주는 입춘 경계를 사용합니다', paragraphs: ['이 서비스의 원국 년주는 입춘을 기준으로 바뀝니다. 양력 연도나 음력 설날만으로 년주를 결정하지 않습니다. 일상에서 부르는 띠의 관습과 사주 년지의 기준이 다르면 같은 생일의 띠 표현이 달라 보일 수 있습니다.', '입춘은 매년 같은 시각에 오지 않습니다. 입춘 당일 출생이라면 날짜만 보고 전년·새해를 선택하지 말고, 출생 시각과 해당 연도의 절입 시각을 같은 시간 기준에서 비교해야 합니다.'] },
+      { title: '월주도 양력·음력 초하루에 일괄 변경되지 않습니다', paragraphs: ['월주는 입춘·경칩 같은 월 경계를 이루는 절기를 기준으로 계산합니다. 따라서 양력 3월생이라는 정보만으로 같은 월주를 확정할 수 없습니다. 24절기 모두가 월주를 한 번씩 바꾸는 것도 아닙니다.', '다른 만세력과 월주가 다르면 생일·시각·달력 종류를 맞춘 뒤 절입 계산과 시간 보정을 비교하세요. 아래는 같은 날짜에서 시각만 바꾼 실제 원국 비교이며, 해석의 좋고 나쁨을 비교한 표가 아닙니다.'] },
+      { title: '경계일에 시간을 모르면 후보가 남습니다', paragraphs: ['시간 모름을 선택하면 계산에 쓰는 기준 시각이 생기지만 실제로 입춘 이전인지 이후인지 알아낸 것은 아닙니다. 경계일 출생은 년주·월주를 확정하기 전에 출생 기록을 확인해야 합니다.', '올해 운세를 읽는 날짜 구분과 태어난 순간의 년주 결정도 구별하세요. 서비스의 양력 연간 화면을 읽는 것과 생일의 절입 경계를 확인하는 일은 서로 다른 작업입니다.'] },
+    ],
+    checklist: ['일상적인 띠와 원국 년지의 기준을 구별했나요?', '절입 시각과 출생 시각을 같은 시간 기준으로 비교했나요?', '경계일의 시간 미상 결과를 확정하지 않았나요?'],
+  }, {
+    title: 'Why pillars change around Ipchun and solar-term boundaries',
+    description: 'Separate January 1, Lunar New Year and Ipchun, and compare birth times around year and month pillar boundaries.',
+    lead: 'A chart can show the previous year’s pair for a birthday in the new calendar year. The chart uses different year and month boundaries from an ordinary calendar.',
+    topics: ['Birth before Ipchun', 'Saju year boundary', 'Month pillar boundaries', 'Birth on a solar-term date'],
+    sections: [
+      { title: 'The year pillar changes at Ipchun', paragraphs: ['This service uses Ipchun for the natal year boundary. Neither January 1 nor Lunar New Year alone determines the year pillar. Everyday zodiac conventions can differ from the chart’s year-branch convention.', 'Ipchun does not occur at an identical clock time every year. For a birth on that date, compare the birth instant and solar-term instant on the same time basis.'] },
+      { title: 'Month pillars do not simply change on the first', paragraphs: ['Month pillars use the solar terms that define month boundaries, such as Ipchun and Gyeongchip. A solar-calendar month does not establish a single pillar. Not every one of the 24 solar terms changes the month pillar.', 'If calculators disagree, match inputs before checking solar-term times and adjustments. The example changes only the time on one date; it compares pillars rather than favorable outcomes.'] },
+      { title: 'Unknown time can leave boundary candidates unresolved', paragraphs: ['A reference time used for an unknown birth time does not reveal which side of Ipchun the birth occurred on. Check records before fixing year and month pillars for a boundary date.', 'Also separate the date range of an annual report from the convention that determines a natal year pillar. Reading a solar-calendar annual page is a different task from establishing birth pillars.'] },
+    ],
+    checklist: ['Separate everyday zodiac conventions from natal year branches.', 'Compare birth and solar-term instants on the same basis.', 'Preserve uncertainty for an unknown time on a boundary date.'],
+  }),
+  guide('midnight-boundary', 'input', ['solar-time', 'birth-time', 'same-chart'], ['/manseryeok/#public-example', '/about/#birth-rules'], 'night', {
+    title: '야자시·정자시와 밤 11시 30분: 일주가 다른 이유',
+    description: '자시의 날짜 경계와 한국 시각 보정을 구분하고, 같은 날짜의 두 시각으로 일주·시주 차이를 확인합니다.',
+    lead: '밤늦게 태어난 사람은 서비스마다 일주가 달라질 수 있습니다. 날짜를 넘기는 규칙과 시계 보정을 따로 확인해야 무엇 때문에 달라졌는지 알 수 있습니다.',
+    topics: ['야자시 정자시 차이', '밤 11시 30분 일주', '자시 출생', '만세력 일주 불일치'],
+    sections: [
+      { title: '자시는 현대 달력의 자정을 가로지릅니다', paragraphs: ['전통적인 자시 구간은 자정 전후에 걸쳐 있습니다. 자시 전체에 다음 날 일주를 적용하는 방법과 야자시·정자시를 나누는 방법 등 계산 관습이 다릅니다. 이것만으로 어느 서비스의 미래 예측이 더 정확하다고 판정할 수 없습니다.', '현행 한국 표준시와 서머타임 미적용 조건에서 이 사이트는 밤 23:30부터 다음 날 일주를 적용합니다. 이는 시간 보정과 날짜 변경 규칙을 합친 결과이며 모든 지역·시대에 보편적으로 적용되는 시각은 아닙니다.'] },
+      { title: '출생 당시 시계 시각을 그대로 입력합니다', paragraphs: ['다른 곳에서 30분을 빼라고 들었더라도 이 사이트에 넣기 전에 직접 빼지 마세요. 이미 보정한 시각을 원래 기록처럼 넣으면 보정이 중복될 수 있습니다. 과거 표준시나 서머타임 적용 기간에는 현대와 경계가 다를 수 있습니다.', '아래 표는 같은 날 23:20과 23:40을 각각 계산한 것입니다. 일주가 바뀌면 일간을 기준으로 하는 십신 등도 달라질 수 있으므로 시주 한 칸만 비교해서는 차이를 설명할 수 없습니다.'] },
+      { title: '경계 부근은 기억의 정밀도도 확인합니다', paragraphs: ['가족의 “자정쯤”이라는 기억과 분 단위 출생 기록은 정보량이 다릅니다. 범위가 경계를 넘으면 두 후보를 남기고 공통점과 차이점을 나누어 읽으세요. 마음에 드는 성격 설명으로 출생 시각을 확정하면 순환 판단이 됩니다.', '이 서비스는 해외 시간대 자동 변환과 출생지별 진태양시를 지원하지 않습니다. 해외 출생이나 기록이 불확실한 경우 하나의 일주만 확정된 사실처럼 저장·공유하지 않는 편이 좋습니다.'] },
+    ],
+    checklist: ['직접 시간을 빼지 않고 당시 시계 시각을 입력했나요?', '23:30 규칙의 표준시·서머타임 조건을 확인했나요?', '경계를 넘는 기억 범위라면 두 후보를 남겼나요?'],
+  }, {
+    title: 'Late-night births: split Rat hours and the 23:30 boundary',
+    description: 'Separate the day-boundary convention from Korean clock adjustments and compare two actual late-night chart calculations.',
+    lead: 'Late-night births can produce different day pillars across calculators. Check both the rule for changing days and the clock adjustment used.',
+    topics: ['Split Rat-hour conventions', 'The 23:30 day boundary', 'Birth near midnight', 'Different day pillars'],
+    sections: [
+      { title: 'The Rat hour crosses modern midnight', paragraphs: ['Traditional Rat hours span midnight. Conventions include applying the next day throughout that interval or splitting its late-night and early-morning parts. A convention difference does not establish superior event prediction.', 'Under current Korean Standard Time without daylight saving, this service changes the day pillar at 23:30. This combines clock adjustment with the day-change rule and is not universal across places or historical periods.'] },
+      { title: 'Enter the original recorded clock time', paragraphs: ['Do not subtract 30 minutes yourself before entering the time here. A previously adjusted input can apply the correction twice. Historical standard time or daylight saving can move the clock-time boundary.', 'The table compares 23:20 and 23:40 on one date. A different day pillar can change Day Master-based relationships too, so checking only the hour pillar is insufficient.'] },
+      { title: 'Check the precision of the record', paragraphs: ['A memory of “around midnight” is less precise than a recorded minute. If the possible interval crosses a boundary, preserve both candidates. Choosing the time by a preferred personality description is circular.', 'Overseas time-zone conversion and location-specific apparent solar time are not supported. Do not share a single pillar as established fact when the birth record or time basis remains uncertain.'] },
+    ],
+    checklist: ['Enter the original clock time without manual subtraction.', 'Check the standard-time and daylight-saving conditions.', 'Preserve candidates if the remembered interval crosses a boundary.'],
+  }),
+  guide('solar-time', 'input', ['midnight-boundary', 'birth-time', 'consultation'], ['/about/#birth-rules', '/manseryeok/'], '', {
+    title: '출생지·진태양시·서머타임: 사주 시간 보정 확인법',
+    description: '표준시·평균태양시·진태양시·서머타임을 구분하고, 해외·과거 출생에서 이 서비스가 지원하는 범위를 안내합니다.',
+    lead: '“한국은 무조건 30분을 빼면 된다”는 말만으로는 모든 출생 기록을 처리할 수 없습니다. 출생 당시 표준시, 서머타임, 출생지 보정은 서로 다른 조건입니다.',
+    topics: ['사주 시간 보정', '진태양시와 표준시', '서머타임 출생', '해외 출생 사주'],
+    sections: [
+      { title: '세 가지 시간 기준을 구별합니다', paragraphs: ['표준시는 지역이 공동으로 사용하는 시계 기준입니다. 평균태양시는 경도에 따른 평균 태양 위치를 반영하고, 진태양시는 계절에 따른 균시차까지 고려합니다. 이름이 비슷해도 같은 보정은 아닙니다.', '서머타임은 사회적으로 시계를 앞당긴 제도이며 경도 보정과 별개입니다. 과거 출생 기록을 현재의 시간대나 서머타임 여부로 처리하면 원래 출생 순간이 달라질 수 있습니다.'] },
+      { title: '이 사이트는 한국의 시계 이력을 반영합니다', paragraphs: ['현재 엔진은 한국의 과거 표준시와 서머타임, 정해진 평균태양시 보정을 반영합니다. 출생지 좌표에 따른 경도와 균시차를 별도로 적용하지 않으며 해외 시간대 자동 변환도 제공하지 않습니다.', '입력 화면에는 출생 당시 한국에서 사용한 시계 시각을 넣습니다. 다른 계산기에서 조정한 시각을 그대로 가져오기보다 원본 기록과 어떤 보정을 했는지 함께 확인하세요.'] },
+      { title: '해외·경계 출생은 도구의 지원 범위를 먼저 봅니다', paragraphs: ['해외 현지 시각을 한국 시각으로 단순 변환했다고 이 계산기의 모든 전제가 맞는 것은 아닙니다. 현지 달력 날짜, 당시 시간대와 서머타임, 출생지 태양시 적용 여부를 함께 다룰 수 있는 도구가 필요할 수 있습니다.', '다른 결과와 비교할 때는 출생지, 기록된 날짜·시각, 시간대, 서머타임, 보정 선택을 메모하세요. 지원하지 않는 입력을 억지로 맞춰 만든 점수를 정확한 개인 결과라고 설명하지 마세요.'] },
+    ],
+    checklist: ['원본 시각과 보정된 시각을 구별했나요?', '출생 당시 표준시·서머타임을 확인했나요?', '해외·진태양시 미지원 범위를 확인했나요?'],
+  }, {
+    title: 'Birthplace, solar time and daylight saving: what to check',
+    description: 'Distinguish standard, mean and apparent solar time, and understand this calculator’s scope for historical and overseas births.',
+    lead: 'A fixed instruction to subtract 30 minutes cannot describe every birth record. Historical clock rules and birthplace adjustments are separate conditions.',
+    topics: ['Clock adjustments', 'Apparent versus standard time', 'Daylight-saving births', 'Overseas births'],
+    sections: [
+      { title: 'Distinguish three time bases', paragraphs: ['Standard time is the shared civil clock. Mean solar time reflects average solar position by longitude; apparent solar time also includes the equation of time. These are different adjustments.', 'Daylight saving is a civil clock change, independent of longitude correction. Applying today’s time-zone rules to a historical record can change the represented birth instant.'] },
+      { title: 'This site uses Korean historical clock rules', paragraphs: ['The engine includes historical Korean standard time, daylight saving and its defined mean solar adjustment. It does not calculate individual birthplace longitude, equation of time or overseas time-zone conversion.', 'Enter the original Korean clock time used at birth. When moving inputs from another calculator, check whether the time has already been adjusted.'] },
+      { title: 'Check tool support before handling overseas births', paragraphs: ['Simply converting an overseas time to Korean time does not establish that every assumption here applies. Local date, historical time zone, daylight saving and any solar-time convention need coordinated handling.', 'Record birthplace, original date and time, time zone and correction settings when comparing results. Do not label an unsupported workaround as an accurate personal calculation.'] },
+    ],
+    checklist: ['Separate original and corrected times.', 'Check historical time zone and daylight saving.', 'Check unsupported overseas and apparent-solar-time cases.'],
+  }),
+  guide('same-chart', 'limits', ['birth-time', 'fortune-scores', 'useful-elements'], ['/manseryeok/', '/about/#limits'], 'same', {
+    title: '같은 사주·쌍둥이는 같은 인생일까요? 결과가 다른 이유',
+    description: '동일 원국·쌍둥이·같은 생일의 차이와 서비스별 계산·해석 차이를 구분하고, 사주의 재현성과 예측력을 나누어 설명합니다.',
+    lead: '쌍둥이인데 성격이 다르거나 같은 생일의 친구와 운세가 같으면 사주가 무엇을 설명하는지 궁금해집니다. 계산기가 같은 값을 내는 것과 실제 삶이 같다는 주장은 구별해야 합니다.',
+    topics: ['같은 사주 다른 인생', '쌍둥이 사주', '사주 정확도', '만세력마다 결과가 다른 이유'],
+    sections: [
+      { title: '같은 생일과 같은 원국은 다릅니다', paragraphs: ['생년월일이 같아도 시진이나 날짜·절입 경계를 사이에 두면 원국이 달라질 수 있습니다. 반대로 분 단위 출생 시각이 달라도 같은 시주가 나올 수 있습니다. 먼저 결과의 네 기둥이 실제로 같은지 확인하세요.', '이 서비스는 같은 입력과 같은 대상 날짜에 같은 결과를 냅니다. 아래 비교는 같은 가상 입력을 다시 계산한 것으로, 실제 쌍둥이의 삶을 조사한 자료가 아닙니다.'] },
+      { title: '동일한 출력은 동일한 인생의 증거가 아닙니다', paragraphs: ['원국에는 양육 환경, 경험, 교육, 자산, 건강 상태, 개인의 선택 같은 정보가 들어 있지 않습니다. 같은 원국을 가진 사람의 실제 삶이 다르다는 사실을 이 계산기의 점수만으로 설명할 수 없습니다.', '계산값이 반복해서 같다는 것은 규칙의 재현성입니다. 사건을 사전에 예측한 자료와 검증 설계가 없는 상태에서 이를 적중률이나 과학적 정확도로 표현하지 않습니다.'] },
+      { title: '서비스 차이는 입력·원국·해석 순서로 좁힙니다', paragraphs: ['먼저 양력·음력·윤달·시각을 맞추고, 다음으로 네 기둥을 비교하세요. 원국이 다르면 시간·절입·자시 규칙을 확인합니다. 원국이 같고 점수만 다르면 강약·용신·가중치 등 해석 모델이 다른 경우를 살핍니다.', '어느 쪽 문장이 자신에게 더 잘 맞는다는 느낌만으로 계산 기준이 옳다고 확정할 수는 없습니다. 공통으로 확인된 값과 각 서비스의 해석을 나누어 기록하는 것이 비교에 도움이 됩니다.'] },
+    ],
+    checklist: ['같은 생일인지, 실제로 네 기둥이 같은지 구별했나요?', '입력과 원국이 같은데 해석만 다른지 확인했나요?', '재현성을 적중률로 표현하지 않았나요?'],
+  }, {
+    title: 'Do identical charts or twins imply identical lives?',
+    description: 'Distinguish a shared birthday from a shared chart, compare calculators in order and separate reproducibility from predictive accuracy.',
+    lead: 'Twins can differ, and friends can receive matching readings. Reproducing a calculation and establishing identical life outcomes are different claims.',
+    topics: ['Identical charts and different lives', 'Twins and saju', 'Predictive accuracy', 'Calculator disagreements'],
+    sections: [
+      { title: 'A shared birthday does not guarantee a shared chart', paragraphs: ['An hour-period, day or solar-term boundary can separate two births on the same date. Conversely, different recorded minutes can produce the same hour pillar. Compare the actual four pillars first.', 'The service produces the same output for the same inputs and reference date. The example repeats fictional inputs; it is not a study of real twins.'] },
+      { title: 'Identical output does not establish identical lives', paragraphs: ['The chart does not contain upbringing, education, assets, health or personal choices. Its scores cannot establish why people with matching charts have different lives.', 'Repeated values demonstrate reproducibility. Without a prospective event-prediction study and validation design, they do not provide a prediction accuracy rate.'] },
+      { title: 'Compare inputs, pillars and interpretation in that order', paragraphs: ['Match calendar, leap month and clock time first, then compare pillars. If pillars differ, inspect clock and boundary conventions. If pillars match but scores differ, compare strength, useful-element and scoring models.', 'Feeling that one description fits better does not establish a correct calculation convention. Record shared calculated values separately from each service’s interpretation.'] },
+    ],
+    checklist: ['Compare the four pillars rather than just birthdays.', 'Identify whether inputs, pillars or interpretation differ.', 'Do not describe reproducibility as predictive accuracy.'],
+  }),
+  guide('consultation', 'limits', ['birth-time', 'fortune-scores', 'same-chart'], ['/editorial/', '/privacy/', '/contact/'], '', {
+    title: '사주 보기 전 준비할 것: 질문·기록·개인정보 체크리스트',
+    description: '무료 사주·AI 사주·상담 결과를 비교할 때 필요한 출생 정보, 질문 작성법, 출처·비용·개인정보 확인 기준을 정리합니다.',
+    lead: '사주를 보고 나서 좋은 말과 나쁜 말만 기억나면 실제로 무엇을 확인해야 할지 남지 않습니다. 입력 근거와 묻고 싶은 일을 미리 정리하면 결과를 비교하고 과도한 결론을 피하기 쉽습니다.',
+    topics: ['사주 상담 질문', '무료 사주 확인 기준', 'AI 사주와 계산기 차이', '출생정보 개인정보'],
+    sections: [
+      { title: '알고 있는 정보와 모르는 정보를 함께 준비합니다', paragraphs: ['출생 연·월·일, 달력 종류, 음력 윤달 여부, 당시 시계 시각과 기록의 근거를 정리합니다. 해외·과거 출생이라면 장소와 시간 기준도 필요할 수 있습니다. 모르는 시각을 성격이나 과거 사건에 맞춰 확정하지 마세요.', '궁금한 질문은 “나는 성공할까요?”보다 “이직을 고민하는데 어떤 설명이 어떤 계산 조건에서 나왔는지 알고 싶다”처럼 좁혀 보세요. 실제 선택에 필요한 연봉·업무·기한은 운세와 별도로 준비합니다.'] },
+      { title: '계산 근거와 문장 생성 방식을 확인합니다', paragraphs: ['무료·유료·AI라는 이름만으로 정확도를 비교할 수 없습니다. 원국을 계산한 규칙, 출처, 해석 방식과 한계를 공개하는지 보세요. 자연스럽고 긴 문장이 실제 사건 예측의 증거는 아닙니다.', '이 사이트의 개인 결과는 정해진 엔진과 작성된 해설을 사용합니다. 편집 콘텐츠에는 AI 도구를 활용하며, 작성·출처 정책에 범위를 안내합니다. 실제 경험이나 전문가 자격을 만들어 신뢰 근거로 삼지 않습니다.'] },
+      { title: '공유·결제 전에 표시 범위와 조건을 읽습니다', paragraphs: ['이름·생년월일·생시는 개인을 알아볼 단서가 될 수 있습니다. 다른 사람의 출생 정보를 입력하거나 공유할 때는 당사자의 의사를 확인하세요. 이 사이트의 저장·공유 방식은 개인정보처리방침에서 확인할 수 있습니다.', '외부 상담을 이용한다면 총비용·추가 결제·취소 조건을 먼저 읽습니다. 불운을 없애려면 즉시 결제해야 한다는 주장만으로 지출을 결정하지 마세요. 결과 오류는 입력·기준·문장 위치를 함께 남겨 제보하면 확인이 쉬워집니다.'] },
+    ],
+    checklist: ['출생 정보의 근거와 미상 항목을 적었나요?', '계산 방식과 해석·AI 활용 범위를 확인했나요?', '공유 정보와 외부 서비스의 결제 조건을 읽었나요?'],
+  }, {
+    title: 'Before a reading: questions, records and privacy checks',
+    description: 'Prepare birth records and useful questions, compare free, AI and consultation outputs, and check sources, costs and privacy.',
+    lead: 'A reading is difficult to assess if only its reassuring or alarming phrases remain. Prepare input evidence and a specific question before comparing results.',
+    topics: ['Questions for a reading', 'Assessing free services', 'AI text versus chart calculation', 'Birth-data privacy'],
+    sections: [
+      { title: 'Prepare known details and their uncertainties', paragraphs: ['Record birth date, calendar, leap-month status, original clock time and the source of the record. Historical or overseas births can need a place and time basis too. Do not infer a definitive time from personality or remembered events.', 'Narrow a question to the issue and the calculation conditions behind an explanation. Prepare real decision criteria such as salary, responsibilities and deadlines separately.'] },
+      { title: 'Check calculation and text-generation methods', paragraphs: ['Free, paid or AI labels do not establish accuracy. Look for disclosed pillar rules, sources, interpretation methods and limitations. Fluent, lengthy text does not validate event prediction.', 'Personal results here use a defined engine and prepared readings. AI tools assist editorial content as described in the editorial policy. Fabricated experience or credentials are not evidence.'] },
+      { title: 'Check sharing and payment conditions', paragraphs: ['Names, birthdays and birth times can help identify a person. Respect the person’s wishes before entering or sharing their details. Read this site’s privacy policy for its storage and sharing behavior.', 'For outside consultations, check total cost, additions and cancellation terms. An urgent claim that payment removes bad luck is not evidence for spending. Report an error with its input, convention and location in the text.'] },
+    ],
+    checklist: ['Record evidence and unknown birth details.', 'Check calculation, interpretation and AI disclosures.', 'Review sharing details and outside payment terms.'],
+  }),
+];

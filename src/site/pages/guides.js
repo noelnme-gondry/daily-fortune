@@ -1,4 +1,5 @@
-import { READING_GUIDES, GUIDE_PUBLISHED } from '../../content/reading-guides.js';
+import { READING_GUIDES } from '../../content/reading-guides.js';
+import { GUIDE_CATEGORIES } from '../../content/guide-catalog.js';
 import { PUBLISHER } from '../../content/publisher.js';
 import { UNKNOWN_TIME } from '../../content/calculation-notes.js';
 import { buildChart, day, addDays, week, month, year, compat, pillarLabel, isoDate } from '../../engine/index.js';
@@ -8,14 +9,22 @@ import { elementName } from '../../i18n/terms.js';
 import { EXAMPLE_INPUT, DEEP_EXAMPLE_INPUT, PARTNER_EXAMPLE_INPUT } from '../public-examples.js';
 import { esc } from '../util.js';
 import { hero } from './tools.js';
+import { guideArticleBody } from '../guide-articles.js';
+import { contentModified } from '../content-revisions.js';
 
 const section = (id, title, paragraphs, extra = '') => `<section class="prose" id="${id}"><h2>${title}</h2>${paragraphs.map(p => `<p>${esc(p)}</p>`).join('')}${extra}</section>`;
 function table(caption, headers, rows) {
   return `<div class="table-wrap" tabindex="0" role="region" aria-label="${esc(caption)}"><table class="grid-table"><caption>${caption}</caption><thead><tr>${headers.map(h => `<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr><th scope="row">${row[0]}</th>${row.slice(1).map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 const inputNote = (p) => `<p class="note">${tr('가상 입력 · 양력', 'Fictional input · solar calendar')} ${isoDate(p)} · ${p.time || tr('시간 모름', 'Time unknown')} · ${p.gender === 'M' ? tr('남성', 'Male') : tr('여성', 'Female')}. ${tr('한국에서 출생 당시 사용한 시계 시각입니다. 이용자 정보나 실제 인물의 사례가 아닙니다.', 'The clock time used in Korea at birth. These are not user details or a real person’s case.')}</p>`;
+function cardsFor(guides, showTopics = false) {
+  return `<div class="cards reading-guide-cards">${guides.map(g => `<a class="card link-card" href="/guides/${g.slug}/"><b>${esc(g.copy.title)}</b><span>${esc(g.copy.description)}</span>${showTopics && g.copy.topics ? `<span class="note">${g.copy.topics.map(esc).join(' · ')}</span>` : ''}</a>`).join('')}</div>`;
+}
 export function guideCards(exclude = '') {
-  return `<div class="cards reading-guide-cards">${READING_GUIDES.filter(g => g.slug !== exclude).map(g => `<a class="card link-card" href="/guides/${g.slug}/"><b>${esc(g.copy.title)}</b><span>${esc(g.copy.description)}</span></a>`).join('')}</div>`;
+  if (!exclude) return cardsFor(READING_GUIDES.slice(0, 4));
+  const current = READING_GUIDES.find(g => g.slug === exclude);
+  const candidates = [...(current.related || []).map(slug => READING_GUIDES.find(g => g.slug === slug)), ...READING_GUIDES.filter(g => g.category === current.category), ...READING_GUIDES];
+  return cardsFor([...new Set(candidates)].filter(g => g && g.slug !== exclude).slice(0, 4));
 }
 export function guideLinks() {
   return `<section class="box-sec reading-guide-links" aria-label="${tr('운세 읽기 안내', 'Reading guidance')}"><div class="sec-head"><h2>${tr('결과가 궁금할 때 함께 읽어보세요', 'Understand your reading')}</h2><a href="/guides/">${tr('이용 가이드 전체', 'All reading guides')}</a></div>${guideCards()}</section>`;
@@ -99,21 +108,24 @@ function tojeong(ctx) {
 export function guidesHub(ctx) {
   const title = tr('운세 이용 가이드', 'Reading guides');
   return {
-    path: '/guides/', title, description: tr('실제 계산 예시로 출생 시각, 운세 점수, 궁합, 토정비결의 차이와 한계를 설명합니다.', 'Worked calculations explain birth time, fortune scores, compatibility and Tojeong conventions and limitations.'),
+    path: '/guides/', title, description: tr('사주·만세력 읽기부터 달력·출생 시각, 오행·십신·용신·대운, 직업·재물·관계까지 질문별 가이드와 실제 계산 예시를 모았습니다.', 'Question-led guides to chart reading, birth dates and times, elements, Ten Gods, useful elements, major cycles, work, money and relationships, with calculated examples.'),
     section: '/guides/', crumbs: [[title, '/guides/']],
-    ld: [{ '@type': 'ItemList', name: title, itemListElement: READING_GUIDES.map((g, i) => ({ '@type': 'ListItem', position: i + 1, name: g.copy.title, url: `${ctx.site}/guides/${g.slug}/` })) }],
-    body: `${hero(title, tr('처음 결과를 읽거나 다른 서비스와 값이 다를 때, 먼저 확인할 내용을 정리했습니다. 모든 예시의 숫자는 현재 계산기에서 직접 생성하며, 해석의 한계도 함께 설명합니다.', 'Start here when reading a result for the first time or comparing calculators. Example values come directly from the current engine, with an explanation of their limits.'))}${guideCards()}<p class="note"><a href="/saju/guide/">${tr('사주 용어부터 차례로 익히기', 'Learn the chart concepts in order')}</a> · <a href="/editorial/">${tr('콘텐츠 작성·출처 기준', 'Editorial and source policy')}</a></p>`,
+    ld: [{ '@type': 'ItemList', name: title, numberOfItems: READING_GUIDES.length, itemListElement: READING_GUIDES.map((g, i) => ({ '@type': 'ListItem', position: i + 1, name: g.copy.title, url: `${ctx.site}/guides/${g.slug}/` })) }],
+    body: `${hero(title, tr('만세력의 글자가 낯설거나 결과마다 설명이 다를 때, 지금 궁금한 질문부터 찾아보세요. 계산 규칙과 전통 해석을 구별하고, 실제 생활에서 확인할 내용까지 정리했습니다.', 'Find the question you have about a chart or conflicting readings. Each guide separates calculation rules from traditional interpretation and explains what to check in practice.'))}<nav class="box guide-category-nav" aria-label="${tr('가이드 주제', 'Guide topics')}"><b>${tr(`주제 전체 목록 · ${READING_GUIDES.length}편`, `Complete topic index · ${READING_GUIDES.length} guides`)}</b><ul>${GUIDE_CATEGORIES.map(c => `<li><a href="#category-${c.id}">${esc(c.copy.title)}</a></li>`).join('')}</ul></nav>${GUIDE_CATEGORIES.map(c => `<section class="box-sec" id="category-${c.id}" aria-labelledby="category-title-${c.id}"><h2 id="category-title-${c.id}">${esc(c.copy.title)}</h2>${cardsFor(READING_GUIDES.filter(g => g.category === c.id), true)}</section>`).join('')}<section class="prose"><h2>${tr('개별 용어와 내 결과로 이어서 보기', 'Continue to terminology and your own chart')}</h2><p><a href="/saju/">${tr('60일주·10일간·십신·오행·신살 백과', 'Day pillars, Day Masters, Ten Gods, elements and special stars')}</a> · <a href="/saju/guide/">${tr('사주 보는 법 7단계', 'Seven steps to read a chart')}</a> · <a href="/manseryeok/">${tr('내 만세력 계산하기', 'Calculate my chart')}</a></p><p class="note"><a href="/editorial/">${tr('콘텐츠 작성·출처 기준', 'Editorial and source policy')}</a> · <a href="/contact/">${tr('오류·빠진 설명 제보', 'Report an error or missing explanation')}</a></p></section>`,
   };
 }
 export function readingGuide(slug, ctx) {
   const g = READING_GUIDES.find(g => g.slug === slug);
-  const body = { 'birth-time': birthTime, 'fortune-scores': scores, compatibility, tojeong }[slug](ctx);
+  if (!g) throw new Error(`Unknown reading guide: ${slug}`);
+  const legacy = { 'birth-time': birthTime, 'fortune-scores': scores, compatibility, tojeong }[slug];
+  const body = legacy ? legacy(ctx) : guideArticleBody(g);
   const path = `/guides/${slug}/`;
+  const modified = contentModified(path);
   return {
-    path, title: g.copy.title, description: g.copy.description, section: '/guides/', ogType: 'article', published: GUIDE_PUBLISHED,
+    path, title: g.copy.title, description: g.copy.description, section: '/guides/', ogType: 'article', published: g.published,
     crumbs: [[tr('운세 이용 가이드', 'Reading guides'), '/guides/'], [g.copy.title, path]],
-    ld: [{ '@type': 'Article', headline: g.copy.title, description: g.copy.description, datePublished: GUIDE_PUBLISHED, dateModified: ctx.buildDate, inLanguage: ctx.lang === 'en' ? 'en' : 'ko-KR', author: { '@type': 'Organization', name: PUBLISHER.name }, publisher: { '@id': `${ctx.site}/#org` }, mainEntityOfPage: { '@id': `${ctx.site}${path}#webpage` } }],
-    body: `<article class="article reading-guide">${hero(g.copy.title, g.copy.lead, tr('운세 이용 가이드', 'Reading guides'))}<p class="updated">${esc(PUBLISHER.name)} · ${tr('내용 수정', 'Edited')} <time datetime="${ctx.buildDate}">${ctx.buildDate}</time></p><p class="note">${tr('가상 사례는 현재 서비스 계산 규칙을 설명하기 위한 자료입니다. 실제 경험·상담 사례나 예측 적중 사례가 아닙니다.', 'Fictional examples explain the current calculation rules. They are not personal experiences, consultations or evidence of prediction accuracy.')}</p>${body}<section class="prose"><h2>${tr('작성 근거와 다음 확인', 'Sources and next steps')}</h2><p>${tr('계산 예시는 이 사이트의 엔진과 공개된 계산 규칙을 기준으로 작성했습니다. 전통 용어의 해석과 날짜 계산의 재현성을 미래 예측력의 검증과 구분합니다.', 'Examples use this site’s engine and published calculation rules. Reproducible date calculations and interpretations of traditional terminology are distinct from evidence of predictive accuracy.')}</p><p><a href="/about/">${tr('계산 규칙·사용 자료', 'Calculation rules and data')}</a> · <a href="/editorial/">${tr('편집·출처 정책', 'Editorial and source policy')}</a> · <a href="/contact/">${tr('오류 제보', 'Report a correction')}</a></p></section></article><section class="box-sec"><h2>${tr('함께 읽을 가이드', 'Related guides')}</h2>${guideCards(slug)}</section>`,
+    ld: [{ '@type': 'Article', headline: g.copy.title, description: g.copy.description, datePublished: g.published, dateModified: modified, inLanguage: ctx.lang === 'en' ? 'en' : 'ko-KR', author: { '@type': 'Organization', name: PUBLISHER.name }, publisher: { '@id': `${ctx.site}/#org` }, mainEntityOfPage: { '@id': `${ctx.site}${path}#webpage` } }],
+    body: `<article class="article reading-guide">${hero(g.copy.title, g.copy.lead, tr('운세 이용 가이드', 'Reading guides'))}<p class="updated">${esc(PUBLISHER.name)} · ${tr('내용 수정', 'Edited')} <time datetime="${modified}">${modified}</time></p><p class="note">${tr('전통 명리와 이 서비스의 계산·해석 범위를 설명합니다. 가상 예시는 실제 경험·상담이나 예측 적중 사례가 아닙니다.', 'This explains traditional saju and this service’s calculation and interpretation scope. Fictional examples are not consultations or evidence of prediction accuracy.')}</p>${body}<section class="prose"><h2>${tr('작성 근거와 다음 확인', 'Sources and next steps')}</h2><p>${tr('계산 예시는 이 사이트의 엔진과 공개된 계산 규칙을 기준으로 작성했습니다. 전통 용어의 해석과 날짜 계산의 재현성을 미래 예측력의 검증과 구분합니다.', 'Examples use this site’s engine and published calculation rules. Reproducible date calculations and interpretations of traditional terminology are distinct from evidence of predictive accuracy.')}</p><p><a href="/about/">${tr('계산 규칙·사용 자료', 'Calculation rules and data')}</a> · <a href="/editorial/">${tr('편집·출처 정책', 'Editorial and source policy')}</a> · <a href="/contact/">${tr('오류 제보', 'Report a correction')}</a></p></section></article><section class="box-sec"><h2>${tr('함께 읽을 가이드', 'Related guides')}</h2>${guideCards(slug)}</section>`,
   };
 }
 
