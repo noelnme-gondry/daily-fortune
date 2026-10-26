@@ -28,12 +28,6 @@ export function chartRelations(chart) {
 
 export function wireReadingExplorer(root) {
   root.addEventListener('click', event => {
-    const topic = event.target.closest('[data-reading-topic]');
-    if (topic) {
-      const group = topic.closest('.interest-cats');
-      group.querySelectorAll('[data-reading-topic]').forEach(button => button.setAttribute('aria-pressed', String(button === topic)));
-      group.querySelectorAll('[data-topic-panel]').forEach(panel => { panel.hidden = panel.id !== topic.getAttribute('aria-controls'); });
-    }
     const relation = event.target.closest('[data-chart-relation]');
     if (relation) {
       const chart = relation.closest('.chart-card');

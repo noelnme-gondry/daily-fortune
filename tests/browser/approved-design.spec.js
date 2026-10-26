@@ -51,19 +51,17 @@ for (const lang of ['ko', 'en']) {
     for (const width of [320, 768, 1280]) { await page.setViewportSize({ width, height: 900 }); await noOverflow(page); }
   });
 
-  test(`${lang}: 분야 선택·원국 관계는 실제 입력값과 연결되고 재계산에 초기화된다`, async ({ page }) => {
+  test(`${lang}: 분야별 운세·원국 관계는 실제 입력값과 연결되고 재계산에 갱신된다`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 900 });
     await ready(page, `${prefix}/today/`); await fill(page); await submit(page);
     const expected = withLanguage(lang, () => day(buildChart(input), date, 'today'));
-    const buttons = page.locator('[data-reading-topic]');
+    const cards = page.locator('.daily-cat');
     for (let i = 0; i < expected.cats.length; i++) {
-      await buttons.nth(i).focus(); await buttons.nth(i).press('Enter');
-      const panel = page.locator(`[id="${await buttons.nth(i).getAttribute('aria-controls')}"]`);
-      await expect(panel).toBeVisible();
-      await expect(panel.locator('p')).toHaveText(expected.cats[i].text);
-      await expect(panel.locator('.num')).toHaveText(`${expected.cats[i].score}${lang === 'ko' ? '점' : ' points'}`);
-      await expect(page.locator('[data-topic-panel]:visible')).toHaveCount(1);
+      await expect(cards.nth(i)).toBeVisible();
+      await expect(cards.nth(i).locator('[data-daily-outlook]')).toHaveText(expected.cats[i].reading.outlook);
+      await expect(cards.nth(i).locator('.num')).toHaveText(`${expected.cats[i].score}${lang === 'ko' ? '점' : ' points'}`);
     }
+    await page.locator('.chart-disclosure > summary').click();
     const chart = page.locator('.chart-card');
     const relation = chart.locator('[data-chart-relation="year,hour"]').filter({ hasText: lang === 'ko' ? '육합' : 'Six-combination' });
     await relation.click();
@@ -79,10 +77,13 @@ for (const lang of ['ko', 'en']) {
     await page.locator('#a-notime').check(); await submit(page);
     await expect(page.locator('[data-chart-branch="hour"]')).toHaveCount(0);
     await expect(chart.locator('[data-chart-relation*="hour"]')).toHaveCount(0);
-    await expect(page.locator('[data-reading-topic]').first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.daily-cat:visible')).toHaveCount(7);
+    const noTime = withLanguage(lang, () => day(buildChart({ ...input, time: null }), date));
+    await expect(cards.locator('.num')).toHaveText(noTime.cats.map(cat => `${cat.score}${lang === 'ko' ? '점' : ' points'}`));
     // 다른 생일도 원국의 실제 관계와 동일하며 시안의 글자를 고정하지 않는다.
     const alternate = { ...input, y: 1993, m: 1, d: 28, time: '03:40' };
     await fill(page, alternate); await submit(page);
+    await page.locator('.chart-disclosure > summary').click();
     const c = buildChart(alternate);
     const pairs = c.cols.flatMap((a, i) => c.cols.slice(i + 1).flatMap(b => branchRels(a.b, b.b).map(kind => ({ a, b, kind }))));
     await expect(chart.locator('[data-chart-relation]')).toHaveCount(pairs.length);

@@ -59,16 +59,23 @@ export function chartCard(c, profile, today) {
 /* ── 공통 리포트 ───────────────────────────── */
 export function reportHead(r, when) {
   const low = [...r.cats].sort((a, b) => a.score - b.score)[0];
-  const lead = low?.text?.split(/(?<=[.!?])\s+/)[0] || r.overall.text;
+  const lead = r.overall.outlook || low?.text?.split(/(?<=[.!?])\s+/)[0] || r.overall.text;
   return `<section class="report-head card" data-result-summary>${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2 data-result-heading>${esc(r.overall.headline)}</h2><p>${esc(lead)}</p><details class="reading-basis"><summary>${tr('이 흐름이 나온 이유', 'How this reading was calculated')}</summary><p>${esc(r.overall.text)}</p></details><p class="score-note">${tr('점수는 이 서비스의 계산 기준이며, 성공 확률을 뜻하지 않습니다.', 'Scores reflect this service’s calculation rules, not a probability of success.')}</p></div></section>`;
 }
 export function catList(cats, withText = true) {
   return `<section class="cats">${cats.map((c) => `<article class="cat"><div class="cat-top"><h3>${c.name}</h3>${band(c.score)}<div class="track"><i style="width:${c.score}%"></i></div><span class="num">${c.score}</span></div>${withText && c.text ? `<p>${esc(c.text)}</p>` : ''}</article>`).join('')}</section>`;
 }
 let categorySequence = 0;
-function interestCategories(cats) {
-  const id = `reading-topic-${++categorySequence}`;
-  return `<section class="interest-cats card" aria-label="${tr('관심 분야별 해설', 'Explore reading areas')}"><h3>${tr('어떤 분야가 궁금하세요?', 'Choose an area to explore')}</h3><div class="topic-pills" role="group" aria-label="${tr('관심 분야', 'Reading area')}">${cats.map((cat, i) => `<button type="button" id="${id}-button-${i}" data-reading-topic aria-pressed="${i === 0}" aria-controls="${id}-panel-${i}">${esc(cat.name)}</button>`).join('')}</div>${cats.map((cat, i) => `<div data-topic-panel id="${id}-panel-${i}" role="region" aria-labelledby="${id}-button-${i}"${i ? ' hidden' : ''}><div class="topic-score"><h3>${esc(cat.name)}</h3><b class="num">${cat.score}${tr('점', ' points')}</b>${band(cat.score)}</div><p>${esc(cat.text)}</p></div>`).join('')}<details class="category-scores"><summary>${tr('모든 분야 점수 비교', 'Compare all area scores')}</summary>${catList(cats, false)}</details></section>`;
+function dailyCategories(cats) {
+  const id = `daily-reading-${++categorySequence}`;
+  return `<section class="daily-cats" aria-labelledby="${id}-title"><div class="daily-intro"><h2 id="${id}-title">${tr('분야별 운세 자세히', 'Your reading in each area')}</h2><p class="muted">${tr('각 운의 흐름과 기회, 주의할 점을 함께 살펴보세요.', 'Explore the outlook, opportunities and cautions for each area.')}</p></div>
+    <nav class="daily-links" aria-label="${tr('분야별 운세 바로가기', 'Jump to a reading area')}">${cats.map(cat => `<a href="#${id}-${cat.key}">${esc(cat.name)}<b>${cat.score}${tr('점', ' pts')}</b></a>`).join('')}</nav>
+    ${cats.map(cat => `<article class="daily-cat card" id="${id}-${cat.key}" tabindex="-1" aria-labelledby="${id}-${cat.key}-title"><div class="daily-cat-head"><h3 id="${id}-${cat.key}-title">${esc(cat.name)}</h3>${band(cat.score)}<b class="num">${cat.score}${tr('점', ' points')}</b></div>
+      <p class="daily-outlook" data-daily-outlook>${esc(cat.reading.outlook)}</p>
+      <div class="daily-aspects"><div><h4>${tr('활용할 기회', 'Opportunities')}</h4><p data-daily-opportunity>${esc(cat.reading.opportunity)}</p></div><div><h4>${tr('주의할 점', 'Take care')}</h4><p data-daily-caution>${esc(cat.reading.caution)}</p></div></div>
+      <div class="daily-action"><h4>${tr('하루의 제안', 'A suggestion for the day')}</h4><p data-daily-action>${esc(cat.reading.action)}</p></div>
+      <details class="reading-basis"><summary>${tr('해석 근거와 전날 비교', 'Reading basis and change from the previous day')}</summary>${cat.reading.basis ? `<p data-daily-basis>${esc(cat.reading.basis)}</p>` : ''}<p data-daily-change>${esc(cat.reading.change)}</p></details>
+    </article>`).join('')}</section>`;
 }
 export function luckyRow(l) {
   return `<section class="lucky card" aria-label="${tr('오행 상징에 따른 참고 요소', 'Five Element symbolic references')}"><div><span>${tr('행운의 색', 'Lucky color')}</span><b>${l.color}</b></div><div><span>${tr('행운의 숫자', 'Lucky number')}</span><b class="num">${l.number}</b></div><div><span>${tr('참고 방향', 'Symbolic direction')}</span><b>${l.dir}</b></div><div><span title="${tr('용신·희신 오행에 연결된 시진이며 시간대별 운세 비교 결과가 아닙니다.', 'An interval associated with your useful or supporting element, not a comparison of hourly fortunes.')}">${tr('오행 참고 시간', 'Symbolic time')}</span><b>${l.time}</b></div></section>`;
@@ -76,7 +83,7 @@ export function luckyRow(l) {
 const same = (a, b) => a.y === b.y && a.m === b.m && a.d === b.d;
 
 export function dayView(r) {
-  return reportHead(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}日</span><span>${r.lunar}</span>`) + interestCategories(r.cats) + luckyRow(r.lucky);
+  return reportHead(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}日</span><span>${r.lunar}</span>`) + dailyCategories(r.cats) + luckyRow(r.lucky);
 }
 export function weekView(r, today) {
   const best = Math.max(...r.days.map((d) => d.score));

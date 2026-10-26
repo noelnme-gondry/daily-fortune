@@ -706,6 +706,7 @@ test('홈 입력 전달 · 궁합 두 사람 시진과 시간 모름 · 저장 �
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page).toHaveURL(/\/today\/$/);
+  await page.locator('.chart-disclosure > summary').click();
   await expect(page.locator('.chart-head')).toContainText('묘시');
   expect(await saved(page)).toBeNull();
   await ready(page, '/compatibility/');
