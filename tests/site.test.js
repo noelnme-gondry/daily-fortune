@@ -47,7 +47,7 @@ test('제목·설명은 페이지마다 고유하고 canonical이 자기 주소�
 
 test('새 브랜드가 홈·전체 페이지의 검색 정보·설치 이름에 일관되게 적용된다', () => {
   const home = site.render('/');
-  assert.equal(head(home, /<title>(.*?)<\/title>/), `${BRAND.descriptor} | ${BRAND.name}`);
+  assert.equal(head(home, /<title>(.*?)<\/title>/), HOME.title);
   assert.ok(home.includes(`<h1>${HOME.h1}</h1>`));
   for (const [path, html] of pages) {
     const brand = withLanguage(path.startsWith('/en/') ? 'en' : 'ko', () => ({ name: BRAND.name, alt: BRAND.alt }));

@@ -68,11 +68,12 @@ function calculatedExample(kind) {
 
 export function guideArticleBody(g) {
   const sections = g.copy.sections;
+  const toolLinks = g.links.map(href => `<li><a href="${esc(href)}">${esc(toolLabel(href))}</a></li>`).join('');
   return `<nav class="box guide-toc" aria-label="${tr('이 글의 순서', 'On this page')}"><b>${tr('이 글에서 확인할 내용', 'In this guide')}</b><ol>${sections.map((s, i) => `<li><a href="#section-${i + 1}">${esc(s.title)}</a></li>`).join('')}${g.example ? `<li><a href="#calculated-example">${tr('실제 계산 예시', 'Worked calculation')}</a></li>` : ''}<li><a href="#checklist">${tr('확인 체크리스트', 'Checklist')}</a></li></ol></nav>
-    ${sections.map((s, i) => `<section class="prose" id="section-${i + 1}"><h2>${esc(s.title)}</h2>${s.paragraphs.map(p => `<p>${esc(p)}</p>`).join('')}</section>`).join('')}
+    ${sections.map((s, i) => `<section class="prose" id="section-${i + 1}"><h2>${esc(s.title)}</h2>${s.paragraphs.map(p => `<p>${esc(p)}</p>`).join('')}${g.linkSection === i ? `<ul>${toolLinks}</ul>` : ''}</section>`).join('')}
     ${g.example ? calculatedExample(g.example) : ''}
     <section class="prose" id="checklist"><h2>${tr('내 결과에서 확인할 것', 'Check your own result')}</h2><ul>${g.copy.checklist.map(s => `<li>${esc(s)}</li>`).join('')}</ul></section>
-    <section class="prose"><h2>${tr('관련 계산기와 백과', 'Related tools and references')}</h2><ul>${g.links.map(href => `<li><a href="${esc(href)}">${esc(toolLabel(href))}</a></li>`).join('')}</ul></section>
+    ${g.linkSection === undefined ? `<section class="prose"><h2>${tr('관련 계산기와 백과', 'Related tools and references')}</h2><ul>${toolLinks}</ul></section>` : ''}
     <section class="prose"><h2>${tr('전통 용어의 참고 자료', 'Background for traditional terminology')}</h2>${GUIDE_SOURCES.map(s => `<p><a href="${esc(s.href)}" target="_blank" rel="noopener">${esc(s.copy.title)}</a> · ${esc(s.copy.scope)}</p>`).join('')}</section>`;
 }
 
@@ -85,7 +86,7 @@ function toolLabel(href) {
     '/today/': ['오늘 운세 계산하기', 'Calculate a daily reading'], '/month/': ['월간 운세', 'Monthly reading'],
     '/week/': ['주간 운세', 'Weekly reading'], '/year/': ['연간 운세', 'Annual readings'],
     '/compatibility/': ['두 사람의 궁합', 'Compatibility for two charts'], '/life-story/': ['인생 캐릭터', 'Life character'],
-    '/tti/': ['띠별 운세', 'Zodiac readings'], '/tti/samjae/': ['삼재 연도표', 'Samjae year table'],
+    '/tti/': ['띠별 운세', 'Zodiac readings'], '/tti/today/': ['입력 없이 띠별 오늘의 운세 보기', 'Today’s zodiac readings without entering details'], '/tti/samjae/': ['삼재 연도표', 'Samjae year table'],
     '/saju/guide/': ['사주 보는 법 7단계', 'Seven steps to read a chart'], '/saju/ilgan/': ['일간 10가지 백과', 'Ten Day Masters'],
     '/saju/ilju/': ['60일주 백과', 'Sixty day pillars'], '/saju/glossary/': ['사주 용어 사전', 'Saju glossary'],
     '/saju/ohaeng/': ['오행 백과', 'Five Elements'], '/saju/sipsin/': ['십신 10가지 백과', 'Ten Gods'],

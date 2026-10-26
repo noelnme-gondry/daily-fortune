@@ -10,6 +10,7 @@ import {
 import { dayPillar, monthPillar, yearPillar, yearPillarOfDate, lunarText } from './calendar.js';
 import { daeunAt } from './chart.js';
 import { readingAction, readingCycle, readingHeadline, dayChangeText, weekRhythm } from '../domain/reading.js';
+import { dailyOverview, dailyReading } from '../domain/daily-reading.js';
 
 export const CATS = ['career', 'money', 'love', 'move', 'health', 'social', 'study'];
 const CAT_W = [1, 1, 1, 0.6, 0.9, 0.8, 0.6];
@@ -179,16 +180,20 @@ function buildReport(c, comb, kind, ctx) {
     // 요약 점수대에 해당하는 요인이 없더라도 실제 존재하는 반대 요인을 설명한다.
     const main = positive ? pos || posG || neg || negG : neg || negG || pos || posG;
     const action = readingAction(cat, sc.cats[i], { factor: main?.[0], cycle: ctx.cycle, identity: c.key });
-    const parts = [];
-    if (ctx.days) parts.push(weekRhythm(ctx.days, i).text);
-    parts.push(action.text);
-    if (main) parts.push((ctx.dayFactors ? tr('일진 해석에서 ', 'In the day pillar: ') : '') + factorText(c, cat, main[0], main[1]));
+    const basis = [];
+    if (main) basis.push((ctx.dayFactors ? tr('일진 해석에서 ', 'In the day pillar: ') : '') + factorText(c, cat, main[0], main[1]));
     const counter = main?.[1] > 0 ? neg : pos;
     if (counter && Math.abs(counter[1]) > 0.6 && (used.get(counter[0]) || 0) < 2) {
-      parts.push(tr('함께 살필 점은 다음과 같습니다. ', 'Also consider: ') + factorText(c, cat, counter[0], counter[1]));
+      basis.push(tr('함께 살필 점은 다음과 같습니다. ', 'Also consider: ') + factorText(c, cat, counter[0], counter[1]));
       used.set(counter[0], (used.get(counter[0]) || 0) + 1);
     }
-    if (ctx.previous) parts.push(dayChangeText(sc.cats[i], ctx.previous.cats[i]));
+    if (kind === 'day') {
+      const reading = dailyReading(cat, bandOf(sc.cats[i]), {
+        action: action.text, basis: basis.join(' '), change: dayChangeText(sc.cats[i], ctx.previous.cats[i]),
+      });
+      return { ...base, focus: action.headline, actionId: action.id, reading, text: reading.text };
+    }
+    const parts = [weekRhythm(ctx.days, i).text, action.text, ...basis];
     return { ...base, focus: action.headline, actionId: action.id, text: parts.join(' ') };
   });
   const ranked = cats.slice().sort((a, b) => b.score - a.score);
@@ -207,7 +212,9 @@ function buildReport(c, comb, kind, ctx) {
     : headline(sc, ctx.unit);
   return {
     kind, key: ctx.key, label: ctx.label,
-    overall: { score: sc.overall, headline: title, text: lines.join(' ') },
+    overall: { score: sc.overall, headline: title, text: lines.join(' '),
+      ...(kind === 'day' ? { outlook: `${dailyOverview(bandOf(sc.overall))} ${lines.at(-1)}` } : {}),
+    },
     cats, lucky: lucky(c, key),
   };
 }

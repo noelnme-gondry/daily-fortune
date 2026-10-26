@@ -223,7 +223,7 @@ export async function mount(root) {
       leaderRank = rankTool.sajuRank(buildChart(toEngine({ ...a, noTime: true })), rankTool.RANK_TABLE);
       html += rankTool.rankView(res, ca, leaderRank);
     }
-    if (!pair && mode !== 'manseryeok') html += `<details class="chart-disclosure"${['today', 'tomorrow'].includes(mode) ? ' open' : ''}><summary>${tr('내 사주 원국과 오행 자세히', 'Explore your birth chart and Five Elements')}</summary>${chartCard(ca, a, today)}</details>`;
+    if (!pair && mode !== 'manseryeok') html += `<details class="chart-disclosure"><summary>${tr('내 사주 원국과 오행 자세히', 'Explore your birth chart and Five Elements')}</summary>${chartCard(ca, a, today)}</details>`;
     html += nextToolsHtml(mode, today) + navTabs(tabMode, today);
     html += `<div class="result-actions"><button type="button" class="link-btn" data-edit-profile aria-controls="tool-form" aria-expanded="${!form.hidden}">${tr('입력 정보 수정·저장', 'Edit or save your details')}</button><span class="hint">${tr('이 기기에 저장하면 다음 방문에 바로 볼 수 있어요.', 'Save on this device for quicker access next time.')}</span></div>`;
     const share = shareFor(mode, res, ca, cb, today, yr);
