@@ -6,6 +6,7 @@ import { GUIDE_CATEGORIES } from '../src/content/guide-catalog.js';
 import { withLanguage } from '../src/i18n/runtime.js';
 import { buildChart, pillarLabel } from '../src/engine/index.js';
 import { EXAMPLE_INPUT, MANSE_BOUNDARIES } from '../src/site/public-examples.js';
+import { contentModified } from '../src/site/content-revisions.js';
 
 const origin = 'https://fortune.example';
 const site = createSite({ site: origin, assets: {}, now: Date.parse('2026-10-25T12:00:00+09:00') });
@@ -52,7 +53,7 @@ test('전체 주제는 목록에서 발견되며 KR/EN 정적 본문·검색 메
       const nodes = jsonld.flatMap(x => x['@graph'] || [x]);
       const article = nodes.find(x => x['@type'] === 'Article');
       assert.equal(article.datePublished, g.published, path);
-      assert.equal(article.dateModified, '2026-10-25', path);
+      assert.equal(article.dateModified, contentModified(path), path);
     }
   }
 });

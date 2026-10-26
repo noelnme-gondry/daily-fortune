@@ -257,6 +257,13 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .reading-guides a + a { border-top: 1px solid var(--line); }
 .reading-guides b { font-size: 15px; }
 .reading-guides span { font-size: 13px; color: var(--ink-2); }
+.home-services > .note { margin-bottom: 14px; }
+.reading-entry { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.reading-entry a { display: grid; gap: 6px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--paper); text-decoration: none; }
+.reading-entry a:hover { border-color: var(--accent); }
+.reading-entry b { font-size: 15px; }
+.reading-entry span { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+@media (max-width: 560px) { .reading-entry { grid-template-columns: minmax(0, 1fr); } }
 
 /* 계산기 */
 .tool { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start; }
