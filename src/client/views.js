@@ -8,6 +8,8 @@ import { pillarTable } from './pillar-table.js';
 import { chartRelations } from './reading-explorer.js';
 import { tr } from '../i18n/runtime.js';
 import { term, elementName, weekdayName } from '../i18n/terms.js';
+import { chartColorPalettes, reportColorPalettes } from '../domain/lucky-colors.js';
+import { chartColors, luckyBanner } from './lucky-colors.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 const hz = (p) => `${STEM_H[p.s]}${BR_H[p.b]}`;
@@ -60,7 +62,7 @@ export function chartCard(c, profile, today) {
 export function reportHead(r, when) {
   const low = [...r.cats].sort((a, b) => a.score - b.score)[0];
   const lead = r.overall.outlook || low?.text?.split(/(?<=[.!?])\s+/)[0] || r.overall.text;
-  return `<section class="report-head card" data-result-summary>${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2 data-result-heading>${esc(r.overall.headline)}</h2><p>${esc(lead)}</p><details class="reading-basis"><summary>${tr('이 흐름이 나온 이유', 'How this reading was calculated')}</summary><p>${esc(r.overall.text)}</p></details><p class="score-note">${tr('점수는 이 서비스의 계산 기준이며, 성공 확률을 뜻하지 않습니다.', 'Scores reflect this service’s calculation rules, not a probability of success.')}</p></div></section>`;
+  return `<section class="report-head card">${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2 data-result-heading>${esc(r.overall.headline)}</h2><p>${esc(lead)}</p><details class="reading-basis"><summary>${tr('이 흐름이 나온 이유', 'How this reading was calculated')}</summary><p>${esc(r.overall.text)}</p></details><p class="score-note">${tr('점수는 이 서비스의 계산 기준이며, 성공 확률을 뜻하지 않습니다.', 'Scores reflect this service’s calculation rules, not a probability of success.')}</p></div></section>`;
 }
 export function catList(cats, withText = true) {
   return `<section class="cats">${cats.map((c) => `<article class="cat"><div class="cat-top"><h3>${c.name}</h3>${band(c.score)}<div class="track"><i style="width:${c.score}%"></i></div><span class="num">${c.score}</span></div>${withText && c.text ? `<p>${esc(c.text)}</p>` : ''}</article>`).join('')}</section>`;
@@ -82,15 +84,19 @@ export function luckyRow(l) {
 }
 const same = (a, b) => a.y === b.y && a.m === b.m && a.d === b.d;
 
-export function dayView(r) {
-  return reportHead(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}日</span><span>${r.lunar}</span>`) + dailyCategories(r.cats) + luckyRow(r.lucky);
+function periodOverview(r, when, banner = true) {
+  return `<div class="reading-overview" data-result-summary>${reportHead(r, when)}${luckyRow(r.lucky)}${banner ? luckyBanner(reportColorPalettes(r.lucky)) : ''}</div>`;
+}
+
+export function dayView(r, { banner = true } = {}) {
+  return periodOverview(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}日</span><span>${r.lunar}</span>`, banner) + dailyCategories(r.cats);
 }
 export function weekView(r, today) {
   const best = Math.max(...r.days.map((d) => d.score));
   const strip = r.days.map((d) => `<button type="button" data-reading-date="${isoDate(d.date)}" aria-controls="calendar-day-detail" aria-pressed="false" aria-label="${esc(d.short)} ${d.score}${tr('점 상세', ' points, details')}" class="wd${d.score === best ? ' best' : ''}${same(d.date, today) ? ' today' : ''}"><span class="d">${d.label} ${d.short}</span><span class="p">${hz(d.pillar)}</span><span class="bar"><i style="height:${d.score}%"></i></span><b>${d.score}</b></button>`).join('');
-  return reportHead(r, `<span>${r.label}</span>`) +
+  return periodOverview(r, `<span>${r.label}</span>`) +
     `<section class="box card"><div class="box-head"><h3>${tr('요일별 흐름', 'Your week at a glance')}</h3><span class="muted">${tr('빨간 테두리 = 오늘', 'Red outline = today')}</span></div><div class="week">${strip}</div><div class="chips">${r.bestByCat.map((b) => `<span class="chip"><em>${b.name}</em>${b.day}${tr('요일', '')}</span>`).join('')}</div></section>` +
-    calendarDetail() + catList(r.cats) + luckyRow(r.lucky);
+    calendarDetail() + catList(r.cats);
 }
 const calendarDetail = () => `<section class="calendar-day-detail" id="calendar-day-detail" role="region" aria-label="${tr('선택한 날짜의 운세', 'Reading for the selected date')}" tabindex="-1" hidden></section>`;
 export function monthView(r, today) {
@@ -98,10 +104,10 @@ export function monthView(r, today) {
   const cells = [1, 2, 3, 4, 5, 6, 0].map((d) => `<div class="h">${weekdayName(d)}</div>`).join('') + '<div class="c blank"></div>'.repeat(lead) +
     r.days.map((d) => { const s = Math.max(0, Math.round((d.score - 30) * 1.25)); return `<button type="button" data-reading-date="${isoDate(d.date)}" aria-controls="calendar-day-detail" aria-pressed="false" class="c${s > 52 ? ' hot' : ''}${same(d.date, today) ? ' today' : ''}" style="--s:${Math.min(85, s)}" aria-label="${d.date.m}/${d.date.d} ${d.score}${tr("점 상세", " points, details")}"><span class="dn">${d.date.d}</span><span class="ps">${hz(d.pillar)}</span><b class="day-score" aria-label="${tr("종합", "Overall")} ${d.score}${tr("점", " pts")}">${d.score}${tr("점", " pts")}</b></button>`; }).join('');
   const dl = (arr) => arr.map((d) => `<span class="chip"><b class="num">${d.date.m}/${d.date.d}</b> ${hz(d.pillar)} · ${d.score}${tr("점", " pts")}</span>`).join('');
-  return reportHead(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}月</span>`) +
+  return periodOverview(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}月</span>`) +
     `<section class="box card"><div class="box-head"><h3>${tr("날짜별 기운", "Daily scores")}</h3><span class="legend">${tr("낮음", "Low")} <i style="background:var(--paper)"></i><i style="background:color-mix(in srgb, var(--accent) 45%, var(--paper))"></i><i style="background:color-mix(in srgb, var(--accent) 85%, var(--paper))"></i> ${tr("높음", "High")}</span></div><div class="cal">${cells}</div>
       <div class="split"><div><h4>${tr("힘을 쓰기 좋은 날", "Days to make progress")}</h4><div class="chips">${dl(r.goodDays)}</div></div><div><h4>${tr("조심할 날", "Days to take care")}</h4><div class="chips">${dl(r.badDays)}</div></div></div></section>` +
-    calendarDetail() + catList(r.cats) + luckyRow(r.lucky);
+    calendarDetail() + catList(r.cats);
 }
 function ymChart(months, curM) {
   const W = 600, H = 200, L = 30, R = 8, Tp = 20, B = 26;
@@ -119,12 +125,15 @@ function ymChart(months, curM) {
 export function yearView(yr, months, today) {
   const curM = yr.year === today.y ? today.m : -1;
   const dy = yr.daeun ? `<span>${tr("대운", "Luck cycle")} <span class="hz">${hz(yr.daeun)}</span></span>` : '';
-  return reportHead(yr, `<span>${tr(`${yr.year}년 총운`, `${yr.year} annual reading`)}</span><span class="hz">${hz(yr.pillar)}年</span>${dy}`) + catList(yr.cats) + luckyRow(yr.lucky) +
+  return periodOverview(yr, `<span>${tr(`${yr.year}년 총운`, `${yr.year} annual reading`)}</span><span class="hz">${hz(yr.pillar)}年</span>${dy}`) + catList(yr.cats) +
     `<section class="box card"><div class="box-head"><h3>${tr(`${yr.year}년 월별 흐름`, `Monthly scores for ${yr.year}`)}</h3><span class="muted">${tr("각 달 15일의 절기 월주 기준", "Based on the solar-term month pillar on the 15th")}</span></div>${ymChart(months, curM)}</section>` +
     `<div class="months">${months.map((m) => `<article class="mcard card${m.m === curM ? ' cur' : ''}"><div class="mcard-top"><h3>${tr(`${m.m}월`, `M${m.m}`)}<small>${hz(m.pillar)}</small></h3><span class="num">${m.score}</span></div><h4>${esc(m.headline)}</h4><p>${esc(m.text)}</p><div class="chips"><span class="chip"><em>${tr("강점", "Strength")}</em>${m.best.name} ${m.best.score}</span>${m.worst ? `<span class="chip"><em>${tr("주의", "Take care")}</em>${m.worst.name} ${m.worst.score}</span>` : ''}</div></article>`).join('')}</div>`;
 }
 
 /* ── 만세력 ───────────────────────────── */
+export function manseOverview(c, profile, today) {
+  return `<div class="reading-overview" data-result-summary>${chartCard(c, profile, today)}${chartColors(c)}${luckyBanner(chartColorPalettes(c))}</div>`;
+}
 export function manseView(c) {
   const rows = c.daeun.map((d) => `<div class="dcard"><span class="muted">${tr(`${d.age}세 · ${d.startYear}년~`, `Age ${d.age} · ${d.startYear} onward`)}</span><b>${hz(d)}${tr(" 대운", " cycle")}</b></div>`).join('');
   const tgRows = c.cols.slice().reverse().map((x) => `<tr><th scope="row">${term(x.label)}</th><td><span class="hz el-${STEM_EL[x.s]}">${STEM_H[x.s]}</span> ${tgLink(x.tgS)}</td><td><span class="hz el-${BR_EL[x.b]}">${BR_H[x.b]}</span> ${tgLink(x.tgB)}</td><td class="hz">${x.hidden.map((h) => STEM_H[h]).join(' ')}</td><td>${term(x.stage)}</td></tr>`).join('');

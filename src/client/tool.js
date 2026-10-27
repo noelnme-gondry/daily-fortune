@@ -8,7 +8,7 @@ import { term } from '../i18n/terms.js';
 import { languagePath } from '../site/locale.js';
 import { ILJU_TAG } from '../content/knowledge.js';
 import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine } from './profile.js';
-import { chartCard, dayView, weekView, monthView, yearView, manseView } from './views.js';
+import { chartCard, dayView, weekView, monthView, yearView, manseOverview, manseView } from './views.js';
 import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, characterCode, SHARE_KINDS, cleanName } from '../site/share-codec.js';
 import { track, trackInputStart } from './analytics.js';
@@ -207,7 +207,6 @@ export async function mount(root) {
     let html = '';
     let res;
     let leaderRank;
-    if (mode === 'manseryeok') html += chartCard(ca, a, today);
     if (mode === 'today') { res = day(ca, today, 'today'); html += dayView(res); }
     else if (mode === 'tomorrow') { res = day(ca, addDays(today, 1), 'tomorrow'); html += dayView(res); }
     else if (mode === 'week') { res = week(ca, today); html += weekView(res, today); }
@@ -215,7 +214,7 @@ export async function mount(root) {
     else if (mode === 'year') { res = year(ca, yr, yr === today.y + 1 ? 'next' : 'this'); html += yearView(res, yearMonths(ca, yr), today); }
     else if (mode === 'lifetime') { res = lifeTool.lifetime(ca, today); html += lifeTool.lifeView(res, ca, today); }
     else if (mode === 'compatibility') { res = compatTool.compat(ca, cb, today); html += compatTool.compatView(res, ca, cb, today); }
-    else if (mode === 'manseryeok') { html += manseView(ca); }
+    else if (mode === 'manseryeok') { html += manseOverview(ca, a, today) + manseView(ca); }
     else if (mode === 'story') { res = storyTool.lifeStory(ca, today); html += storyTool.storyView(res, ca); }
     else if (mode === 'rank') {
       res = rankTool.sajuRank(ca, rankTool.RANK_TABLE);
@@ -297,7 +296,7 @@ export async function mount(root) {
       const panel = $('#calendar-day-detail', out);
       selectedDateButton = dateButton;
       out.querySelectorAll('[data-reading-date]').forEach(button => button.setAttribute('aria-pressed', String(button === dateButton)));
-      panel.innerHTML = `<button type="button" class="link-btn" data-close-day>${tr('날짜 상세 닫기', 'Close daily detail')}</button>${dayView(day(currentChart, { y, m, d }))}`;
+      panel.innerHTML = `<button type="button" class="link-btn" data-close-day>${tr('날짜 상세 닫기', 'Close daily detail')}</button>${dayView(day(currentChart, { y, m, d }), { banner: false })}`;
       panel.hidden = false;
       panel.focus({ preventScroll: true });
       panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
