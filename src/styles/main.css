@@ -460,6 +460,19 @@ select.input { padding-right: 4px; }
 @media (max-width: 560px) { .lucky div:nth-child(3) { border-left: 0; } .lucky div:nth-child(n+3) { border-top: 1px solid var(--line); } }
 .lucky span { font-size: 12px; color: var(--ink-2); }
 .lucky b { font-weight: 600; }
+.reading-overview { display: grid; gap: 20px; min-width: 0; }
+.lucky-colors { display: grid; gap: 12px; padding: 16px; }
+.lucky-colors h3, .lucky-banner h3 { font-size: 17px; }
+.lucky-palettes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; margin: 0; }
+.lucky-palette { display: grid; gap: 4px; padding-left: 12px; border-left: 3px solid var(--el); }
+.lucky-palette dt { font-size: 13px; color: var(--ink-2); }
+.lucky-palette dd { margin: 0; font-weight: 600; }
+.lucky-banner { width: 100%; max-width: var(--lucky-banner-max-width); min-width: 0; justify-self: start; display: grid; gap: 8px; }
+.lucky-banner-heading { display: grid; gap: 4px; }
+.lucky-banner-heading p { font-size: 13px; color: var(--ink-2); }
+.lucky-banner-slot { width: 100%; height: var(--lucky-banner-height); }
+.lucky-banner-slot iframe { display: block; border: 0; }
+.lucky-banner[data-banner-state="pending"] .lucky-banner-slot { display: grid; place-items: center; padding: 16px; background: var(--sunk); outline: 1px dashed var(--line); outline-offset: -1px; color: var(--ink-2); text-align: center; font-size: 14px; }
 .box { padding: 18px 20px; display: grid; gap: 14px; min-width: 0; align-content: start; }
 .box > h3 { font-size: 17px; }
 .box-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 12px; flex-wrap: wrap; }

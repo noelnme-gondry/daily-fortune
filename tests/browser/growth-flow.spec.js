@@ -44,8 +44,8 @@ test('KST 자정을 지난 재계산은 새 날짜의 실제 점수와 공유 �
   await ready(page); await fill(page); await submit(page);
   await page.clock.setFixedTime(new Date('2026-10-21T00:01:00+09:00'));
   await submit(page);
-  await expect(page.locator('#result > .report-head .when')).toContainText('21');
-  await expect(page.locator('#result > .report-head .val b')).toHaveText(String(day(buildChart(profile), { y: 2026, m: 10, d: 21 }).overall.score));
+  await expect(page.locator('#result > .reading-overview > .report-head .when')).toContainText('21');
+  await expect(page.locator('#result > .reading-overview > .report-head .val b')).toHaveText(String(day(buildChart(profile), { y: 2026, m: 10, d: 21 }).overall.score));
   await expect(page.locator('#tool')).toHaveAttribute('data-date', '2026-10-21');
   await expect(page.locator('#public-example')).toHaveAttribute('data-example-date', '2026-10-21');
 });
@@ -105,7 +105,7 @@ test('기기·세션 저장소가 모두 막혀도 홈에서 현재 화면에 �
 for (const lang of ['', '/en']) {
   test(`${lang || 'ko'} 결과 우선·원국 펼침·월간 날짜 선택과 포커스 복귀`, async ({ page }) => {
     await ready(page, `${lang}/month/`); await fill(page); await submit(page);
-    await expect(page.locator('#result > .report-head')).toBeVisible();
+    await expect(page.locator('#result > .reading-overview > .report-head')).toBeVisible();
     await expect(page.locator('.chart-disclosure')).not.toHaveAttribute('open', '');
     const button = page.locator('[data-reading-date="2026-10-31"]');
     await button.click();
@@ -129,7 +129,7 @@ test('저장 사용자 홈 바로 보기는 재입력 없이 실제 오늘 결�
   await ready(page, '/');
   await expect(page.locator('[data-saved-entry]')).toBeVisible();
   await page.locator('[data-saved-result]').click();
-  await expect(page.locator('#result > .report-head')).toBeVisible();
+  await expect(page.locator('#result > .reading-overview > .report-head')).toBeVisible();
   await expect(page).toHaveURL(/\/$/);
   const events = await page.evaluate(() => window.growthEvents.filter(e => e[1] === 'calc_result'));
   expect(events[0][2]).toMatchObject({ tool: 'today', calc_origin: 'session_restore', usage_date: '2026-10-20' });

@@ -9,8 +9,10 @@ test.beforeEach(async ({ context }) => {
   await context.route('https://ads-partners.coupang.com/g.js', (route) => route.fulfill({
     contentType: 'application/javascript',
     body: `window.PartnersCoupang = { G: function(options) {
-      window.partnerCalls = (window.partnerCalls || 0) + 1;
-      window.partnerConfig = { ...options, container: undefined };
+      if (options.container.dataset.partnerAdSlot === 'common') {
+        window.partnerCalls = (window.partnerCalls || 0) + 1;
+        window.partnerConfig = { ...options, container: undefined };
+      }
       const frame = document.createElement('iframe');
       frame.width = options.width; frame.height = options.height;
       const wrapper = document.createElement('ins');
@@ -363,9 +365,11 @@ test('띠 메뉴의 부분 이동에도 기존 광고 지면을 중복 생성하
 
 const slotEvents = (page) => page.evaluate(() => window.adEvents.filter((e) => e[1] === 'ad_slot_view'));
 async function showFraction(page, fraction) {
-  await page.locator('[data-partner-ad-slot]').evaluate((el, fraction) => {
+  await page.locator('[data-partner-ad-slot]').evaluate(async (el, fraction) => {
+    // 결과 등장 효과가 끝난 뒤 자동 스크롤을 취소하고 목표 노출률에 맞춘다.
+    await Promise.all(document.getAnimations().filter(animation => animation.playState === 'running' && Number.isFinite(animation.effect.getTiming().iterations)).map(animation => animation.finished.catch(() => {})));
     const box = el.getBoundingClientRect();
-    window.scrollTo(0, window.scrollY + box.top - window.innerHeight + box.height * fraction);
+    window.scrollTo({ top: window.scrollY + box.top - window.innerHeight + box.height * fraction, behavior: 'instant' });
   }, fraction);
   // IntersectionObserver가 스크롤 후 레이아웃을 관찰할 기회를 준다.
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));

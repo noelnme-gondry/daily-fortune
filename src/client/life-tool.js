@@ -3,6 +3,8 @@ import { STEM_EL, STEM_H, EL_H, pillarH as hz } from '../engine/core.js';
 import { tr } from '../i18n/runtime.js';
 import { term, elementName } from '../i18n/terms.js';
 import { lifeEventsView } from './life-events-view.js';
+import { chartColors, luckyBanner } from './lucky-colors.js';
+import { chartColorPalettes } from '../domain/lucky-colors.js';
 export { lifetime } from '../engine/lifetime.js';
 
 /* ── 평생 ───────────────────────────── */
@@ -23,8 +25,10 @@ export function lifeView(L, c, today) {
   const dlist = L.daeun.map((d) => `<div class="dcard${d.current ? ' cur' : ''}"><span class="muted">${tr(`${d.age}세 · ${d.startYear}년~`, `Age ${d.age} · ${d.startYear} onward`)}</span><b>${hz(d)}${tr(" 대운", " cycle")}</b><span>${term(d.tgS)}·${term(d.tgB)} · ${d.keyword}</span><span class="muted">${tr(`${d.score}${tr("점", " pts")} · ${d.best} 강세`, `${d.score} points · strength: ${d.best}`)}</span></div>`).join('');
   const yong = L.roles.yong;
   return `<div class="life">
+    <div class="reading-overview wide" data-result-summary>
     <section class="box card wide"><div class="dm-hero"><span class="char el-${STEM_EL[c.dm]}">${STEM_H[c.dm]}</span><div><h3>${dm.title}<small>${dm.image}</small></h3></div></div><p>${dm.summary}</p>
       <div class="pros"><div><h4>${tr("타고난 강점", "Natural strengths")}</h4><ul>${dm.strengths.map((s) => `<li>${s}</li>`).join('')}</ul></div><div><h4>${tr("다듬을 점", "Room to grow")}</h4><ul>${dm.weaknesses.map((s) => `<li>${s}</li>`).join('')}</ul></div></div><p class="muted">${dm.advice}</p></section>
+    ${chartColors(c)}${luckyBanner(chartColorPalettes(c))}</div>
     <section class="box card"><h3>${tr("오행의 균형", "Element balance")}</h3><p>${L.strength.text}</p>${L.elements.excess.map((t) => `<p>${t}</p>`).join('')}${L.elements.lack.map((t) => `<p>${t}</p>`).join('')}<p>${tr("운을 끌어올리는 용신은 ", "Your useful element: ")}<a href="/saju/ohaeng/${['wood', 'fire', 'earth', 'metal', 'water'][yong]}/"><b>${elementName(yong)}(${EL_H[yong]})</b></a>${tr("입니다.", ".")}</p></section>
     <section class="box card"><h3>${tr("성향과 적성", "Personality & interests")}</h3><p>${L.persona}</p><p><b>${tr("맞는 일:", "Suggested work:")}</b> ${L.career.jobs}</p><p><b>${tr("용신 업종:", "Fields linked to your useful element:")}</b> ${L.career.industry}</p><p class="muted">${L.career.note}</p></section>
     <section class="box card"><h3>${tr("재물운", "Wealth")}</h3>${L.wealth.map((t) => `<p>${t}</p>`).join('')}</section>
