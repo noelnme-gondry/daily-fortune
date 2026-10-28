@@ -220,7 +220,7 @@ export function home(ctx) {
     </div></section>
     ${faqBlock(HOME.faq)}`;
   return {
-    path: '/', title: HOME.title, description: HOME.lead, section: '/', tool: true, crumbs: [],
+    path: '/', title: HOME.title, description: HOME.description, section: '/', tool: true, crumbs: [],
     ld: [faqLd(HOME.faq), { '@type': 'ItemList', name: `${SITE.name}${siteText(" 운세 종류")}`, itemListElement: cards.map(([h, t], i) => ({ '@type': 'ListItem', position: i + 1, name: t, url: `${ctx.site}${h}` })) }],
     body,
   };

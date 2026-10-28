@@ -17,8 +17,9 @@ for (const lang of ['ko', 'en']) {
   test(`${lang}: 홈은 전용 무료운세 메타와 기존 서비스 목록을 가이드보다 앞에 제공한다`, () => withLanguage(lang, () => {
     const html = site.render(`${prefix}/`), body = main(html);
     assert.ok(html.includes(`<title>${esc(HOME.title)}</title>`));
-    assert.ok(html.includes(`<meta name="description" content="${esc(HOME.lead)}">`));
+    assert.ok(html.includes(`<meta name="description" content="${esc(HOME.description)}">`));
     assert.ok(body.includes(`<h1>${esc(HOME.h1)}</h1>`));
+    assert.ok(body.includes(`<p class="lead">${esc(HOME.lead)}</p>`));
     assert.ok(body.includes(FREE_ACCESS.description));
     const services = body.indexOf('class="box-sec home-services"');
     assert.ok(body.indexOf('id="tool"') < services);
@@ -31,6 +32,21 @@ for (const lang of ['ko', 'en']) {
     for (const path of paths) assert.ok(site.has(path));
     if (!prefix) assert.equal(HOME.title, `무료운세 | 오늘의 운세·사주·궁합 - ${BRAND.name}`);
     assert.equal(site.page(`${prefix}/today/`).title, TOOLS.today.title, '오늘 제목은 유지');
+  }));
+
+  test(`${lang}: 홈 검색·공유 설명은 본문 소개와 분리하고 한국어는 80자 이내로 제공한다`, () => withLanguage(lang, () => {
+    const html = site.render(`${prefix}/`);
+    const description = html.match(/<meta name="description" content="([^"]+)">/)[1];
+    if (lang === 'ko') assert.ok([...description].length <= 80, `네이버 설명 권장 길이 초과: ${[...description].length}자`);
+    assert.notEqual(HOME.description, HOME.lead);
+    for (const attribute of ['name="description"', 'property="og:description"', 'name="twitter:description"']) {
+      const tags = [...html.matchAll(new RegExp(`<meta ${attribute} content="([^"]+)">`, 'g'))];
+      assert.equal(tags.length, 1, attribute);
+      assert.equal(tags[0][1], esc(HOME.description), attribute);
+    }
+    const graph = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1])['@graph'];
+    assert.equal(graph.find(node => node['@type'] === 'WebPage').description, HOME.description);
+    if (lang === 'en') assert.doesNotMatch(description, /[가-힣]/);
   }));
 
   test(`${lang}: 개인·띠별 선택과 가이드의 문맥 링크가 서버 HTML에 있고 기존 경로를 유지한다`, () => {
