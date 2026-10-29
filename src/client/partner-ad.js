@@ -5,9 +5,11 @@ import { adExperimentParams } from './ad-experiment.js';
 
 const selector = '[data-partner-ad-slot="common"]';
 const viewedPaths = new Set();
+const luckyViewedPaths = new Set();
 const resultViewedPaths = new Set();
 const exposedPaths = new Set();
 let stopTracking;
+let stopLuckyTracking;
 let stopResultTracking;
 let resultReady = false;
 let partnerSdk;
@@ -16,6 +18,7 @@ let partnerSdk;
 export function clearResultWithPartnerAd(out) {
   stopResultTracking?.();
   stopTracking?.();
+  stopLuckyTracking?.();
   resultReady = false;
   const ad = out.querySelector('.partner-ad');
   if (ad) document.querySelector('main').after(ad);
@@ -23,6 +26,8 @@ export function clearResultWithPartnerAd(out) {
 }
 export function renderResultWithPartnerAd(out, html, resultParams = {}) {
   stopResultTracking?.();
+  stopTracking?.();
+  stopLuckyTracking?.();
   resultReady = false;
   const ad = document.querySelector('.partner-ad');
   out.innerHTML = html;
@@ -74,14 +79,21 @@ export function initPartnerAd() {
   partnerSdk.then(mount, () => slots.forEach(slot => { slot.dataset.adState = 'unavailable'; }));
 }
 
-// 광고의 실제 송출·구매가 아니라, 사용자가 공통 광고 영역까지 도달했는지를 측정한다.
+// 실제 송출·구매가 아닌 슬롯 도달. 같은 문서의 pathname마다 common/lucky를 각각 한 번 측정한다.
 export function initAdSlotTracking() {
   stopTracking?.();
-  const slot = document.querySelector(selector);
+  stopLuckyTracking?.();
   // 계산 전 푸터 도달을 실험 결과로 섞지 않는다. 일반 콘텐츠 페이지는 기존대로 측정한다.
-  if (!slot || (adExperimentParams().experiment_id && !resultReady)) return;
-  stopTracking = observeView(slot, 'ad_slot_view', viewedPaths, {
-    ad_provider: 'coupang', ad_slot: slot.dataset.partnerAdSlot,
+  if (adExperimentParams().experiment_id && !resultReady) return;
+  const params = { ad_provider: 'coupang', ad_context: resultReady ? 'result' : 'content', ad_measurement_version: '1' };
+  const slot = document.querySelector(selector);
+  if (slot) stopTracking = observeView(slot, 'ad_slot_view', viewedPaths, {
+    ...params, ad_slot: 'common',
+  });
+  const luckySlot = resultReady && document.querySelector('[data-lucky-banner-slot]');
+  // 오행별 dataset 값은 배너 선택 전용이며 분석 이벤트에는 넣지 않는다.
+  if (luckySlot) stopLuckyTracking = observeView(luckySlot, 'ad_slot_view', luckyViewedPaths, {
+    ...params, ad_slot: 'lucky',
   });
 }
 
@@ -89,8 +101,12 @@ function observeView(target, eventName, seen, params = {}, viewKey = location.pa
   const path = location.pathname;
   if (seen.has(viewKey) || !window.IntersectionObserver) return;
   let visible = false;
+  let stopped = false;
   const report = () => {
-    if (!visible || document.visibilityState !== 'visible' || seen.has(viewKey)) return;
+    if (stopped || !visible || document.visibilityState !== 'visible' || seen.has(viewKey)) return;
+    if (!target.isConnected || target.closest('[hidden], [aria-hidden="true"]')) return;
+    const box = target.getBoundingClientRect();
+    if (box.width <= 0 || box.height <= 0 || window.getComputedStyle(target).visibility !== 'visible') return;
     seen.add(viewKey);
     track(eventName, {
       ...params,
@@ -103,6 +119,7 @@ function observeView(target, eventName, seen, params = {}, viewKey = location.pa
     report();
   }, { threshold: [0, 0.5] });
   const stop = () => {
+    stopped = true;
     observer.disconnect();
     document.removeEventListener('visibilitychange', report);
   };
