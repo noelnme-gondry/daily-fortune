@@ -61,7 +61,8 @@ GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint →
 - 크기와 마크업은 `src/site/partner-ad.js`에서 관리합니다. 배너를 연결할 위치는 `[data-partner-ad-slot="common"]`입니다.
 - 발급된 배너 `1039151`(`AF3219545`, `carousel`)를 공식 `g.js`의 `PartnersCoupang.G`로 연결합니다. 스크립트는 비동기로 한 번 불러오며, 차단·실패해도 운세 기능은 계속 동작합니다. 기존 애드센스 설정과 별개입니다.
 - 배너 위에 수수료 고지를 표시하며 개인정보처리방침에도 쿠팡 광고를 안내합니다. 이름·생년월일시는 배너 설정과 광고 영역 이벤트에 넣지 않습니다.
-- `ad_slot_view`는 활성 탭에서 배너 영역의 **50% 이상**이 보일 때 같은 페이지 경로당 한 번 전송합니다. 실험 대상 계산기에서는 성공한 결과가 나온 뒤부터 측정합니다. 띠 메뉴의 부분 이동은 새 경로에서 다시 측정하고, 뒤로가기로 이미 측정한 경로에 돌아오면 중복 전송하지 않습니다. 새로고침·문서 이동 시에는 다시 측정합니다. 광고 차단 여부와 무관한 **영역 도달 지표**이며, 쿠팡의 실제 노출·클릭·구매 집계가 아닙니다. GA4 미설정 시 전송하지 않습니다.
+- `ad_slot_view`는 활성 탭에서 배너 영역의 **50% 이상**이 보일 때 같은 문서의 페이지 경로당 공통(`common`)·행운색(`lucky`) 슬롯을 각각 한 번 전송합니다. 체류시간 조건은 없으며 재계산·행운색 변경은 추가 도달로 세지 않습니다. 실험 대상 계산기에서는 성공한 결과가 나온 뒤부터 측정합니다. 띠 메뉴의 부분 이동은 새 경로에서 다시 측정하고, 뒤로가기로 이미 측정한 경로에 돌아오면 중복 전송하지 않습니다. 새로고침·문서 이동 시에는 다시 측정합니다. 광고 차단 여부와 무관한 **영역 도달 지표**이며, 쿠팡의 실제 노출·클릭·구매 집계가 아닙니다. GA4 미설정 시 전송하지 않습니다.
+- 광고 계약은 `ad_measurement_version=1`, 기존 전역 계약은 `measurement_version=2`입니다. `ad_context`는 일반 콘텐츠의 `content`와 계산 후의 `result`를 구분합니다. 이전 자료에서 이 값이 없으면 문맥을 소급 추정하지 않습니다. 실험의 `ad_placement`는 공통 광고의 배정 위치이며 행운색 배너 위치를 뜻하지 않습니다. 광고 이벤트의 URL에는 query·fragment를 넣지 않고 오행·행운색·점수도 보내지 않습니다.
 
 ## 공유
 
@@ -80,9 +81,9 @@ GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint →
 | `calc_submit` | `tool` | 계산기 폼 제출 |
 | `calc_result` | `tool`, `calc_origin`(form·saved·sample) | 계산 성공 후 결과 표시 |
 | `form_error` | `tool` | 날짜 오류 |
-| `ad_slot_view` | `ad_provider`(coupang), `ad_slot`(common), `page_path` | 활성 탭에서 공통 광고 영역 50% 이상 노출, 경로당 한 번 |
+| `ad_slot_view` | `ad_provider`(coupang), `ad_slot`(common/lucky), `ad_context`(content/result), `ad_measurement_version`(1), `page_path`, query·fragment 없는 `page_location` | 활성 탭에서 슬롯 영역 50% 이상 도달, 같은 문서의 경로·슬롯 유형당 한 번 |
 | `ad_experiment_exposure` | `experiment_id`, `experiment_variant`, `ad_placement`, `assignment_scope`, `tool`, `page_path` | 실험 대상의 첫 성공 결과 배치, 경로당 한 번 |
-| `result_view` | 위 실험 매개변수, `page_path` | 활성 탭에서 결과의 첫 제목 50% 이상 도달, 경로당 한 번 |
+| `result_view` | 위 실험 매개변수, `page_path`, `reading_date` | 활성 탭에서 결과의 첫 제목 50% 이상 도달, 같은 문서의 경로·운세 날짜당 한 번 |
 | `story_result` | 개인 결과 값 없음 | 인생 캐릭터 결과 |
 | `rank_result` | 개인 결과 값 없음 | 사주 랭킹 결과 |
 | `compat_result` | 개인 결과 값 없음 | 궁합 결과 |

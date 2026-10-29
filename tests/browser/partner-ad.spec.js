@@ -318,7 +318,8 @@ for (const variant of ['A', 'B']) {
     await page.locator('button[type="submit"]').click();
     await showFraction(page, 0.8);
     const events = await page.evaluate(() => window.adEvents);
-    for (const name of ['ad_experiment_exposure', 'ad_slot_view', 'result_view']) expect(events.filter((e) => e[1] === name)).toHaveLength(1);
+    for (const name of ['ad_experiment_exposure', 'result_view']) expect(events.filter((e) => e[1] === name)).toHaveLength(1);
+    expect(await slotEvents(page)).toHaveLength(1);
     for (const name of ['ad_experiment_exposure', 'ad_slot_view', 'result_view', 'calc_result', 'share']) {
       expect(events.find((e) => e[1] === name)?.[2]).toMatchObject({
         experiment_id: AD_POSITION_EXPERIMENT.id, experiment_variant: variant,
@@ -363,9 +364,9 @@ test('띠 메뉴의 부분 이동에도 기존 광고 지면을 중복 생성하
   expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
 });
 
-const slotEvents = (page) => page.evaluate(() => window.adEvents.filter((e) => e[1] === 'ad_slot_view'));
-async function showFraction(page, fraction) {
-  await page.locator('[data-partner-ad-slot]').evaluate(async (el, fraction) => {
+const slotEvents = (page, slot = 'common') => page.evaluate((slot) => window.adEvents.filter((e) => e[1] === 'ad_slot_view' && e[2].ad_slot === slot), slot);
+async function showFraction(page, fraction, selector = '[data-partner-ad-slot]') {
+  await page.locator(selector).evaluate(async (el, fraction) => {
     // 결과 등장 효과가 끝난 뒤 자동 스크롤을 취소하고 목표 노출률에 맞춘다.
     await Promise.all(document.getAnimations().filter(animation => animation.playState === 'running' && Number.isFinite(animation.effect.getTiming().iterations)).map(animation => animation.finished.catch(() => {})));
     const box = el.getBoundingClientRect();
@@ -387,7 +388,7 @@ test('발급 코드로 한 번만 초기화하고 절반 이상 노출 시 개�
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
   const event = (await slotEvents(page))[0];
   expect(event.slice(0, 2)).toEqual(['event', 'ad_slot_view']);
-  expect(event[2]).toEqual({ measurement_version: '2', usage_date: isoDate(todayKST()), ad_provider: 'coupang', ad_slot: 'common', page_path: '/tti/', page_location: 'http://127.0.0.1:4176/tti/', page_title: await page.title() });
+  expect(event[2]).toEqual({ measurement_version: '2', usage_date: isoDate(todayKST()), ad_measurement_version: '1', ad_provider: 'coupang', ad_slot: 'common', ad_context: 'content', page_path: '/tti/', page_location: 'http://127.0.0.1:4176/tti/', page_title: await page.title() });
   expect(JSON.stringify(event)).not.toContain('private');
   await showFraction(page, 0);
   await showFraction(page, 0.8);
@@ -438,6 +439,9 @@ test('광고 로드 실패·GA 미설정에서도 운세를 계산하고 공유�
   await expect(page.locator('#result .chart-card')).toBeAttached();
   await showFraction(page, 0.6);
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
+  await expect(page.locator('[data-lucky-banner-slot]')).toHaveAttribute('data-ad-state', 'unavailable');
+  await showFraction(page, 0.6, '[data-lucky-banner-slot]');
+  await expect.poll(async () => (await slotEvents(page, 'lucky')).length).toBe(1);
   await page.evaluate(() => { delete window.gtag; });
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-y').selectOption('1993');
@@ -452,5 +456,118 @@ test('광고 로드 실패·GA 미설정에서도 운세를 계산하고 공유�
   await page.goto('/not-a-page/');
   await expect(page.locator('[data-partner-ad-slot]')).toHaveCount(0);
   expect(requests).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+for (const lang of ['', '/en']) for (const variant of ['A', 'B']) {
+  test(`${lang || 'KR'} ${variant}: 늦게 생성된 행운색 도달은 공통 도달과 독립적이고 재계산·다음 날짜에도 중복되지 않는다`, async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-10-29T12:00:00+09:00'));
+    await page.addInitScript(({ key, variant }) => localStorage.setItem(key, variant), { key: AD_POSITION_EXPERIMENT.storageKey, variant });
+    await page.setViewportSize({ width: 390, height: 844 });
+    const path = `${lang}/today/`;
+    await page.goto(`${path}?name=private-name#private-birth`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('[data-lucky-banner-slot]')).toHaveCount(0);
+    await showFraction(page, 0.8);
+    expect(await slotEvents(page)).toHaveLength(0);
+    await completeProfile(page);
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('[data-lucky-banner-slot]')).toHaveAttribute('data-ad-state', 'initialized');
+    await showFraction(page, 0.4, '[data-lucky-banner-slot]');
+    expect(await slotEvents(page, 'lucky')).toHaveLength(0);
+    await showFraction(page, 0.6, '[data-lucky-banner-slot]');
+    await expect.poll(async () => (await slotEvents(page, 'lucky')).length).toBe(1);
+    await showFraction(page, 0.8);
+    await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
+    for (const slot of ['common', 'lucky']) {
+      expect((await slotEvents(page, slot))[0][2]).toEqual({
+        experiment_id: 'ad_position_v2', experiment_variant: variant,
+        ad_placement: AD_POSITION_EXPERIMENT.placements[variant], assignment_scope: 'browser', tool: 'today',
+        measurement_version: '2', usage_date: '2026-10-29', ad_measurement_version: '1',
+        ad_provider: 'coupang', ad_slot: slot, ad_context: 'result', page_path: path,
+        page_location: `http://127.0.0.1:4176${path}`, page_title: await page.title(),
+      });
+    }
+    await page.locator('#a-d').selectOption('2');
+    await page.locator('button[type="submit"]').click();
+    await showFraction(page, 0.8, '[data-lucky-banner-slot]');
+    expect(await slotEvents(page, 'lucky')).toHaveLength(1);
+    expect(await page.evaluate(() => window.adEvents.filter(e => e[1] === 'result_view').length)).toBe(1);
+    await page.clock.setFixedTime(new Date('2026-10-30T12:00:00+09:00'));
+    await page.locator('button[type="submit"]').click();
+    const heading = '[data-result-summary] [data-result-heading]';
+    await page.locator(heading).scrollIntoViewIfNeeded();
+    await expect.poll(() => page.evaluate(() => window.adEvents.filter(e => e[1] === 'result_view').length)).toBe(2);
+    expect(await page.evaluate(() => window.adEvents.filter(e => e[1] === 'result_view').map(e => e[2].reading_date))).toEqual(['2026-10-29', '2026-10-30']);
+    await showFraction(page, 0.8, '[data-lucky-banner-slot]');
+    await showFraction(page, 0.8);
+    expect(await slotEvents(page, 'lucky')).toHaveLength(1);
+    expect(await slotEvents(page)).toHaveLength(1);
+    expect(await page.evaluate(() => window.adEvents.filter(e => e[1] === 'ad_experiment_exposure').length)).toBe(1);
+    expect(await page.evaluate(() => window.partnerCalls)).toBe(1);
+  });
+}
+
+test('결과 교체는 이전 슬롯 관측·리스너를 정리하고 숨은/제거된 슬롯의 지연 콜백을 무시한다', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.slotObservers = [];
+    window.visibilityListeners = new Set();
+    const add = document.addEventListener.bind(document), remove = document.removeEventListener.bind(document);
+    document.addEventListener = (type, fn, ...rest) => { if (type === 'visibilitychange') window.visibilityListeners.add(fn); add(type, fn, ...rest); };
+    document.removeEventListener = (type, fn, ...rest) => { if (type === 'visibilitychange') window.visibilityListeners.delete(fn); remove(type, fn, ...rest); };
+    window.IntersectionObserver = class {
+      constructor(callback) { this.callback = callback; window.slotObservers.push(this); }
+      observe(target) { this.target = target; this.active = true; }
+      disconnect() { this.active = false; }
+    };
+    window.emitSlot = (observer, ratio = 1) => observer.callback([{ target: observer.target, isIntersecting: ratio > 0, intersectionRatio: ratio }]);
+  });
+  await calculateResult(page, '/today/');
+  await expect.poll(() => page.evaluate(() => window.slotObservers.filter(o => o.active && o.target.matches('[data-lucky-banner-slot]')).length)).toBe(1);
+  await page.evaluate(() => { window.previousObservers = window.slotObservers.filter(o => o.active); window.previousListenerCount = window.visibilityListeners.size; });
+  await page.locator('#a-d').selectOption('2');
+  await page.locator('button[type="submit"]').click();
+  expect(await page.evaluate(() => window.previousObservers.every(o => !o.active))).toBe(true);
+  expect(await page.evaluate(() => window.visibilityListeners.size === window.previousListenerCount)).toBe(true);
+  await page.evaluate(() => window.previousObservers.forEach(o => window.emitSlot(o)));
+  expect(await slotEvents(page)).toHaveLength(0);
+  expect(await slotEvents(page, 'lucky')).toHaveLength(0);
+  for (const state of ['hidden', 'aria-hidden', 'zero', 'removed', 'document-hidden', 'partial']) {
+    await page.evaluate((state) => {
+      const observer = window.slotObservers.find(o => o.active && o.target.matches('[data-lucky-banner-slot]'));
+      const slot = observer.target, parent = slot.parentElement;
+      if (state === 'hidden') parent.hidden = true;
+      if (state === 'aria-hidden') parent.setAttribute('aria-hidden', 'true');
+      if (state === 'zero') slot.style.height = '0px';
+      if (state === 'removed') slot.remove();
+      if (state === 'document-hidden') Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
+      window.emitSlot(observer, state === 'partial' ? 0.49 : 1);
+      parent.hidden = false;
+      parent.removeAttribute('aria-hidden');
+      slot.style.height = '';
+      if (state === 'removed') parent.append(slot);
+      if (state === 'document-hidden') delete document.visibilityState;
+    }, state);
+    expect(await slotEvents(page, 'lucky')).toHaveLength(0);
+  }
+  await page.evaluate(() => window.emitSlot(window.slotObservers.find(o => o.active && o.target.matches('[data-lucky-banner-slot]')), 0.5));
+  expect(await slotEvents(page, 'lucky')).toHaveLength(1);
+  expect(await slotEvents(page)).toHaveLength(0);
+  expect(await page.evaluate(() => window.slotObservers.filter(o => o.active && o.target.matches('[data-partner-ad-slot]')).length)).toBe(1);
+});
+
+test('관측 API가 없어도 계산·재계산·복원을 유지하고 도달은 추정하지 않는다', async ({ page }) => {
+  await page.addInitScript(() => { delete window.IntersectionObserver; });
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await calculateResult(page, '/today/');
+  await showFraction(page, 0.8, '[data-lucky-banner-slot]');
+  await page.locator('#a-d').selectOption('2');
+  await page.locator('button[type="submit"]').click();
+  await page.reload();
+  await expect(page.locator('#result .chart-card')).toBeAttached();
+  await showFraction(page, 0.8);
+  expect(await slotEvents(page)).toHaveLength(0);
+  expect(await slotEvents(page, 'lucky')).toHaveLength(0);
   expect(errors).toEqual([]);
 });
