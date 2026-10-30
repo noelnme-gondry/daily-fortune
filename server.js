@@ -10,6 +10,7 @@ import { readAssets } from './src/site/assets.js';
 import { todayKST, isoDate } from './src/engine/core.js';
 import { BRAND } from './src/content/brand.js';
 import { handleLanguage } from './src/site/language-middleware.js';
+import { handleAdsterraFrame } from './src/site/adsterra-frame.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, 'dist');
@@ -32,6 +33,10 @@ app.use(compression());
 
 // 헬스 체크 (railway.json healthcheckPath)
 app.get('/healthz', (req, res) => res.type('text').send('ok'));
+
+app.use((req, res, next) => {
+  if (!handleAdsterraFrame(req, res)) next();
+});
 
 // SITE_URL을 지정했다면 다른 호스트(예: *.up.railway.app)로 들어온 요청을 정식 주소로 보낸다
 app.use((req, res, next) => {
