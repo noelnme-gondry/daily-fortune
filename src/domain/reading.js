@@ -2,6 +2,7 @@ import { hash, toUTC, DAY_MS } from '../engine/core.js';
 import { tr } from '../i18n/runtime.js';
 import { READING_ACTIONS, SHORT_READING_LABELS, ZODIAC_RELATION, ELEMENT_THEME } from '../content/reading-actions.js';
 import { READING_HEADLINES } from '../content/reading-headlines.js';
+import { LEGACY_READING_LABELS, LEGACY_READING_HEADLINES } from '../content/reading-share-legacy.js';
 import { zodiacOutlook } from './zodiac-outlook.js';
 
 const localized = (pair) => tr(...pair);
@@ -32,10 +33,10 @@ export function readingHeadlines(kind) {
   const rhythms = kind === 'week' ? Object.keys(SHORT_READING_LABELS).filter((key) => key !== 'day')
     : kind === 'today' || kind === 'tomorrow' ? ['day'] : [];
   const actions = Object.values(READING_ACTIONS).flat();
-  const titles = Object.values(READING_HEADLINES).flat(2).map(localized);
+  const titles = [...Object.values(READING_HEADLINES).flat(2), ...LEGACY_READING_HEADLINES].map(localized);
   return [
     // 기존에 발급한 공유 링크의 짧은 주제명도 계속 인식한다.
-    ...rhythms.flatMap((rhythm) => actions.map((row) => readingHeadline(localized(row[2]), rhythm))),
+    ...rhythms.flatMap((rhythm) => [...actions.map((row) => row[2]), ...LEGACY_READING_LABELS].map((pair) => readingHeadline(localized(pair), rhythm))),
     ...rhythms.flatMap((rhythm) => titles.map((title) => rhythm === 'day' ? title : readingHeadline(title, rhythm))),
   ];
 }

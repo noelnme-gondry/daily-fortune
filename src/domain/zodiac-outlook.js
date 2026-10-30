@@ -1,5 +1,5 @@
 import { tr } from '../i18n/runtime.js';
-import { ZODIAC_OPPORTUNITY, ZODIAC_CAUTION, ZODIAC_ELEMENT_CAUTION, ZODIAC_CATEGORY_OUTLOOK } from '../content/zodiac-outlook.js';
+import { ZODIAC_OPPORTUNITY, ZODIAC_CAREFUL_OPPORTUNITY, ZODIAC_CAUTION, ZODIAC_ELEMENT_CAUTION, ZODIAC_CATEGORY_OUTLOOK } from '../content/zodiac-outlook.js';
 
 const localized = (pair) => tr(...pair);
 const ELEMENT_OPPORTUNITY = { 0: 'peers', 2: 'money', 4: 'learning' };
@@ -10,10 +10,13 @@ export function zodiacOutlook({ rel, e, es, score }) {
   const opportunities = [relation, ...elements.map((value) => ELEMENT_OPPORTUNITY[value])].filter(Boolean);
   const cautions = [ZODIAC_CAUTION[rel], ...elements.map((value) => ZODIAC_ELEMENT_CAUTION[value])].filter(Boolean);
   const opening = score >= 75
-    ? tr('적극적으로 움직여 볼 만한 흐름입니다.', 'The overall reading favors taking initiative.')
+    ? tr('기다리던 반응이나 반가운 만남에 기대를 걸어 볼 만한 흐름입니다.', 'There is room to look forward to an awaited response or a welcome encounter.')
     : score >= 60 ? '' : tr('전체적으로는 속도를 조절하며 챙길 것을 챙기는 편이 좋습니다.', 'Overall, take a measured pace and attend to practical details.');
-  const strength = opportunities.length ? opportunities.map((key) => localized(ZODIAC_OPPORTUNITY[key])).join(' ')
-    : tr('업무운은 당장 성과를 넓히기보다 진행 중인 일을 정리하는 쪽에 초점을 맞추세요.', 'At work, focus on organizing tasks in progress before pursuing more results.');
+  const copy = score >= 60 ? ZODIAC_OPPORTUNITY : ZODIAC_CAREFUL_OPPORTUNITY;
+  const strength = opportunities.length ? opportunities.map((key) => localized(copy[key])).join(' ')
+    : score >= 60
+      ? tr('업무운에서는 내 아이디어가 호응을 얻거나 맡은 일을 마무리하는 뿌듯함을 기대해 볼 만합니다.', 'At work, your idea may receive interest, or finishing a task may bring satisfaction.')
+      : tr('업무운은 반응이 늦어도 내 수고를 낮춰 보지 않는 것이 필요합니다. 부담을 나누며 한 가지씩 이어 가세요.', 'At work, a slow response need not diminish your effort. Share the load and continue one thing at a time.');
   return {
     outlook: [opening, strength].filter(Boolean).join(' '),
     caution: cautions.length ? cautions.map(localized).join(' ') : tr('새로운 약속은 지금 맡은 일과 겹치지 않는지 확인하세요.', 'Check that new commitments fit with what you already have to do.'),

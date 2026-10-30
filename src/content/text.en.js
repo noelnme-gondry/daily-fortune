@@ -94,7 +94,7 @@ T.relSummary={
 };
 T.cat={};
 T.cat.career={
- lead:{high:['{P}, the reading favors visible progress at work.','{P}, tasks may flow smoothly and give you a chance to show your abilities.'],good:['{P}, a steady workflow can help effort turn into results.','{P}, work you have pursued patiently begins to find its place.'],mid:['{P}, maintaining your current work suits the flow more than major change.','{P}, carefully finishing your usual tasks is enough.'],low:['{P}, delays or departures from your plan may feel frustrating.','{P}, unexpected demands or complications may arise at work.']},
+ lead:{high:['{P}, your preparation may earn recognition or open a conversation about a new role.','{P}, a proposal may receive interest or completed work may get noticed.'],good:['{P}, a word of recognition or help from a colleague may encourage you.','{P}, working together may move a stalled task one step forward.'],mid:['{P}, maintaining your current work suits the flow more than major change.','{P}, carefully finishing your usual tasks is enough.'],low:['{P}, delays or departures from your plan may feel frustrating.','{P}, unexpected demands or complications may arise at work.']},
  factor:{
  '정관':['Direct Officer supports trust from senior colleagues and themes of promotion, selection and recognition.','Direct Officer may feel demanding, with rules and responsibilities leaving little room to breathe.'],
  '편관':['Seven Killings can turn tension into drive for tackling difficult tasks directly.','Seven Killings may bring pressure from a heavy workload or a demanding manager.'],
@@ -117,10 +117,10 @@ T.cat.career={
  '간합':['A combination with the Day Master highlights good partners and collaborative proposals.',''],
  '양인':['Yang Blade adds determination to work that needs a firm push.','Yang Blade may make rushed or overly ambitious decisions tempting.'],
  },
- advice:{high:['Use this time to present an important proposal or report.','Step forward with confidence.'],good:['Clearing delayed tasks can make room for the next opportunity.','Record small achievements for future reviews.'],mid:['Improve work already underway before adding more.','Review your priorities.'],low:['Take more time over major decisions and keep clear records.','Pause before reacting emotionally.']},
+ advice:{high:['When there is a chance to discuss your work, let yourself take credit.','Tell someone you trust about a role or idea that interests you.'],good:['Share your progress with a collaborator and continue the conversation.','Let yourself recognize even a small step as something you achieved.'],mid:['Improve work already underway before adding more.','Review your priorities.'],low:['Take more time over major decisions and keep clear records.','Pause before reacting emotionally.']},
 };
 T.cat.money={
- lead:{high:['{P}, the reading highlights opportunities to improve your finances.','{P}, money themes look favorable, with attention on income and opportunity.'],good:['{P}, income and spending are relatively balanced in this reading.','{P}, modest, concrete gains are the main theme.'],mid:['{P}, the financial flow is ordinary, so stay within your plan.','{P}, inflows and outflows may roughly balance.'],low:['{P}, allow for unexpected expenses.','{P}, pay closer attention to small leaks in your budget.']},
+ lead:{high:['{P}, a gift or reward for effort offers a welcome money theme.','{P}, a small windfall or a paid opportunity that values your skill fits the reading.'],good:['{P}, a wanted item on appealing terms or a small thank-you may bring a sense of abundance.','{P}, a treat from someone or a lighter-than-expected cost may offer a modest gain.'],mid:['{P}, the financial flow is ordinary, so stay within your plan.','{P}, inflows and outflows may roughly balance.'],low:['{P}, allow for unexpected expenses.','{P}, pay closer attention to small leaks in your budget.']},
  factor:{
  '정재':['Direct Wealth highlights regular income and patient accumulation.','Direct Wealth may bring additional worries or responsibilities around money.'],
  '편재':['Indirect Wealth highlights side income, investments and unexpected financial opportunities.','Indirect Wealth may encourage speculation. Avoid staking too much on one outcome.'],
@@ -141,10 +141,10 @@ T.cat.money={
  '년지합':['A combination with the year branch highlights family support.',''],
  '년지충':['','A clash with the year branch may bring unexpected family expenses.'],
  },
- advice:{high:['Set a savings and investment allocation before deciding what to do with extra income.','Use clear rules when assessing an opportunity.'],good:['Small, regular savings can add up.','Review fixed expenses to create more breathing room.'],mid:['Review your spending list.','Give unplanned purchases another day.'],low:['Take more time before major spending or investment decisions.','Leave impulse purchases in your cart overnight.']},
+ advice:{high:['If an opportunity comes to discuss your contribution, speak with confidence.','Enjoy a small gift or kindness, while letting expected money arrive before spending it.'],good:['Look for a satisfying choice between what you need and what you enjoy.','Enjoy a small reward while keeping room you will feel comfortable with later.'],mid:['Review your spending list.','Give unplanned purchases another day.'],low:['Take more time before major spending or investment decisions.','Leave impulse purchases in your cart overnight.']},
 };
 T.cat.love={
- lead:{high:['{P}, romantic attention and deeper connections are highlighted.','{P}, the reading favors growing closer to someone you connect with.'],good:['{P}, relationships have a warm, steady tone.','{P}, affection can develop naturally in a relaxed atmosphere.'],mid:['{P}, focus on strengthening existing bonds rather than major progress.','{P}, feelings may be steady without much excitement.'],low:['{P}, a small remark may be easy to misunderstand.','{P}, heightened sensitivity may create distance in a relationship.']},
+ lead:{high:['{P}, a welcome message or another date may bring a sense of closeness.','{P}, there is room to look forward to a revealing conversation or a tender expression of affection.'],good:['{P}, a remembered promise or preference may make someone’s care feel tangible.','{P}, an easy conversation and a shared laugh offer room for affection to grow.'],mid:['{P}, focus on strengthening existing bonds rather than major progress.','{P}, feelings may be steady without much excitement.'],low:['{P}, a small remark may be easy to misunderstand.','{P}, heightened sensitivity may create distance in a relationship.']},
  factor:{
  '정재M':['Direct Wealth, the traditional partner star here, favors serious commitment.','Direct Wealth may bring requests for greater responsibility in a relationship.'],
  '편재M':['Indirect Wealth highlights new romantic encounters.','Indirect Wealth may scatter romantic attention and put trust under strain.'],
@@ -170,10 +170,10 @@ T.cat.love={
  '간합':['A combination with the Day Master highlights a connection with someone who understands you.',''],
  '간충':['','A clash with the Day Master may reduce emotional room and increase sensitivity.'],
  },
- advice:{high:['Reach out to someone you would like to get to know.','Plan a thoughtful date or mark a meaningful occasion.'],good:['A small gift or kind remark can strengthen the bond.','Visit somewhere new together.'],mid:['Give the other person time to finish their story.','Make room for easy conversation without rushing the relationship.'],low:['Wait before replying when emotions run high.','Avoid bringing old disagreements back into the conversation.']},
+ advice:{high:['Suggest a meal or walk you would enjoy sharing.','Share appreciation you have not expressed or a moment you enjoyed together.'],good:['Share something you both like without needing a special event.','Make time to relax together without having to impress.'],mid:['Give the other person time to finish their story.','Make room for easy conversation without rushing the relationship.'],low:['Wait before replying when emotions run high.','Avoid bringing old disagreements back into the conversation.']},
 };
 T.cat.move={
- lead:{high:['{P}, movement can open up opportunities.','{P}, the reading favors travel, business trips and changes of place.'],good:['{P}, a short outing or trip can offer a refreshing change.','{P}, exploring a new place may bring something useful.'],mid:['{P}, necessary journeys fit the flow without major changes.','{P}, familiar routes may feel most comfortable.'],low:['{P}, allow for delays and keep track of your belongings.','{P}, give demanding travel or moving plans another review.']},
+ lead:{high:['{P}, a visit may bring a welcome face or a place you like.','{P}, unfamiliar surroundings may offer inspiration, or a delayed visit may become a good memory.'],good:['{P}, a simple outing or short visit may offer a fresh feeling.','{P}, a familiar route may reveal a shop or view worth enjoying.'],mid:['{P}, necessary journeys fit the flow without major changes.','{P}, familiar routes may feel most comfortable.'],low:['{P}, allow for delays and keep track of your belongings.','{P}, give demanding travel or moving plans another review.']},
  factor:{
  '역마':['Strong Travel Horse energy favors trips, relocation and changes of role.','Travel Horse may bring shifting schedules and a busy pace.'],
  '일지충':['A clash with the day branch highlights a change in home or daily surroundings.','A clash with the day branch calls for care with minor accidents or arguments while traveling.'],
@@ -191,10 +191,10 @@ T.cat.move={
  '귀인':['Noble Helper symbolizes help even in unfamiliar surroundings.',''],
  '간충':['','A clash with the Day Master may make travel especially tiring.'],
  },
- advice:{high:['Turn a postponed travel or moving idea into a concrete plan.','Meet people in a new setting.'],good:['Take a walk or a short outing nearby.','Try a different route for your usual journey.'],mid:['Recheck your schedule and essentials before leaving.','Leave extra time for travel.'],low:['Drive calmly and keep valuables secure.','Consider a less demanding time for a long trip.']},
+ advice:{high:['If you have wanted to see somewhere, begin with a manageable visit.','Take your time with the conversations and scenery a new place offers.'],good:['Choose one place you would enjoy, even close to home.','Leave a little room to look around between plans.'],mid:['Recheck your schedule and essentials before leaving.','Leave extra time for travel.'],low:['Drive calmly and keep valuables secure.','Consider a less demanding time for a long trip.']},
 };
 T.cat.health={
- lead:{high:['{P}, reviewing your daily rhythm is a prominent theme.','{P}, use this reading to review the balance of activity and rest.'],good:['{P}, this reading focuses on a regular routine.','{P}, choose a habit that you can maintain comfortably.'],mid:['{P}, review your schedule alongside time for rest.','{P}, separate time for tasks from time for rest.'],low:['{P}, look for demands you can reduce in your routine.','{P}, adjust your schedule using how you actually feel.']},
+ lead:{high:['{P}, make room to enjoy favorite activities and restful time for yourself.','{P}, look for enjoyment in a neglected hobby or a gentle walk.'],good:['{P}, familiar pleasures such as an easy meal or unhurried evening may feel precious.','{P}, enjoy the satisfaction of caring for yourself without an elaborate plan.'],mid:['{P}, review your schedule alongside time for rest.','{P}, separate time for tasks from time for rest.'],low:['{P}, look for demands you can reduce in your routine.','{P}, adjust your schedule using how you actually feel.']},
  factor:{
  '식신':['Eating God symbolizes daily enjoyment. Leave time for meals.','Eating God symbolizes enjoyment of food. Review your actual eating routine.'],
  '정인':['Direct Resource symbolizes care and rest. Review your resting environment.','Direct Resource highlights self-care. Review time for movement and rest.'],
@@ -215,10 +215,10 @@ T.cat.health={
  '일지합':['A day-branch combination symbolizes harmony. Review what makes your resting environment comfortable.',''],
  '귀인':['Noble Helper highlights asking for support. Assess physical discomfort separately from this reading.',''],
  },
- advice:{high:['Consider starting a suitable exercise routine.','Use good energy to tackle a task you have postponed.'],good:['Keep up gentle stretching.','Include seasonal foods in your meals.'],mid:['Drink water regularly and protect your sleep schedule.','If you sit for long periods, get up each hour.'],low:['Listen to your body and rest early.','Reduce an overloaded schedule and do not put off necessary checkups.']},
+ advice:{high:['Remember why you enjoyed an activity before worrying about doing it well.','Let your actual condition guide a comfortable amount of activity.'],good:['It is fine to choose your own pace instead of following others.','Your free time does not need to be filled with achievements.'],mid:['Drink water regularly and protect your sleep schedule.','If you sit for long periods, get up each hour.'],low:['Listen to your body and rest early.','Reduce an overloaded schedule and do not put off necessary checkups.']},
 };
 T.cat.social={
- lead:{high:['{P}, support through other people is highlighted.','{P}, goodwill and encouragement from others stand out.'],good:['{P}, getting along with others may bring useful information.','{P}, conversation and cooperation have a smoother flow.'],mid:['{P}, care for close relationships before expanding your circle.','{P}, ordinary courtesy is enough to maintain a steady social flow.'],low:['{P}, misunderstandings or gossip may be easier to encounter.','{P}, interactions with others may feel more emotionally difficult.']},
+ lead:{high:['{P}, a message, a welcome invitation or someone in your corner offers something to look forward to.','{P}, sharing a difficult concern may bring unexpected support.'],good:['{P}, you may reconnect with someone or hear that your kindness was remembered.','{P}, a simple conversation with someone on your wavelength may be enjoyable.'],mid:['{P}, care for close relationships before expanding your circle.','{P}, ordinary courtesy is enough to maintain a steady social flow.'],low:['{P}, misunderstandings or gossip may be easier to encounter.','{P}, interactions with others may feel more emotionally difficult.']},
  factor:{
  '비견':['Peer energy highlights support from friends and colleagues.','Peer energy may make compromise harder on both sides.'],
  '겁재':['Rival highlights allies even in a competitive setting.','Rival may put shared interests under strain in close relationships.'],
@@ -243,10 +243,10 @@ T.cat.social={
  '도화':['Peach Blossom highlights popularity and attention.',''],
  '화개':['Canopy favors a connection through deeper conversation.','Canopy highlights a need for time alone.'],
  },
- advice:{high:['Take part in a gathering or event.','Reach out if there is help you need.'],good:['Check in with someone you have not spoken to recently.','Be the first to express thanks.'],mid:['Keep even small promises.','Choose your words carefully in group conversations.'],low:['Listen without passing on other people’s stories.','Politely decline uncomfortable money requests or unreasonable favors.']},
+ advice:{high:['Share a concern you have carried alone with someone you trust.','Join a gathering or conversation that interests you as yourself.'],good:['Ask someone who comes to mind how they have been.','You need not brush aside a compliment or kind gesture out of shyness.'],mid:['Keep even small promises.','Choose your words carefully in group conversations.'],low:['Listen without passing on other people’s stories.','Politely decline uncomfortable money requests or unreasonable favors.']},
 };
 T.cat.study={
- lead:{high:['{P}, clear focus supports learning and practice.','{P}, examinations, qualifications, contracts and documents are favorable themes.'],good:['{P}, steady concentration supports study and paperwork.','{P}, consistent study may begin to show results.'],mid:['{P}, review and organize what you have already learned.','{P}, strengthen familiar material before adding something new.'],low:['{P}, distraction and paperwork errors deserve extra attention.','{P}, recheck contracts and important documents carefully.']},
+ lead:{high:['{P}, a difficult topic may connect, or you may get a chance to show what you prepared.','{P}, sharing your thoughts in a presentation or assignment may make learning feel rewarding.'],good:['{P}, review may feel clearer, or you may find material that suits you.','{P}, a little progress may renew your interest in learning and your confidence.'],mid:['{P}, review and organize what you have already learned.','{P}, strengthen familiar material before adding something new.'],low:['{P}, distraction and paperwork errors deserve extra attention.','{P}, recheck contracts and important documents carefully.']},
  factor:{
  '정인':['Direct Resource strongly supports study, examinations, qualifications and document work in this reading.','Direct Resource may make it tempting to postpone studying.'],
  '편인':['Indirect Resource favors deep concentration on specialist subjects or skills.','Indirect Resource may scatter your thoughts.'],
@@ -264,7 +264,7 @@ T.cat.study={
  '월지형':['','A penalty relation with the month branch calls for care with paperwork errors.'],
  '일지형':['','A penalty relation with the day branch calls for another review of contract clauses.'],
  },
- advice:{high:['Move forward with a prepared exam application or important document.','Try a challenging subject.'],good:['A little extra study time may be manageable.','Explain what you learned to someone else to help retain it.'],mid:['Organize notes and review mistakes.','Use short, frequent review sessions.'],low:['Read once more before signing and leave time before deadlines.','When tired, review familiar material instead of rushing ahead.']},
+ advice:{high:['Put a topic you care about to use or explain it to someone.','Let yourself share what you prepared without minimizing it.'],good:['Ask about what interests you and look for connections you missed alone.','Value one new understanding more than the amount covered.'],mid:['Organize notes and review mistakes.','Use short, frequent review sessions.'],low:['Read once more before signing and leave time before deadlines.','When tired, review familiar material instead of rushing ahead.']},
 };
 T.generic={'오행':['A supportive element gives this area added strength.','Demanding element energy suggests adjusting your pace in this area.'],'운성':['A stronger stage of the Day Master supports confidence.','A weaker stage of the Day Master suggests avoiding overextension.']};
 T.compat={

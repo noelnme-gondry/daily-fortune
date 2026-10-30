@@ -1,0 +1,2190 @@
+// 2026-10-30 문구 개편 전에 발급한 공유 URL의 한영 대응표.
+// 신규 풀이 선택에는 사용하지 않는다. 과거 제목 문자열이 URL 계약이므로 보존한다.
+export const LEGACY_READING_LABELS = [
+  [
+    "보고의 핵심",
+    "The point of your report"
+  ],
+  [
+    "업무를 넘기는 기준",
+    "A clear handoff"
+  ],
+  [
+    "초안으로 시작하기",
+    "Start with a draft"
+  ],
+  [
+    "마감의 우선순위",
+    "Deadline priorities"
+  ],
+  [
+    "해낸 일의 기록",
+    "A record of your work"
+  ],
+  [
+    "맡을 일의 범위",
+    "The scope of a task"
+  ],
+  [
+    "정기 결제 점검",
+    "Recurring payments"
+  ],
+  [
+    "구매 조건 비교",
+    "Compare purchase terms"
+  ],
+  [
+    "함께 쓴 돈의 정산",
+    "Shared expenses"
+  ],
+  [
+    "청구 내역 확인",
+    "Check a bill"
+  ],
+  [
+    "쓸 돈의 경계",
+    "A spending boundary"
+  ],
+  [
+    "시간과 비용의 균형",
+    "Time and cost"
+  ],
+  [
+    "부담 없는 초대",
+    "A simple invitation"
+  ],
+  [
+    "마음을 확인하는 질문",
+    "A question that listens"
+  ],
+  [
+    "작은 약속 지키기",
+    "Keep a small promise"
+  ],
+  [
+    "구체적인 고마움",
+    "Specific appreciation"
+  ],
+  [
+    "각자의 시간",
+    "Room for each other"
+  ],
+  [
+    "다음 만남의 준비",
+    "Plan the next meeting"
+  ],
+  [
+    "동선 미리 보기",
+    "Preview your route"
+  ],
+  [
+    "예약 조건 확인",
+    "Check booking terms"
+  ],
+  [
+    "이동 사이의 여유",
+    "Space between trips"
+  ],
+  [
+    "만날 장소 맞추기",
+    "Agree on a meeting point"
+  ],
+  [
+    "챙길 물건 줄이기",
+    "Pack what you need"
+  ],
+  [
+    "방문의 목적",
+    "A purpose for your visit"
+  ],
+  [
+    "일정 사이의 휴식",
+    "Rest between tasks"
+  ],
+  [
+    "잠들기 전의 정리",
+    "Wind down before sleep"
+  ],
+  [
+    "식사 시간 챙기기",
+    "Make room for meals"
+  ],
+  [
+    "내 몸에 맞는 속도",
+    "Your own pace"
+  ],
+  [
+    "오래 머무는 자리",
+    "Your everyday space"
+  ],
+  [
+    "긴장을 푸는 시간",
+    "Time to unwind"
+  ],
+  [
+    "부탁을 명확하게",
+    "Make a clear request"
+  ],
+  [
+    "서로의 역할",
+    "Each person’s role"
+  ],
+  [
+    "답장 전에 확인",
+    "Check before replying"
+  ],
+  [
+    "도움에 대한 답례",
+    "Acknowledge help"
+  ],
+  [
+    "합의 내용 남기기",
+    "Record an agreement"
+  ],
+  [
+    "대화의 경계",
+    "Boundaries in conversation"
+  ],
+  [
+    "질문 하나 깊게 보기",
+    "Explore one question"
+  ],
+  [
+    "배운 내용 써 보기",
+    "Use what you learned"
+  ],
+  [
+    "헷갈린 지점 복습",
+    "Review a confusing point"
+  ],
+  [
+    "설명하며 배우기",
+    "Learn by explaining"
+  ],
+  [
+    "집중할 구간 정하기",
+    "Set a focus interval"
+  ],
+  [
+    "자료의 근거 확인",
+    "Check the source"
+  ]
+];
+export const LEGACY_READING_HEADLINES = [
+  [
+    "보고의 첫 줄에 결론을",
+    "Put the conclusion on the first line"
+  ],
+  [
+    "회의에서 꺼낼 핵심 한 가지",
+    "One key point to bring to the meeting"
+  ],
+  [
+    "제안서에 원하는 답을 분명하게",
+    "Make the ask clear in your proposal"
+  ],
+  [
+    "진행 상황을 공유할 때 다음 요청도",
+    "Include the next request in a progress update"
+  ],
+  [
+    "검토받을 문서에는 결론을 눈에 띄게",
+    "Make the conclusion visible in a document for review"
+  ],
+  [
+    "회의 안건을 한 문장으로 요약하기",
+    "Summarize the meeting’s key point in one sentence"
+  ],
+  [
+    "긴 설명 전에 결정할 것부터",
+    "Identify the decision before explaining"
+  ],
+  [
+    "보고를 받는 사람의 질문으로 돌아가기",
+    "Return to the reader’s question"
+  ],
+  [
+    "자료를 더하기 전에 요청 사항 점검",
+    "Check the request before adding detail"
+  ],
+  [
+    "보고서를 보내기 전 판단에 필요한 것 확인",
+    "Check what the reader needs to make a decision"
+  ],
+  [
+    "논의가 길어지면 결정할 질문으로",
+    "Return a long discussion to the decision at hand"
+  ],
+  [
+    "상세한 설명보다 먼저 맞출 논점",
+    "Agree on the issue before a detailed explanation"
+  ],
+  [
+    "함께 하는 일, 담당자부터 맞추기",
+    "Agree on who owns each shared task"
+  ],
+  [
+    "인수인계는 완료 기준까지",
+    "Include completion criteria in the handoff"
+  ],
+  [
+    "다음 사람이 이어 갈 수 있는 업무 메모",
+    "Leave notes the next person can use"
+  ],
+  [
+    "공동 작업의 마지막 확인 담당 정하기",
+    "Assign the final check in a shared task"
+  ],
+  [
+    "협업 문서에 각자의 완료 기준 남기기",
+    "Record each person’s completion criteria"
+  ],
+  [
+    "교대 전에 함께 맞춰 볼 업무 목록",
+    "Review the task list together before a handover"
+  ],
+  [
+    "일을 넘기기 전 남은 항목 확인",
+    "Check what is unfinished before handing over"
+  ],
+  [
+    "말로 전한 마감도 글로 남기기",
+    "Write down deadlines discussed aloud"
+  ],
+  [
+    "끝낸 일과 넘길 일을 나눠 볼 차례",
+    "Separate completed work from the handoff"
+  ],
+  [
+    "자리를 비우기 전 진행 중인 일 메모",
+    "Note work in progress before stepping away"
+  ],
+  [
+    "넘겨받을 사람이 놓치기 쉬운 마감 표시",
+    "Flag deadlines the next person could miss"
+  ],
+  [
+    "담당자가 바뀌면 미완료 항목도 함께",
+    "Pass on unfinished items when the owner changes"
+  ],
+  [
+    "머릿속 아이디어를 첫 초안으로",
+    "Turn an idea into a first draft"
+  ],
+  [
+    "의견을 구할 수 있는 작은 시안",
+    "Make a small draft people can respond to"
+  ],
+  [
+    "제안할 내용은 짧게 써서 보여주기",
+    "Show your proposal in a short written draft"
+  ],
+  [
+    "기획의 첫 페이지로 의견 구하기",
+    "Ask for feedback on the first page of a plan"
+  ],
+  [
+    "새 아이디어를 설명할 간단한 샘플",
+    "Make a simple sample to explain a new idea"
+  ],
+  [
+    "회의에 가져갈 초안 한 장 준비",
+    "Prepare a one-page draft for the meeting"
+  ],
+  [
+    "전면 수정 전에 한 부분부터 시험",
+    "Test one part before a full revision"
+  ],
+  [
+    "새 방식은 작은 작업에서 확인하기",
+    "Try a new approach on a small task"
+  ],
+  [
+    "초안의 반응을 살피고 다음 단계로",
+    "Review the draft’s feedback before moving on"
+  ],
+  [
+    "기획 전체를 바꾸기 전 예시 하나",
+    "Try one example before changing the whole plan"
+  ],
+  [
+    "시범 작업의 피드백부터 살펴보기",
+    "Start by reviewing feedback on the trial task"
+  ],
+  [
+    "수정 방향은 작은 샘플로 확인",
+    "Check a revision’s direction with a small sample"
+  ],
+  [
+    "가장 먼저 끝낼 일에 시간을 배정하기",
+    "Reserve time for the task to finish first"
+  ],
+  [
+    "마감 목록에서 첫 번째 과제 고르기",
+    "Choose the first task on your deadline list"
+  ],
+  [
+    "중요한 작업 앞에 비워 둘 일정",
+    "Clear a slot for an important task"
+  ],
+  [
+    "업무를 시작할 때 첫 마감부터 표시",
+    "Mark the first deadline as you start work"
+  ],
+  [
+    "여러 과제 중 먼저 닫을 일 하나",
+    "Choose one task to close before the others"
+  ],
+  [
+    "미뤄 둔 핵심 작업에 집중 시간 잡기",
+    "Book focused time for a key task you postponed"
+  ],
+  [
+    "겹친 요청은 마감부터 조율하기",
+    "Negotiate deadlines when requests overlap"
+  ],
+  [
+    "다 할 수 있는지 답하기 전 일정 확인",
+    "Check your schedule before promising it all"
+  ],
+  [
+    "급한 일의 순서를 함께 정할 때",
+    "Agree together on the order of urgent tasks"
+  ],
+  [
+    "새 요청이 들어오면 기존 마감과 함께 조율",
+    "Fit a new request around existing deadlines"
+  ],
+  [
+    "일정이 겹친다면 가능한 시각부터 전달",
+    "State feasible times when schedules overlap"
+  ],
+  [
+    "급하다는 말만으로 순서를 바꾸기 전에",
+    "Check priorities before reshuffling urgent work"
+  ],
+  [
+    "끝낸 일에서 다음 제안의 근거 찾기",
+    "Use completed work to support your next idea"
+  ],
+  [
+    "잘된 결과와 배운 점을 한곳에",
+    "Keep outcomes and lessons in one place"
+  ],
+  [
+    "성과를 설명할 수 있는 작업 기록",
+    "Keep a record that explains your results"
+  ],
+  [
+    "다음 회고에 가져갈 결과와 교훈",
+    "Collect results and lessons for the next review"
+  ],
+  [
+    "제안서에 활용할 지난 작업 정리",
+    "Organize past work to use in a proposal"
+  ],
+  [
+    "마친 프로젝트에서 다시 쓸 경험 남기기",
+    "Save reusable lessons from a finished project"
+  ],
+  [
+    "기억이 흐린 업무 조건은 기록으로",
+    "Check the record when work terms are unclear"
+  ],
+  [
+    "수정 요청의 이력을 다시 펼쳐 보기",
+    "Revisit the history of revision requests"
+  ],
+  [
+    "처음 합의와 달라진 부분 점검",
+    "Check what changed from the original agreement"
+  ],
+  [
+    "다시 논의할 조건은 이전 메일부터",
+    "Revisit earlier emails before discussing terms again"
+  ],
+  [
+    "업무 범위가 헷갈리면 합의 문서 확인",
+    "Check the agreement when task scope is unclear"
+  ],
+  [
+    "최신 요청과 지난 수정 사항 나란히 보기",
+    "Compare the latest request with past revisions"
+  ],
+  [
+    "새 일을 맡을 때 필요한 지원도 함께",
+    "Discuss support when taking on new work"
+  ],
+  [
+    "제안받은 역할의 범위를 구체적으로",
+    "Clarify the scope of a proposed role"
+  ],
+  [
+    "혼자 할 일과 도움받을 일 나누기",
+    "Separate solo tasks from work needing help"
+  ],
+  [
+    "새 프로젝트에 필요한 자원 이야기하기",
+    "Discuss resources needed for a new project"
+  ],
+  [
+    "담당 업무와 협업이 필요한 부분 구분",
+    "Distinguish your tasks from work needing collaboration"
+  ],
+  [
+    "제안의 시작부터 지원 조건 맞추기",
+    "Agree on support terms at the start of a proposal"
+  ],
+  [
+    "수락 버튼 앞에서 업무량 확인",
+    "Check your workload before saying yes"
+  ],
+  [
+    "추가 요청과 기존 일정의 겹침 살피기",
+    "Look for overlaps with an extra request"
+  ],
+  [
+    "맡을 수 있는 범위를 먼저 말하기",
+    "State how much you can take on first"
+  ],
+  [
+    "새 역할과 지금 맡은 일의 접점 확인",
+    "Check how a new role intersects with current work"
+  ],
+  [
+    "추가 업무를 약속하기 전 여력 살피기",
+    "Check capacity before promising extra work"
+  ],
+  [
+    "도움 요청에도 현재 일정 함께 알리기",
+    "Mention your current schedule when asked to help"
+  ],
+  [
+    "구독 목록에서 계속 쓸 것 고르기",
+    "Choose which subscriptions to keep"
+  ],
+  [
+    "잊고 있던 정기 결제를 펼쳐 볼 시간",
+    "Take a look at forgotten recurring payments"
+  ],
+  [
+    "계속 나가는 비용에 쓰임새 붙여 보기",
+    "Match each recurring cost to its purpose"
+  ],
+  [
+    "자주 쓰지 않는 앱 구독 살펴보기",
+    "Review subscriptions to apps you rarely use"
+  ],
+  [
+    "멤버십 갱신 전에 이용 내역 확인",
+    "Check usage before renewing a membership"
+  ],
+  [
+    "자동 연장할 서비스와 끝낼 서비스 구분",
+    "Decide which services to renew and which to end"
+  ],
+  [
+    "자동 결제 전에 날짜와 잔액 확인",
+    "Check dates and balances before autopay"
+  ],
+  [
+    "출금 일정이 겹치는지 살펴보기",
+    "Check whether payment dates overlap"
+  ],
+  [
+    "정기 지출을 미리 달력에 표시하기",
+    "Mark recurring expenses on your calendar"
+  ],
+  [
+    "갱신 예정인 서비스의 결제일 점검",
+    "Check payment dates for services due to renew"
+  ],
+  [
+    "고정비가 빠져나갈 계좌 잔액 살피기",
+    "Check the balance in the account used for fixed costs"
+  ],
+  [
+    "결제 알림을 받았다면 출금 날짜 확인",
+    "Check the debit date when a payment notice arrives"
+  ],
+  [
+    "가격표 옆에 배송비도 나란히",
+    "Put delivery costs beside the price tag"
+  ],
+  [
+    "살 때 가격과 유지할 비용을 함께",
+    "Compare purchase and upkeep costs together"
+  ],
+  [
+    "구매 후보를 같은 조건에서 비교하기",
+    "Compare purchases on the same terms"
+  ],
+  [
+    "배송 조건이 다른 판매처 비교",
+    "Compare sellers with different delivery terms"
+  ],
+  [
+    "기기 가격에 소모품 비용도 포함",
+    "Include consumable costs when comparing devices"
+  ],
+  [
+    "배송비까지 합친 최종 금액으로 선택",
+    "Compare final totals including delivery"
+  ],
+  [
+    "할인 중인 물건, 실제로 쓸지부터",
+    "Before buying a sale item, will you use it?"
+  ],
+  [
+    "결제 전에 반품 조건 읽어 보기",
+    "Read the return terms before paying"
+  ],
+  [
+    "장바구니에서 필요한 물건만 남기기",
+    "Keep only what you need in the cart"
+  ],
+  [
+    "묶음 할인에도 다 쓸 수 있는지 확인",
+    "Check whether you can use a discounted bundle"
+  ],
+  [
+    "충동적으로 담은 물건의 사용처 생각하기",
+    "Consider how you would use an impulse purchase"
+  ],
+  [
+    "마음이 바뀔 수 있는 구매는 반품 조건부터",
+    "Check returns when you may reconsider a purchase"
+  ],
+  [
+    "함께 쓴 돈은 기억날 때 정리하기",
+    "Record shared costs while they are fresh"
+  ],
+  [
+    "모임 비용을 항목별로 나눠 보기",
+    "Break down the costs of a gathering"
+  ],
+  [
+    "공동 지출 내역을 함께 볼 수 있게",
+    "Make shared expense details easy to review"
+  ],
+  [
+    "함께 먹은 식사 비용을 내역별로",
+    "Break down the cost of a shared meal"
+  ],
+  [
+    "여행에서 함께 낸 돈을 정리하기",
+    "Organize expenses shared on a trip"
+  ],
+  [
+    "공동 구매 비용을 기억날 때 적기",
+    "Record a group purchase while details are fresh"
+  ],
+  [
+    "대신 결제하기 전 정산 시점부터",
+    "Agree on repayment before covering a cost"
+  ],
+  [
+    "나눠 낼 금액은 먼저 맞춰 보기",
+    "Agree on each share of the cost first"
+  ],
+  [
+    "돈이 오가는 부탁에는 금액을 분명하게",
+    "Be clear about amounts when money is involved"
+  ],
+  [
+    "모임 예약금을 대신 내기 전 분담 확인",
+    "Agree on shares before paying a group deposit"
+  ],
+  [
+    "함께 살 물건은 각자 낼 금액부터",
+    "Agree on contributions before a joint purchase"
+  ],
+  [
+    "여행 비용을 먼저 낸다면 정산 날짜도",
+    "Set repayment dates before covering trip costs"
+  ],
+  [
+    "청구서와 영수증을 맞춰 볼 차례",
+    "Match the bill against your receipts"
+  ],
+  [
+    "기다리는 환불이 들어왔는지 확인",
+    "Check whether a pending refund has arrived"
+  ],
+  [
+    "아직 남은 정산 항목 찾아보기",
+    "Look for reimbursements still outstanding"
+  ],
+  [
+    "취소한 주문의 환불 내역 살펴보기",
+    "Review refunds for canceled orders"
+  ],
+  [
+    "따로 모은 영수증을 청구 내역과 비교",
+    "Compare saved receipts with billed charges"
+  ],
+  [
+    "처리되지 않은 비용 정산 챙기기",
+    "Follow up on an expense still awaiting reimbursement"
+  ],
+  [
+    "낯선 결제 이름은 사용처부터 확인",
+    "Check the merchant behind an unfamiliar charge"
+  ],
+  [
+    "기억나지 않는 지출은 내역을 열어 보기",
+    "Open the details of a charge you cannot recall"
+  ],
+  [
+    "청구 금액을 짐작으로 넘기지 않기",
+    "Verify a billed amount instead of guessing"
+  ],
+  [
+    "처음 보는 상호의 결제는 주문 내역 확인",
+    "Check orders behind an unfamiliar merchant name"
+  ],
+  [
+    "낯선 출금 항목은 결제처에 확인하기",
+    "Ask the merchant about an unfamiliar debit"
+  ],
+  [
+    "영수증이 없는 결제는 이용 내역부터",
+    "Review transaction details when a receipt is missing"
+  ],
+  [
+    "쓸 돈과 남길 돈을 따로 적기",
+    "Write spending and savings amounts separately"
+  ],
+  [
+    "예정된 지출부터 예산에 자리 잡기",
+    "Make room in the budget for planned costs"
+  ],
+  [
+    "남겨 둘 금액을 먼저 정해 보기",
+    "Decide how much to keep aside first"
+  ],
+  [
+    "큰 지출을 앞두고 남길 금액 표시",
+    "Mark what to keep aside before a large expense"
+  ],
+  [
+    "모임과 약속에 쓸 돈을 예산에 반영",
+    "Include social plans in your spending budget"
+  ],
+  [
+    "가까운 지출 계획을 한 목록으로",
+    "Put upcoming expenses together in one list"
+  ],
+  [
+    "예정에 없던 소비 앞에서 한도 확인",
+    "Check your limit before an unplanned purchase"
+  ],
+  [
+    "추가 결제는 남은 예산 안에서",
+    "Fit extra purchases within the remaining budget"
+  ],
+  [
+    "갖고 싶은 물건과 쓸 수 있는 금액",
+    "Compare what you want with what you can spend"
+  ],
+  [
+    "예산 밖의 약속은 비용부터 확인",
+    "Check costs for plans outside your budget"
+  ],
+  [
+    "갑자기 눈에 든 물건은 지출 계획과 비교",
+    "Compare a tempting item with your spending plan"
+  ],
+  [
+    "추가 구매가 남겨 둘 돈을 건드리는지",
+    "Check if an extra purchase uses money set aside"
+  ],
+  [
+    "작은 부탁에도 시간과 비용 계산",
+    "Count both time and money for a small request"
+  ],
+  [
+    "일을 맡기 전 필요한 수고까지",
+    "Consider the effort before assigning a task"
+  ],
+  [
+    "직접 할지 맡길지 비용과 시간으로 비교",
+    "Compare time and cost before doing it yourself"
+  ],
+  [
+    "작은 외주에도 필요한 시간 적어 보기",
+    "Estimate the time involved in a small freelance task"
+  ],
+  [
+    "부탁받은 작업의 시간당 수고 살피기",
+    "Consider the time a requested task will take"
+  ],
+  [
+    "돈을 아끼는 선택에 들 시간도 계산",
+    "Count the time required by a money-saving option"
+  ],
+  [
+    "싼 가격 뒤에 드는 수고도 살피기",
+    "Look at the effort behind a low price"
+  ],
+  [
+    "절약한 돈과 더 쓸 시간을 함께 보기",
+    "Weigh money saved against extra time spent"
+  ],
+  [
+    "선택하기 전 숨은 번거로움 확인",
+    "Check the hidden hassle before choosing"
+  ],
+  [
+    "싼 물건을 찾는 데 드는 이동도 비용",
+    "Count travel effort when looking for a cheaper item"
+  ],
+  [
+    "할인 혜택에 필요한 추가 수고 살피기",
+    "Check the extra effort needed to claim a discount"
+  ],
+  [
+    "직접 처리하는 선택에도 내 시간 계산",
+    "Include your time in the choice to do it yourself"
+  ],
+  [
+    "같이 하고 싶은 일을 구체적으로 제안",
+    "Suggest something specific to do together"
+  ],
+  [
+    "상대가 고를 여지를 남긴 초대",
+    "Offer an invitation with room to choose"
+  ],
+  [
+    "막연한 만남 대신 함께할 활동 정하기",
+    "Give a possible meeting a concrete activity"
+  ],
+  [
+    "함께 걷고 싶은 장소를 제안해 보기",
+    "Suggest a place where you could walk together"
+  ],
+  [
+    "궁금했던 전시나 영화로 초대하기",
+    "Invite them to an exhibition or film you want to see"
+  ],
+  [
+    "같이 먹고 싶은 메뉴를 물어보기",
+    "Ask what they would like to eat together"
+  ],
+  [
+    "만나자는 말에 앞서 편한 시간 묻기",
+    "Ask about a comfortable time before meeting"
+  ],
+  [
+    "초대는 상대의 여유를 살피며",
+    "Consider their availability when inviting them"
+  ],
+  [
+    "만남의 속도를 함께 맞춰 보기",
+    "Agree on a comfortable pace for meeting"
+  ],
+  [
+    "갑작스러운 초대라면 일정부터 묻기",
+    "Ask about their schedule for a last-minute invitation"
+  ],
+  [
+    "늦은 시간의 만남은 편한지 먼저",
+    "Check their comfort with a late meeting first"
+  ],
+  [
+    "먼 곳으로 부르기 전에 이동 부담 확인",
+    "Check travel comfort before inviting them far away"
+  ],
+  [
+    "최근 마음에 남은 일을 물어보세요",
+    "Ask what has been on their mind lately"
+  ],
+  [
+    "대답을 끝까지 들을 수 있는 대화",
+    "Make space to hear the whole answer"
+  ],
+  [
+    "안부에서 한 걸음 더 들어가는 질문",
+    "Ask a question beyond the usual greeting"
+  ],
+  [
+    "최근 기억에 남은 순간을 물어보기",
+    "Ask about a recent moment they remember"
+  ],
+  [
+    "상대가 꺼낸 이야기에 끝까지 귀 기울이기",
+    "Stay with the story they chose to share"
+  ],
+  [
+    "하루를 어떻게 보냈는지 차분히 듣기",
+    "Listen calmly to how their day went"
+  ],
+  [
+    "짧은 답장의 의미를 단정하지 않기",
+    "Avoid assuming what a short reply means"
+  ],
+  [
+    "대화를 시작하기 전 여유부터 확인",
+    "Check if there is time before starting a talk"
+  ],
+  [
+    "연락의 길이보다 지금의 사정 살피기",
+    "Consider their situation beyond reply length"
+  ],
+  [
+    "바쁜 시간의 답장을 감정으로 읽지 않기",
+    "Avoid reading feelings into a busy-time reply"
+  ],
+  [
+    "할 말이 길어질 때 통화할 여유 묻기",
+    "Ask about time for a call when there is more to say"
+  ],
+  [
+    "문자만으로 짐작하기 전 대화 가능 여부 확인",
+    "Check availability before drawing conclusions by text"
+  ],
+  [
+    "함께 정한 약속 하나를 행동으로",
+    "Put one shared promise into action"
+  ],
+  [
+    "기억하고 있던 작은 약속 챙기기",
+    "Follow up on that small promise"
+  ],
+  [
+    "마음을 표현할 구체적인 실천",
+    "Choose a concrete way to show you care"
+  ],
+  [
+    "도와주기로 했던 일 하나 챙기기",
+    "Follow through on a task you promised to help with"
+  ],
+  [
+    "보내 주기로 한 소식 잊지 않기",
+    "Remember the update you promised to send"
+  ],
+  [
+    "다음에 하자던 작은 일을 실천하기",
+    "Act on a small thing you said you would do later"
+  ],
+  [
+    "어려워진 약속은 미리 이야기하기",
+    "Speak early about a promise you cannot keep"
+  ],
+  [
+    "늦기 전에 다시 맞출 만남의 일정",
+    "Reschedule the meeting before it is too late"
+  ],
+  [
+    "기다리게 하기 전 사정부터 전하기",
+    "Explain before leaving someone waiting"
+  ],
+  [
+    "늦어질 것 같다면 먼저 연락하기",
+    "Get in touch first if you expect to be late"
+  ],
+  [
+    "일정이 바뀌면 가능한 대안 함께 전하기",
+    "Offer an alternative when plans change"
+  ],
+  [
+    "취소해야 할 약속은 미루지 말고 설명",
+    "Explain a cancellation without putting it off"
+  ],
+  [
+    "고마웠던 행동 하나를 말로 전하기",
+    "Name one action you appreciated"
+  ],
+  [
+    "지나쳤던 배려에 짧은 감사 인사",
+    "Thank them for a kindness you overlooked"
+  ],
+  [
+    "무엇이 좋았는지 구체적으로 표현하기",
+    "Be specific about what you appreciated"
+  ],
+  [
+    "내 이야기를 들어 준 마음에 감사 전하기",
+    "Thank them for listening to your story"
+  ],
+  [
+    "챙겨 준 작은 일도 기억해서 말하기",
+    "Mention a small thing they took care of for you"
+  ],
+  [
+    "같이 보낸 시간에서 좋았던 장면 나누기",
+    "Share a moment you enjoyed in your time together"
+  ],
+  [
+    "떠보는 말 대신 내 마음을 분명하게",
+    "State your feelings without testing theirs"
+  ],
+  [
+    "원하는 반응보다 전하고 싶은 말부터",
+    "Focus on your message before their response"
+  ],
+  [
+    "감정 표현은 짧고 솔직하게",
+    "Keep an expression of feeling simple and honest"
+  ],
+  [
+    "돌려 말한 속마음을 한 문장으로",
+    "Put an indirectly expressed feeling into one sentence"
+  ],
+  [
+    "관심을 확인하려는 질문보다 내 느낌 전하기",
+    "Share your feeling before seeking reassurance"
+  ],
+  [
+    "메시지를 쓰기 전 전하고 싶은 마음 정리",
+    "Clarify the feeling you want to convey in a message"
+  ],
+  [
+    "함께할 시간과 혼자 쉴 시간 나누기",
+    "Plan time together and time to rest alone"
+  ],
+  [
+    "서로의 휴식 방식도 대화에 담기",
+    "Talk about how each of you likes to rest"
+  ],
+  [
+    "가까운 사이에도 각자의 일정 챙기기",
+    "Make room for separate plans in a close bond"
+  ],
+  [
+    "각자의 취미를 위한 시간도 함께 존중",
+    "Make room for each person’s own interests"
+  ],
+  [
+    "쉬는 날의 계획에 혼자만의 여유 남기기",
+    "Leave some personal time in plans for a day off"
+  ],
+  [
+    "바쁜 일정 속 함께할 시간 미리 의논",
+    "Discuss shared time within busy schedules"
+  ],
+  [
+    "연락 간격이 다르면 기준 맞추기",
+    "Agree on contact habits when they differ"
+  ],
+  [
+    "서운함이 쌓이기 전 편한 빈도 묻기",
+    "Ask about contact frequency before resentment"
+  ],
+  [
+    "답장을 기다리는 마음도 말로 나누기",
+    "Talk about how waiting for replies feels"
+  ],
+  [
+    "일하는 시간의 연락 기대 맞춰 보기",
+    "Agree on expectations for contact during work"
+  ],
+  [
+    "서로 다른 통화 습관을 이야기하기",
+    "Talk about differences in calling habits"
+  ],
+  [
+    "쉬고 싶은 시간에는 연락 기준도 함께",
+    "Agree on contact expectations during rest time"
+  ],
+  [
+    "다음 만남의 장소를 함께 고르기",
+    "Choose the next meeting place together"
+  ],
+  [
+    "데이트 계획에 비용도 자연스럽게",
+    "Include costs in the conversation about a date"
+  ],
+  [
+    "함께 정하는 다음 약속의 세부 사항",
+    "Plan the details of your next meeting together"
+  ],
+  [
+    "서로 오기 편한 만남의 장소 찾기",
+    "Find a meeting place convenient for both of you"
+  ],
+  [
+    "특별한 일정의 비용을 함께 이야기",
+    "Discuss the cost of a special plan together"
+  ],
+  [
+    "다음 나들이의 준비를 나눠 맡기",
+    "Share preparations for your next outing"
+  ],
+  [
+    "좋아할 거라는 짐작 전에 취향 묻기",
+    "Ask their preferences before assuming"
+  ],
+  [
+    "세운 계획에서 바꾸고 싶은 점 확인",
+    "Ask what they would change in your plan"
+  ],
+  [
+    "만남의 준비에 상대의 의견도 남겨 두기",
+    "Leave room for their input when making plans"
+  ],
+  [
+    "깜짝 계획에도 상대의 취향부터",
+    "Consider their preferences even for a surprise"
+  ],
+  [
+    "고른 장소가 마음에 드는지 물어보기",
+    "Ask how they feel about the place you chose"
+  ],
+  [
+    "하고 싶은 활동이 같은지 먼저 확인",
+    "Check that you want the same kind of activity"
+  ],
+  [
+    "방문할 곳을 지도 위에 모아 보기",
+    "Put your destinations together on a map"
+  ],
+  [
+    "들를 곳의 순서를 미리 정하기",
+    "Decide the order of your stops in advance"
+  ],
+  [
+    "여러 볼일을 잇는 동선 짜기",
+    "Plan a route that connects your errands"
+  ],
+  [
+    "처음 가는 동네의 목적지 순서 살피기",
+    "Review the order of stops in an unfamiliar area"
+  ],
+  [
+    "멀리 떨어진 약속 장소를 지도에서 비교",
+    "Compare distant meeting places on a map"
+  ],
+  [
+    "출장에서 들를 곳을 이동 순서대로",
+    "Order the stops on a business trip"
+  ],
+  [
+    "빠른 길 옆에 대안 경로도 하나",
+    "Keep an alternative to the fastest route"
+  ],
+  [
+    "평소 길이 막힐 때의 선택지 확인",
+    "Check your options if the usual route is blocked"
+  ],
+  [
+    "출발 전 다른 이동 방법 살펴보기",
+    "Review another way to travel before leaving"
+  ],
+  [
+    "익숙한 경로에도 우회할 길 확인",
+    "Find a detour even for a familiar route"
+  ],
+  [
+    "교통편이 바뀔 때 갈 수 있는 다른 길",
+    "Check another route if transport plans change"
+  ],
+  [
+    "목적지까지 한 가지 길만 정하지 않기",
+    "Keep more than one route to your destination"
+  ],
+  [
+    "예약 시간과 변경 조건을 한곳에",
+    "Keep booking times and change terms together"
+  ],
+  [
+    "바꿀 수 있는 일정인지 미리 기록",
+    "Note whether a reservation can be changed"
+  ],
+  [
+    "예약한 약속을 달력에 정리하기",
+    "Organize booked appointments on your calendar"
+  ],
+  [
+    "숙소 예약 정보와 변경 기한 모아 두기",
+    "Keep lodging details and change deadlines together"
+  ],
+  [
+    "시간이 정해진 방문 일정 따로 표시",
+    "Mark visits that have a fixed appointment time"
+  ],
+  [
+    "교통편 예약의 변경 가능 여부 메모",
+    "Note whether transport reservations can be changed"
+  ],
+  [
+    "예약 확정 전에 취소 규정 확인",
+    "Check cancellation rules before confirming"
+  ],
+  [
+    "안내된 가격 외 추가 비용 살피기",
+    "Look for costs beyond the listed price"
+  ],
+  [
+    "일정 변경에 드는 비용까지 확인",
+    "Check the cost of changing your plans"
+  ],
+  [
+    "숙소를 고를 때 환불 가능 시점도",
+    "Check refund deadlines when choosing lodging"
+  ],
+  [
+    "예약 가격에 포함되지 않은 항목 살피기",
+    "Review what is excluded from the booking price"
+  ],
+  [
+    "취소 수수료가 생기는 날짜 확인",
+    "Check when cancellation fees start applying"
+  ],
+  [
+    "다음 약속까지 잠깐 쉴 틈 남기기",
+    "Leave a short rest before the next appointment"
+  ],
+  [
+    "짐 챙길 시간도 이동 일정에 포함",
+    "Include packing time in your travel plans"
+  ],
+  [
+    "바로 이어지는 일정 사이에 여백",
+    "Leave a gap between consecutive appointments"
+  ],
+  [
+    "출장 중 다음 이동 전에 쉬어 갈 시간",
+    "Allow a break before the next leg of a work trip"
+  ],
+  [
+    "약속을 마친 뒤 짐 챙길 여유 두기",
+    "Leave time to gather your things after a meeting"
+  ],
+  [
+    "여행 동선에 잠깐 머무를 틈 만들기",
+    "Build a short pause into your travel route"
+  ],
+  [
+    "연속된 약속의 이동 시간 다시 계산",
+    "Recheck travel time between appointments"
+  ],
+  [
+    "빠듯한 환승보다 여유 있는 연결",
+    "Allow room in a tight connection"
+  ],
+  [
+    "무리한 이동 간격은 일정에서 조정",
+    "Adjust plans with unrealistic travel gaps"
+  ],
+  [
+    "먼 약속 두 개 사이의 시간 재확인",
+    "Recheck the gap between two distant appointments"
+  ],
+  [
+    "출발이 늦어지면 다음 일정도 조율",
+    "Adjust the next appointment if departure is delayed"
+  ],
+  [
+    "환승과 대기까지 이동 시간에 포함",
+    "Include transfers and waiting in travel time"
+  ],
+  [
+    "만날 장소는 출입구까지 구체적으로",
+    "Specify the entrance when choosing where to meet"
+  ],
+  [
+    "서로 찾기 쉬운 약속 지점 고르기",
+    "Choose a meeting point you can both find"
+  ],
+  [
+    "눈에 띄는 표지를 만남의 기준으로",
+    "Use a visible landmark as your meeting point"
+  ],
+  [
+    "역에서 만날 때는 출구 번호까지",
+    "Specify the exit number when meeting at a station"
+  ],
+  [
+    "큰 건물에서는 만날 층도 함께 정하기",
+    "Agree on the floor when meeting in a large building"
+  ],
+  [
+    "여럿이 모일 장소는 찾기 쉬운 지점으로",
+    "Choose an easy-to-find spot for a group meeting"
+  ],
+  [
+    "바뀐 약속 장소는 모두에게 확인",
+    "Confirm everyone knows the new meeting place"
+  ],
+  [
+    "새 주소를 보낸 뒤 확인 여부 살피기",
+    "Check that the new address was received"
+  ],
+  [
+    "출발 전에 같은 장소를 보고 있는지",
+    "Check you have the same destination before leaving"
+  ],
+  [
+    "지점이 여러 개인 장소는 주소로 확인",
+    "Use the address when a venue has several branches"
+  ],
+  [
+    "약속 변경 메시지를 모두 읽었는지 살피기",
+    "Check everyone has read the change of plans"
+  ],
+  [
+    "늦게 합류할 사람에게 새 위치 전하기",
+    "Send the updated location to someone joining later"
+  ],
+  [
+    "이동 목적에 맞춰 준비물 추리기",
+    "Choose supplies that fit the purpose of the trip"
+  ],
+  [
+    "가방에서 없어도 될 물건 덜어내기",
+    "Remove items you can do without from your bag"
+  ],
+  [
+    "필요한 짐만 챙겨 가볍게 출발",
+    "Travel light with just what you need"
+  ],
+  [
+    "짧은 외출에는 쓸 물건만 골라 담기",
+    "Pack only useful items for a short outing"
+  ],
+  [
+    "출장 준비물은 할 일에 맞춰 정리",
+    "Match business-trip supplies to the work planned"
+  ],
+  [
+    "가방 목록에서 용도가 겹치는 물건 확인",
+    "Check for items with overlapping uses in your bag"
+  ],
+  [
+    "출발 전에 꼭 필요한 물건부터",
+    "Check essential items before setting off"
+  ],
+  [
+    "가는 길과 함께 귀가 수단도 확인",
+    "Check how to get home as well as how to get there"
+  ],
+  [
+    "짐을 줄여도 필수품은 한 번 더",
+    "Double-check essentials even when packing light"
+  ],
+  [
+    "먼 외출 전 돌아올 교통편 챙기기",
+    "Check return transport before a longer outing"
+  ],
+  [
+    "출발 직전에 필수 준비물 목록 확인",
+    "Review the essentials list just before leaving"
+  ],
+  [
+    "귀가가 늦어질 일정은 돌아오는 방법부터",
+    "Plan the way home for an outing that ends late"
+  ],
+  [
+    "직접 만나서 물어볼 질문 준비",
+    "Prepare questions to ask in person"
+  ],
+  [
+    "방문 목적을 짧은 목록으로 정리",
+    "Make a short list of reasons for your visit"
+  ],
+  [
+    "찾아간 자리에서 확인할 것 정하기",
+    "Decide what to check during your visit"
+  ],
+  [
+    "상담을 받으러 갈 때 질문 목록 준비",
+    "Prepare a question list for a consultation"
+  ],
+  [
+    "방문 미팅에서 논의할 내용 적기",
+    "Write down topics for an in-person meeting"
+  ],
+  [
+    "현장에서 직접 확인할 항목 모으기",
+    "Gather the items you need to check on site"
+  ],
+  [
+    "직접 가기 전에 연락으로 확인",
+    "Contact them before making the trip"
+  ],
+  [
+    "이동이 꼭 필요한 일인지 살펴보기",
+    "Check whether the task really needs a trip"
+  ],
+  [
+    "방문 계획을 잡기 전 문의 한 번",
+    "Make an inquiry before planning a visit"
+  ],
+  [
+    "서류 때문에 가는 길이라면 처리 방법 문의",
+    "Ask how paperwork can be handled before traveling"
+  ],
+  [
+    "직접 만나야 하는 일인지 먼저 확인",
+    "Check whether the matter needs an in-person meeting"
+  ],
+  [
+    "전화로 풀 수 있는 문의부터 처리",
+    "Handle questions that can be resolved by phone first"
+  ],
+  [
+    "집중하는 시간 사이에 짧은 휴식",
+    "Take short breaks between focused tasks"
+  ],
+  [
+    "일정표에 잠깐 일어날 시간 남기기",
+    "Leave time in your schedule to get up briefly"
+  ],
+  [
+    "다음 작업 전에 한 번 쉬어 가기",
+    "Pause for a break before the next task"
+  ],
+  [
+    "긴 작업을 나눌 작은 휴식 구간",
+    "Break up a long task with short rests"
+  ],
+  [
+    "오래 앉은 뒤 잠깐 일어나기",
+    "Get up briefly after sitting for a while"
+  ],
+  [
+    "회의가 끝나면 다음 일 전에 숨 돌리기",
+    "Take a breather between a meeting and the next task"
+  ],
+  [
+    "피곤하다면 덜 급한 일부터 줄이기",
+    "If tired, reduce the less urgent tasks first"
+  ],
+  [
+    "계속 밀어붙이기 전 쉬어 갈 여지",
+    "Make room to rest before pushing on"
+  ],
+  [
+    "남은 일정에서 내려놓을 일 고르기",
+    "Choose what to drop from the remaining schedule"
+  ],
+  [
+    "지친 상태라면 추가 일정부터 살피기",
+    "Review extra commitments when you feel worn out"
+  ],
+  [
+    "미뤄도 되는 일을 골라 쉬는 시간 만들기",
+    "Make rest time by choosing tasks that can wait"
+  ],
+  [
+    "피로를 느낄 때 작업량 다시 정하기",
+    "Reconsider the workload when you notice fatigue"
+  ],
+  [
+    "잠들기 전 일을 끝낼 시각 정하기",
+    "Set a time to stop working before bed"
+  ],
+  [
+    "저녁 일정에 쉬는 시간 확보",
+    "Protect rest time in your evening plans"
+  ],
+  [
+    "잠자리까지 가져가지 않을 일 정리",
+    "Decide which tasks to leave out of bedtime"
+  ],
+  [
+    "늦은 작업의 마무리 시각 미리 정하기",
+    "Set a finish time before starting late work"
+  ],
+  [
+    "하던 일을 접고 쉴 준비를 할 시간",
+    "Allow time to close your tasks and prepare to rest"
+  ],
+  [
+    "저녁 할 일 목록에 끝나는 지점 두기",
+    "Give the evening to-do list a stopping point"
+  ],
+  [
+    "밤늦게 남은 일은 꼭 필요한 것만",
+    "Keep late-night work to what is essential"
+  ],
+  [
+    "쉬기 전에 모두 끝내려 하지 않기",
+    "You do not have to finish everything before resting"
+  ],
+  [
+    "남겨도 되는 일과 지금 할 일 나누기",
+    "Separate tasks that can wait from what must be done"
+  ],
+  [
+    "잠들기 전 추가 작업은 필요한지 먼저",
+    "Check whether another task is needed before bed"
+  ],
+  [
+    "늦은 밤의 미완료 목록을 가볍게 정리",
+    "Trim the unfinished list when it gets late"
+  ],
+  [
+    "내일로 넘길 일을 골라 휴식 확보",
+    "Make room for rest by choosing what can wait"
+  ],
+  [
+    "바쁜 일정에도 식사 자리는 미리",
+    "Reserve a place for meals in a busy schedule"
+  ],
+  [
+    "약속을 잡을 때 밥 먹을 시간도",
+    "Allow time to eat when making appointments"
+  ],
+  [
+    "할 일 목록 사이에 식사 시간 챙기기",
+    "Make room for a meal among your tasks"
+  ],
+  [
+    "긴 외출 계획에는 밥 먹을 틈도",
+    "Allow a meal break during a long outing"
+  ],
+  [
+    "점심시간을 다른 약속으로 채우기 전에",
+    "Protect lunch time before adding another commitment"
+  ],
+  [
+    "이동이 많은 일정에도 식사 시간 표시",
+    "Mark meal times even in a schedule full of travel"
+  ],
+  [
+    "식사가 자꾸 밀리면 일정 간격 조정",
+    "Adjust your schedule if meals keep getting delayed"
+  ],
+  [
+    "연속된 약속 사이에 밥 먹을 틈 찾기",
+    "Find a meal break between appointments"
+  ],
+  [
+    "미뤄 둔 식사부터 일정에 다시 넣기",
+    "Put that postponed meal back into your schedule"
+  ],
+  [
+    "회의가 이어진다면 식사할 간격 확보",
+    "Leave time to eat between consecutive meetings"
+  ],
+  [
+    "약속 때문에 미뤄진 끼니 챙기기",
+    "Make room for a meal delayed by appointments"
+  ],
+  [
+    "일정이 빽빽하면 식사 자리부터 비우기",
+    "Clear space for a meal in a packed schedule"
+  ],
+  [
+    "몸 상태를 살피며 가볍게 움직이기",
+    "Move gently and notice how you feel"
+  ],
+  [
+    "편안하게 이어 갈 수 있는 활동 찾기",
+    "Find an activity you can keep up comfortably"
+  ],
+  [
+    "내게 맞는 강도로 움직임 이어 가기",
+    "Keep moving at an intensity that suits you"
+  ],
+  [
+    "산책도 몸 상태에 맞는 속도로",
+    "Choose a walking pace that fits how you feel"
+  ],
+  [
+    "가벼운 활동 중에도 편안한지 살피기",
+    "Notice your comfort even during light activity"
+  ],
+  [
+    "무리 없이 이어 갈 움직임의 양 정하기",
+    "Choose an amount of movement you can manage"
+  ],
+  [
+    "다른 사람의 속도에 맞추지 않아도",
+    "You do not have to match someone else’s pace"
+  ],
+  [
+    "지금 편안한 움직임의 범위부터",
+    "Start with a range of movement that feels comfortable"
+  ],
+  [
+    "무리해서 따라가기 전 몸 상태 확인",
+    "Check how you feel before trying to keep up"
+  ],
+  [
+    "함께 움직여도 내 속도는 따로 살피기",
+    "Check your own pace even when active with others"
+  ],
+  [
+    "평소 기준보다 지금의 편안함부터",
+    "Start with current comfort rather than your usual level"
+  ],
+  [
+    "활동량을 비교하기보다 내 상태 보기",
+    "Check your condition before comparing activity levels"
+  ],
+  [
+    "오래 앉는 자리의 높이 살펴보기",
+    "Check the height of the seat you use most"
+  ],
+  [
+    "자주 쓰는 물건을 편한 위치로",
+    "Put frequently used items within comfortable reach"
+  ],
+  [
+    "작업 공간을 내 몸에 맞춰 점검",
+    "Review how your workspace fits you"
+  ],
+  [
+    "책상에서 자주 뻗는 손의 동선 살피기",
+    "Review where you reach most often at your desk"
+  ],
+  [
+    "의자와 책상 높이를 함께 확인",
+    "Check the seat and desk heights together"
+  ],
+  [
+    "오래 쓰는 도구의 위치 바꿔 보기",
+    "Review the placement of tools you use for long periods"
+  ],
+  [
+    "한 자세가 길어졌다면 잠시 멈추기",
+    "Pause if you have held one position too long"
+  ],
+  [
+    "화면 앞에서 잠깐 자세 바꿔 보기",
+    "Take a moment to change position at your screen"
+  ],
+  [
+    "작업을 끊고 몸의 자세 돌아보기",
+    "Stop work briefly and check your position"
+  ],
+  [
+    "긴 회의 뒤에는 자세 한 번 바꾸기",
+    "Change position after a long meeting"
+  ],
+  [
+    "같은 자리에서 오래 작업했다면 잠시 일어나기",
+    "Get up briefly after working in one spot for a while"
+  ],
+  [
+    "몰입해 있던 일을 잠깐 끊고 움직이기",
+    "Pause a task you were absorbed in to change position"
+  ],
+  [
+    "좋아하는 활동에 짧은 시간 내기",
+    "Make a little time for something you enjoy"
+  ],
+  [
+    "해야 할 일 사이에 즐거운 일 하나",
+    "Put one enjoyable activity among your tasks"
+  ],
+  [
+    "일정에 취향을 위한 작은 자리",
+    "Leave a small slot for a personal interest"
+  ],
+  [
+    "좋아하는 음악을 들을 짧은 여유",
+    "Make a little time for music you enjoy"
+  ],
+  [
+    "취미를 위해 비워 둘 한 구간",
+    "Set aside a short slot for a hobby"
+  ],
+  [
+    "즐겨 하던 활동을 일정에 다시 넣기",
+    "Put an activity you enjoyed back into your plans"
+  ],
+  [
+    "쉬는 시간까지 계획으로 채우지 않기",
+    "Leave some rest time free of plans"
+  ],
+  [
+    "아무 약속 없는 틈을 남겨 두세요",
+    "Leave a gap with no commitments"
+  ],
+  [
+    "잠깐은 할 일 목록을 내려놓기",
+    "Set the to-do list aside for a moment"
+  ],
+  [
+    "휴식마저 과제가 되지 않도록",
+    "Keep rest from becoming another assignment"
+  ],
+  [
+    "빈 시간을 바로 약속으로 채우지 않기",
+    "Leave free time open instead of adding a commitment"
+  ],
+  [
+    "쉬는 구간에는 새 목표를 더하지 않기",
+    "Avoid adding a new goal to every rest period"
+  ],
+  [
+    "부탁할 내용에 원하는 도움을 구체적으로",
+    "Be specific about the help you are asking for"
+  ],
+  [
+    "도움이 필요한 때를 함께 말하기",
+    "Say when you need the help as well"
+  ],
+  [
+    "상대가 답하기 쉬운 요청 만들기",
+    "Make your request easy to respond to"
+  ],
+  [
+    "모임 준비를 부탁할 때 필요한 일 명시",
+    "Specify the help needed with a gathering"
+  ],
+  [
+    "협조를 구하는 메시지에 기한도 함께",
+    "Include a deadline when asking for cooperation"
+  ],
+  [
+    "함께할 작업에서 도와줄 부분 짚기",
+    "Point out where help is needed in a shared task"
+  ],
+  [
+    "알아주길 기다리기 전에 필요한 것 말하기",
+    "State your needs before waiting to be understood"
+  ],
+  [
+    "모호한 부탁은 필요한 부분부터 풀기",
+    "Clarify an unclear request by naming the need"
+  ],
+  [
+    "기대를 짐작하게 두지 말고 설명하기",
+    "Explain expectations instead of leaving them implied"
+  ],
+  [
+    "간접적으로 꺼낸 부탁을 구체적인 말로",
+    "Make an indirect request more specific"
+  ],
+  [
+    "도움을 기다리는 일은 필요한 범위부터 전달",
+    "State the scope of help you are waiting for"
+  ],
+  [
+    "상대가 놓친 요청은 뜻을 다시 설명",
+    "Explain a request again if it was missed"
+  ],
+  [
+    "여럿이 하는 일은 잘하는 것부터 분담",
+    "Share group tasks according to people’s strengths"
+  ],
+  [
+    "각자의 역할을 함께 정해 보기",
+    "Decide on each person’s role together"
+  ],
+  [
+    "함께할 일에서 내가 보탤 몫 찾기",
+    "Find what you can contribute to shared work"
+  ],
+  [
+    "모임을 준비할 때 잘하는 일로 역할 나누기",
+    "Share gathering preparations by each person’s strengths"
+  ],
+  [
+    "공동 작업을 시작하며 담당 정하기",
+    "Assign roles as a shared task begins"
+  ],
+  [
+    "함께 세운 계획에 각자의 기여 넣기",
+    "Include each person’s contribution in a shared plan"
+  ],
+  [
+    "모두의 일을 떠안기 전 내 몫 확인",
+    "Check your share before taking on everyone’s work"
+  ],
+  [
+    "돕더라도 맡을 범위는 먼저 정하기",
+    "Set limits on your role even when helping"
+  ],
+  [
+    "역할이 겹치면 책임 범위부터 조율",
+    "Clarify responsibilities when roles overlap"
+  ],
+  [
+    "모임의 뒷정리까지 혼자 맡지 않도록",
+    "Set a fair share of the cleanup after a gathering"
+  ],
+  [
+    "부탁이 이어질 때 내 담당 다시 확인",
+    "Review your role when more requests keep coming"
+  ],
+  [
+    "공동 작업에서 빠진 몫을 혼자 메우기 전에",
+    "Check before covering every gap in group work"
+  ],
+  [
+    "뜸했던 연락에 구체적인 안부 하나",
+    "Ask a specific question after time out of touch"
+  ],
+  [
+    "생각난 사람에게 근황을 물어보기",
+    "Ask someone on your mind how they are doing"
+  ],
+  [
+    "지난 대화에서 기억나는 일로 안부 전하기",
+    "Check in about something from your last conversation"
+  ],
+  [
+    "오랜 친구가 하던 일의 근황 묻기",
+    "Ask an old friend how their project is going"
+  ],
+  [
+    "연락이 뜸한 동료에게 안부 전하기",
+    "Check in with a colleague you rarely hear from"
+  ],
+  [
+    "예전에 나눈 관심사로 대화 시작",
+    "Restart a conversation through a shared interest"
+  ],
+  [
+    "뜻이 모호한 메시지는 먼저 되묻기",
+    "Clarify an ambiguous message before replying"
+  ],
+  [
+    "답장을 보내기 전 의도 확인",
+    "Check the intention before sending your reply"
+  ],
+  [
+    "문장 하나로 상대의 뜻을 단정하지 않기",
+    "Avoid judging their intent from one sentence"
+  ],
+  [
+    "단체 대화의 짧은 말도 의미 확인",
+    "Clarify a brief comment in a group chat"
+  ],
+  [
+    "애매한 부탁에는 구체적인 뜻 되묻기",
+    "Ask what an ambiguous request means in practice"
+  ],
+  [
+    "감정이 앞선 답장을 쓰기 전 확인 한 번",
+    "Clarify once before writing an emotional reply"
+  ],
+  [
+    "받은 도움에서 유용했던 점 전하기",
+    "Say exactly how someone’s help was useful"
+  ],
+  [
+    "함께한 사람의 기여를 구체적으로",
+    "Name the contribution of someone you worked with"
+  ],
+  [
+    "작은 도움도 기억해서 답례하기",
+    "Acknowledge even a small act of help"
+  ],
+  [
+    "소개해 준 사람에게 도움이 된 점 전하기",
+    "Tell someone how their introduction helped"
+  ],
+  [
+    "조언을 받고 활용한 부분 이야기하기",
+    "Share how you used advice someone gave you"
+  ],
+  [
+    "일손을 보태 준 사람에게 구체적인 감사",
+    "Thank someone specifically for lending a hand"
+  ],
+  [
+    "해명하기 전에 불편했던 지점 듣기",
+    "Hear what felt uncomfortable before explaining"
+  ],
+  [
+    "내 의도보다 상대가 겪은 일부터",
+    "Start with their experience before your intentions"
+  ],
+  [
+    "어긋난 대화는 상대의 말에서 다시 시작",
+    "Restart a difficult conversation by listening"
+  ],
+  [
+    "조언이 불편했다면 어떤 부분인지 먼저 듣기",
+    "Hear which part of your advice felt uncomfortable"
+  ],
+  [
+    "농담의 의도보다 상대가 들은 뜻 확인",
+    "Check how a joke landed before explaining its intent"
+  ],
+  [
+    "오해를 풀 때 변명에 앞서 경청",
+    "Listen before defending yourself in a misunderstanding"
+  ],
+  [
+    "대화 끝에 합의한 내용 짧게 정리",
+    "Summarize the agreement at the end of a talk"
+  ],
+  [
+    "함께 정한 일을 같은 문장으로 확인",
+    "Confirm shared decisions in the same words"
+  ],
+  [
+    "약속의 세부 사항을 글로 남기기",
+    "Write down the details of an agreement"
+  ],
+  [
+    "모임에서 정한 다음 할 일 공유",
+    "Share the next actions agreed at a gathering"
+  ],
+  [
+    "통화에서 맞춘 내용을 메시지로 확인",
+    "Confirm what was agreed on a call in a message"
+  ],
+  [
+    "함께 정한 일정은 짧은 메모로",
+    "Keep a short note of plans made together"
+  ],
+  [
+    "기억이 다르면 남은 기록부터",
+    "Check the record when memories differ"
+  ],
+  [
+    "맞고 틀림을 따지기 전 합의 내용 확인",
+    "Check the agreement before debating who is right"
+  ],
+  [
+    "엇갈린 약속은 원래 대화로 돌아가기",
+    "Revisit the original conversation about a promise"
+  ],
+  [
+    "시간을 다르게 기억한다면 메시지 확인",
+    "Check messages if you remember different times"
+  ],
+  [
+    "역할을 다르게 알고 있다면 지난 합의부터",
+    "Review the agreement if roles are understood differently"
+  ],
+  [
+    "바뀐 조건을 논하기 전 이전 기록 살피기",
+    "Check earlier records before discussing changed terms"
+  ],
+  [
+    "서로 편한 연락 시간을 맞춰 보기",
+    "Agree on contact times that work for both of you"
+  ],
+  [
+    "이야기할 범위를 미리 정하는 대화",
+    "Set the scope of a conversation in advance"
+  ],
+  [
+    "연락 방식에도 각자의 사정 담기",
+    "Consider both people’s needs when keeping in touch"
+  ],
+  [
+    "늦은 연락이 편한지 미리 물어보기",
+    "Ask in advance about late contact"
+  ],
+  [
+    "함께 이야기할 주제를 먼저 맞추기",
+    "Agree on the topics to discuss first"
+  ],
+  [
+    "일과 개인 시간의 연락 기준 정하기",
+    "Set contact expectations for work and personal time"
+  ],
+  [
+    "어려운 부탁에 바로 답하지 않아도",
+    "You can take time to answer a difficult request"
+  ],
+  [
+    "생각할 시간이 필요하다고 말하기",
+    "Say that you need time to think"
+  ],
+  [
+    "즉답 대신 검토할 여유 확보",
+    "Make room to consider before giving an answer"
+  ],
+  [
+    "갑작스러운 부탁에는 확인할 시간 요청",
+    "Ask for time to check a sudden request"
+  ],
+  [
+    "중요한 답변은 생각을 정리한 뒤에",
+    "Gather your thoughts before an important answer"
+  ],
+  [
+    "거절하기 어려운 요청도 판단할 시간부터",
+    "Take time to weigh a request that is hard to refuse"
+  ],
+  [
+    "궁금한 질문 하나를 끝까지 따라가기",
+    "Follow one question through to an explanation"
+  ],
+  [
+    "읽은 내용을 내 말로 풀어 보기",
+    "Explain what you read in your own words"
+  ],
+  [
+    "알고 싶은 주제에 질문부터 세우기",
+    "Start a topic you want to learn with a question"
+  ],
+  [
+    "독서에서 생긴 의문 하나 깊게 보기",
+    "Explore one question raised by your reading"
+  ],
+  [
+    "강의에서 궁금했던 개념 직접 찾아보기",
+    "Look up a concept that puzzled you in a lesson"
+  ],
+  [
+    "낯선 용어를 내 표현으로 설명하기",
+    "Explain an unfamiliar term in your own words"
+  ],
+  [
+    "자료를 더 찾기 전에 질문 좁히기",
+    "Narrow the question before finding more material"
+  ],
+  [
+    "지금 풀어야 할 문제의 범위 확인",
+    "Define the scope of the problem to solve now"
+  ],
+  [
+    "넓게 펼친 공부에서 한 가지 골라 보기",
+    "Choose one focus from a broad field of study"
+  ],
+  [
+    "읽을 자료가 쌓였다면 찾는 답부터 정하기",
+    "Define the answer you need before a stack of reading"
+  ],
+  [
+    "새 강의를 열기 전에 해결할 질문 확인",
+    "Check your question before opening another lesson"
+  ],
+  [
+    "검색을 이어 가기 전 궁금한 점 구체화",
+    "Make the question specific before searching further"
+  ],
+  [
+    "읽고 이해한 내용을 실습으로",
+    "Put what you understood into practice"
+  ],
+  [
+    "배운 개념을 문제 하나에 적용",
+    "Apply a concept to one problem"
+  ],
+  [
+    "작은 결과물을 만들며 배움 확인",
+    "Check your learning by making something small"
+  ],
+  [
+    "설명서에서 읽은 기능 직접 써 보기",
+    "Try a feature you read about in the instructions"
+  ],
+  [
+    "강의 예제를 내 손으로 한 번 더",
+    "Work through a lesson’s example yourself"
+  ],
+  [
+    "배운 방법을 작은 과제에 써 보기",
+    "Use a method you learned on a small assignment"
+  ],
+  [
+    "분량보다 한 문제의 풀이 과정",
+    "Focus on one solution’s steps before volume"
+  ],
+  [
+    "빨리 넘긴 단계에서 빠진 것 확인",
+    "Check what you missed in a rushed step"
+  ],
+  [
+    "실습의 속도를 낮추고 순서 살피기",
+    "Slow down practice and review the sequence"
+  ],
+  [
+    "답만 맞춘 문제도 풀이 순서 점검",
+    "Review the steps even when your answer was correct"
+  ],
+  [
+    "따라 한 예제에서 이해 못한 단계 찾기",
+    "Find the unclear step in an example you copied"
+  ],
+  [
+    "학습 진도보다 지금 푸는 과정 확인",
+    "Check the current process before pushing ahead"
+  ],
+  [
+    "헷갈렸던 지점에 이유를 적어 보기",
+    "Write down why a point was confusing"
+  ],
+  [
+    "틀린 문제에서 다시 배울 부분 찾기",
+    "Find what to relearn from a mistaken answer"
+  ],
+  [
+    "복습할 때 정답과 함께 틀린 이유도",
+    "Review the error’s cause alongside the right answer"
+  ],
+  [
+    "오답 노트에 헷갈린 조건 표시",
+    "Mark the confusing condition in your error notes"
+  ],
+  [
+    "비슷한 개념이 섞인 부분 다시 보기",
+    "Revisit where similar concepts got mixed up"
+  ],
+  [
+    "반복한 실수에서 놓친 단서 찾기",
+    "Find the missed clue in a repeated mistake"
+  ],
+  [
+    "익숙한 내용도 답을 가리고 확인",
+    "Cover the answer even for familiar material"
+  ],
+  [
+    "안다고 느끼는 개념을 직접 떠올리기",
+    "Recall a concept you feel you already know"
+  ],
+  [
+    "눈으로 읽은 내용을 기억으로 꺼내 보기",
+    "Try recalling what you read without looking"
+  ],
+  [
+    "외웠던 내용을 빈 종이에 다시 써 보기",
+    "Write what you memorized on a blank page"
+  ],
+  [
+    "힌트 없이 개념을 설명할 수 있는지",
+    "Check if you can explain the concept without hints"
+  ],
+  [
+    "익숙한 예제는 풀이를 가리고 도전",
+    "Try a familiar example with the solution covered"
+  ],
+  [
+    "배운 것을 누군가에게 짧게 설명",
+    "Explain what you learned briefly to someone"
+  ],
+  [
+    "설명 뒤에 질문받을 시간 남기기",
+    "Leave time for questions after your explanation"
+  ],
+  [
+    "다른 사람의 질문으로 이해를 넓히기",
+    "Explore your understanding through their questions"
+  ],
+  [
+    "스터디에서 맡은 개념 짧게 설명하기",
+    "Briefly explain your assigned concept in a study group"
+  ],
+  [
+    "동료에게 새로 배운 방법 소개하기",
+    "Introduce a method you learned to a colleague"
+  ],
+  [
+    "친구의 질문을 받으며 학습 내용 점검",
+    "Review your learning through a friend’s questions"
+  ],
+  [
+    "이해가 끊긴 부분을 구체적으로 질문",
+    "Ask specifically where your understanding stopped"
+  ],
+  [
+    "모르는 대목은 넘기지 말고 짚기",
+    "Pause at the part you do not understand"
+  ],
+  [
+    "다시 설명이 필요한 지점 찾기",
+    "Find the point that needs another explanation"
+  ],
+  [
+    "강의에서 놓친 연결 고리를 질문하기",
+    "Ask about a connection you missed in a lesson"
+  ],
+  [
+    "스터디에서 아는 척 넘겼던 부분 확인",
+    "Clarify a study-group point you only seemed to grasp"
+  ],
+  [
+    "질문할 때 마지막으로 이해한 지점부터",
+    "Start a question from the last point you understood"
+  ],
+  [
+    "방해받지 않을 시간에 작은 목표 하나",
+    "Set one small goal for uninterrupted time"
+  ],
+  [
+    "집중할 범위를 끝낼 수 있게 줄이기",
+    "Keep your focus small enough to finish"
+  ],
+  [
+    "공부할 시간을 먼저 비워 두기",
+    "Clear time for studying before you start"
+  ],
+  [
+    "짧은 공부 시간에는 끝낼 단원 하나",
+    "Choose one section for a short study session"
+  ],
+  [
+    "알림을 잠시 끄고 작은 과제에 집중",
+    "Pause notifications for one small assignment"
+  ],
+  [
+    "학습 시작 전에 마칠 범위 표시",
+    "Mark the section to finish before studying"
+  ],
+  [
+    "밀린 계획에서 다음 한 단계만",
+    "Choose the next step from a delayed plan"
+  ],
+  [
+    "전부 만회하기보다 다시 시작할 지점",
+    "Find a restart point before trying to catch up"
+  ],
+  [
+    "학습 계획을 지금 할 수 있는 크기로",
+    "Scale the study plan to what you can do now"
+  ],
+  [
+    "밀린 강의는 다음 한 편부터 정하기",
+    "Choose the next lesson from an unfinished course"
+  ],
+  [
+    "중단했던 공부는 작은 단원부터 다시",
+    "Restart interrupted study with a small section"
+  ],
+  [
+    "못 채운 분량보다 다음 시작점 표시",
+    "Mark where to restart instead of counting missed pages"
+  ],
+  [
+    "정리한 노트에 출처도 함께 남기기",
+    "Keep sources alongside your study notes"
+  ],
+  [
+    "참고 자료에서 핵심 근거 짚어 보기",
+    "Identify the key evidence in your references"
+  ],
+  [
+    "다시 찾아볼 수 있게 근거 기록",
+    "Record evidence so you can find it again"
+  ],
+  [
+    "인용한 문장 옆에 원문 위치 메모",
+    "Note the original location beside a quotation"
+  ],
+  [
+    "발표 자료에 쓴 근거를 함께 정리",
+    "Keep track of evidence used in a presentation"
+  ],
+  [
+    "읽은 자료의 핵심과 출처 묶어 두기",
+    "Keep a reading’s key points with its source"
+  ],
+  [
+    "요약에서 빠진 조건은 원문으로",
+    "Check the original for conditions a summary omits"
+  ],
+  [
+    "결론을 옮기기 전에 예외도 확인",
+    "Check exceptions before using a conclusion"
+  ],
+  [
+    "짧은 설명 뒤에 있는 근거 찾아보기",
+    "Look for the evidence behind a brief explanation"
+  ],
+  [
+    "표 하나를 옮길 때 적용 조건도 확인",
+    "Check the conditions when reusing a table"
+  ],
+  [
+    "간추린 강의 노트는 원래 설명과 비교",
+    "Compare condensed lesson notes with the original"
+  ],
+  [
+    "인용하려는 주장에 빠진 예외 살피기",
+    "Check for omitted exceptions in a claim you will cite"
+  ]
+];
