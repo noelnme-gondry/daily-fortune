@@ -15,5 +15,6 @@ export function adsterraDocument(format) {
   const options = JSON.stringify({ key, format: 'iframe', height, width, params: {} });
   // srcdoc otherwise inherits the embedding page's full URL through baseURI.
   // Keep its base public and its origin opaque; never grant allow-same-origin.
-  return `<!doctype html><html><head><base href="${ADSTERRA_ORIGIN}/"><meta name="referrer" content="origin"><style>html,body{margin:0;padding:0;overflow:hidden}</style></head><body><script>var atOptions=${options};</script><script src="${ADSTERRA_ORIGIN}/22/${key}" referrerpolicy="origin"></script></body></html>`;
+  // The SDK deletes consumed options; a global var would be non-configurable.
+  return `<!doctype html><html><head><base href="${ADSTERRA_ORIGIN}/"><meta name="referrer" content="origin"><style>html,body{margin:0;padding:0;overflow:hidden}</style></head><body><script>window.atOptions=${options};</script><script src="${ADSTERRA_ORIGIN}/22/${key}" referrerpolicy="origin"></script></body></html>`;
 }
