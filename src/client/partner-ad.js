@@ -1,4 +1,4 @@
-import { ADSTERRA_FORMATS, ADSTERRA_SANDBOX, adsterraFormat, adsterraDocument } from '../domain/adsterra.js';
+import { ADSTERRA_FORMATS, ADSTERRA_SANDBOX, adsterraFormat, adsterraSource } from '../domain/adsterra.js';
 import { tr } from '../i18n/runtime.js';
 import { localizeClientLinks } from './language.js';
 import { track } from './analytics.js';
@@ -114,7 +114,7 @@ function initCommonAd(slot) {
     frame.loading = 'lazy';
     frame.referrerPolicy = 'origin';
     frame.setAttribute('sandbox', ADSTERRA_SANDBOX);
-    frame.srcdoc = adsterraDocument(format);
+    frame.src = adsterraSource(format);
     slot.replaceChildren(frame);
     // Initialized means the container was mounted, not that an ad was delivered.
     slot.dataset.adState = 'initialized';

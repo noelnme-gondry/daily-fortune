@@ -2,9 +2,23 @@ import { completeProfile } from './helpers/profile.js';
 import { isoDate, todayKST } from '../../src/engine/core.js';
 import { test, expect } from '@playwright/test';
 import { AD_POSITION_EXPERIMENT } from '../../src/domain/ad-experiment.js';
+import { ADSTERRA_FRAME_ORIGIN, ADSTERRA_SANDBOX, adsterraSource, adsterraDocument } from '../../src/domain/adsterra.js';
+
+const nestedCreativeSdk = `"use strict";
+  window.consumedAdOptions = window.atOptions; delete window.atOptions;
+  const child = document.createElement('iframe');
+  child.width = window.consumedAdOptions.width; child.height = window.consumedAdOptions.height;
+  child.style.border = '0'; document.body.append(child);
+  child.contentWindow.document.open();
+  child.contentWindow.document.write('<!doctype html><body>Test display ad</body>');
+  child.contentWindow.document.close();`;
 
 test.beforeEach(async ({ context }) => {
   await context.route('https://**/*', (route) => route.abort());
+  // Local app fixtures use a mock host document; production headers are tested separately.
+  await context.route(`${ADSTERRA_FRAME_ORIGIN}/**`, route => route.fulfill({
+    contentType: 'text/html', body: adsterraDocument(new URL(route.request().url()).pathname.split('/').pop()),
+  }));
   // 외부 광고 실적을 발생시키지 않고 공식 생성자의 입력·삽입 위치를 검증한다.
   await context.route('https://ads-partners.coupang.com/g.js', (route) => route.fulfill({
     contentType: 'application/javascript',
@@ -23,7 +37,7 @@ test.beforeEach(async ({ context }) => {
   await context.route('https://bauval.org/22/*', route => route.fulfill({
     contentType: 'application/javascript',
     // The issued SDK consumes and deletes its configuration before rendering.
-    body: `"use strict"; window.consumedAdOptions = window.atOptions; delete window.atOptions; document.body.textContent = 'Test display ad';`,
+    body: nestedCreativeSdk,
   }));
   await context.addInitScript((key) => {
     if (window.top !== window) return;
@@ -158,7 +172,7 @@ for (const variant of ['A', 'B']) {
       await expect(frame).toHaveCount(1);
       if (variant === 'B') await expect(slot).toBeInViewport({ ratio: 1 });
       await frame.scrollIntoViewIfNeeded();
-      await expect(page.frameLocator('[data-partner-ad-slot] iframe').getByText('Test display ad')).toBeVisible();
+      await expect(page.frameLocator('[data-partner-ad-slot] iframe').frameLocator('iframe').getByText('Test display ad')).toBeVisible();
       const isolated = await frame.elementHandle().then(handle => handle.contentFrame());
       await isolated.evaluate(() => { window.mobileSentinel = 'retained'; });
       const geometry = await adGeometry(page, `result-${variant}`);
@@ -532,7 +546,7 @@ test('발급 코드로 한 번만 초기화하고 절반 이상 노출 시 개�
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/tti/?name=private-name#private-birth');
   await expect(page.locator('[data-partner-ad-slot]')).toHaveAttribute('data-ad-state', 'initialized');
-  await expect(page.locator('[data-partner-ad-slot] iframe')).toHaveAttribute('srcdoc', /c4be6b408b9381b6023794252df541c1/);
+  await expect(page.locator('[data-partner-ad-slot] iframe')).toHaveAttribute('src', adsterraSource('compact'));
   expect(await page.evaluate(() => window.partnerConfig)).toBeUndefined();
   expect(await slotEvents(page)).toHaveLength(0);
   await showFraction(page, 0.4);
@@ -737,10 +751,11 @@ test('일반 배너는 SDK 설정을 소비·삭제하고 부모 입력·저장�
   await calculateResult(page, '/today/?name=private-name#private-birth');
   const frame = page.locator('[data-partner-ad-slot] iframe');
   await frame.scrollIntoViewIfNeeded();
-  await expect(frame).toHaveAttribute('sandbox', 'allow-scripts allow-popups allow-popups-to-escape-sandbox');
+  await expect(frame).toHaveAttribute('sandbox', ADSTERRA_SANDBOX);
+  expect(await frame.getAttribute('srcdoc')).toBeNull();
   await expect(frame).toHaveAttribute('referrerpolicy', 'origin');
   await expect(frame).toHaveCount(1);
-  await expect(page.frameLocator('[data-partner-ad-slot] iframe').getByText('Test display ad')).toBeVisible();
+  await expect(page.frameLocator('[data-partner-ad-slot] iframe').frameLocator('iframe').getByText('Test display ad')).toBeVisible();
   const isolated = await frame.elementHandle().then(handle => handle.contentFrame());
   expect(await isolated.evaluate(() => {
     let documentBlocked = false, storageBlocked = false;
@@ -752,7 +767,7 @@ test('일반 배너는 SDK 설정을 소비·삭제하고 부모 입력·저장�
   expect(allowedReferrers).toContain(await isolated.evaluate(() => document.referrer));
   expect(await isolated.evaluate(() => document.baseURI)).not.toContain('private');
   expect(requests.length).toBeGreaterThan(0);
-  for (const request of requests) expect(allowedReferrers).toContain(request.referrer);
+  for (const request of requests) expect(['', `${ADSTERRA_FRAME_ORIGIN}/`]).toContain(request.referrer);
   expect(JSON.stringify(requests)).not.toContain('private');
   await frame.evaluate(el => el.dataset.instance = 'original');
   await completeProfile(page);
@@ -763,7 +778,7 @@ test('일반 배너는 SDK 설정을 소비·삭제하고 부모 입력·저장�
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(frame).toHaveAttribute('width', '728');
   await frame.scrollIntoViewIfNeeded();
-  await expect(page.frameLocator('[data-partner-ad-slot] iframe').getByText('Test display ad')).toBeVisible();
+  await expect(page.frameLocator('[data-partner-ad-slot] iframe').frameLocator('iframe').getByText('Test display ad')).toBeVisible();
   const wideFrame = await frame.elementHandle().then(handle => handle.contentFrame());
   expect(await wideFrame.evaluate(() => ({ options: window.consumedAdOptions, optionsDeleted: !Object.hasOwn(window, 'atOptions') }))).toEqual({
     options: { key: 'fc789e07e083f374c174aee8f7464e7a', format: 'iframe', height: 90, width: 728, params: {} }, optionsDeleted: true,
@@ -776,7 +791,7 @@ for (const variant of ['A', 'B']) {
     let requests = 0;
     await context.route('https://bauval.org/22/*', route => {
       requests++;
-      return route.fulfill({ contentType: 'application/javascript', body: "document.body.textContent = 'Test display ad';" });
+      return route.fulfill({ contentType: 'application/javascript', body: nestedCreativeSdk });
     });
     await page.addInitScript(({ key, variant }) => localStorage.setItem(key, variant), { key: AD_POSITION_EXPERIMENT.storageKey, variant });
     await page.setViewportSize({ width: 390, height: 844 });
@@ -784,14 +799,14 @@ for (const variant of ['A', 'B']) {
       await calculateResult(page, path, variant);
       const frame = page.locator('[data-partner-ad-slot] iframe');
       await frame.scrollIntoViewIfNeeded();
-      await expect(page.frameLocator('[data-partner-ad-slot] iframe').getByText('Test display ad')).toBeVisible();
+      await expect(page.frameLocator('[data-partner-ad-slot] iframe').frameLocator('iframe').getByText('Test display ad')).toBeVisible();
       const isolated = await frame.elementHandle().then(handle => handle.contentFrame());
       await isolated.evaluate(() => { window.recalculationSentinel = 'preserved'; });
       const initialRequests = requests;
       await page.locator(path === '/tojeong/' ? '#tj-d' : '#a-d').selectOption('2');
       await page.locator('button[type="submit"]').click();
       await frame.scrollIntoViewIfNeeded();
-      await expect(page.frameLocator('[data-partner-ad-slot] iframe').getByText('Test display ad')).toBeVisible();
+      await expect(page.frameLocator('[data-partner-ad-slot] iframe').frameLocator('iframe').getByText('Test display ad')).toBeVisible();
       expect(requests, path).toBe(initialRequests);
       expect(await isolated.evaluate(() => window.recalculationSentinel), path).toBe('preserved');
     }
