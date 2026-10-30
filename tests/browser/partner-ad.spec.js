@@ -22,7 +22,8 @@ test.beforeEach(async ({ context }) => {
   }));
   await context.route('https://bauval.org/22/*', route => route.fulfill({
     contentType: 'application/javascript',
-    body: `document.body.textContent = 'Test display ad';`,
+    // The issued SDK consumes and deletes its configuration before rendering.
+    body: `"use strict"; window.consumedAdOptions = window.atOptions; delete window.atOptions; document.body.textContent = 'Test display ad';`,
   }));
   await context.addInitScript((key) => {
     if (window.top !== window) return;
@@ -31,6 +32,30 @@ test.beforeEach(async ({ context }) => {
     window.gtag = (...args) => window.adEvents.push(args);
   }, AD_POSITION_EXPERIMENT.storageKey);
 });
+
+async function adGeometry(page, context) {
+  return page.locator('[data-partner-ad-slot="common"]').evaluate((slot, context) => {
+    const inner = slot.parentElement, ad = inner.parentElement;
+    const style = window.getComputedStyle(inner);
+    const left = parseFloat(style.getPropertyValue('--ad-safe-left')) || 0;
+    const right = parseFloat(style.getPropertyValue('--ad-safe-right')) || 0;
+    const box = element => element?.getBoundingClientRect().toJSON() || null;
+    return {
+      path: location.pathname, context, viewport: window.innerWidth, clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth, parentWidth: ad.parentElement.clientWidth,
+      safeInsets: { left, right }, safeWidth: ad.getBoundingClientRect().width - left - right,
+      padding: { left: parseFloat(style.paddingLeft), right: parseFloat(style.paddingRight) },
+      slotClientWidth: slot.clientWidth, slot: box(slot), ad: box(ad), frame: box(slot.querySelector('iframe')),
+      format: slot.dataset.adFormat, state: slot.dataset.adState, iframeCount: slot.querySelectorAll('iframe').length,
+      mainPadding: window.getComputedStyle(document.querySelector('main')).paddingInline,
+      formPadding: document.querySelector('.pform') ? window.getComputedStyle(document.querySelector('.pform')).paddingInline : null,
+    };
+  }, context);
+}
+
+async function recordGeometry(testInfo, rows) {
+  await testInfo.attach('ad-geometry', { body: JSON.stringify(rows, null, 2), contentType: 'application/json' });
+}
 
 test('B는 계산 결과 첫 부분에 광고를 두고 결과로 이동할 때 광고를 건너뛰지 않는다', async ({ page }) => {
   await page.addInitScript((key) => localStorage.setItem(key, 'B'), AD_POSITION_EXPERIMENT.storageKey);
@@ -49,36 +74,43 @@ test('B는 계산 결과 첫 부분에 광고를 두고 결과로 이동할 때 
   await expect(page.locator('[data-result-summary] + .partner-ad, .chart-card + .partner-ad, .tojeong-summary + .partner-ad, .story-hero + .partner-ad, .rank-hero + .partner-ad')).toHaveCount(0);
 });
 
-for (const width of [320, 390, 768, 1024, 1440]) {
-  test(`${width}px 화면에서 공통 배너는 본문 폭에 맞는 고정 배너 하나를 중앙에 표시하며 좁으면 숨긴다`, async ({ page }) => {
+for (const width of [320, 360, 375, 390, 412, 768, 1024, 1440]) {
+  test(`${width}px 화면에서 공통 배너는 광고 여백을 조절해 고정 배너 하나를 표시한다`, async ({ page }, testInfo) => {
+    const rows = [];
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ['/', '/today/', '/tti/']) {
+    for (const path of ['/', '/today/', '/lifetime/', '/compatibility/', '/tojeong/', '/tti/', '/en/today/']) {
       await page.goto(path);
       const slot = page.locator('[data-partner-ad-slot="common"]');
       await expect(slot).toHaveCount(1);
-      await expect(slot).toHaveAttribute('data-ad-state', width < 352 ? 'no-fit' : 'initialized');
-      if (width < 352) {
-        await expect(slot.locator('iframe')).toHaveCount(0);
-        await expect(page.locator('main + .partner-ad')).toBeHidden();
-        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
-        continue;
-      }
+      await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
       // 공개 예시는 main 안에 있고, 공통 광고는 main 바로 다음이다.
       await expect(page.locator('main + .partner-ad')).toBeVisible();
       const box = await slot.boundingBox();
-      const expectedWidth = Math.min(width, 1160) - 32;
+      const expectedWidth = Math.min(width, 1160) - Math.min(32, Math.max(0, width - 320));
       expect(box.width).toBe(expectedWidth);
       expect(box.height).toBe(140);
       expect(box.x).toBe((width - expectedWidth) / 2);
       expect(box.x + box.width).toBeLessThanOrEqual(width);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       await expect(slot.locator('iframe')).toHaveCount(1);
-      await expect(slot.locator('iframe')).toHaveAttribute('title', 'Adsterra 디스플레이 광고');
+      await expect(slot.locator('iframe')).toHaveAttribute('title', path.startsWith('/en/') ? 'Adsterra display advertisement' : 'Adsterra 디스플레이 광고');
       const frameBox = await slot.locator('iframe').boundingBox();
       expect(frameBox.width).toBe(expectedWidth >= 728 ? 728 : 320);
       expect(frameBox.height).toBe(expectedWidth >= 728 ? 90 : 50);
       expect(await slot.boundingBox()).toEqual(box);
+      rows.push(await adGeometry(page, 'before-result'));
     }
+    await calculateResult(page, '/today/');
+    const slot = page.locator('[data-partner-ad-slot]');
+    await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+    const geometry = await adGeometry(page, 'result-A');
+    expect(geometry.frame.x).toBeGreaterThanOrEqual(0);
+    expect(geometry.frame.right).toBeLessThanOrEqual(geometry.clientWidth);
+    expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth);
+    expect(geometry.mainPadding).toBe('16px');
+    expect(geometry.formPadding).toBe('20px');
+    rows.push(geometry);
+    await recordGeometry(testInfo, rows);
   });
 }
 
@@ -92,6 +124,9 @@ test('화면 폭에 맞춰 배너 한 개만 교체하고 좁은 화면에서는
   await expect(slot.locator('iframe')).toHaveAttribute('width', '320');
   expect((await slot.locator('iframe').boundingBox()).width).toBe(320);
   await page.setViewportSize({ width: 320, height: 844 });
+  await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+  expect((await slot.locator('iframe').boundingBox()).width).toBe(320);
+  await page.setViewportSize({ width: 319, height: 844 });
   await expect(slot).toHaveAttribute('data-ad-state', 'no-fit');
   await expect(slot.locator('iframe')).toHaveCount(0);
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -102,14 +137,112 @@ test('화면 폭에 맞춰 배너 한 개만 교체하고 좁은 화면에서는
 
 async function calculateResult(page, path, variant = 'A') {
   await page.goto(path);
-  const tojeong = path.startsWith('/tojeong/');
+  const tojeong = /^\/(?:en\/)?tojeong\//.test(path);
   await expect(page.locator(tojeong ? '#tojeong-tool' : '#tool')).toHaveAttribute('data-ready', 'true');
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator(variant === 'B' ? '#result > .partner-ad:first-child, #tojeong-result > .partner-ad:first-child' : '[data-result-summary] + .partner-ad, .chart-card + .partner-ad, .tojeong-summary + .partner-ad, .story-hero + .partner-ad, .rank-hero + .partner-ad')).toHaveCount(1);
   await expect(page.locator('[data-share-page]')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: '링크 복사', exact: true })).toHaveCount(1);
+  await expect(page.getByRole('button', { name: /^(링크 복사|Copy link)$/ })).toHaveCount(1);
 }
+
+for (const variant of ['A', 'B']) {
+  test(`320px ${variant}: 모든 주요 결과·재계산·복원·회전에서 원래 크기 구좌를 유지한다`, async ({ page }, testInfo) => {
+    await page.addInitScript(({ key, variant }) => localStorage.setItem(key, variant), { key: AD_POSITION_EXPERIMENT.storageKey, variant });
+    await page.setViewportSize({ width: 320, height: 844 });
+    const rows = [];
+    for (const path of ['/today/', '/lifetime/', '/compatibility/', '/tojeong/', '/en/today/', '/en/tojeong/']) {
+      await calculateResult(page, path, variant);
+      const slot = page.locator('[data-partner-ad-slot]'), frame = slot.locator('iframe');
+      await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+      await expect(frame).toHaveCount(1);
+      if (variant === 'B') await expect(slot).toBeInViewport({ ratio: 1 });
+      await frame.scrollIntoViewIfNeeded();
+      await expect(page.frameLocator('[data-partner-ad-slot] iframe').getByText('Test display ad')).toBeVisible();
+      const isolated = await frame.elementHandle().then(handle => handle.contentFrame());
+      await isolated.evaluate(() => { window.mobileSentinel = 'retained'; });
+      const geometry = await adGeometry(page, `result-${variant}`);
+      expect(geometry.slot.width).toBe(320);
+      expect(geometry.frame.width).toBe(320);
+      expect(geometry.frame.height).toBe(50);
+      expect(geometry.frame.x).toBe(0);
+      expect(geometry.scrollWidth).toBe(320);
+      rows.push(geometry);
+      await page.locator(path.includes('/tojeong/') ? '#tj-d' : '#a-d').selectOption('2');
+      await page.locator('button[type="submit"]').click();
+      expect(await isolated.evaluate(() => window.mobileSentinel)).toBe('retained');
+      await expect(frame).toHaveCount(1);
+      await page.reload();
+      await expect(page.locator('#result .partner-ad, #tojeong-result .partner-ad')).toHaveCount(1);
+      await expect(frame).toHaveAttribute('width', '320');
+      rows.push(await adGeometry(page, `restored-${variant}`));
+    }
+    for (const width of [844, 319, 320]) {
+      await page.setViewportSize({ width, height: width === 844 ? 320 : 844 });
+      const slot = page.locator('[data-partner-ad-slot]');
+      await expect(slot).toHaveAttribute('data-ad-state', width < 320 ? 'no-fit' : 'initialized');
+      await expect(slot.locator('iframe')).toHaveCount(width < 320 ? 0 : 1);
+      rows.push(await adGeometry(page, `rotated-${variant}`));
+    }
+    await recordGeometry(testInfo, rows);
+  });
+}
+
+test('부모·safe-area·스크롤바를 뺀 실제 폭이 부족하면 구좌·도달을 숨기고 복구한다', async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 360, height: 844 });
+  await page.goto('/tti/');
+  const slot = page.locator('[data-partner-ad-slot]');
+  // Asymmetric safe-area fixture, applied to the same CSS inputs as env().
+  await page.locator('.partner-ad-inner').evaluate(el => {
+    el.style.setProperty('--ad-safe-left', '30px');
+    el.style.setProperty('--ad-safe-right', '11px');
+  });
+  await expect(slot).toHaveAttribute('data-ad-state', 'no-fit');
+  await expect(slot.locator('iframe')).toHaveCount(0);
+  await page.locator('.site-foot').scrollIntoViewIfNeeded();
+  expect(await slotEvents(page)).toHaveLength(0);
+  const rows = [await adGeometry(page, 'safe-area-no-fit')];
+  // A container inset change must restore the collapsed slot, without a window resize.
+  await page.locator('.partner-ad-inner').evaluate(el => el.style.setProperty('--ad-safe-right', '10px'));
+  await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+  await expect(slot.locator('iframe')).toHaveCount(1);
+  const geometry = await adGeometry(page, 'safe-area-exact-fit');
+  expect(geometry.safeWidth).toBe(320);
+  expect(geometry.frame.x).toBe(30);
+  expect(geometry.frame.right).toBe(350);
+  rows.push(geometry);
+  await page.locator('.partner-ad-inner').evaluate(el => {
+    el.style.setProperty('--ad-safe-left', '0px');
+    el.style.setProperty('--ad-safe-right', '0px');
+  });
+  await page.locator('.partner-ad').evaluate(el => { el.style.width = '319.75px'; });
+  await expect(slot).toHaveAttribute('data-ad-state', 'no-fit');
+  const fractional = await adGeometry(page, 'fractional-parent-no-fit');
+  expect(fractional.slotClientWidth).toBe(320);
+  expect(fractional.slot.width).toBe(319.75);
+  rows.push(fractional);
+  await page.locator('.partner-ad').evaluate(el => { el.style.width = '320px'; });
+  await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+  await page.locator('.partner-ad').evaluate(el => { el.style.width = ''; });
+  // Measure the host's actual scrollbar allocation (overlay scrollbars may reserve zero).
+  await page.addStyleTag({ content: 'html { overflow-y: scroll; scrollbar-gutter: stable; } ::-webkit-scrollbar { width: 12px; }' });
+  await page.setViewportSize({ width: 320, height: 844 });
+  const actualWidth = await slot.evaluate(el => el.getBoundingClientRect().width);
+  await expect(slot).toHaveAttribute('data-ad-state', actualWidth < 320 ? 'no-fit' : 'initialized');
+  rows.push(await adGeometry(page, 'host-scrollbar'));
+  // Model a 12px reserved scrollbar strip independently of host overlay preferences.
+  await page.addStyleTag({ content: 'body { padding-right: 12px; }' });
+  await expect(slot).toHaveAttribute('data-ad-state', 'no-fit');
+  const gutter = await adGeometry(page, 'reserved-scrollbar-space-fixture-no-fit');
+  expect(gutter.slot.width).toBe(actualWidth - 12);
+  rows.push(gutter);
+  await page.setViewportSize({ width: 360, height: 844 });
+  await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
+  await showFraction(page, 0.8);
+  await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
+  rows.push(await adGeometry(page, 'reserved-scrollbar-space-fixture-recovered'));
+  await recordGeometry(testInfo, rows);
+});
 
 for (const width of [320, 390, 768, 1024, 1440]) {
   test(`${width}px 공개 예시·기능 안내는 광고 앞에 읽히고 광고와 본문이 잘리지 않는다`, async ({ page }) => {
@@ -118,20 +251,20 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     for (const path of ['/today/', '/manseryeok/', '/year/2027/', '/tojeong/2027/', '/tti/2027/', '/manseryeok/2027/']) {
       await page.goto(path);
       const slot = page.locator('[data-partner-ad-slot]');
-      await expect(slot).toHaveAttribute('data-ad-state', width < 352 ? 'no-fit' : 'initialized');
+      await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
       const ad = await page.locator('.partner-ad').boundingBox();
       const additions = page.locator('#public-example, section[aria-labelledby="year-guide-title"]');
       if (await additions.count()) {
         const firstAddition = await additions.first().boundingBox();
         expect(firstAddition.y + firstAddition.height).toBeLessThanOrEqual(ad.y);
       }
-      if (width >= 352) {
+      {
         const frame = await slot.locator('iframe').boundingBox();
         expect(frame.height).toBe((await slot.boundingBox()).width >= 728 ? 90 : 50);
         expect(frame.width).toBe((await slot.boundingBox()).width >= 728 ? 728 : 320);
         expect(frame.x).toBeGreaterThanOrEqual(0);
         expect(frame.x + frame.width).toBeLessThanOrEqual(width);
-      } else await expect(slot.locator('iframe')).toHaveCount(0);
+      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       for (const paragraph of await page.locator('.search-supplement p, .year-options dd').all()) {
         expect(await paragraph.evaluate((el) => parseFloat(window.getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(15);
@@ -593,7 +726,9 @@ test('관측 API가 없어도 계산·재계산·복원을 유지하고 도달�
   expect(errors).toEqual([]);
 });
 
-test('일반 배너는 부모 입력·저장소에서 격리되고 재계산에도 같은 프레임을 유지한다', async ({ page }) => {
+test('일반 배너는 SDK 설정을 소비·삭제하고 부모 입력·저장소에서 격리된다', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
   const requests = [];
   page.on('request', request => {
     if (request.url().startsWith('https://bauval.org/22/')) requests.push({ url: request.url(), referrer: request.headers().referer || '' });
@@ -611,8 +746,8 @@ test('일반 배너는 부모 입력·저장소에서 격리되고 재계산에�
     let documentBlocked = false, storageBlocked = false;
     try { void window.parent.document.body; } catch { documentBlocked = true; }
     try { void window.parent.localStorage.length; } catch { storageBlocked = true; }
-    return { documentBlocked, storageBlocked, options: window.atOptions };
-  })).toEqual({ documentBlocked: true, storageBlocked: true, options: { key: 'c4be6b408b9381b6023794252df541c1', format: 'iframe', height: 50, width: 320, params: {} } });
+    return { documentBlocked, storageBlocked, options: window.consumedAdOptions, optionsDeleted: !Object.hasOwn(window, 'atOptions') };
+  })).toEqual({ documentBlocked: true, storageBlocked: true, optionsDeleted: true, options: { key: 'c4be6b408b9381b6023794252df541c1', format: 'iframe', height: 50, width: 320, params: {} } });
   const allowedReferrers = ['', `${new URL(page.url()).origin}/`];
   expect(allowedReferrers).toContain(await isolated.evaluate(() => document.referrer));
   expect(await isolated.evaluate(() => document.baseURI)).not.toContain('private');
@@ -624,6 +759,16 @@ test('일반 배너는 부모 입력·저장소에서 격리되고 재계산에�
   await page.locator('button[type="submit"]').click();
   await expect(frame).toHaveAttribute('data-instance', 'original');
   await expect(page.locator('[data-lucky-banner-slot] iframe')).toHaveCount(1);
+  // The result shares desktop space with the profile form; 1440px fits 728px.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(frame).toHaveAttribute('width', '728');
+  await frame.scrollIntoViewIfNeeded();
+  await expect(page.frameLocator('[data-partner-ad-slot] iframe').getByText('Test display ad')).toBeVisible();
+  const wideFrame = await frame.elementHandle().then(handle => handle.contentFrame());
+  expect(await wideFrame.evaluate(() => ({ options: window.consumedAdOptions, optionsDeleted: !Object.hasOwn(window, 'atOptions') }))).toEqual({
+    options: { key: 'fc789e07e083f374c174aee8f7464e7a', format: 'iframe', height: 90, width: 728, params: {} }, optionsDeleted: true,
+  });
+  expect(errors).toEqual([]);
 });
 
 for (const variant of ['A', 'B']) {

@@ -97,7 +97,8 @@ const commonObservers = new WeakMap();
 function initCommonAd(slot) {
   if (commonObservers.has(slot)) return;
   const resize = () => {
-    const format = adsterraFormat(slot.clientWidth);
+    // CSS preserves this width even in no-fit. Keep fractions: 319.75px cannot fit 320px.
+    const format = adsterraFormat(slot.getBoundingClientRect().width);
     if (slot.dataset.adFormat === (format || 'none')) return;
     slot.dataset.adFormat = format || 'none';
     if (!format) {
