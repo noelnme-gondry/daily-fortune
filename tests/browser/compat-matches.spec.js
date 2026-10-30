@@ -25,7 +25,8 @@ async function calculate(page) {
   await expect(page.locator('#result .report-head')).toBeVisible();
 }
 
-const pairReport = (page) => page.locator('#result > :not(.compat-matches)').evaluateAll((els) => els.map((el) => el.innerHTML));
+// 반응형 광고의 규격·숨김 상태는 광고 테스트에서 검증한다. 여기서는 두 사람의 해석만 비교한다.
+const pairReport = (page) => page.locator('#result > :not(.compat-matches, .partner-ad)').evaluateAll((els) => els.map((el) => el.innerHTML));
 
 test('궁합 맨 아래 추천: 분야별 실점수·상세·모바일·기준 전환, 기존 두 사람 결과 유지', async ({ page }) => {
   const expected = findCompatMatches(a, b.gender, today);

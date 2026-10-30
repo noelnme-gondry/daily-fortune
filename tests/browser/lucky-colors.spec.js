@@ -140,7 +140,7 @@ test('발급 배너를 재계산해도 공통 배너·SDK를 중복 생성하지
   await expect(slot.locator('iframe')).toHaveCount(1);
   await expect(page.locator('.lucky-banner .partner-ad-disclosure')).toBeVisible();
   expect(await page.evaluate(() => window.partnerCalls)).toContainEqual(bannerConfig(day(chart, date).lucky.el));
-  expect(await page.evaluate(() => window.partnerCalls.length)).toBe(2);
+  expect(await page.evaluate(() => window.partnerCalls.length)).toBe(1);
   await page.locator('[data-partner-ad-slot="common"]').evaluate(el => el.dataset.testInstance = 'original');
   await page.locator('#a-d').selectOption('29');
   await page.locator('#tool-form [type="submit"]').click();
@@ -148,7 +148,7 @@ test('발급 배너를 재계산해도 공통 배너·SDK를 중복 생성하지
   await expect(slot.locator('iframe')).toHaveCount(1);
   const changed = buildChart({ ...input, d: 29 });
   expect(await page.evaluate(() => window.partnerCalls.at(-1))).toEqual(bannerConfig(day(changed, date).lucky.el));
-  expect(await page.evaluate(() => window.partnerCalls.length)).toBe(3);
+  expect(await page.evaluate(() => window.partnerCalls.length)).toBe(2);
   await expect(page.locator('[data-partner-ad-slot="common"]')).toHaveAttribute('data-test-instance', 'original');
   expect(sdkRequests).toBe(1);
 });

@@ -1,3 +1,4 @@
+import { ADSTERRA_FORMATS, ADSTERRA_SANDBOX, adsterraFormat, adsterraDocument } from '../domain/adsterra.js';
 import { tr } from '../i18n/runtime.js';
 import { localizeClientLinks } from './language.js';
 import { track } from './analytics.js';
@@ -24,25 +25,62 @@ export function clearResultWithPartnerAd(out) {
   if (ad) document.querySelector('main').after(ad);
   out.replaceChildren();
 }
+
+// iframe은 같은 DOM 노드를 다시 삽입해도 재로드된다. 광고와 그 조상만 연결된 채
+// 남기고 나머지 결과를 교체한다. 평생운의 .life 내부 배치에도 같은 규칙을 쓴다.
+function replaceAroundAd(out, next, ad, marker) {
+  const branches = [];
+  let current = ad, replacement = marker;
+  while (current && replacement && current !== out && replacement !== next) {
+    if (current !== ad && current.nodeName !== replacement.nodeName) return false;
+    branches.push([current, replacement]);
+    current = current.parentNode;
+    replacement = replacement.parentNode;
+  }
+  if (current !== out || replacement !== next) return false;
+  for (const [retained, incoming] of branches) {
+    if (retained !== ad) {
+      for (const { name } of [...retained.attributes]) retained.removeAttribute(name);
+      for (const { name, value } of incoming.attributes) retained.setAttribute(name, value);
+    }
+    const parent = retained.parentNode;
+    for (const child of [...parent.childNodes]) if (child !== retained) child.remove();
+    let before = true;
+    for (const child of [...incoming.parentNode.childNodes]) {
+      if (child === incoming) before = false;
+      else parent.insertBefore(child, before ? retained : null);
+    }
+  }
+  return true;
+}
+
 export function renderResultWithPartnerAd(out, html, resultParams = {}) {
   stopResultTracking?.();
   stopTracking?.();
   stopLuckyTracking?.();
   resultReady = false;
   const ad = document.querySelector('.partner-ad');
-  out.innerHTML = html;
+  const next = out.cloneNode(false);
+  next.innerHTML = html;
+  const summary = next.querySelector(':scope > [data-result-summary], :scope > .report-head, :scope > .tojeong-summary, :scope > .chart-card, :scope > .life > .wide') || next.firstElementChild;
+  const share = next.querySelector('.result-share + .hint');
+  const experiment = adExperimentParams();
+  const marker = document.createComment('partner-ad');
+  if (ad && share) {
+    if (experiment.experiment_variant === 'B') next.prepend(marker);
+    else summary.after(marker);
+  }
+  if (!ad || !share || !replaceAroundAd(out, next, ad, marker)) {
+    out.replaceChildren(...next.childNodes);
+    if (ad && share) marker.replaceWith(ad);
+  }
   localizeClientLinks(out);
   if (ad) initPartnerAd();
-  const summary = out.querySelector(':scope > [data-result-summary], :scope > .report-head, :scope > .tojeong-summary, :scope > .chart-card, :scope > .life > .wide') || out.firstElementChild;
   summary?.setAttribute('data-result-summary', '');
   const start = summary?.querySelector('[data-result-heading], h2, h3');
   if (start) stopResultTracking = observeView(start, 'result_view', resultViewedPaths, { measurement_version: '2', ...resultParams }, `${location.pathname}:${resultParams.reading_date || ''}`);
   if (!ad) return;
-  const share = out.querySelector('.result-share + .hint');
-  const experiment = adExperimentParams();
   if (share) {
-    if (experiment.experiment_variant === 'B') out.prepend(ad);
-    else summary.after(ad);
     resultReady = true;
     if (experiment.experiment_id) {
       const path = location.pathname;
@@ -55,8 +93,40 @@ export function renderResultWithPartnerAd(out, html, resultParams = {}) {
   initAdSlotTracking();
 }
 
+const commonObservers = new WeakMap();
+function initCommonAd(slot) {
+  if (commonObservers.has(slot)) return;
+  const resize = () => {
+    const format = adsterraFormat(slot.clientWidth);
+    if (slot.dataset.adFormat === (format || 'none')) return;
+    slot.dataset.adFormat = format || 'none';
+    if (!format) {
+      slot.replaceChildren();
+      slot.dataset.adState = 'no-fit';
+      return;
+    }
+    const { width, height } = ADSTERRA_FORMATS[format];
+    const frame = document.createElement('iframe');
+    frame.title = tr('Adsterra 디스플레이 광고', 'Adsterra display advertisement');
+    frame.width = width;
+    frame.height = height;
+    frame.loading = 'lazy';
+    frame.referrerPolicy = 'origin';
+    frame.setAttribute('sandbox', ADSTERRA_SANDBOX);
+    frame.srcdoc = adsterraDocument(format);
+    slot.replaceChildren(frame);
+    // Initialized means the container was mounted, not that an ad was delivered.
+    slot.dataset.adState = 'initialized';
+  };
+  const observer = new window.ResizeObserver(resize);
+  commonObservers.set(slot, observer);
+  observer.observe(slot);
+  resize();
+}
+
 export function initPartnerAd() {
-  const slots = [...document.querySelectorAll(`${selector}, [data-lucky-banner-slot][data-partner-ad-config]`)].filter(slot => !slot.dataset.adState);
+  document.querySelectorAll(selector).forEach(initCommonAd);
+  const slots = [...document.querySelectorAll('[data-lucky-banner-slot][data-partner-ad-config]')].filter(slot => !slot.dataset.adState);
   if (!slots.length) return;
   slots.forEach(slot => { slot.dataset.adState = 'loading'; });
   const mount = () => slots.filter(slot => slot.isConnected).forEach(slot => {
@@ -88,7 +158,7 @@ export function initAdSlotTracking() {
   const params = { ad_provider: 'coupang', ad_context: resultReady ? 'result' : 'content', ad_measurement_version: '1' };
   const slot = document.querySelector(selector);
   if (slot) stopTracking = observeView(slot, 'ad_slot_view', viewedPaths, {
-    ...params, ad_slot: 'common',
+    ...params, ad_provider: 'adsterra', ad_slot: 'common',
   });
   const luckySlot = resultReady && document.querySelector('[data-lucky-banner-slot]');
   // 오행별 dataset 값은 배너 선택 전용이며 분석 이벤트에는 넣지 않는다.
@@ -104,7 +174,7 @@ function observeView(target, eventName, seen, params = {}, viewKey = location.pa
   let stopped = false;
   const report = () => {
     if (stopped || !visible || document.visibilityState !== 'visible' || seen.has(viewKey)) return;
-    if (!target.isConnected || target.closest('[hidden], [aria-hidden="true"]')) return;
+    if (!target.isConnected || target.dataset.adState === 'no-fit' || target.closest('[hidden], [aria-hidden="true"]')) return;
     const box = target.getBoundingClientRect();
     if (box.width <= 0 || box.height <= 0 || window.getComputedStyle(target).visibility !== 'visible') return;
     seen.add(viewKey);
