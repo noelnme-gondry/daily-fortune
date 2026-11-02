@@ -610,27 +610,20 @@ select.input { padding-right: 4px; }
 .partner-ad-inner {
   --ad-safe-left: env(safe-area-inset-left, 0px);
   --ad-safe-right: env(safe-area-inset-right, 0px);
-  --ad-gutter: clamp(0px, calc((100% - var(--ad-safe-left) - var(--ad-safe-right) - var(--partner-ad-min-width)) / 2), var(--page-gutter));
   display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; width: 100%;
-  padding-left: calc(var(--ad-safe-left) + var(--ad-gutter));
-  padding-right: calc(var(--ad-safe-right) + var(--ad-gutter));
+  padding-left: max(var(--ad-safe-left), var(--page-gutter));
+  padding-right: max(var(--ad-safe-right), var(--page-gutter));
 }
 .partner-ad-disclosure { font-size: 12px; line-height: 1.6; color: var(--ink-2); }
 .partner-ad-slot { display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; min-width: 0; overflow: hidden; width: 100%; height: var(--partner-ad-height); }
-.partner-ad:has([data-ad-state="no-fit"]) { visibility: hidden; height: 0; padding: 0; overflow: hidden; }
 /* 빈 상태에도 배너 크기를 유지하고, 외곽선은 실제 너비를 줄이지 않는다. */
 .partner-ad-slot:empty { background: var(--paper); outline: 1px solid var(--line); }
-.partner-ad-slot iframe { display: block; border: 0; }
+.partner-ad-slot > ins { display: block; width: 100%; }
+.partner-ad-slot iframe { display: block; width: 100%; border: 0; }
 .result .partner-ad, .tojeong-result .partner-ad { padding-bottom: 0; }
 .life > .partner-ad { grid-column: 1 / -1; }
-.result .partner-ad-inner, .tojeong-result .partner-ad-inner { padding-inline: 0; }
-@media (max-width: 900px) {
-  /* Only the ad borrows the single-column page gutter; forms and results keep it. */
-  .result .partner-ad, .tojeong-result .partner-ad { margin-inline: calc(-1 * var(--page-gutter)); }
-  .result .partner-ad-inner, .tojeong-result .partner-ad-inner {
-    padding-left: calc(var(--ad-safe-left) + var(--ad-gutter));
-    padding-right: calc(var(--ad-safe-right) + var(--ad-gutter));
-  }
+.result .partner-ad-inner, .tojeong-result .partner-ad-inner {
+  padding-left: var(--ad-safe-left); padding-right: var(--ad-safe-right);
 }
 
 /* 계산 예시는 main 안에서 광고보다 먼저 읽는다. 표는 영역 안에서만 스크롤한다. */

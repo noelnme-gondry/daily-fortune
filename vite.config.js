@@ -1,8 +1,6 @@
 import fs from 'node:fs';
 import { defineConfig } from 'vite';
 import { handleLanguage } from './src/site/language-middleware.js';
-import { handleAdsterraFrame } from './src/site/adsterra-frame.js';
-import { ADSTERRA_FRAME_ORIGIN } from './src/domain/adsterra.js';
 
 // 개발 서버: 페이지 HTML을 운영과 같은 렌더러(src/site/render.js)로 즉석 생성한다.
 const TEXT_ROUTES = {
@@ -18,7 +16,6 @@ function sitePages() {
     name: 'ohaeng-site-pages',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        if (handleAdsterraFrame(req, res)) return;
         const url = new URL(req.url, 'http://localhost');
         const path = url.pathname;
         if (path.startsWith('/@') || path.startsWith('/src/') || path.startsWith('/node_modules/')) return next();
@@ -102,5 +99,5 @@ export default defineConfig({
       },
     },
   },
-  server: { port: 5173, allowedHosts: [new URL(ADSTERRA_FRAME_ORIGIN).hostname] },
+  server: { port: 5173 },
 });
