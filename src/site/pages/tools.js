@@ -11,8 +11,7 @@ import { esc, faqBlock, faqLd, disclosure } from '../util.js';
 import { animalIcon, uiIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
 import { adSlot } from '../layout.js';
-import { birthTimeOptions } from '../../domain/birth-time.js';
-import { BIRTH_YEAR_MIN, BIRTH_TIME_HINT } from '../../domain/birth-input.js';
+import { personFields } from '../birth-form.js';
 import { dayExample, manseExample, yearExample, lifetimeExample, compatibilityExample } from '../public-examples.js';
 import { playExample } from '../play-examples.js';
 import { yearGuide } from '../year-guide.js';
@@ -24,32 +23,7 @@ const BAND = (s) => (s >= 75 ? ['high', siteText('대길')] : s >= 60 ? ['good',
 export const bandChip = (s) => { const [k, n] = BAND(s); return `<span class="band band-${k}">${siteValue(n)}</span>`; };
 
 /* ── 입력 폼 ───────────────────────────── */
-function personFields(p, ctx, legend) {
-  const ys = [];
-  for (let y = ctx.today.y; y >= BIRTH_YEAR_MIN; y--) ys.push(`<option value="${y}">${y}${siteText("년")}</option>`);
-  const ms = [...Array(12).keys()].map((i) => `<option value="${i + 1}">${i + 1}${siteText("월")}</option>`).join('');
-  const ds = [...Array(31).keys()].map((i) => `<option value="${i + 1}">${i + 1}${siteText("일")}</option>`).join('');
-  return `<fieldset class="person" data-person="${p}">
-    ${legend ? `<legend class="person-legend">${esc(legend)}</legend>` : ''}
-    <fieldset class="field field-birth"><legend>${siteText("생년월일")}</legend>
-      <div class="seg"><label><input type="radio" name="${p}-cal" value="solar" checked><span>${siteText("양력")}</span></label><label><input type="radio" name="${p}-cal" value="lunar"><span>${siteText("음력")}</span></label></div>
-      <div class="ymd"><select class="input" id="${p}-y" aria-label="${siteText("태어난 해")}" required><option value="">${tr('연도', 'Year')}</option>${ys.join('')}</select><select class="input" id="${p}-m" aria-label="${siteText("태어난 달")}" required><option value="">${tr('월', 'Month')}</option>${ms}</select><select class="input" id="${p}-d" aria-label="${siteText("태어난 날")}" required><option value="">${tr('일', 'Day')}</option>${ds}</select></div>
-      <label class="check"><input type="checkbox" id="${p}-leap" disabled>${siteText(" 음력 윤달")}</label>
-    </fieldset>
-    <fieldset class="field field-gender"><legend>${siteText("성별")}</legend>
-      <div class="seg"><label><input type="radio" name="${p}-gender" value="F"><span>${siteText("여성")}</span></label><label><input type="radio" name="${p}-gender" value="M" checked><span>${siteText("남성")}</span></label></div>
-    </fieldset>
-    <fieldset class="field field-time"><legend>${siteText("태어난 시각")}</legend>
-      <div class="seg seg-time"><label><input type="radio" name="${p}-tmode" value="exact" checked><span>${siteText("시각 입력")}</span></label><label><input type="radio" name="${p}-tmode" value="branch"><span>${siteText("시진만 알아요")}</span></label></div>
-      <input class="input" type="time" id="${p}-time" aria-label="${siteText("태어난 시각")}" aria-describedby="${p}-time-hint">
-      <select class="input" id="${p}-branch" aria-label="${siteText("태어난 시진")}" aria-describedby="${p}-time-hint" hidden>${birthTimeOptions().map((t) => `<option value="${t.value}"${t.value === '6' ? ' selected' : ''}>${t.label}</option>`).join('')}</select>
-      <label class="check"><input type="checkbox" id="${p}-notime">${siteText(" 시간을 몰라요")}</label>
-      <p class="hint" id="${p}-time-hint" data-time-hint>${BIRTH_TIME_HINT.exact}</p>
-    </fieldset>
-    <div class="field field-name"><label for="${p}-name">${siteText("이름 (선택)")}</label><input class="input" id="${p}-name" maxlength="12" autocomplete="off" placeholder="${siteText("결과에 표시할 이름")}"></div>
-  </fieldset>`;
-}
-const HINT = () => siteText('<div class="storage-options"><label class="check"><input type="checkbox" id="save-device"> 이 기기에 저장</label><button class="link-btn" type="button" data-delete-profile>저장된 정보 삭제</button><p class="hint" data-storage-status role="status">저장을 선택하면 다음 방문에도 불러옵니다. 미선택 시 현재 탭에서만 임시로 유지됩니다.</p></div><p class="hint">입력한 생년월일은 서버로 전송되지 않습니다.</p>');
+const HINT = () => `<div class="storage-options"><label class="check"><input type="checkbox" id="save-device"> ${tr('이 기기에 저장', 'Save on this device')}</label><button class="link-btn" type="button" data-delete-profile>${tr('저장된 정보 모두 삭제', 'Delete all saved people')}</button><p class="hint" data-storage-status role="status">${tr('저장을 선택하고 계산하면 이름별로 보관합니다. 저장하지 않으면 현재 탭에서만 유지됩니다.', 'Choose Save on this device, then calculate to save by name. Otherwise details remain only in this tab.')}</p><div data-delete-all-confirm hidden><p>${tr('저장한 사람과 나·상대 정보를 모두 삭제할까요? 토정비결은 유지됩니다.', 'Delete all saved people and both saju profiles? Tojeong details will be kept.')}</p><button type="button" class="sbtn" data-confirm-delete-all>${tr('모두 삭제', 'Delete everyone')}</button><button type="button" class="link-btn" data-cancel-delete-all>${tr('취소', 'Cancel')}</button></div></div><p class="hint">${tr('입력한 생년월일은 서버로 전송되지 않습니다.', 'Birth details are not sent to the server.')}</p>`;
 
 export function toolBlock(mode, ctx, extra = {}) {
   const pair = mode === 'compatibility';

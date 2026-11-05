@@ -172,10 +172,12 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
     <nav class="language-switch" aria-label="${tr('언어 선택', 'Language')}"><a data-set-language="ko" href="${attr(languagePath(page.path, 'ko'))}" hreflang="ko" lang="ko"${ctx.lang !== 'en' ? ' aria-current="true"' : ''}>한국어</a><a data-set-language="en" href="${attr(languagePath(page.path, 'en'))}" hreflang="en" lang="en"${ctx.lang === 'en' ? ' aria-current="true"' : ''}>English</a></nav>
   </div>
   <div class="wrap gnav-row">
-    <nav class="gnav" aria-label="${tr('주요 메뉴', 'Main navigation')}">${[['/today/', tr('오늘', 'Today')], ['/lifetime/', tr('내 사주', 'My saju')], ['/compatibility/', tr('궁합', 'Compatibility')]].map(([path, name]) => `<a href="${path}"${page.path === path || (path === '/today/' && page.path === '/') ? ' aria-current="page"' : ''}>${name}</a>`).join('')}</nav>
+    <nav class="gnav" aria-label="${tr('주요 메뉴', 'Main navigation')}">${[['/today/', tr('오늘', 'Today')], ['/lifetime/', tr('내 사주', 'My saju')], ['/compatibility/', tr('궁합', 'Compatibility')]].map(([path, name]) => `<a href="${path}"${page.path === path || (path === '/today/' && page.path === '/') ? ' aria-current="page"' : ''}>${name}</a>`).join('')}<button type="button" class="profiles-tab" data-manage-profiles aria-haspopup="dialog" aria-controls="profile-manager">${tr('저장한 사람', 'People')}</button></nav>
     <details class="all-menu"><summary>${tr('전체', 'All')}</summary><nav class="menu-panel" aria-label="${tr('전체 메뉴', 'All navigation')}">${nav}</nav></details>
   </div>
 </header>
+<dialog id="profile-manager" class="profile-manager" aria-labelledby="profile-manager-title"><h2 id="profile-manager-title">${tr('저장한 사람', 'Saved people')}</h2></dialog>
+<aside class="profile-coach" data-profile-coach hidden role="status"><strong>${tr('저장한 사람은 여기서 관리하세요', 'Your people, all in one place')}</strong><p>${tr('위 메뉴의 ‘저장한 사람’에서 가족을 추가하고, 정보를 수정하거나 골라 볼 수 있어요.', 'Open People in the menu to add family, edit details, or choose whose reading to see.')}</p><div><button class="sbtn" type="button" data-manage-profiles aria-controls="profile-manager" aria-haspopup="dialog">${tr('저장한 사람 열기', 'Open People')}</button><button class="link-btn" type="button" data-dismiss-profile-guide>${tr('확인', 'Got it')}</button></div></aside>
 <main id="main" class="wrap">
 ${crumbsHtml(page.crumbs)}
 ${page.section === '/tti/' ? `${ttiNav(ctx, page.path)}<div class="tti-content" data-tti-content>${page.body}</div>` : page.body}

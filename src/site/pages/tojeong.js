@@ -5,12 +5,14 @@ import { esc, faqBlock, faqLd, disclosure } from '../util.js';
 import { hero } from './tools.js';
 import { yearGuide } from '../year-guide.js';
 import { isEnglish, tr } from '../../i18n/runtime.js';
+import { profilePicker } from '../birth-form.js';
 
 function birthForm(ctx) {
   const years = Array.from({ length: Math.min(ctx.today.y, TOJEONG_RANGE.max) - TOJEONG_RANGE.min + 1 }, (_, i) => Math.min(ctx.today.y, TOJEONG_RANGE.max) - i);
   const options = (values, suffix) => values.map((n) => `<option value="${n}">${n}${suffix}</option>`).join('');
   return `<form class="pform card" id="tojeong-form" novalidate>
     <h2 class="form-title">${tr('내 토정비결 보기', 'Get your Tojeong reading')}</h2>
+    ${profilePicker('tj')}
     <p class="hint">${tr('태어난 시간과 성별은 필요하지 않습니다.', 'Birth time and gender are not needed.')}</p>
     <fieldset class="field"><legend>${tr('생일 달력', 'Birth-date calendar')}</legend><div class="seg"><label><input type="radio" name="tj-calendar" value="solar" checked><span>${tr('양력', 'Solar')}</span></label><label><input type="radio" name="tj-calendar" value="lunar"><span>${tr('음력', 'Lunar')}</span></label></div></fieldset>
     <fieldset class="field"><legend>${tr('생년월일', 'Birth date')}</legend><div class="ymd">

@@ -3,7 +3,9 @@ import { tojeongView } from './tojeong-view.js';
 import { tojeongHeadline } from '../content/tojeong.js';
 import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, cleanName } from '../site/share-codec.js';
-import { load, save, removeSaved, sessionLoad, sessionSave } from './profile.js';
+import { load, save, removeSaved, sessionLoad, sessionSave, listPeople, profileLabel } from './profile.js';
+import { esc } from '../site/util.js';
+import { readingControls, applyReadingPreferences, wireReadingPreferences } from './reading-preferences.js';
 import { track, trackInputStart } from './analytics.js';
 import { renderResultWithPartnerAd, clearResultWithPartnerAd } from './partner-ad.js';
 import { isEnglish, tr } from '../i18n/runtime.js';
@@ -24,6 +26,7 @@ const inputError = (message) => tr(message, ({
 
 export async function mountTojeong(root) {
   const form = root.querySelector('form'), out = root.querySelector('#tojeong-result');
+  wireReadingPreferences(out);
   trackInputStart(form, 'tojeong');
   const field = (id) => form.querySelector(`#tj-${id}`);
   const persist = field('save'), status = field('storage-status');
@@ -31,7 +34,7 @@ export async function mountTojeong(root) {
   function fill(p) {
     if (!p) return;
     field('name').value = p.name || '';
-    for (const k of ['y', 'm', 'd']) if ([...field(k).options].some((o) => +o.value === p[k])) field(k).value = p[k];
+    for (const k of ['y', 'm', 'd']) field(k).value = [...field(k).options].some((o) => +o.value === p[k]) ? p[k] : '';
     form.querySelector(`input[name="tj-calendar"][value="${p.calendar === 'lunar' ? 'lunar' : 'solar'}"]`).checked = true;
     field('leap').checked = !!p.leap && p.calendar === 'lunar';
     field('leap').disabled = p.calendar !== 'lunar';
@@ -73,7 +76,8 @@ export async function mountTojeong(root) {
     try {
       const r = await reading(result.code);
       if (token !== latest) return false;
-      renderResultWithPartnerAd(out, tojeongView(result, r, p.name) + resultShareHtml(), { tool: 'tojeong', calc_origin: source, reading_date: isoDate(todayKST()) });
+      renderResultWithPartnerAd(out, readingControls({ chart: false }) + tojeongView(result, r, p.name) + resultShareHtml(), { tool: 'tojeong', calc_origin: source, reading_date: isoDate(todayKST()) });
+      applyReadingPreferences(out);
       wireShare(out.querySelector('.result-share'), shareFor(result, r, p.name));
       field('error').hidden = true;
       track('calc_result', { tool: 'tojeong', calc_origin: source, entry_point: 'tojeong', reading_date: isoDate(todayKST()) });
@@ -129,6 +133,30 @@ export async function mountTojeong(root) {
   try { const preference = sessionStorage.getItem('ohaeng:tojeong-save'); if (preference !== null) persist.checked = preference === 'true'; } catch { /* 접근 제한 */ }
   const own = sessionLoad('tojeong') || stored;
   const p = own || sessionLoad('a') || shared;
+  let people = [], selectedId = own?.profileId || '';
+  const picker = field('saved-person');
+  async function refreshPeople(change = {}) {
+    people = await listPeople();
+    picker.closest('.profile-picker').hidden = people.length === 0;
+    picker.innerHTML = `<option value="">${tr('직접 입력 · 새 사람', 'Enter details · new person')}</option>${people.map(person => `<option value="${esc(person.id)}">${esc(profileLabel(person.profile))} · ${person.profile.y}.${person.profile.m}.${person.profile.d}</option>`).join('')}`;
+    picker.value = selectedId;
+    if (change.deleted === selectedId && selectedId) { selectedId = ''; sessionSave('tojeong', read()); }
+    const edited = people.find(person => person.id === change.edited && person.id === selectedId);
+    if (edited) await choose({ ...edited.profile, profileId: edited.id });
+  }
+  async function choose(profile) {
+    selectedId = profile.profileId || ''; picker.value = selectedId;
+    fill(profile); sessionSave('tojeong', { ...read(), profileId: selectedId });
+    await render(read(), 'device_restore');
+  }
+  picker.addEventListener('change', () => {
+    const person = people.find(person => person.id === picker.value);
+    if (person) choose({ ...person.profile, profileId: person.id });
+    else { selectedId = ''; fill({}); latest++; clearResultWithPartnerAd(out); }
+  });
+  document.addEventListener('profile-selected', event => { choose(event.detail.profile); });
+  document.addEventListener('profiles-changed', event => { refreshPeople(event.detail).catch(() => {}); });
+  try { await refreshPeople(); } catch { /* The calculator works without saved people. */ }
   if (p && !own) status.textContent += tr(' 저장된 사주 생일을 불러왔으며, 토정비결 정보는 별도로 저장합니다.', ' Your saved Saju birth date was loaded. Tojeong information is saved separately.');
   root.dataset.ready = 'true';
   if (p) { fill(p); await render(p, sessionLoad('tojeong') || sessionLoad('a') ? 'session_restore' : 'device_restore'); }

@@ -1,6 +1,7 @@
 // 평생 해설과 주요 시기 상세는 평생 운세에서만 로드한다.
 import { STEM_EL, STEM_H, EL_H, pillarH as hz } from '../engine/core.js';
 import { tr } from '../i18n/runtime.js';
+import { cycleAgeNote } from './chart-basis.js';
 import { term, elementName } from '../i18n/terms.js';
 import { lifeEventsView } from './life-events-view.js';
 import { chartColors, luckyBanner } from './lucky-colors.js';
@@ -35,7 +36,7 @@ export function lifeView(L, c, today) {
     <section class="box card"><h3>${tr("애정·결혼운", "Love & marriage")}</h3>${L.love.map((t) => `<p>${t}</p>`).join('')}</section>
     <section class="box card"><h3>${tr("건강", "Wellbeing")}</h3>${L.health.map((t) => `<p>${t}</p>`).join('')}</section>
     <section class="box card"><h3>${tr("인생의 리듬", "Life rhythm")}</h3><p>${tr("대운은 10년 단위의 전통 해석입니다. 점수는 이 서비스의 비교 기준이며 중요한 결정을 내릴 시기나 결과를 보장하지 않습니다. 빨간 점이 지금의 대운입니다.", "Ten-year luck cycles are a traditional interpretation. Scores are comparisons within this service and do not determine when to make major decisions or guarantee outcomes. The red dot marks the current cycle.")}</p></section>
-    <section class="box card wide"><div class="box-head"><h3>${tr("대운 흐름", "Ten-year luck cycles")}</h3><span class="muted">${tr("10년 단위 · 만 나이", "Ten-year periods · age in years")}</span></div>${daeunChart(L.daeun)}<div class="daeun-list">${dlist}</div></section>
+    <section class="box card wide"><div class="box-head"><h3>${tr("대운 흐름", "Ten-year luck cycles")}</h3><span class="muted">${cycleAgeNote()}</span></div>${daeunChart(L.daeun)}<div class="daeun-list">${dlist}</div></section>
     ${lifeEventsView(L.events, c, today)}
   </div>`;
 }

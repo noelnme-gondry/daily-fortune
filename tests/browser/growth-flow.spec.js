@@ -88,6 +88,7 @@ test('사주 삭제는 별도 토정비결 저장정보를 보존한다', async 
   await fill(page); await page.locator('#save-device').check(); await submit(page);
   await expect(page.locator('[data-storage-status]')).toContainText('저장했습니다');
   await page.locator('[data-delete-profile]').click();
+  await page.locator('[data-confirm-delete-all]').click();
   await expect(page.locator('[data-storage-status]')).toContainText('삭제했습니다');
   expect(await page.evaluate(async () => (await import('/src/client/profile.js')).load('tojeong'))).toMatchObject({ y: 1990, m: 5, d: 17 });
   expect(await page.evaluate(async () => (await import('/src/client/profile.js')).load('a'))).toBeNull();
