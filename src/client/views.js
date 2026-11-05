@@ -10,6 +10,8 @@ import { tr } from '../i18n/runtime.js';
 import { term, elementName, weekdayName } from '../i18n/terms.js';
 import { chartColorPalettes, reportColorPalettes } from '../domain/lucky-colors.js';
 import { chartColors, luckyBanner } from './lucky-colors.js';
+import { chartBasis, cycleAgeNote } from './chart-basis.js';
+import { STRENGTH_BANDS } from '../domain/chart-rules.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 const hz = (p) => `${STEM_H[p.s]}${BR_H[p.b]}`;
@@ -17,7 +19,7 @@ const bandKey = (s) => (s >= 75 ? 'high' : s >= 60 ? 'good' : s >= 45 ? 'mid' : 
 const BAND = { high: '대길', good: '길', mid: '평', low: '주의' };
 export const band = (s) => `<span class="band band-${bandKey(s)}">${term(BAND[bandKey(s)])}</span>`;
 const tgLink = (t) => (TG.includes(t) ? `<a href="/saju/sipsin/${TG_SLUG[TG.indexOf(t)]}/">${term(t)}</a>` : term(t));
-const STRENGTHS = ['극신약', '신약', '중화', '신강', '극신강'];
+const STRENGTHS = STRENGTH_BANDS.map(b => b.label);
 export const elChip = (role, el) => `<span class="chip el el-${el}"><em>${term(role)}</em><b>${elementName(el)}(${EL_H[el]})</b></span>`;
 const SS_LINK = { '도화살': 'dohwa', '역마살': 'yeokma', '화개살': 'hwagae', '천을귀인': 'cheoneul-gwiin', '문창귀인': 'munchang-gwiin', '양인살': 'yangin', '괴강살': 'gwegang', '백호살': 'baekho' };
 
@@ -54,7 +56,7 @@ export function chartCard(c, profile, today) {
         <div><h3>${tr('일주 · 신살 · 대운', 'Day pillar, symbolic stars & luck cycle')} ${tip(TIPS.extras, tr('일주·신살·대운 설명', 'Pillars, stars and cycles'))}</h3><div class="chips"><a class="chip" href="/saju/ilju/${iljuSlug(day)}/"><em>${tr('일주', 'Day pillar')}</em><b class="hz">${hz(day)}</b> ${tr(`${pillarKo(day)}일주`, pillarLabel(day))}</a>${ss.map((n) => (SS_LINK[n] ? `<a class="chip" href="/saju/sinsal/${SS_LINK[n]}/">${term(n)}</a>` : `<span class="chip">${term(n)}</span>`)).join('')}${cur ? `<span class="chip"><em>${tr('현재 대운', 'Current luck cycle')}</em><b class="hz">${hz(cur)}</b> ${tr(`${cur.age}세~`, `Age ${cur.age}+`)}</span>` : ''}</div></div>
       </div>
     </div>
-    ${chartRelations(c)}
+    ${chartBasis(c, today)}${chartRelations(c)}
   </section>`;
 }
 
@@ -64,14 +66,14 @@ export function reportHead(r, when) {
   const lead = r.overall.outlook || low?.text?.split(/(?<=[.!?])\s+/)[0] || r.overall.text;
   return `<section class="report-head card">${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2 data-result-heading>${esc(r.overall.headline)}</h2><p>${esc(lead)}</p><details class="reading-basis"><summary>${tr('이 흐름이 나온 이유', 'How this reading was calculated')}</summary><p>${esc(r.overall.text)}</p></details><p class="score-note">${tr('점수는 이 서비스의 계산 기준이며, 성공 확률을 뜻하지 않습니다.', 'Scores reflect this service’s calculation rules, not a probability of success.')}</p></div></section>`;
 }
-export function catList(cats, withText = true) {
-  return `<section class="cats">${cats.map((c) => `<article class="cat"><div class="cat-top"><h3>${c.name}</h3>${band(c.score)}<div class="track"><i style="width:${c.score}%"></i></div><span class="num">${c.score}</span></div>${withText && c.text ? `<p>${esc(c.text)}</p>` : ''}</article>`).join('')}</section>`;
+export function catList(cats, withText = true, scope = null) {
+  return `<section class="cats">${cats.map((c) => `<article class="cat"${scope ? ` id="${scope}-${c.key}" tabindex="-1" aria-labelledby="${scope}-${c.key}-title"` : ''}><div class="cat-top"><h3${scope ? ` id="${scope}-${c.key}-title"` : ''}>${c.name}</h3>${band(c.score)}<div class="track"><i style="width:${c.score}%"></i></div><span class="num">${c.score}</span></div>${withText && c.text ? `<p>${esc(c.text)}</p>` : ''}</article>`).join('')}</section>`;
 }
-let categorySequence = 0;
-function dailyCategories(cats) {
-  const id = `daily-reading-${++categorySequence}`;
+export function readingAreaLinks(cats, scope = 'reading') {
+  return `<nav class="daily-links area-switch" aria-label="${tr('분야별 운세 바로가기', 'Jump to a reading area')}">${scope === 'reading' ? `<a href="#reading-summary" data-reading-area>${tr('종합', 'Overview')}</a>` : ''}${cats.map(cat => `<a href="#${scope}-${cat.key}"${scope === 'reading' ? ' data-reading-area' : ''}>${esc(cat.name)}<b>${cat.score}${tr('점', ' pts')}</b></a>`).join('')}</nav>`;
+}
+function dailyCategories(cats, id) {
   return `<section class="daily-cats" aria-labelledby="${id}-title"><div class="daily-intro"><h2 id="${id}-title">${tr('분야별 운세 자세히', 'Your reading in each area')}</h2><p class="muted">${tr('각 운의 흐름과 기회, 주의할 점을 함께 살펴보세요.', 'Explore the outlook, opportunities and cautions for each area.')}</p></div>
-    <nav class="daily-links" aria-label="${tr('분야별 운세 바로가기', 'Jump to a reading area')}">${cats.map(cat => `<a href="#${id}-${cat.key}">${esc(cat.name)}<b>${cat.score}${tr('점', ' pts')}</b></a>`).join('')}</nav>
     ${cats.map(cat => `<article class="daily-cat card" id="${id}-${cat.key}" tabindex="-1" aria-labelledby="${id}-${cat.key}-title"><div class="daily-cat-head"><h3 id="${id}-${cat.key}-title">${esc(cat.name)}</h3>${band(cat.score)}<b class="num">${cat.score}${tr('점', ' points')}</b></div>
       <p class="daily-outlook" data-daily-outlook>${esc(cat.reading.outlook)}</p>
       <div class="daily-aspects"><div><h4>${tr('활용할 기회', 'Opportunities')}</h4><p data-daily-opportunity>${esc(cat.reading.opportunity)}</p></div><div><h4>${tr('주의할 점', 'Take care')}</h4><p data-daily-caution>${esc(cat.reading.caution)}</p></div></div>
@@ -84,19 +86,20 @@ export function luckyRow(l) {
 }
 const same = (a, b) => a.y === b.y && a.m === b.m && a.d === b.d;
 
-function periodOverview(r, when, banner = true) {
-  return `<div class="reading-overview" data-result-summary>${reportHead(r, when)}${luckyRow(r.lucky)}${banner ? luckyBanner(reportColorPalettes(r.lucky)) : ''}</div>`;
+function periodOverview(r, when, banner = true, scope = 'reading') {
+  return `<div class="reading-overview" data-result-summary id="${scope}-summary" tabindex="-1">${reportHead(r, when)}${luckyRow(r.lucky)}${banner ? luckyBanner(reportColorPalettes(r.lucky)) : ''}</div>${readingAreaLinks(r.cats, scope)}`;
 }
 
-export function dayView(r, { banner = true } = {}) {
-  return periodOverview(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}日</span><span>${r.lunar}</span>`, banner) + dailyCategories(r.cats);
+let dailySequence = 0;
+export function dayView(r, { banner = true, scope = `daily-${++dailySequence}` } = {}) {
+  return periodOverview(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}日</span><span>${r.lunar}</span>`, banner, scope) + dailyCategories(r.cats, scope);
 }
 export function weekView(r, today) {
   const best = Math.max(...r.days.map((d) => d.score));
   const strip = r.days.map((d) => `<button type="button" data-reading-date="${isoDate(d.date)}" aria-controls="calendar-day-detail" aria-pressed="false" aria-label="${esc(d.short)} ${d.score}${tr('점 상세', ' points, details')}" class="wd${d.score === best ? ' best' : ''}${same(d.date, today) ? ' today' : ''}"><span class="d">${d.label} ${d.short}</span><span class="p">${hz(d.pillar)}</span><span class="bar"><i style="height:${d.score}%"></i></span><b>${d.score}</b></button>`).join('');
   return periodOverview(r, `<span>${r.label}</span>`) +
     `<section class="box card"><div class="box-head"><h3>${tr('요일별 흐름', 'Your week at a glance')}</h3><span class="muted">${tr('빨간 테두리 = 오늘', 'Red outline = today')}</span></div><div class="week">${strip}</div><div class="chips">${r.bestByCat.map((b) => `<span class="chip"><em>${b.name}</em>${b.day}${tr('요일', '')}</span>`).join('')}</div></section>` +
-    calendarDetail() + catList(r.cats);
+    calendarDetail() + catList(r.cats, true, 'reading');
 }
 const calendarDetail = () => `<section class="calendar-day-detail" id="calendar-day-detail" role="region" aria-label="${tr('선택한 날짜의 운세', 'Reading for the selected date')}" tabindex="-1" hidden></section>`;
 export function monthView(r, today) {
@@ -107,7 +110,7 @@ export function monthView(r, today) {
   return periodOverview(r, `<span>${r.label}</span><span class="hz">${hz(r.pillar)}月</span>`) +
     `<section class="box card"><div class="box-head"><h3>${tr("날짜별 기운", "Daily scores")}</h3><span class="legend">${tr("낮음", "Low")} <i style="background:var(--paper)"></i><i style="background:color-mix(in srgb, var(--accent) 45%, var(--paper))"></i><i style="background:color-mix(in srgb, var(--accent) 85%, var(--paper))"></i> ${tr("높음", "High")}</span></div><div class="cal">${cells}</div>
       <div class="split"><div><h4>${tr("힘을 쓰기 좋은 날", "Days to make progress")}</h4><div class="chips">${dl(r.goodDays)}</div></div><div><h4>${tr("조심할 날", "Days to take care")}</h4><div class="chips">${dl(r.badDays)}</div></div></div></section>` +
-    calendarDetail() + catList(r.cats);
+    calendarDetail() + catList(r.cats, true, 'reading');
 }
 function ymChart(months, curM) {
   const W = 600, H = 200, L = 30, R = 8, Tp = 20, B = 26;
@@ -125,7 +128,7 @@ function ymChart(months, curM) {
 export function yearView(yr, months, today) {
   const curM = yr.year === today.y ? today.m : -1;
   const dy = yr.daeun ? `<span>${tr("대운", "Luck cycle")} <span class="hz">${hz(yr.daeun)}</span></span>` : '';
-  return periodOverview(yr, `<span>${tr(`${yr.year}년 총운`, `${yr.year} annual reading`)}</span><span class="hz">${hz(yr.pillar)}年</span>${dy}`) + catList(yr.cats) +
+  return periodOverview(yr, `<span>${tr(`${yr.year}년 총운`, `${yr.year} annual reading`)}</span><span class="hz">${hz(yr.pillar)}年</span>${dy}`) + catList(yr.cats, true, 'reading') +
     `<section class="box card"><div class="box-head"><h3>${tr(`${yr.year}년 월별 흐름`, `Monthly scores for ${yr.year}`)}</h3><span class="muted">${tr("각 달 15일의 절기 월주 기준", "Based on the solar-term month pillar on the 15th")}</span></div>${ymChart(months, curM)}</section>` +
     `<div class="months">${months.map((m) => `<article class="mcard card${m.m === curM ? ' cur' : ''}"><div class="mcard-top"><h3>${tr(`${m.m}월`, `M${m.m}`)}<small>${hz(m.pillar)}</small></h3><span class="num">${m.score}</span></div><h4>${esc(m.headline)}</h4><p>${esc(m.text)}</p><div class="chips"><span class="chip"><em>${tr("강점", "Strength")}</em>${m.best.name} ${m.best.score}</span>${m.worst ? `<span class="chip"><em>${tr("주의", "Take care")}</em>${m.worst.name} ${m.worst.score}</span>` : ''}</div></article>`).join('')}</div>`;
 }
@@ -138,5 +141,6 @@ export function manseView(c) {
   const rows = c.daeun.map((d) => `<div class="dcard"><span class="muted">${tr(`${d.age}세 · ${d.startYear}년~`, `Age ${d.age} · ${d.startYear} onward`)}</span><b>${hz(d)}${tr(" 대운", " cycle")}</b></div>`).join('');
   const tgRows = c.cols.slice().reverse().map((x) => `<tr><th scope="row">${term(x.label)}</th><td><span class="hz el-${STEM_EL[x.s]}">${STEM_H[x.s]}</span> ${tgLink(x.tgS)}</td><td><span class="hz el-${BR_EL[x.b]}">${BR_H[x.b]}</span> ${tgLink(x.tgB)}</td><td class="hz">${x.hidden.map((h) => STEM_H[h]).join(' ')}</td><td>${term(x.stage)}</td></tr>`).join('');
   return `<section class="box card"><h3>${tr("기둥별 상세", "Pillar details")}</h3><div class="table-wrap"><table><thead><tr><th scope="col">${tr("기둥", "Pillar")}</th><th scope="col">${tr("천간 · 십신", "Heavenly stem · Ten God")}</th><th scope="col">${tr("지지 · 십신", "Earthly branch · Ten God")}</th><th scope="col">${tr("지장간", "Hidden stems")}</th><th scope="col">${tr("12운성", "Life stage")}</th></tr></thead><tbody>${tgRows}</tbody></table></div></section>
-    <section class="box card"><div class="box-head"><h3>${tr("대운", "Ten-year luck cycle")}</h3><span class="muted">${tr("10년 단위 · 만 나이", "Ten-year periods · age in years")}</span></div><div class="daeun-list">${rows}</div></section>`;
+    <section class="box card"><div class="box-head"><h3>${tr("대운", "Ten-year luck cycle")}</h3><span class="muted">${cycleAgeNote()}</span></div><div class="daeun-list">${rows}</div></section>
+    <section class="box card manse-basis"><h3>${tr('다른 만세력과 결과가 다를 때', 'When another birth chart differs')}</h3><p>${tr('여덟 글자와 해석은 확인할 기준이 다릅니다. 먼저 출생 입력을 맞추고, 그다음 해석 규칙을 비교해 보세요.', 'Check the birth inputs before comparing interpretation rules. The pillars and their interpretation follow different checks.')}</p><ol><li><b>${tr('양력·음력·윤달과 출생 시간', 'Calendar, leap month and birth time')}</b><p>${tr('년·월주는 절입 시각, 일·시주는 동경 127.5° 평균태양시를 사용합니다. 한국의 과거 표준시·서머타임을 반영하지만 출생 도시·해외 시간대는 보정하지 않습니다.', 'Year and month pillars follow solar-term boundaries. Day and hour pillars use mean solar time at 127.5°E with historical Korean time zones and daylight saving. Birth cities and overseas time zones are not adjusted.')}</p></li><li><b>${tr('밤 자시와 시간 모름', 'Late Zi hour and unknown time')}</b><p>${tr('현행 한국 표준시에서는 23:30부터 다음 날 일주로 계산합니다. 시간을 모르면 시주는 제외하고, 절기·대운은 정오를 기준으로 잡으므로 경계 부근에는 차이가 날 수 있습니다.', 'With current Korean standard time, the day pillar changes at 23:30. Unknown time omits the hour pillar and uses noon for solar terms and luck cycles, so results near boundaries can differ.')}</p></li><li><b>${tr('오행 개수와 강약·용신', 'Element counts, strength and useful elements')}</b><p>${tr('위 막대는 겉글자 개수입니다. 강약은 월지·일지와 지장간에 가중치를 주는 포춘의 규칙으로 판정합니다. 조후·합화·격국을 적용하는 다른 방식과 결론이 달라도 곧바로 계산 오류를 뜻하지는 않습니다.', 'The bars count visible characters. Fortune assesses strength with weighted month/day branches and hidden stems. Schools using climate, transformations or chart patterns may reach different conclusions without a pillar-calculation error.')}</p></li></ol><a href="/about/">${tr('포춘의 계산 규칙 자세히 보기', 'Read Fortune’s calculation rules')}</a></section>`;
 }

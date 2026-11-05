@@ -44,6 +44,7 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('#a-time')).toHaveValue('14:00');
     await expect(page.locator('[data-saved-entry] [data-edit-profile]')).toHaveAttribute('aria-expanded', 'true');
     await page.locator('[data-delete-profile]').click();
+    await page.locator('[data-confirm-delete-all]').click();
     await expect(page.locator('[data-saved-entry]')).toBeHidden();
     await page.reload();
     await expect(page.locator('#tool-form')).toBeVisible();

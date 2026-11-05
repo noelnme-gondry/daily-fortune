@@ -16,7 +16,7 @@ export const EN_TERMS = {
   '목': 'Wood', '화': 'Fire', '토': 'Earth', '금': 'Metal', '수': 'Water',
   '합': 'Combination', '삼합': 'Trine', '충': 'Clash', '형': 'Penalty', '해': 'Harm', '파': 'Break',
   '원진': 'Friction', '같음': 'Same branch', '없음': 'None', '상생': 'Generating', '상극': 'Controlling',
-  '용신': 'Useful element', '희신': 'Supporting element', '기신': 'Challenging element',
+  '용신': 'Useful element', '희신': 'Supporting element', '한신': 'Neutral element', '구신': 'Adverse element', '기신': 'Challenging element',
   '도화': 'Peach Blossom', '도화살': 'Peach Blossom', '역마': 'Travel Horse', '역마살': 'Travel Horse',
   '화개': 'Canopy', '화개살': 'Canopy', '천을귀인': 'Noble Helper', '귀인': 'Noble Helper',
   '문창': 'Scholar Star', '문창귀인': 'Scholar Star', '양인': 'Yang Blade', '양인살': 'Yang Blade',

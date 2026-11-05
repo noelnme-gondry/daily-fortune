@@ -3,7 +3,7 @@ import { tr } from '../i18n/runtime.js';
 import { term, stemName, branchName } from '../i18n/terms.js';
 import { TIPS } from '../content/tips.js';
 const tg = (name) => TG.includes(name) ? `<a href="/saju/sipsin/${TG_SLUG[TG.indexOf(name)]}/">${term(name)}</a>` : term(name);
-const char = (hanja, label, el) => `<span class="char el-${el}">${hanja}<small>${label}</small></span>`;
+const char = (hanja, label, el) => `<span class="char el-${el}"><span class="char-hanja">${hanja}</span><small>${label}</small></span>`;
 
 export function pillarTable(chart, tip) {
   const cols = chart.cols.slice().reverse();

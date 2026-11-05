@@ -220,6 +220,7 @@ test('묘시 입력 · 저장 선택 · 새 탭 복원 · 삭제', async ({ page
   await expect(next.locator('#a-branch')).toBeVisible();
   await expect(next.locator('#result .chart-card')).toBeAttached();
   await next.locator('[data-delete-profile]').click();
+  await next.locator('[data-confirm-delete-all]').click();
   await expect(next.locator('[data-storage-status]')).toContainText('삭제했습니다');
   expect(await saved(next)).toBeNull();
   await next.reload();

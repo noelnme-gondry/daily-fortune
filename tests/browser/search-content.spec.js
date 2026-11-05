@@ -62,6 +62,7 @@ test('KR/EN 만세력 경계의 네 입력은 직접 계산한 원국과 일치�
       await expect(page.locator('#a-d')).toHaveValue(String(input.d));
     }
     await page.locator('[data-delete-profile]').click();
+    await page.locator('[data-confirm-delete-all]').click();
   }
 });
 
@@ -121,6 +122,7 @@ test('KR/EN 월별 공개 해설은 직접 계산·재계산·저장 복원 결�
     await expect(page.locator('#result .mcard-top .num')).toHaveText(months.map((m) => String(m.score)));
     await expect.poll(async () => (await events(page)).filter((e) => e[1] === 'calc_result').map((e) => e[2].calc_origin)).toEqual(['session_restore']);
     await page.locator('[data-delete-profile]').click();
+    await page.locator('[data-confirm-delete-all]').click();
     await expect(page.locator('[data-storage-status]')).toContainText(prefix ? 'Deleted' : '삭제했습니다');
   }
 });
@@ -170,6 +172,7 @@ test('오늘·내일 공개 예시에서 직접 계산하면 같은 점수가 �
     expect(logged.some((e) => e[2].calc_origin === 'form')).toBe(true);
     expect(JSON.stringify(logged)).not.toMatch(/가상비밀|1990|14:30|score_band/);
     await page.locator('[data-delete-profile]').click();
+    await page.locator('[data-confirm-delete-all]').click();
   }
 });
 

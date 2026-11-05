@@ -442,12 +442,17 @@ for (const variant of ['A', 'B']) {
     await page.locator('button[type="submit"]').click();
     await expect(page.locator('#result .chart-card')).toBeAttached();
     await expect.poll(() => page.evaluate(() => window.adEvents.filter((e) => e[1] === 'result_view').length)).toBe(1);
-    await showFraction(page, 0.8);
+    // 계산 후 자동 스크롤과 충돌하지 않도록 안정된 지면으로 이동하고 실제 노출을 확인한다.
+    // 이 검사는 이벤트 구분·중복을 검증하며, 50% 경계는 아래 별도 검사에서 확인한다.
+    const commonAd = page.locator('[data-partner-ad-slot="common"]');
+    await commonAd.scrollIntoViewIfNeeded();
+    await expect(commonAd).toBeInViewport({ ratio: 1 });
     await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
     await page.getByRole('button', { name: '링크 복사', exact: true }).click();
     await completeProfile(page);
     await page.locator('button[type="submit"]').click();
-    await showFraction(page, 0.8);
+    await commonAd.scrollIntoViewIfNeeded();
+    await expect(commonAd).toBeInViewport({ ratio: 1 });
     const events = await page.evaluate(() => window.adEvents);
     for (const name of ['ad_experiment_exposure', 'result_view']) expect(events.filter((e) => e[1] === name)).toHaveLength(1);
     expect(await slotEvents(page)).toHaveLength(1);

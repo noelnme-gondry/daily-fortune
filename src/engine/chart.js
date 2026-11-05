@@ -7,6 +7,7 @@ import {
 import { Solar, lunarText, solarOfLunar, utcOffset } from './calendar.js';
 import { resolveBirthTime, offsetNote } from '../domain/birth-time.js';
 import { BIRTH_YEAR_MIN, BIRTH_YEAR_MAX } from '../domain/birth-input.js';
+import { STRENGTH_BANDS, BALANCE_THRESHOLD, BRANCH_STRENGTH_WEIGHT, SEASON_BONUS } from '../domain/chart-rules.js';
 
 const PILLAR_KO = { year: '년주', month: '월주', day: '일주', hour: '시주' };
 
@@ -40,7 +41,7 @@ export function buildChart(input) {
   const pillars = { year: gz(ecA.getYear()), month: gz(ecA.getMonth()), day: gz(ecB.getDay()), hour: hasTime ? gz(ecB.getTime()) : null };
   const gender = input.gender === 'F' ? 'F' : 'M';
   const a = analyze(pillars, gender);
-  // 대운 (표시 나이는 만 나이 기준)
+  // 대운은 시작 연도로 전환한다. 표시 나이는 시작 연도 - 출생 연도이며 생일 기준 만 나이가 아니다.
   const yun = ecA.getYun(gender === 'M' ? 1 : 0);
   const daeun = yun.getDaYun().slice(1, 10).map((d) => ({ startYear: d.getStartYear(), age: d.getStartYear() - birth.y, ...gz(d.getGanZhi()) }));
 
@@ -48,6 +49,7 @@ export function buildChart(input) {
     ...a, input, birth, hasTime, dst: hasTime && dst, name: (input.name || '').trim(),
     timeLabel: !hasTime ? tr('시간 모름', 'Time unknown') : selected ? selected.label : time,
     lunarText: lunarText(birth, true), daeun,
+    cycleBasis: { forward: yun.isForward(), years: yun.getStartYear(), months: yun.getStartMonth(), days: yun.getStartDay() },
   };
 }
 
@@ -80,7 +82,7 @@ export function analyze(pillars, gender = 'M') {
       if (g === 0 || g === 4) sup += 1;
       tot += 1;
     }
-    const bw = pos === 'month' ? 3 : pos === 'day' ? 1.5 : 1;
+    const bw = BRANCH_STRENGTH_WEIGHT[pos];
     for (const [hs, days] of HIDDEN[p.b]) {
       const w = bw * days / 30;
       weights[STEM_EL[hs]] += days / 30;
@@ -92,8 +94,8 @@ export function analyze(pillars, gender = 'M') {
   }
   const ratio = sup / tot;
   // 경계값은 무작위 원국 300개 분포의 10·35·65·90 백분위
-  const strengthLabel = ratio >= 0.64 ? '극신강' : ratio >= 0.47 ? '신강' : ratio >= 0.35 ? '중화' : ratio >= 0.19 ? '신약' : '극신약';
-  const strong = ratio >= 0.41;
+  const strengthLabel = STRENGTH_BANDS.findLast(band => ratio >= band.min).label;
+  const strong = ratio >= BALANCE_THRESHOLD;
 
   // 억부(강약 조절) + 조후(계절 온도)로 오행 선호도 산출
   let favG;
@@ -106,13 +108,14 @@ export function analyze(pillars, gender = 'M') {
     if (drains[0] === 2) favG[0] += 0.9; else favG[4] += 0.7;
     favG[drains[0]] -= 0.5;
   }
-  const tilt = Math.min(1, Math.abs(ratio - 0.41) / 0.15 + 0.35);
+  const tilt = Math.min(1, Math.abs(ratio - BALANCE_THRESHOLD) / 0.15 + 0.35);
   favG = favG.map((v) => v * tilt);
   const fav = [0, 0, 0, 0, 0];
   favG.forEach((v, g) => { fav[(STEM_EL[dm] + g) % 5] = v; });
   const mb = pillars.month.b;
-  if ([11, 0, 1].includes(mb) && counts[1] <= 1) fav[1] += 0.7;
-  if ([5, 6, 7].includes(mb) && counts[4] <= 1) fav[4] += 0.7;
+  let seasonalElement = null;
+  if ([11, 0, 1].includes(mb) && counts[1] <= 1) { fav[1] += SEASON_BONUS; seasonalElement = 1; }
+  if ([5, 6, 7].includes(mb) && counts[4] <= 1) { fav[4] += SEASON_BONUS; seasonalElement = 4; }
   const order = [0, 1, 2, 3, 4].sort((a, b) => fav[b] - fav[a]);
   const roles = { yong: order[0], hee: order[1], han: order[2], gu: order[3], gi: order[4] };
 
@@ -159,6 +162,7 @@ export function analyze(pillars, gender = 'M') {
   return {
     key, gender, pillars, positions, dm, cols, counts, weights, groupW, ratio, strengthLabel, strong,
     fav, roles, ss, natalSS, tenGodCount,
+    analysisBasis: { support: sup, total: tot, seasonalElement },
   };
 }
 

@@ -5,10 +5,14 @@ import { esc } from './util.js';
 // 도구의 주소·이름은 기존 콘텐츠 계약에서 파생한다.
 export function toolNavigation(today) {
   return [
-    ...['today', 'tomorrow', 'week', 'month'].map(key => ({ key, ...TOOLS[key] })),
-    ...[today.y, today.y + 1].map(y => ({ key: `year${y}`, ...yearTool(y) })),
-    ...['lifetime', 'story', 'rank', 'compatibility', 'manseryeok'].map(key => ({ key, ...TOOLS[key] })),
+    ...['today', 'tomorrow', 'week', 'month'].map(key => ({ key, group: 'period', ...TOOLS[key] })),
+    ...[today.y, today.y + 1].map(y => ({ key: `year${y}`, group: 'period', ...yearTool(y) })),
+    ...['lifetime', 'story', 'rank', 'compatibility', 'manseryeok'].map(key => ({ key, group: 'chart', ...TOOLS[key] })),
   ];
+}
+export function readingNavigation(mode, today) {
+  const tools = toolNavigation(today);
+  return `<section class="reading-navigation" aria-label="${tr('기간과 풀이 선택', 'Choose a period or reading')}"><nav class="period-switch" aria-label="${tr('기간별 운세', 'Reading period')}"><b>${tr('기간', 'Period')}</b><div>${tools.filter(t => t.group === 'period').map(t => `<a href="${t.path}#reading-summary" data-period-link${t.key === mode ? ' aria-current="page"' : ''}>${esc(t.nav)}</a>`).join('')}</div></nav><details class="reading-more"><summary>${tr('사주·궁합 등 다른 풀이', 'Birth chart, compatibility and more')}</summary><nav aria-label="${tr('다른 풀이 선택', 'Other readings')}">${tools.filter(t => t.group === 'chart').map(t => `<a href="${t.path}"${t.key === mode ? ' aria-current="page"' : ''}>${esc(t.nav)}</a>`).join('')}</nav></details></section>`;
 }
 export function nextTools(mode, today) {
   const order = {

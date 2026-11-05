@@ -9,8 +9,10 @@ import { initPartnerAd, initAdSlotTracking } from './partner-ad.js';
 import { initAdExperiment } from './ad-experiment.js';
 import { initMobileHeader } from './mobile-header.js';
 import { initLanguage } from './language.js';
+import { initProfileNavigation } from './profile-navigation.js';
 
 initLanguage();
+initProfileNavigation();
 
 initAdExperiment();
 initMobileHeader();
