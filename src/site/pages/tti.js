@@ -16,8 +16,25 @@ const yy = (y) => String(y).slice(2);
 const article = (ctx, page) => ({ '@type': 'Article', headline: page.h1 || page.title, description: page.description, inLanguage: siteText('ko-KR'), datePublished: ctx.published, dateModified: ctx.buildDate, author: { '@id': `${ctx.site}/#org` }, publisher: { '@id': `${ctx.site}/#org` }, mainEntityOfPage: { '@id': `${ctx.site}${page.path}#webpage` }, image: `${ctx.site}/og-default.png` });
 
 export function hub(ctx) {
-  const page = today(ctx);
-  return { ...page, path: '/tti/', title: siteText('[무료] 띠별 운세 — 오늘의 12띠 운세와 신년운세'), description: siteText('회원가입 없이 무료로 보는 띠별 운세. 띠별 운세의 시작은 오늘의 운세입니다. 동물 아이콘으로 내 띠를 고르고 오늘 해석, 올해·내년의 월별 운세, 삼재와 띠 궁합을 확인하세요.'), crumbs: [[siteText('띠별 운세'), '/tti/']] };
+  const y = ctx.today.y;
+  const choices = [
+    ['/tti/today/', tr('오늘의 12띠 운세', 'Today’s twelve zodiac readings'), tr('오늘 점수와 해석을 비교하고 내 띠의 7일 흐름으로 이동합니다.', 'Compare today’s readings and open the seven-day view for your sign.')],
+    [`/tti/${y}/`, tr(`${y}년 띠별 운세`, `${y} zodiac readings`), tr('출생 연도를 선택해 월별 흐름을 확인합니다. 띠 공통 해석과 연생별 표시를 구분하세요.', 'Choose a birth year to inspect monthly readings, distinguishing sign-wide text from birth-year details.')],
+    [`/tti/${y + 1}/`, tr(`${y + 1}년 띠별 운세`, `${y + 1} zodiac readings`), tr('다음 해의 간지와 월별 해석을 봅니다. 미래 사건의 예측 확률은 아닙니다.', 'Explore next year’s calendar relationships and monthly readings, not probabilities of future events.')],
+    ['/tti/samjae/', tr('삼재 연도 확인', 'Check Samjae years'), tr('띠 그룹별 들삼재·눌삼재·날삼재를 표로 확인합니다.', 'Look up the traditional three-year Samjae cycle by zodiac group.')],
+    ['/tti/compatibility/', tr('띠 궁합 관계표', 'Zodiac relationship table'), tr('합·충 등 전통적인 지지 관계를 비교합니다. 실제 관계의 성공 여부를 판정하지 않습니다.', 'Compare traditional branch relationships, not the success of a real relationship.')],
+  ];
+  return {
+    path: '/tti/', section: '/tti/',
+    title: tr('띠별 운세 안내 — 오늘·신년·삼재·궁합 고르기', 'Zodiac reading guide — daily, annual, Samjae and compatibility'),
+    description: tr('띠별 오늘 운세, 연간 운세, 삼재와 궁합의 차이를 확인하고 필요한 자료를 고르세요. 출생 연도와 입춘 기준, 개인 사주와 띠별 해석의 차이도 설명합니다.', 'Choose between daily and annual zodiac readings, Samjae and compatibility. Learn about birth-year boundaries, Ipchun and the difference from a full birth chart.'),
+    crumbs: [[siteText('띠별 운세'), '/tti/']],
+    body: `<article class="article" data-zodiac-guide>${hero(tr('어떤 띠별 운세를 찾으세요?', 'Which zodiac reading do you need?'), tr('하루의 해석, 한 해의 월별 흐름, 삼재 연도와 궁합 관계표는 서로 다른 질문에 답합니다. 필요한 자료를 고른 뒤 해석이 적용되는 범위를 함께 확인하세요.', 'Daily readings, annual monthly views, Samjae years and compatibility answer different questions. Choose a resource and check what its interpretation covers.'))}
+      <div class="cards">${choices.map(([href, title, text]) => `<a class="card link-card" href="${href}"><b>${esc(title)}</b><span>${esc(text)}</span></a>`).join('')}</div>
+      <section class="prose"><h2>${tr('1월·2월 초 출생이라면 띠의 경계를 확인하세요', 'Check the year boundary for January and early-February births')}</h2><p>${tr('이 서비스의 띠는 명리의 입춘 경계를 사용합니다. 양력 1월 1일이나 음력 설날 기준의 띠와 다를 수 있으므로, 경계 무렵 출생자는 날짜와 시각을 확인하세요. 출생 연도 숫자만 보고 정하지 않습니다.', 'This service uses the Ipchun boundary. It can differ from January 1 or Lunar New Year conventions. If you were born near the boundary, check the date and time rather than choosing by the year number alone.')} <a href="/manseryeok/">${tr('만세력에서 내 띠 확인하기', 'Check my sign in the birth chart')}</a> · <a href="/guides/ipchun-boundary/">${tr('입춘 경계 읽는 법', 'Read the Ipchun boundary guide')}</a></p></section>
+      <section class="prose"><h2>${tr('띠별 해석과 개인 사주는 범위가 다릅니다', 'Zodiac and personal birth-chart readings have different scope')}</h2><p>${tr('같은 띠는 같은 기본 해석을 봅니다. 생년월일시 전체를 반영하지 않으며 개인의 성격·건강·미래 사건을 측정하지 않습니다. 내 네 기둥의 관계가 궁금하면 개인 사주 계산으로 이동하세요.', 'People with the same sign share the base reading. It does not use the full birth date and time or measure personality, health or future events. Use a personal chart when you need to inspect all four pillars.')} <a href="/today/">${tr('내 사주로 오늘의 운세 보기', 'Read today with my full chart')}</a> · <a href="/guides/zodiac-samjae/">${tr('띠·삼재 해석의 이용 기준', 'How to use zodiac and Samjae readings')}</a></p></section>
+      <section class="prose"><h2>${tr('오늘에서 내일로 이어서 보려면', 'Continue from today to tomorrow')}</h2><p>${tr('오늘의 12띠 목록에서 내 띠를 고르면 날짜별 점수 근거와 7일 흐름을 볼 수 있습니다. 날짜가 바뀐 해석과 현재 날짜를 구분하고, 점수를 일의 성공 확률로 읽지 마세요.', 'Choose your sign in today’s list to see the score basis and seven-day view. Check the date of each reading; scores are not probabilities of success.')} <a href="/tti/today/">${tr('오늘의 띠별 목록 열기', 'Open today’s zodiac list')}</a></p></section></article>`,
+  };
 }
 
 export function yearIndex(y, ctx) {
