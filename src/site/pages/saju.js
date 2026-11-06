@@ -8,12 +8,13 @@ import { ILJU_TAG, STEM_COLOR, BRANCH_TG_NOTE, STAGE_NOTE, GANJI_REL, STAGE_INFO
 import {
   STEM_H, BR_H, EL_H, EL_SLUG, STEM_EL, BR_EL, BR_MAIN, HIDDEN, TG, TG_H, TG_SLUG, STEM_SLUG, STAGES, STAGES_H,
   LIUHE, DOHWA, YEOKMA, HWAGAE, GWIIN, MUNCHANG, YANGIN, GWEGANG, BAEKHO, hongran, cheonhui,
-  tenGod, groupOf, stageOf, elRel, sexagenary, iljuSlug, pillarH, dayPillar, toUTC, fromUTC, DAY_MS,
+  tenGod, stageOf, elRel, sexagenary, iljuSlug, pillarH, dayPillar, toUTC, fromUTC, DAY_MS,
 } from '../../engine/index.js';
 import { esc, faqBlock, faqLd, factTable, elSpan } from '../util.js';
 import { hero } from './tools.js';
 import { adSlot } from '../layout.js';
 import RANK from '../../content/rank-table.js';
+import { iljuPerspective } from '../ilju-reading.js';
 
 const article = (ctx, page, extra = {}) => ({
   '@type': 'Article', headline: page.h1 || page.title, description: page.description, inLanguage: siteText('ko-KR'),
@@ -100,8 +101,7 @@ export function iljuPage(n, ctx) {
   if ([0, 3, 6, 9].includes(p.b)) ss.push([siteText('도화의 자리(자오묘유)'), '/saju/sinsal/dohwa/']);
   if ([2, 5, 8, 11].includes(p.b)) ss.push([siteText('역마의 자리(인신사해)'), '/saju/sinsal/yeokma/']);
   if ([1, 4, 7, 10].includes(p.b)) ss.push([siteText('화개의 자리(진술축미)'), '/saju/sinsal/hwagae/']);
-  const g = groupOf(tg);
-  const career = T.groupCareer[g];
+  const perspective = iljuPerspective(n);
   const best = { s: (p.s + 5) % 10, b: LIUHE[p.b] };
   const goods = [...Array(10).keys()].filter((s) => s % 2 === LIUHE[p.b] % 2 && s !== best.s).map((s) => ({ s, b: LIUHE[p.b] }))
     .filter((q) => [1, 4].includes(elRel(STEM_EL[p.s], STEM_EL[q.s])) || elRel(STEM_EL[p.s], STEM_EL[q.s]) === 0).slice(0, 3);
@@ -117,8 +117,8 @@ export function iljuPage(n, ctx) {
   const dates = [y, y + 1].map((yy) => `<p><b>${yy}${siteText("년:")}</b> ${datesOf(p, yy).map((o) => `${o.m}/${o.d}`).join(', ')}</p>`).join('');
   const lead = `${name}(${hz}${siteText("日柱)는 천간 ")}${displayJosa(stemName(p.s), '과/와')}${siteText(" 지지 ")}${displayJosa(brName(p.b), '이/가')}${siteText(" 만난 일주로, ")}"${ILJU_TAG[n]}"${siteText("으로 상징됩니다. 일지에 ")}${displayJosa(tg, '을/를')}${siteText(" 깔고 있고 12운성으로는 ")}${siteValue(stage)}${siteText("에 해당합니다. ")}${GANJI_REL[rel]}`;
   const faq = [
-    { q: `${name}${siteText("의 성격은 어떤가요?")}`, a: `${ILJU_TAG[n].split(' — ')[1]}${siteText("입니다. ")}${dm.summary.split('. ')[0]}. ${BRANCH_TG_NOTE[tg].split('. ')[1] || ''}`.trim() },
-    { q: `${name}${siteText("에게 맞는 직업은 무엇인가요?")}`, a: `${siteText("일지 ")}${siteValue(tg)}${siteText("의 성향으로 ")}${career.jobs}${siteText(" 같은 분야가 잘 맞습니다. ")}${career.note}` },
+    { q: `${name}${siteText("의 성격은 어떤가요?")}`, a: perspective.personality },
+    { q: `${name}${siteText("에게 맞는 직업은 무엇인가요?")}`, a: perspective.work },
     { q: `${name}${siteText("의 연애와 결혼 스타일은?")}`, a: T.spousePalace[tg] },
     { q: `${displayJosa(name, '과/와')}${siteText(" 잘 맞는 일주는?")}`, a: `${iljuName(best)}(${pillarH(best)})${tr("는 천간합·육합 관계, ", " has a stem/branch combination relationship; ")}${iljuName(bad)}(${pillarH(bad)})${tr("는 극·충 관계로 분류합니다. 전통적인 글자 관계이며 실제 두 사람의 관계를 판정하지 않습니다.", " has a control/clash relationship. These are traditional character relationships, not verdicts on a real couple.")}` },
     { q: `${siteText("내 일주가 ")}${name}${siteText("인지 어떻게 알 수 있나요?")}`, a: `${siteText("일주는 태어난 날짜의 간지로 정해지며 띠와 상관이 없습니다. ")}${SITE.name}${siteText(" 만세력에 생년월일을 넣으면 바로 확인할 수 있습니다.")}` },
@@ -135,10 +135,11 @@ export function iljuPage(n, ctx) {
       [siteText('지장간'), HIDDEN[p.b].map(([h]) => `${STEM_H[h]}(${siteValue(tenGod(p.s, h))})`).join(' · ')],
       [siteText('관련 신살'), ss.length ? ss.map(([t, h]) => `<a href="${h}">${siteValue(t)}</a>`).join(', ') : '없음'],
     ], `${name}${siteText(" 핵심 정리")}`)}
-    <section class="prose"><h2>${name}${siteText("의 성격")}</h2><p>${dm.summary}</p><p>${BRANCH_TG_NOTE[tg]}</p><p>${STAGE_NOTE[stage]}</p><p>${GANJI_REL[rel]}</p>
+    ${perspective.comparison}
+    <section class="prose"><h2>${name}${siteText("의 성격")}</h2><p>${esc(perspective.personality)}</p><p>${dm.summary}</p><p>${BRANCH_TG_NOTE[tg]}</p><p>${STAGE_NOTE[stage]}</p><p>${GANJI_REL[rel]}</p>
       <div class="pros"><div><h3>${siteText("강점")}</h3><ul>${dm.strengths.map((s) => `<li>${s}</li>`).join('')}<li>${SIPSIN[tg].keywords.slice(0, 2).join('·')}${siteText("의 기질")}</li></ul></div><div><h3>${siteText("다듬을 점")}</h3><ul>${dm.weaknesses.map((s) => `<li>${s}</li>`).join('')}</ul></div></div></section>
     <section class="prose"><h2>${name}${siteText("의 연애와 결혼")}</h2>${love.map((t) => `<p>${siteValue(t)}</p>`).join('')}</section>
-    <section class="prose"><h2>${name}${siteText("에게 맞는 직업과 적성")}</h2><p>${isEnglish() ? SIPSIN[tg].summary : `${siteText("일지의 ")}${displayJosa(tg, '은/는')} ${SIPSIN[tg].summary.split('. ')[1] || SIPSIN[tg].summary}`}</p><p><b>${siteText("잘 맞는 분야:")}</b> ${career.jobs}. ${career.note}</p><p><b>${siteText("일간 오행으로 본 업종:")}</b> ${T.elementIndustry[(STEM_EL[p.s] + 1) % 5]}${siteText(" (일간이 생하는 ")}${elementName((STEM_EL[p.s] + 1) % 5)}${siteText(" 기운의 분야에서 재능이 드러납니다)")}</p></section>
+    <section class="prose"><h2>${tr('직업 상징을 실제 업무 질문으로 바꾸기', 'Turn career symbolism into practical work questions')}</h2><p>${esc(perspective.work)}</p><p><a href="/guides/career/">${tr('직업·이직 선택에서 확인할 조건', 'Review the conditions of a career decision')}</a></p></section>
     <section class="prose"><h2>${name} · ${tr("일주 간 합·충 관계", "Combinations and clashes between day pillars")}</h2>
       <p><b>${tr("천간합·육합:", "Stem and branch combinations:")}</b> ${iljuLink(best)}${siteText(" — 천간 ")}${STEM_H[p.s]}${STEM_H[best.s]}${siteText("합과 지지 ")}${BR_H[p.b]}${BR_H[best.b]}${siteText("육합을 함께 이루는 천지합(天地合) 관계입니다.")}</p>
       <p><b>${siteText("잘 맞는 일주:")}</b> ${goods.map(iljuLink).join(', ')}${siteText(" — 배우자 자리끼리 육합을 이룹니다.")}</p>
@@ -149,7 +150,7 @@ export function iljuPage(n, ctx) {
   return articlePage(ctx, {
     path: `/saju/ilju/${iljuSlug(p)}/`, h1: `${name}(${hz}日柱)`, eyebrow: `${siteText("60일주 · ")}${n + 1}${siteText("번째")}`,
     title: `${name}${siteText(" 성격·연애·직업·궁합 총정리")}`,
-    description: `${name}(${hz}${siteText(")는 ")}${ILJU_TAG[n].replace(' — ', ', ')}${siteText(". 일지 ")}${siteValue(tg)}${siteText(", 12운성 ")}${siteValue(stage)}${siteText("로 보는 성격과 연애·결혼, 맞는 직업, 궁합이 좋은 일주를 정리했습니다.")}`,
+    description: tr(`${name}(${hz})의 일지 본기 십신 ${tg}와 12운성 ${stage}를 같은 일간·다른 일지와 비교합니다. 성격·직업·관계의 전통 해석과 실제 판단의 범위를 구분해 읽으세요.`, `${name} (${hz}): compare ${siteValue(tg)} and ${siteValue(stage)} with shared stems and branches. Distinguish traditional personality, career and relationship symbolism from real-world assessment.`),
     crumbs: [[siteText('사주 백과'), '/saju/'], [siteText('60일주'), '/saju/ilju/'], [name, `/saju/ilju/${iljuSlug(p)}/`]],
     lead, content, faq, about: { '@type': 'Thing', name: `${name}(${hz}日柱)` },
     after: `<nav class="pager" aria-label="${siteText("이전·다음 일주")}"><a href="/saju/ilju/${iljuSlug(prev)}/">← ${iljuName(prev)}</a><a href="/saju/ilju/">${siteText("60일주 목록")}</a><a href="/saju/ilju/${iljuSlug(next)}/">${iljuName(next)} →</a></nav>`,

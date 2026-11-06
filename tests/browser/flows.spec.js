@@ -645,13 +645,15 @@ test('12띠 생성형 심볼이 홈 카드·일별 상세·연간 운세에 로�
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 });
 
-test('띠 기본은 오늘 · 쥐띠 상세는 일별 라이트박스 · 다섯 메뉴 유지 및 뒤로가기', async ({ page }) => {
+test('띠 안내 허브에서 오늘로 진입 · 쥐띠 라이트박스 · 다섯 메뉴 및 뒤로가기', async ({ page }) => {
   await page.goto('/tti/');
+  await expect(page.locator('[data-zodiac-guide]')).toBeVisible();
+  await page.locator('main a[href="/tti/today/"]').first().click();
   await expect(page.locator('h1')).toContainText('오늘');
   await expect(page.locator('.tti-nav > a')).toHaveCount(5);
   await page.locator('.tti-name').first().click();
   await expect(page.locator('dialog[open]')).toContainText('쥐띠의 오늘');
-  await expect(page).toHaveURL(/\/tti\/$/);
+  await expect(page).toHaveURL(/\/tti\/today\/$/);
   await page.keyboard.press('Escape');
   await page.evaluate(() => { window._navIdentity = document.querySelector('.tti-nav'); });
   const yearLink = page.locator('.tti-nav > a').nth(1);

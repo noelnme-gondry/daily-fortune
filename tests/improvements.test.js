@@ -120,6 +120,7 @@ test('KST 새해 직전·직후: 경로·메뉴·메타·사이트맵·띠 출�
   assert.match(next.sitemap(), /\/tti\/2028\/rat\//);
   assert.match(next.sitemap(), /\/year\/2026\//);
   assert.ok(next.has('/tti/today/rat/'));
-  assert.match(next.render('/tti/'), /data-dialog="tti-day-0"/);
+  assert.match(next.render('/tti/today/'), /data-dialog="tti-day-0"/);
+  assert.match(next.render('/tti/'), /data-zodiac-guide/);
   assert.doesNotMatch(next.render('/tti/'), /<h2>12띠 성격/);
 });
