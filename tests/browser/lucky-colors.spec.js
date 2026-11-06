@@ -21,7 +21,7 @@ const sdkStub = `window.partnerCalls = []; window.PartnersCoupang = { G: functio
   frame.width = options.width; frame.height = options.height;
   options.container.append(frame);
 } };`;
-const bannerConfig = element => ({ ...LUCKY_BANNERS[EL_SLUG[element]], width: '100%', height: '250', bordered: false, tsource: '' });
+const bannerConfig = element => ({ ...LUCKY_BANNERS[EL_SLUG[element]], width: '100%', height: '320', bordered: false, tsource: '' });
 
 test.beforeEach(async ({ context, page }) => {
   await context.route('https://**/*', route => route.abort());
@@ -55,10 +55,10 @@ async function checkBannerArea(page) {
     expect(box.width).toBe(Math.min(result.width, 784));
     const slot = await area.locator('[data-lucky-banner-slot]').boundingBox();
     expect(slot.width).toBe(box.width);
-    expect(slot.height).toBe(250);
+    expect(slot.height).toBe(320);
     const frame = await area.locator('iframe').boundingBox();
     expect(frame.width).toBe(slot.width);
-    expect(frame.height).toBe(250);
+    expect(frame.height).toBe(320);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
   }
 }
@@ -72,7 +72,7 @@ for (const lang of ['ko', 'en']) {
       await expect(page.locator('#result > .reading-overview > .report-head + .lucky + .lucky-banner')).toHaveCount(1);
       await expect(page.locator('#result .lucky > div:first-child b')).toHaveText(color);
       await expect(page.locator('#result [data-lucky-banner-slot]')).toHaveAttribute('data-lucky-banner-slot', EL_SLUG[withLanguage(lang, () => report().lucky.el)]);
-      await expect(page.locator('#result > [data-result-summary] + .partner-ad')).toHaveCount(1);
+      await expect(page.locator('#tool + .partner-ad')).toHaveCount(1);
       await checkBannerArea(page);
       await page.reload();
       await expect(page.locator('#result .lucky-banner')).toHaveCount(1);
@@ -153,11 +153,11 @@ test('발급 배너를 재계산해도 공통 배너·SDK를 중복 생성하지
   expect(sdkRequests).toBe(1);
 });
 
-test('B 광고도 총운과 행운색 사이에 끼지 않고 기존 배너 하나를 유지한다', async ({ page }) => {
+test('기존 B 저장값도 총운·행운색 순서와 결과 뒤 공통 배너 하나를 유지한다', async ({ page }) => {
   await page.addInitScript(key => localStorage.setItem(key, 'B'), AD_POSITION_EXPERIMENT.storageKey);
   for (const path of ['/today/', '/lifetime/']) {
     await calculate(page, path);
-    await expect(page.locator('#result > .partner-ad:first-child')).toHaveCount(1);
+    await expect(page.locator('#tool + .partner-ad')).toHaveCount(1);
     await expect(page.locator('.reading-overview > section + .lucky, .reading-overview > section + .lucky-colors')).toHaveCount(1);
     await expect(page.locator('[data-partner-ad-slot]')).toHaveCount(1);
   }

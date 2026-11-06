@@ -1,3 +1,6 @@
+// 2026-11-06부터 공통 배너는 결과 아래의 전체 폭 지면을 사용한다.
+// 이전 배정 키·계약은 과거 자료 해석용으로 보존하며 클라이언트에서 재배정하지 않는다.
+export const AD_LAYOUT = Object.freeze({ id: 'result_footer_v1', placement: 'after_reading' });
 export const AD_POSITION_EXPERIMENT = Object.freeze({
   id: 'ad_position_v2',
   storageKey: 'myod:ad-position:v2',
