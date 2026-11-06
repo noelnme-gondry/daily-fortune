@@ -1,0 +1,99 @@
+{
+  "snapshotStage": "pre-merge-local-validation",
+  "date": "2026-11-06",
+  "timezone": "Asia/Seoul",
+  "branch": "codex/unslop-site-review",
+  "base": "2e703726fa9a27b3d118bc394600734588fb69b1",
+  "axeVersion": "4.14.0",
+  "scope": {
+    "routes": 470,
+    "widths": [
+      320,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "locales": [
+      "ko",
+      "en"
+    ],
+    "pageChecks": 1880,
+    "disclosureOpenChecks": 5280,
+    "nativeDetailsOpenChecks": 3168,
+    "publicDialogChecks": 480,
+    "resultStates": 44,
+    "largeNamesFirstStates": 44,
+    "resultDialogChecks": 2676,
+    "tooltipChecks": 144,
+    "decodedImageAssets": 148,
+    "productionSmokeCases": 6
+  },
+  "findingsAfter": {
+    "pageAxeViolations": 0,
+    "pageErrors": 0,
+    "overflowChecks": 0,
+    "clippedTextChecks": 0,
+    "missingImages": [],
+    "footerUnreachable": 0,
+    "resultStateViolations": [],
+    "preferenceStateViolations": [],
+    "extraStateIssues": []
+  },
+  "fonts": {
+    "loaded": true,
+    "failedRequests": 0
+  },
+  "lighthouse": {
+    "environment": "Local production build, default Lighthouse mobile simulation, live Google Fonts and Coupang Partners SDK, AdSense disabled",
+    "performance": 94,
+    "accessibility": 100,
+    "bestPractices": 77,
+    "fcpMs": 2517.0594,
+    "lcpMs": 2517.0594,
+    "cls": 0.020450046113455328,
+    "tbtMs": 11
+  },
+  "limits": [
+    "Physical iPhone and Android devices were not tested.",
+    "Production-domain browser access is blocked by local DNS returning 0.0.0.0; remote DNS resolves a public address.",
+    "Actual Coupang SDK was observed on local preview and Safari, not on the production domain.",
+    "Automated WCAG checks are not a full accessibility certification."
+  ],
+  "changesCommitted": false,
+  "pushed": false,
+  "deployed": false,
+  "tests": {
+    "unitAndSite": {
+      "passed": 166,
+      "failed": 0
+    },
+    "chromium": {
+      "passed": 204,
+      "failed": 0
+    },
+    "webkit": {
+      "passed": 204,
+      "failed": 0
+    },
+    "firefox": {
+      "fullRunPassed": 199,
+      "fullRunFailed": 5,
+      "recheckPassed": 5,
+      "recheckFailed": 0,
+      "reason": "Native layout coordinate floating-point rounding; height assertions now allow less than 0.005 CSS px error."
+    },
+    "uniquePassingScenarios": 778,
+    "newRegressionCasesPerBrowser": 14,
+    "newRegressionAcrossEngines": 42,
+    "lint": "pass",
+    "buildPages": 470,
+    "diffCheck": "pass"
+  },
+  "dependencies": {
+    "runtimeVulnerabilities": 0,
+    "developmentModerateAdvisories": 5,
+    "packageFilesChanged": false
+  }
+}

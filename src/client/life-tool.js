@@ -19,7 +19,7 @@ function daeunChart(list) {
   const pts = list.map((d, i) => `${x(i).toFixed(1)},${y(d.score).toFixed(1)}`).join(' ');
   const area = `${x(0).toFixed(1)},${y(0)} ${pts} ${x(n - 1).toFixed(1)},${y(0)}`;
   const marks = list.map((d, i) => `<circle class="pt${d.current ? ' cur' : ''}" cx="${x(i).toFixed(1)}" cy="${y(d.score).toFixed(1)}" r="${d.current ? 6 : 4.5}"></circle><text class="v" x="${x(i).toFixed(1)}" y="${(y(d.score) - 10).toFixed(1)}" text-anchor="middle">${d.score}</text><text class="hzt" x="${x(i).toFixed(1)}" y="${H - 24}" text-anchor="middle">${hz(d)}</text><text x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${tr(`${d.age}세`, `Age ${d.age}`)}</text>`).join('');
-  return `<div class="scroll-x"><svg class="chart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${tr("대운별 점수", "Scores by ten-year luck cycle")}">${g}<polygon class="area" points="${area}"></polygon><polyline class="line" points="${pts}"></polyline>${marks}</svg></div>`;
+  return `<div class="scroll-x" tabindex="0" role="region" aria-label="${tr("대운별 점수 그래프", "Ten-year luck cycle score chart")}"><svg class="chart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${tr("대운별 점수", "Scores by ten-year luck cycle")}">${g}<polygon class="area" points="${area}"></polygon><polyline class="line" points="${pts}"></polyline>${marks}</svg></div>`;
 }
 export function lifeView(L, c, today) {
   const dm = L.dayMaster;

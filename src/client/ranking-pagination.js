@@ -9,7 +9,7 @@ export function rankingPagination(p, listId, label) {
       <button type="button" data-ranking-page="${p.page - 1}" data-ranking-direction="previous" ${controls}${p.page === 1 ? ' disabled' : ''} aria-label="${tr("이전 페이지", "Previous page")}">← ${tr("이전", "Previous")}</button>
       <button type="button" data-ranking-page="${p.page + 1}" data-ranking-direction="next" ${controls}${p.page === p.pages ? ' disabled' : ''} aria-label="${tr("다음 페이지", "Next page")}">${tr("다음", "Next")} →</button>
     </div></div>
-    <div class="ranking-page-numbers">${Array.from({ length: p.pages }, (_, i) => `<button type="button" data-ranking-page="${i + 1}" ${controls} aria-label="${tr(`${i + 1}페이지`, `Page ${i + 1}`)}"${p.page === i + 1 ? ' aria-current="page"' : ''}>${i + 1}</button>`).join('')}</div>
+    <div class="ranking-page-numbers">${Array.from({ length: p.pages }, (_, i) => `<button type="button" data-ranking-page="${i + 1}" ${controls} aria-label="${tr(`${i + 1} 페이지`, `Page ${i + 1}`)}"${p.page === i + 1 ? ' aria-current="page"' : ''}>${i + 1}</button>`).join('')}</div>
   </nav>`;
 }
 

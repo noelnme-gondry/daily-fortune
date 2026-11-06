@@ -88,7 +88,7 @@ for (const width of [320, 360, 375, 390, 412, 768, 1024, 1440]) {
       const box = await slot.boundingBox();
       const expectedWidth = Math.min(width, 1440) - 32;
       expect(box.width).toBe(expectedWidth);
-      expect(box.height).toBe(250);
+      expect(box.height).toBeCloseTo(250, 2);
       expect(box.x).toBe((width - expectedWidth) / 2);
       expect(box.x + box.width).toBeLessThanOrEqual(width);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
@@ -96,7 +96,7 @@ for (const width of [320, 360, 375, 390, 412, 768, 1024, 1440]) {
       await expect(slot.locator('iframe')).toHaveAttribute('title', path.startsWith('/en/') ? 'Coupang Partners product advertisement' : '쿠팡 파트너스 상품 광고');
       const frameBox = await slot.locator('iframe').boundingBox();
       expect(frameBox.width).toBe(expectedWidth);
-      expect(frameBox.height).toBe(250);
+      expect(frameBox.height).toBeCloseTo(250, 2);
       expect(await slot.boundingBox()).toEqual(box);
       rows.push(await adGeometry(page, 'before-result'));
     }
@@ -258,7 +258,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       if (width <= 390 && path === '/manseryeok/') {
         const table = page.getByRole('region', { name: '가상 사례 원국 상세 표' });
         await table.focus();
-        await page.keyboard.press('ArrowRight');
+        await page.keyboard.press('ArrowRight', { delay: 100 });
         await expect.poll(() => table.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
       }
     }

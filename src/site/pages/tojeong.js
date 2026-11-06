@@ -40,7 +40,7 @@ function yearTable(y) {
     <h2 id="tj-table-h">${tr(`${y}년 토정비결 작괘 기준표`, `${y} Tojeong calculation reference`)}</h2>
     <p>${tr(`${y}년은 음력 <b>${ko(t.ganji)}(${t.ganji})년</b>으로 태세수는 <b>${t.taese}</b>입니다. 풀이 기간은 양력 ${ymd(t.period.start)}부터 ${ymd(t.period.end)}까지입니다.`, `The lunar year ${y} is <b>${t.ganji}</b>, with a year value of <b>${t.taese}</b>. The reading covers ${ymd(t.period.start)} to ${ymd(t.period.end)} in the solar calendar.`)}</p>
     <h3>${tr('음력 생월로 정해지는 중괘', 'Middle number by lunar birth month')}</h3>
-    <div class="scroll-x"><table class="tj-table">
+    <div class="scroll-x" tabindex="0" role="region" aria-label="${tr('음력 생월별 중괘 기준표', 'Middle number reference by lunar birth month')}"><table class="tj-table">
       <thead><tr><th scope="col">${tr('음력 생월', 'Lunar birth month')}</th><th scope="col">${tr('그 달 간지', 'Month stem–branch')}</th><th scope="col">${tr('날수', 'Days')}</th><th scope="col">${tr('월건수', 'Month value')}</th><th scope="col">${tr('중괘', 'Middle')}</th></tr></thead>
       <tbody>${t.months.map((m) => `<tr><th scope="row">${tr(`${m.m}월`, `Month ${m.m}`)}</th><td>${isEnglish() ? m.ganji : `${ko(m.ganji)} <small>${m.ganji}</small>`}</td><td>${tr(`${m.days}일`, `${m.days} days`)} <small>${m.days === 30 ? tr('큰달', 'long month') : tr('작은달', 'short month')}</small></td><td>${m.wolgeon}</td><td><b>${m.middle}</b></td></tr>`).join('')}</tbody>
     </table></div>

@@ -27,7 +27,7 @@ export function lifeEventsView(events, chart, today) {
   const cards = groups.map((group) => `<div class="ev"><h4>${group.name}</h4>${group.items.length ? `<ul>${group.items.map((item) => {
     const id = `life-event-${group.key}-${item.y}`;
     dialogs.push(detailDialog(group, item, id));
-    return `<li><button type="button" class="life-event-trigger" data-dialog="${id}" aria-controls="${id}" aria-haspopup="dialog" aria-label="${item.y}${tr("년", "")} ${group.name} · ${item.badge} · ${tr("상세 보기", "View details")}">
+    return `<li><button type="button" class="life-event-trigger" data-dialog="${id}" aria-controls="${id}" aria-haspopup="dialog" title="${item.y}${tr("년", "")} ${group.name} · ${item.badge} · ${tr("상세 보기", "View details")}">
       <span class="life-event-year">${item.y}<small>${tr("년", "year")}</small></span>${badge(item)}
       <span class="life-event-age">${tr(`${item.age}세`, `Age ${item.age}`)} · <span class="hz">${pillarH(item.pillar)}</span>年</span>
       <span class="life-event-reason">${esc(item.why)}</span><span class="life-event-more">${tr("상세 보기", "View details")} <span aria-hidden="true">↗</span></span>
