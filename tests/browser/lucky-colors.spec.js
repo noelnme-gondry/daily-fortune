@@ -55,10 +55,11 @@ async function checkBannerArea(page) {
     expect(box.width).toBe(Math.min(result.width, 784));
     const slot = await area.locator('[data-lucky-banner-slot]').boundingBox();
     expect(slot.width).toBe(box.width);
-    expect(slot.height).toBe(320);
+    // Firefox는 큰 문서 좌표에서 높이에 미세한 소수점 오차를 반환한다.
+    expect(slot.height).toBeCloseTo(320, 2);
     const frame = await area.locator('iframe').boundingBox();
     expect(frame.width).toBe(slot.width);
-    expect(frame.height).toBe(320);
+    expect(frame.height).toBeCloseTo(320, 2);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
   }
 }

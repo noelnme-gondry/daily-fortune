@@ -1,4 +1,5 @@
 import { animalName, weekdayName } from '../../i18n/terms.js';
+import { tr } from '../../i18n/runtime.js';
 import { siteText, displayPillar, siteValue } from '../copy.js';
 // 만세력 표: 연도별(24절기·월건) / 월별(날짜별 일진·음력·절기)
 import { MANSE_COPY } from '../../content/pages.js';
@@ -43,7 +44,7 @@ export function manseMonth(y, m, ctx) {
   return {
     path: `/manseryeok/${y}/${m}/`, title: c.title, description: `${y}${siteText("년 ")}${m}${siteText("월 만세력: 날짜별 일진(간지), 음력 날짜, 월건 ")}${pillarLabel(mp)}${terms.length ? `, ${terms.map((t) => siteValue(t.name)).join('·')}${siteText(" 절입 시각")}` : ''}${siteText("을 한 표로 확인하세요.")}`,
     crumbs: [[siteText('만세력'), '/manseryeok/'], [`${y}${siteText("년")}`, `/manseryeok/${y}/`], [`${m}${siteText("월")}`, `/manseryeok/${y}/${m}/`]], section: '/manseryeok/', ogType: 'article',
-    body: `${hero(c.h1, lead)}<div class="table-wrap"><table class="grid-table manse"><thead><tr><th scope="col">${siteText("양력")}</th><th scope="col">${siteText("일진")}</th><th scope="col">${siteText("음력")}</th><th scope="col">${siteText("월주")}</th><th scope="col">${siteText("절기")}</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>
+    body: `${hero(c.h1, lead)}<div class="table-wrap" tabindex="0" role="region" aria-label="${tr('월별 만세력', 'Monthly calendar pillars')}"><table class="grid-table manse"><thead><tr><th scope="col">${siteText("양력")}</th><th scope="col">${siteText("일진")}</th><th scope="col">${siteText("음력")}</th><th scope="col">${siteText("월주")}</th><th scope="col">${siteText("절기")}</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>
       <nav class="pager" aria-label="${siteText("이전·다음 달")}">${inRange(prev[0]) ? `<a href="/manseryeok/${prev[0]}/${prev[1]}/">← ${prev[0]}${siteText("년 ")}${prev[1]}${siteText("월")}</a>` : '<span></span>'}<a href="/manseryeok/${y}/">${y}${siteText("년 만세력")}</a>${inRange(next[0]) ? `<a href="/manseryeok/${next[0]}/${next[1]}/">${next[0]}${siteText("년 ")}${next[1]}${siteText("월 →")}</a>` : '<span></span>'}</nav>
       <p class="cta"><a class="btn" href="/manseryeok/">${siteText("내 사주 원국 계산하기")}</a></p>`,
   };

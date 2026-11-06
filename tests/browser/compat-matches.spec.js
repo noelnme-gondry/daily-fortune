@@ -44,7 +44,7 @@ test('궁합 맨 아래 추천: 분야별 실점수·상세·모바일·기준 �
     await expect(section.locator('.leader-date')).toHaveText(expected.rankings[key].slice(0, 5).map((r) => `양력 ${r.input.y}년 ${r.input.m}월 ${r.input.d}일`));
     await expect(section.locator('.ranking-page-numbers button')).toHaveCount(20);
     await expect(section.getByRole('button', { name: '이전 페이지', exact: true })).toBeDisabled();
-    await section.getByRole('button', { name: '20페이지', exact: true }).click();
+    await section.getByRole('button', { name: '20 페이지', exact: true }).click();
     await expect(section.locator('.leader-score')).toHaveText(expected.rankings[key].slice(95).map((r) => `${r.score}점`));
     await expect(section.locator('.leader-date')).toHaveText(expected.rankings[key].slice(95).map((r) => `양력 ${r.input.y}년 ${r.input.m}월 ${r.input.d}일`));
     await expect(section.locator('.leader-place')).toHaveText(expected.rankings[key].slice(95).map((r) => `${r.rank}위`));
@@ -60,7 +60,7 @@ test('궁합 맨 아래 추천: 분야별 실점수·상세·모바일·기준 �
   await expect(section.locator('.leader-score')).toHaveText(expected.rankings.money.slice(5, 10).map((r) => `${r.score}점`));
   await expect(section.getByRole('button', { name: '다음 페이지', exact: true })).toBeFocused();
   await section.getByRole('button', { name: '이전 페이지', exact: true }).press('Enter');
-  await expect(section.getByRole('button', { name: '1페이지', exact: true })).toBeFocused();
+  await expect(section.getByRole('button', { name: '1 페이지', exact: true })).toBeFocused();
   const first = section.locator('.leader-button').first();
   await expect(first).toContainText(`만 ${expected.rankings.money[0].age}세`);
   await first.focus();
@@ -78,7 +78,7 @@ test('궁합 맨 아래 추천: 분야별 실점수·상세·모바일·기준 �
   await page.keyboard.press('Escape');
   await expect(first).toBeFocused();
   const before = await section.locator('.leader-date').allTextContents();
-  await section.getByRole('button', { name: '20페이지', exact: true }).click();
+  await section.getByRole('button', { name: '20 페이지', exact: true }).click();
   await section.locator('[data-match-base="b"]').click();
   await expect(section.locator('[data-match-base="b"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(section.locator('[data-match-scope]')).toContainText('1978~1998년생 · 여성');

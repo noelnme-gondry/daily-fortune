@@ -159,7 +159,7 @@ ${page.ogType === 'article' ? `<meta property="article:modified_time" content="$
 <link rel="manifest" href="${ctx.lang === 'en' ? '/en' : ''}/site.webmanifest?v=sun">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600;900&display=swap">
 <link rel="stylesheet" href="${ctx.assets.css}">
 ${page.tool && ctx.assets.tool ? `<link rel="modulepreload" href="${ctx.assets.tool}">\n` : ''}<script type="application/ld+json">${ld}</script>
 ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-account" content="${attr(cfg.adsense.client)}">
@@ -168,7 +168,7 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
 <a class="skip" href="#main">${tr('본문 바로가기', 'Skip to content')}</a>
 <header class="site-head">
   <div class="wrap head-row">
-    <a class="brand" href="/" aria-label="${attr(BRAND.name)} ${tr('홈', 'home')}"><img class="brand-logo" src="${BRAND.logo}" alt="" width="48" height="48"><span class="brand-name"><b>${BRAND.name}</b><small>${BRAND.descriptor}</small></span></a>
+    <a class="brand" href="/"><img class="brand-logo" src="${BRAND.logo}" alt="" width="48" height="48"><span class="brand-name"><b>${BRAND.name}</b><small>${BRAND.descriptor}</small></span></a>
     <nav class="language-switch" aria-label="${tr('언어 선택', 'Language')}"><a data-set-language="ko" href="${attr(languagePath(page.path, 'ko'))}" hreflang="ko" lang="ko"${ctx.lang !== 'en' ? ' aria-current="true"' : ''}>한국어</a><a data-set-language="en" href="${attr(languagePath(page.path, 'en'))}" hreflang="en" lang="en"${ctx.lang === 'en' ? ' aria-current="true"' : ''}>English</a></nav>
   </div>
   <div class="wrap gnav-row">

@@ -31,7 +31,8 @@ test('KR/EN 만세력 경계 표는 JS 없이 390px에서 탐색하고 유효한
         await expect(section.locator('[data-changed="true"]')).toHaveCount(id === 'ipchun' ? 3 : 2);
         const region = section.getByRole('region');
         await region.focus();
-        await region.press('ArrowRight');
+        // WebKit은 키를 누른 동안 네이티브 스크롤을 시작한다.
+        await region.press('ArrowRight', { delay: 100 });
         await expect.poll(() => region.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
       }
       expect(await page.evaluate(() => {

@@ -379,7 +379,7 @@ test('명예의 전당은 시간 제외 기준으로 고정되고 모든 분야�
       await expect(panel.locator('.leader-score')).toHaveText(rows.slice(0, 5).map((r) => `${r.score}점`));
       await expect(panel.locator('.ranking-page-numbers button')).toHaveCount(20);
       await expect(panel.getByRole('button', { name: '이전 페이지', exact: true })).toBeDisabled();
-      await panel.getByRole('button', { name: '20페이지', exact: true }).click();
+      await panel.getByRole('button', { name: '20 페이지', exact: true }).click();
       await expect(panel.locator('.leader-score')).toHaveText(rows.slice(95).map((r) => `${r.score}점`));
       await expect(panel.locator('.leader-place')).toHaveText(rows.slice(95).map((r) => `${r.rank}위`));
       await expect(panel.getByRole('button', { name: '다음 페이지', exact: true })).toBeDisabled();
@@ -450,13 +450,13 @@ test('명예의 전당 20페이지는 100개를 중복 없이 보여주며 하�
   const section = page.locator('.rank-leaders');
   const ids = [];
   for (let number = 1; number <= 20; number++) {
-    await section.getByRole('button', { name: `${number}페이지`, exact: true }).click();
+    await section.getByRole('button', { name: `${number} 페이지`, exact: true }).click();
     await expect(section.locator('.leader-button')).toHaveCount(5);
     const expected = LEADERS.three.total.slice((number - 1) * 5, number * 5);
     await expect(section.locator('.leader-score')).toHaveText(expected.map((r) => `${r.score}점`));
     ids.push(...await section.locator('.leader-button').evaluateAll((buttons) => buttons.map((b) => b.getAttribute('aria-controls'))));
     await expect(section.locator('.ranking-pagination [aria-current="page"]')).toHaveText(String(number));
-    await expect(section.getByRole('button', { name: `${number}페이지`, exact: true })).toBeFocused();
+    await expect(section.getByRole('button', { name: `${number} 페이지`, exact: true })).toBeFocused();
   }
   expect(new Set(ids).size).toBe(100);
   const last = section.locator('.leader-button').last();
@@ -466,14 +466,14 @@ test('명예의 전당 20페이지는 100개를 중복 없이 보여주며 하�
   await expect(page.locator('dialog[open] .comparison')).toContainText(`${LEADERS.three.total[99].score}점`);
   await page.keyboard.press('Escape');
   await expect(last).toBeFocused();
-  await section.getByRole('button', { name: '1페이지', exact: true }).click();
+  await section.getByRole('button', { name: '1 페이지', exact: true }).click();
   await section.getByRole('button', { name: '다음 페이지', exact: true }).press('Enter');
   await expect(section.locator('.ranking-pagination [aria-current="page"]')).toHaveText('2');
   await expect(section.getByRole('button', { name: '다음 페이지', exact: true })).toBeFocused();
   await section.getByRole('button', { name: '이전 페이지', exact: true }).press('Enter');
-  await expect(section.getByRole('button', { name: '1페이지', exact: true })).toBeFocused();
+  await expect(section.getByRole('button', { name: '1 페이지', exact: true })).toBeFocused();
   await expect(section.getByRole('button', { name: '이전 페이지', exact: true })).toBeDisabled();
-  await section.getByRole('button', { name: '20페이지', exact: true }).click();
+  await section.getByRole('button', { name: '20 페이지', exact: true }).click();
   for (const width of [320, 390, 768]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await section.locator('.ranking-pagination button').evaluateAll((buttons) => buttons.every((b) => {
@@ -553,7 +553,7 @@ test('새 브랜드와 해 로고가 홈·모바일·공유 페이지에 표시�
   await ready(page, '/');
   await expect(page).toHaveTitle(HOME.title);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(HOME.h1);
-  await expect(page.getByRole('link', { name: `${BRAND.name} 홈`, exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: `${BRAND.name} ${BRAND.descriptor}`, exact: true })).toBeVisible();
   const logo = page.locator('.brand-logo');
   await expect(logo).toHaveJSProperty('naturalWidth', 128);
   const icons = await page.locator('link[rel="icon"], link[rel="apple-touch-icon"]').evaluateAll((links) => links.map((link) => link.href));

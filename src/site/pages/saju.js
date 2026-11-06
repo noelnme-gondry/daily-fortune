@@ -223,7 +223,7 @@ export function sipsinPage(i, ctx) {
     lead: d.summary,
     content: `${factTable([[siteText('정의'), d.formula], [siteText('육친 (남성)'), d.family.M], [siteText('육친 (여성)'), d.family.F], [siteText('키워드'), d.keywords.join(' · ')], [siteText('잘 맞는 분야'), d.career]], `${siteValue(t)}${siteText(" 핵심 정리")}`)}
       <section class="prose"><h2>${displayJosa(t, '이/가')}${siteText(" 많을 때")}</h2><p>${d.many}</p><h2>${displayJosa(t, '이/가')}${siteText(" 없을 때")}</h2><p>${d.none}</p><h2>${siteText("운에서 ")}${displayJosa(t, '이/가')}${siteText(" 들어올 때")}</h2><p>${d.luck}</p><p>${T.tgMeaning[t]}${siteText("이라는 점을 기억하면 해석이 쉬워집니다.")}</p></section>
-      <section class="prose"><h2>${siteText("일간별 ")}${siteValue(t)}${siteText(" 찾기")}</h2><p>${siteText("아래 표는 일간마다 ")}${displayJosa(t, '이/가')}${siteText(" 되는 천간과 지지(지장간 정기 기준)입니다.")}</p><div class="table-wrap"><table class="grid-table"><thead><tr><th scope="col">${siteText("일간")}</th><th scope="col">${siteText("천간")}</th><th scope="col">${siteText("지지")}</th></tr></thead><tbody>${rows}</tbody></table></div></section>
+      <section class="prose"><h2>${siteText("일간별 ")}${siteValue(t)}${siteText(" 찾기")}</h2><p>${siteText("아래 표는 일간마다 ")}${displayJosa(t, '이/가')}${siteText(" 되는 천간과 지지(지장간 정기 기준)입니다.")}</p><div class="table-wrap" tabindex="0" role="region" aria-label="${tr('일간별 십신 찾기', 'Ten Gods by Day Master')}"><table class="grid-table"><thead><tr><th scope="col">${siteText("일간")}</th><th scope="col">${siteText("천간")}</th><th scope="col">${siteText("지지")}</th></tr></thead><tbody>${rows}</tbody></table></div></section>
       <nav class="chips">${TG.map((x, j) => `<a class="chip${j === i ? ' on' : ''}" href="/saju/sipsin/${TG_SLUG[j]}/">${siteValue(x)}</a>`).join('')}</nav>`,
     faq,
   });
@@ -273,7 +273,7 @@ function sinsalTable(slug) {
   if (slug === 'yangin') return byStem((s) => (YANGIN[s] >= 0 ? `${branchName(YANGIN[s])}(${BR_H[YANGIN[s]]})` : siteText('음간은 보지 않음')));
   if (slug === 'gwegang') return `<p>${GWEGANG.map((h) => { const p = { s: STEM_H.indexOf(h[0]), b: BR_H.indexOf(h[1]) }; return iljuLink(p); }).join(', ')}</p>`;
   if (slug === 'baekho') return `<p>${BAEKHO.map((h) => { const p = { s: STEM_H.indexOf(h[0]), b: BR_H.indexOf(h[1]) }; return iljuLink(p); }).join(', ')}</p>`;
-  if (slug === 'hongran') return `<div class="table-wrap"><table class="grid-table"><thead><tr><th scope="col">${siteText("띠(년지)")}</th><th scope="col">${siteText("홍란")}</th><th scope="col">${siteText("천희")}</th></tr></thead><tbody>${[...Array(12).keys()].map((b) => `<tr><th scope="row">${animalName(b)}${siteText("띠 ")}${branchName(b)}(${BR_H[b]})</th><td>${branchName(hongran(b))}(${BR_H[hongran(b)]})</td><td>${branchName(cheonhui(b))}(${BR_H[cheonhui(b)]})</td></tr>`).join('')}</tbody></table></div>`;
+  if (slug === 'hongran') return `<div class="table-wrap" tabindex="0" role="region" aria-label="${tr('홍란과 천희 조견표', 'Hongran and Tianxi reference')}"><table class="grid-table"><thead><tr><th scope="col">${siteText("띠(년지)")}</th><th scope="col">${siteText("홍란")}</th><th scope="col">${siteText("천희")}</th></tr></thead><tbody>${[...Array(12).keys()].map((b) => `<tr><th scope="row">${animalName(b)}${siteText("띠 ")}${branchName(b)}(${BR_H[b]})</th><td>${branchName(hongran(b))}(${BR_H[hongran(b)]})</td><td>${branchName(cheonhui(b))}(${BR_H[cheonhui(b)]})</td></tr>`).join('')}</tbody></table></div>`;
   if (slug === 'wonjin') return siteText('<p>자(子)↔미(未), 축(丑)↔오(午), 인(寅)↔유(酉), 묘(卯)↔신(申), 진(辰)↔해(亥), 사(巳)↔술(戌)</p>');
   return '';
 }
@@ -319,7 +319,7 @@ export function unseong(ctx) {
     crumbs: [[siteText('사주 백과'), '/saju/'], [siteText('12운성'), '/saju/12unseong/']],
     lead: faq[0].a,
     content: `<section class="prose"><h2>${siteText("12단계의 뜻")}</h2><dl class="dl">${STAGES.map((st, i) => `<dt>${siteValue(st)}(${STAGES_H[i]})</dt><dd>${STAGE_INFO[st]}</dd>`).join('')}</dl></section>
-      <section class="prose"><h2>${siteText("12운성 조견표")}</h2><div class="table-wrap"><table class="grid-table small"><thead>${head}</thead><tbody>${rows}</tbody></table></div></section>`,
+      <section class="prose"><h2>${siteText("12운성 조견표")}</h2><div class="table-wrap" tabindex="0" role="region" aria-label="${tr('12운성 조견표', 'Twelve life stages reference')}"><table class="grid-table small"><thead>${head}</thead><tbody>${rows}</tbody></table></div></section>`,
     faq,
   });
 }
