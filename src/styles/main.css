@@ -685,7 +685,7 @@ select.input { padding-right: 4px; }
 .partner-ad-inner {
   --ad-safe-left: env(safe-area-inset-left, 0px);
   --ad-safe-right: env(safe-area-inset-right, 0px);
-  display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; width: 100%;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; width: 100%; max-width: 1440px;
   padding-left: max(var(--ad-safe-left), var(--page-gutter));
   padding-right: max(var(--ad-safe-right), var(--page-gutter));
 }
@@ -695,9 +695,8 @@ select.input { padding-right: 4px; }
 .partner-ad-slot:empty { background: var(--paper); outline: 1px solid var(--line); }
 .partner-ad-slot > ins { display: block; width: 100%; }
 .partner-ad-slot iframe { display: block; width: 100%; border: 0; }
-.result .partner-ad, .tojeong-result .partner-ad { padding-bottom: 0; }
-.life > .partner-ad { grid-column: 1 / -1; }
-.result .partner-ad-inner, .tojeong-result .partner-ad-inner {
+.partner-ad[data-ad-context="result_footer"] { padding-top: 24px; padding-bottom: 16px; border-top: 1px solid var(--line); }
+.partner-ad[data-ad-context="result_footer"] .partner-ad-inner {
   padding-left: var(--ad-safe-left); padding-right: var(--ad-safe-right);
 }
 

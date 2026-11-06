@@ -56,18 +56,19 @@ GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint →
 
 ## 공통 파트너스 광고 영역
 
-- 계산 결과가 있는 페이지는 광고 위치 A/B 실험을 적용합니다. **A는 결과 공유·안내문 바로 아래**, **B는 결과 내용 시작 전**입니다. 같은 브라우저의 배정을 유지하고, 재계산 때도 지면은 한 개만 유지합니다. 계산 전과 광고 허용 콘텐츠 페이지는 본문·페이지 공유 다음, 푸터 직전에 표시합니다. 광고 제외 정책은 Google 광고와 동일합니다. [실험 범위·지표·검증 방법](docs/ad-position-experiment.md)
-- 쿠팡 다이나믹 배너는 **너비 100% × 높이 140px, 테두리 없음**인 가로형 한 개를 사용합니다. 결과 안에서는 결과 열의 너비, 하단에서는 본문 너비(최대 1,128px)에 맞춥니다. 광고 라벨·고지 문구는 이 크기 바깥에 둡니다. 발급 코드의 너비 1,128px을 반응형으로 적용하며, 상품 구성·표시 개수는 쿠팡이 결정합니다.
+- 계산 결과가 있는 페이지는 공통 배너를 **결과 전체가 끝난 뒤**에 표시합니다. 결과 상단의 행운색 소품 배너와 간격을 확보하고, PC에서는 입력 폼과 결과를 합친 전체 너비를 사용합니다. 재계산 때 지면을 재생성하지 않습니다. 계산 전과 광고 허용 콘텐츠 페이지는 본문·페이지 공유 다음, 푸터 직전에 표시합니다. 광고 제외 정책은 Google 광고와 동일합니다. 과거 A/B 배정은 새로 만들지 않으며 저장값은 보존합니다. [새 배치와 측정 계약](docs/ad-layout-result-footer.md)
+- 쿠팡 다이나믹 배너는 **너비 100% × 높이 250px, 테두리 없음**인 가로형 한 개를 사용합니다. 결과 아래에서는 최대 1,128px, 일반 페이지 하단에서는 최대 1,408px입니다. 모바일은 좌우 기본 여백과 safe-area를 제외한 전체 너비를 씁니다. 광고 라벨·고지 문구는 이 크기 바깥에 둡니다. 상품 구성·표시 개수는 쿠팡이 결정하며 실제 송출 크기는 운영 화면에서 확인해야 합니다.
 - 크기와 마크업은 `src/site/partner-ad.js`에서 관리합니다. 배너를 연결할 위치는 `[data-partner-ad-slot="common"]`입니다.
+- PC 오른쪽 결과 열의 행운색 소품 배너는 `src/content/lucky-banners.js`에서 최대 너비 784px·높이 320px로 관리합니다. 모바일은 화면 너비에 맞추고 높이 320px를 유지합니다.
 - 발급된 배너 `1039151`(`AF3219545`, `carousel`)를 공식 `g.js`의 `PartnersCoupang.G`로 연결합니다. 스크립트는 비동기로 한 번 불러오며, 차단·실패해도 운세 기능은 계속 동작합니다. 기존 애드센스 설정과 별개입니다.
 - 배너 위에 수수료 고지를 표시하며 개인정보처리방침에도 쿠팡 광고를 안내합니다. 이름·생년월일시는 배너 설정과 광고 영역 이벤트에 넣지 않습니다.
 - `ad_slot_view`는 활성 탭에서 배너 영역의 **50% 이상**이 보일 때 같은 문서의 페이지 경로당 공통(`common`)·행운색(`lucky`) 슬롯을 각각 한 번 전송합니다. 체류시간 조건은 없으며 재계산·행운색 변경은 추가 도달로 세지 않습니다. 실험 대상 계산기에서는 성공한 결과가 나온 뒤부터 측정합니다. 띠 메뉴의 부분 이동은 새 경로에서 다시 측정하고, 뒤로가기로 이미 측정한 경로에 돌아오면 중복 전송하지 않습니다. 새로고침·문서 이동 시에는 다시 측정합니다. 광고 차단 여부와 무관한 **영역 도달 지표**이며, 쿠팡의 실제 노출·클릭·구매 집계가 아닙니다. GA4 미설정 시 전송하지 않습니다.
-- 광고 계약은 `ad_measurement_version=1`, 기존 전역 계약은 `measurement_version=2`입니다. `ad_context`는 일반 콘텐츠의 `content`와 계산 후의 `result`를 구분합니다. 이전 자료에서 이 값이 없으면 문맥을 소급 추정하지 않습니다. 실험의 `ad_placement`는 공통 광고의 배정 위치이며 행운색 배너 위치를 뜻하지 않습니다. 광고 이벤트의 URL에는 query·fragment를 넣지 않고 오행·행운색·점수도 보내지 않습니다.
+- 광고 계약은 `ad_measurement_version=1`, 기존 전역 계약은 `measurement_version=2`입니다. `ad_context`는 일반 콘텐츠 `content`, 계산 후 공통 배너 `result_footer`, 행운색 배너 `result`를 구분합니다. 계산기 이벤트에 `ad_layout_version=result_footer_v1`, `ad_placement=after_reading`을 붙이며, 이 배치값은 공통 배너를 뜻합니다. 이전 실험 자료와 합쳐 비교하지 않습니다. 광고 이벤트의 URL에는 query·fragment를 넣지 않고 오행·행운색·점수도 보내지 않습니다.
 
 ## 공유
 
 - **결과 공유**(모든 계산기): 카카오톡 · 공유 시트 · 링크 복사 · X · 페이스북 · **이미지 저장**(1080×1350 PNG, 모바일은 공유 시트로 바로 전송).
-- 결과 공유가 있는 계산기 페이지에는 별도의 하단 **이 페이지 공유**를 표시하지 않습니다. 쿠팡 배너는 A/B 배정 위치에 표시하며, 홈·백과·띠 등 결과 공유가 없는 페이지는 페이지 공유를 유지합니다.
+- 결과 공유가 있는 계산기 페이지에는 별도의 하단 **이 페이지 공유**를 표시하지 않습니다. 쿠팡 배너는 결과 끝에 표시하며, 홈·백과·띠 등 결과 공유가 없는 페이지는 페이지 공유를 유지합니다.
 - 공유 링크는 `/share/?k=…` 카드 페이지로 연결되며 **생년월일시는 담지 않고** 결과 요약(점수·제목·이름)만 담습니다. 서버가 허용된 값(정해진 제목 목록, 점수 범위, 이름 10자)만 받아 카드와 Open Graph를 만들고, 검색 색인에서는 제외합니다.
 - **페이지 공유**(결과 공유가 없는 페이지 하단): 카카오톡 · 공유 시트 · 링크 복사 · X · 페이스북 · 밴드.
 
@@ -81,9 +82,9 @@ GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint →
 | `calc_submit` | `tool` | 계산기 폼 제출 |
 | `calc_result` | `tool`, `calc_origin`(form·saved·sample) | 계산 성공 후 결과 표시 |
 | `form_error` | `tool` | 날짜 오류 |
-| `ad_slot_view` | `ad_provider`(coupang), `ad_slot`(common/lucky), `ad_context`(content/result), `ad_measurement_version`(1), `page_path`, query·fragment 없는 `page_location` | 활성 탭에서 슬롯 영역 50% 이상 도달, 같은 문서의 경로·슬롯 유형당 한 번 |
-| `ad_experiment_exposure` | `experiment_id`, `experiment_variant`, `ad_placement`, `assignment_scope`, `tool`, `page_path` | 실험 대상의 첫 성공 결과 배치, 경로당 한 번 |
-| `result_view` | 위 실험 매개변수, `page_path`, `reading_date` | 활성 탭에서 결과의 첫 제목 50% 이상 도달, 같은 문서의 경로·운세 날짜당 한 번 |
+| `ad_slot_view` | `ad_provider`(coupang), `ad_slot`(common/lucky), `ad_context`(content/result_footer/result), `ad_measurement_version`(1), `page_path`, query·fragment 없는 `page_location` | 활성 탭에서 슬롯 영역 50% 이상 도달, 같은 문서의 경로·슬롯 유형당 한 번 |
+| `ad_experiment_exposure` | 과거 실험 매개변수 | 과거 자료 전용. 새 배치에서는 전송하지 않음 |
+| `result_view` | `ad_layout_version`, `ad_placement`, `tool`, `page_path`, `reading_date` | 활성 탭에서 결과의 첫 제목 50% 이상 도달, 같은 문서의 경로·운세 날짜당 한 번 |
 | `story_result` | 개인 결과 값 없음 | 인생 캐릭터 결과 |
 | `rank_result` | 개인 결과 값 없음 | 사주 랭킹 결과 |
 | `compat_result` | 개인 결과 값 없음 | 궁합 결과 |

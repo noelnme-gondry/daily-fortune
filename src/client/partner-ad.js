@@ -7,7 +7,6 @@ const selector = '[data-partner-ad-slot="common"]';
 const viewedPaths = new Set();
 const luckyViewedPaths = new Set();
 const resultViewedPaths = new Set();
-const exposedPaths = new Set();
 let stopTracking;
 let stopLuckyTracking;
 let stopResultTracking;
@@ -20,37 +19,10 @@ export function clearResultWithPartnerAd(out) {
   stopTracking?.();
   stopLuckyTracking?.();
   resultReady = false;
-  const ad = out.querySelector('.partner-ad');
+  const ad = document.querySelector('.partner-ad');
   if (ad) document.querySelector('main').after(ad);
+  ad?.removeAttribute('data-ad-context');
   out.replaceChildren();
-}
-
-// iframe은 같은 DOM 노드를 다시 삽입해도 재로드된다. 광고와 그 조상만 연결된 채
-// 남기고 나머지 결과를 교체한다. 평생운의 .life 내부 배치에도 같은 규칙을 쓴다.
-function replaceAroundAd(out, next, ad, marker) {
-  const branches = [];
-  let current = ad, replacement = marker;
-  while (current && replacement && current !== out && replacement !== next) {
-    if (current !== ad && current.nodeName !== replacement.nodeName) return false;
-    branches.push([current, replacement]);
-    current = current.parentNode;
-    replacement = replacement.parentNode;
-  }
-  if (current !== out || replacement !== next) return false;
-  for (const [retained, incoming] of branches) {
-    if (retained !== ad) {
-      for (const { name } of [...retained.attributes]) retained.removeAttribute(name);
-      for (const { name, value } of incoming.attributes) retained.setAttribute(name, value);
-    }
-    const parent = retained.parentNode;
-    for (const child of [...parent.childNodes]) if (child !== retained) child.remove();
-    let before = true;
-    for (const child of [...incoming.parentNode.childNodes]) {
-      if (child === incoming) before = false;
-      else parent.insertBefore(child, before ? retained : null);
-    }
-  }
-  return true;
 }
 
 export function renderResultWithPartnerAd(out, html, resultParams = {}) {
@@ -63,16 +35,10 @@ export function renderResultWithPartnerAd(out, html, resultParams = {}) {
   next.innerHTML = html;
   const summary = next.querySelector(':scope > [data-result-summary], :scope > .report-head, :scope > .tojeong-summary, :scope > .chart-card, :scope > .life > .wide') || next.firstElementChild;
   const share = next.querySelector('.result-share + .hint');
-  const experiment = adExperimentParams();
-  const marker = document.createComment('partner-ad');
-  if (ad && share) {
-    if (experiment.experiment_variant === 'B') next.prepend(marker);
-    else summary.after(marker);
-  }
-  if (!ad || !share || !replaceAroundAd(out, next, ad, marker)) {
-    out.replaceChildren(...next.childNodes);
-    if (ad && share) marker.replaceWith(ad);
-  }
+  out.replaceChildren(...next.childNodes);
+  // 계산기 밖에 두어 고정 입력 폼이 배너를 가리지 않게 한다. 재계산에는 iframe을 이동하지 않는다.
+  const tool = out.parentElement;
+  if (ad && share && tool.nextElementSibling !== ad) tool.after(ad);
   localizeClientLinks(out);
   if (ad) initPartnerAd();
   summary?.setAttribute('data-result-summary', '');
@@ -81,14 +47,11 @@ export function renderResultWithPartnerAd(out, html, resultParams = {}) {
   if (!ad) return;
   if (share) {
     resultReady = true;
-    if (experiment.experiment_id) {
-      const path = location.pathname;
-      if (!exposedPaths.has(path)) {
-        exposedPaths.add(path);
-        track('ad_experiment_exposure', { page_path: path });
-      }
-    }
-  } else document.querySelector('main').after(ad);
+    ad.dataset.adContext = 'result_footer';
+  } else {
+    document.querySelector('main').after(ad);
+    ad.removeAttribute('data-ad-context');
+  }
   initAdSlotTracking();
 }
 
@@ -120,12 +83,12 @@ export function initPartnerAd() {
 export function initAdSlotTracking() {
   stopTracking?.();
   stopLuckyTracking?.();
-  // 계산 전 푸터 도달을 실험 결과로 섞지 않는다. 일반 콘텐츠 페이지는 기존대로 측정한다.
-  if (adExperimentParams().experiment_id && !resultReady) return;
+  // 계산 전 푸터 도달을 결과 하단 도달로 섞지 않는다. 일반 콘텐츠 페이지는 기존대로 측정한다.
+  if (adExperimentParams().tool && !resultReady) return;
   const params = { ad_provider: 'coupang', ad_context: resultReady ? 'result' : 'content', ad_measurement_version: '1' };
   const slot = document.querySelector(selector);
   if (slot) stopTracking = observeView(slot, 'ad_slot_view', viewedPaths, {
-    ...params, ad_slot: 'common',
+    ...params, ad_slot: 'common', ad_context: resultReady ? 'result_footer' : 'content',
   });
   const luckySlot = resultReady && document.querySelector('[data-lucky-banner-slot]');
   // 오행별 dataset 값은 배너 선택 전용이며 분석 이벤트에는 넣지 않는다.

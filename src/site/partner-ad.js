@@ -3,7 +3,7 @@ import { attr } from './util.js';
 import { allowsAds } from './ad-policy.js';
 
 // 모바일·PC에서 같은 쿠팡 다이나믹 배너 하나를 사용하는 공통 지면.
-export const PARTNER_AD_SIZE = Object.freeze({ width: '100%', height: 140 });
+export const PARTNER_AD_SIZE = Object.freeze({ width: '100%', height: 250 });
 const BANNER = { id: 1039151, template: 'carousel', trackingCode: 'AF3219545', width: PARTNER_AD_SIZE.width, height: String(PARTNER_AD_SIZE.height), bordered: false, tsource: '' };
 
 export function partnerAdSlot(page) {
