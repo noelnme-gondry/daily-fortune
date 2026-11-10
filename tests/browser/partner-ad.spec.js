@@ -140,6 +140,9 @@ async function calculateResult(page, path, variant = 'A') {
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#tool + .partner-ad, #tojeong-tool + .partner-ad')).toHaveCount(1);
   await expect(page.locator('[data-share-page]')).toHaveCount(0);
+  if (/^\/(?:en\/)?saju-ranking\//.test(path)) {
+    await page.getByRole('button', { name: /^(내 순위 공개|Reveal my rank)$/ }).click();
+  }
   await expect(page.getByRole('button', { name: /^(링크 복사|Copy link)$/ })).toHaveCount(1);
 }
 

@@ -47,6 +47,12 @@ test('all English calculators render English results and keep internal links in 
   for (const path of paths) {
     await page.goto(`/en${path}`);
     await calculate(page);
+    if (path === '/saju-ranking/') {
+      await page.getByRole('button', { name: 'Reveal my rank' }).click();
+      await expect(page.locator('.rank-character')).toBeVisible();
+      await expect(page.locator('.rank-specialty')).toContainText('My specialty');
+      await expect(page.locator('.rank-plot-marker')).toBeVisible();
+    }
     expect((await page.locator('#result').textContent()).match(/[가-힣]+/g), path).toBeNull();
     const links = await page.locator('#result a[href^="/"]').evaluateAll((items) => items.map((item) => item.getAttribute('href')));
     expect(links.every((href) => href.startsWith('/en/')), path).toBe(true);

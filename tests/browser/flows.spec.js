@@ -424,8 +424,9 @@ test('개인 랭킹은 출생시간을 반영하고 명예의 전당 비교 점�
     await completeProfile(page);
     await page.locator('button[type="submit"]').click();
     const personal = sajuRank(buildChart({ ...input, ...time }), RANK_TABLE);
+    await page.getByRole('button', { name: '내 순위 공개' }).click();
     await expect(page.locator('.rank-head .rank-num')).toHaveText(`${personal.rank.toLocaleString('ko-KR')}위`);
-    await expect(page.locator('.rank-head ~ .box h3 .num')).toHaveText(String(personal.total));
+    await expect(page.locator('#rank-details .box h3 .num')).toHaveText(String(personal.total));
     await expect(page.locator('.rank-leaders > .hint')).toContainText('출생시간을 제외');
     for (const [category, rows] of Object.entries(LEADERS.three)) {
       await page.locator('[data-leader-category]').selectOption(category);
@@ -492,6 +493,7 @@ test('명예의 전당 20페이지는 100개를 중복 없이 보여주며 하�
 test('랭킹 날짜·년월일주·장단점과 감점별 개운 가이드가 실제 진입 경로에 연결된다', async ({ page }) => {
   await ready(page, '/saju-ranking/');
   await calculateExact(page);
+  await page.getByRole('button', { name: '내 순위 공개' }).click();
   const guidance = page.locator('.rank-guidance');
   await expect(guidance).toContainText('내게 복이 되는 습관');
   await expect(guidance.locator('.support-element')).toHaveCount(2);
