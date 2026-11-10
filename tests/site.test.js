@@ -50,15 +50,10 @@ test('새 브랜드가 홈·전체 페이지의 검색 정보·설치 이름에 
   assert.equal(head(home, /<title>(.*?)<\/title>/), HOME.title);
   assert.ok(home.includes(`<h1>${HOME.h1}</h1>`));
   for (const [path, html] of pages) {
-    const brand = withLanguage(path.startsWith('/en/') ? 'en' : 'ko', () => ({ name: BRAND.name, alt: BRAND.alt }));
-    assert.equal(head(html, /<meta property="og:site_name" content="(.*?)">/), brand.name, path);
+    const brand = withLanguage(path.startsWith('/en/') ? 'en' : 'ko', () => BRAND.name);
+    assert.equal(head(html, /<meta property="og:site_name" content="(.*?)">/), brand, path);
     // 한국어 하위 페이지 제목은 브랜드를 붙이지 않고, 영어 하위 페이지는 기존처럼 붙인다.
-    if (!['/', '/en/'].includes(path)) assert.equal(head(html, /<title>(.*?)<\/title>/).endsWith(` | ${brand.name}`), path.startsWith('/en/'), path);
-    const ld = JSON.parse(head(html, /<script type="application\/ld\+json">(.*?)<\/script>/s));
-    for (const node of ld['@graph'].filter((n) => ['WebSite', 'Organization'].includes(n['@type']))) {
-      assert.equal(node.name, brand.name, path);
-      assert.equal(node.alternateName, brand.alt, path);
-    }
+    if (!['/', '/en/'].includes(path)) assert.equal(head(html, /<title>(.*?)<\/title>/).endsWith(` | ${brand}`), path.startsWith('/en/'), path);
     assert.ok(html.includes(`src="${BRAND.logo}"`), path);
     assert.ok(!html.includes('오행 운세'), `${path}: 이전 브랜드명이 남아 있음`);
   }
@@ -67,6 +62,36 @@ test('새 브랜드가 홈·전체 페이지의 검색 정보·설치 이름에 
   assert.equal(manifest.short_name, BRAND.name);
   assert.ok(site.renderShare(null).includes(BRAND.name));
   assert.ok(!site.renderShare(null).includes('오행 운세'));
+});
+
+test('한국어와 영어 페이지는 같은 사이트와 발행자를 가리키고 각자의 페이지 주소를 유지한다', () => {
+  const websiteId = `${SITE}/#website`, publisherId = `${SITE}/#org`;
+  const koreanBrand = withLanguage('ko', () => BRAND.name);
+  const englishBrand = withLanguage('en', () => BRAND.name);
+  for (const [path, html] of pages) {
+    const nodes = JSON.parse(head(html, /<script type="application\/ld\+json">(.*?)<\/script>/s))['@graph'];
+    const webpage = nodes.find((node) => node['@id'] === `${SITE}${path}#webpage`);
+    assert.equal(webpage.url, `${SITE}${path}`, path);
+    assert.equal(webpage.inLanguage, path.startsWith('/en/') ? 'en' : 'ko-KR', path);
+    assert.equal(webpage.isPartOf['@id'], websiteId, path);
+    assert.equal(webpage.isPartOf.url, `${SITE}/`, path);
+    const org = nodes.find((node) => node['@type'] === 'Organization');
+    assert.equal(org['@id'], publisherId, path);
+    assert.equal(org.name, koreanBrand, path);
+    assert.ok(org.alternateName.includes(englishBrand), path);
+    const websites = nodes.filter((node) => node['@type'] === 'WebSite');
+    if (path === '/') {
+      assert.equal(websites.length, 1);
+      assert.equal(websites[0].url, `${SITE}/`);
+      assert.equal(websites[0].name, koreanBrand);
+      assert.ok(websites[0].alternateName.includes(englishBrand));
+      assert.equal(websites[0].publisher['@id'], publisherId);
+    } else assert.equal(websites.length, 0, path);
+    for (const node of nodes) {
+      if (node.publisher?.['@id']) assert.equal(node.publisher['@id'], publisherId, path);
+      if (node.mainEntityOfPage?.['@id']) assert.equal(node.mainEntityOfPage['@id'], webpage['@id'], path);
+    }
+  }
 });
 
 test('JSON-LD는 유효하고 이동 경로·FAQ가 화면과 일치한다', () => {
