@@ -84,6 +84,7 @@ export async function mount(root) {
   wireReadingExplorer(out);
   wireReadingPreferences(out);
   wireReadingNavigation(out);
+  rankTool?.wireRankReveal(out);
   let today = todayKST();
   const pair = mode === 'compatibility';
   const yr = +(root.dataset.year || today.y);
@@ -112,7 +113,7 @@ export async function mount(root) {
       const dateInputs = ['y', 'm', 'd'].map(id => $(`#${person}-${id}`, form));
       const emptyInputs = dateInputs.filter(input => !input.value);
       const input = readForm(form, person);
-      const invalid = emptyInputs.length ? emptyInputs : check({ ...input, noTime: true })
+      const invalid = dateInputs[0].validity.patternMismatch ? [dateInputs[0]] : emptyInputs.length ? emptyInputs : check({ ...input, noTime: true })
         ? dateInputs : !input.noTime && input.timeMode === 'exact' && !input.time ? [$(`#${person}-time`, form)] : dateInputs;
       for (const input of invalid) { input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-errormessage', el.id); }
       (invalid.find(input => !input.value) || invalid.at(-1)).focus();
@@ -160,7 +161,10 @@ export async function mount(root) {
     html += nextToolsHtml(mode, today);
     html += `<div class="result-actions"><button type="button" class="link-btn" data-edit-profile aria-controls="tool-form" aria-expanded="${!form.hidden}">${tr('입력 정보 수정·저장', 'Edit or save your details')}</button><span class="hint">${tr('이 기기에 저장하면 다음 방문에 바로 볼 수 있어요.', 'Save on this device for quicker access next time.')}</span></div>`;
     const share = shareFor(mode, res, ca, cb, today, yr);
-    if (share) html += resultShareHtml();
+    if (share) {
+      const shareHtml = resultShareHtml();
+      html += rankTool ? `<div class="rank-share" id="rank-share" data-rank-locked hidden>${shareHtml}</div>` : shareHtml;
+    }
     if (pair) html += compatTool.compatMatchesShell(ca, cb);
     stopMatches?.();
     const readingDate = isoDate(res?.date || today);

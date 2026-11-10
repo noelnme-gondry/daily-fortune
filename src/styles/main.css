@@ -186,7 +186,6 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .faq details { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 0 16px; }
 .faq summary { cursor: pointer; padding: 13px 0; font-weight: 600; list-style-position: outside; }
 .faq details p { padding: 0 0 14px; color: var(--ink); }
-.related h2 { font-size: 20px; margin-bottom: 12px; }
 .tti-traits { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
 .tti-traits .card { padding: 16px 18px; display: grid; gap: 8px; align-content: start; }
 .tti-traits h3 { font-size: 17px; }
@@ -779,20 +778,39 @@ select.input { padding-right: 4px; }
 .quest b { color: var(--seal); margin-right: 4px; }
 
 /* 사주 랭킹 */
-.rank-head { display: grid; gap: 22px; align-items: center; grid-template-columns: 110px minmax(0, 1fr); }
-.tier { width: 110px; height: 110px; border-radius: 22px; display: grid; place-items: center; align-content: center; gap: 0; background: var(--sunk); color: var(--ink); }
-.tier b { font: 700 46px/1 var(--f-display); }
-.tier span { font-size: 12px; color: var(--ink-2); }
-.tier-Sp, .tier-S { background: var(--seal); color: var(--on-seal); }
-.tier-Sp span, .tier-S span { color: var(--on-seal); }
-.tier-A { background: var(--accent); color: var(--on-accent); }
-.tier-A span { color: var(--on-accent); opacity: 0.85; }
-.tier-B { background: var(--accent-soft); color: var(--accent); }
-.rank-num { color: var(--accent); }
-.rank-head h2 small { font: 500 15px var(--f-body); color: var(--ink-2); }
-.pct-bar { position: relative; height: 14px; border-radius: 999px; background: var(--sunk); display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-.pct-bar i { position: absolute; top: -5px; width: 4px; height: 24px; border-radius: 2px; background: var(--seal); transform: translateX(-2px); }
-.pct-bar span { position: relative; top: 20px; font-size: 11.5px; color: var(--ink-2); }
+.rank-head { display: grid; gap: 18px; padding: clamp(16px, 3vw, 28px); }
+.rank-heading { display: grid; gap: 4px; }
+.rank-heading h2 { font-size: clamp(20px, 3vw, 27px); }
+.rank-eyebrow, .rank-intro, .rank-pool { color: var(--ink-2); font-size: 13px; }
+.rank-eyebrow { font-weight: 600; }
+.rank-identity { display: grid; grid-template-columns: clamp(72px, 16vw, 112px) minmax(0, 1fr); align-items: center; gap: 14px; }
+.rank-identity img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 9px; }
+.rank-tier { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 9px; color: var(--accent); font-size: 13px; font-weight: 600; }
+.rank-tier b { padding: 1px 7px; border-radius: 4px; background: var(--accent-soft); }
+.rank-num { width: fit-content; margin-top: 2px; color: var(--ink); font: 700 clamp(28px, 5vw, 42px)/1.15 var(--f-body); letter-spacing: -.035em; }
+.rank-pool { margin-top: 3px; }
+.rank-character { margin-top: 5px; font: 600 clamp(16px, 2.5vw, 20px)/1.4 var(--f-display); }
+.rank-specialty { margin-top: 3px; color: var(--ink-2); font-size: 13px; }
+.rank-specialty b { color: var(--ink); }
+.rank-distribution { margin: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.rank-distribution figcaption { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 3px 12px; font-size: 14px; }
+.rank-score-marker { color: var(--seal); font-size: 13px; font-weight: 600; }
+.rank-plot { position: relative; height: clamp(84px, 13vw, 128px); margin: 7px 10px 0; border-bottom: 1px solid var(--line); }
+.rank-plot svg { display: block; width: 100%; height: 100%; }
+.rank-plot-fill { fill: var(--accent-soft); }
+.rank-plot-curve { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+.rank-plot-marker { position: absolute; inset-block: var(--rank-y) 0; left: var(--rank-x); min-height: 1px; border-left: 1px dashed var(--seal); }
+.rank-plot-marker::before { content: ''; position: absolute; top: 0; left: -1px; width: 12px; height: 12px; border: 2px solid var(--paper); border-radius: 50%; background: var(--seal); transform: translate(-50%, -50%); }
+.rank-plot-scale { display: grid; grid-template-columns: repeat(4, 1fr) 0; margin: 5px 10px 0; color: var(--ink-2); font-size: 11px; }
+.rank-plot-scale span { width: max-content; transform: translateX(-50%); }
+.rank-plot-unit { text-align: center; }
+.rank-reveal-actions { display: flex; justify-content: center; }
+.rank-reveal-actions .btn { min-width: min(100%, 190px); }
+.rank-details, .rank-share { display: grid; grid-template-columns: minmax(0, 1fr); gap: inherit; }
+@media (prefers-reduced-motion: no-preference) {
+  .rank-identity:not([hidden]), .rank-plot-marker:not([hidden]) { animation: rank-reveal-in 420ms var(--motion-ease) both; }
+  @keyframes rank-reveal-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+}
 .sub-h { font: 600 14px/1.4 var(--f-body); margin: 6px 0 0; }
 .reasons { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .reasons li { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 10px; font-size: 14.5px; align-items: baseline; }

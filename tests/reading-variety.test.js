@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { buildChart, day, week, ttiDay, ttiYear, ttiMonths, addDays, ANIMAL } from '../src/engine/index.js';
 import { withLanguage } from '../src/i18n/runtime.js';
-import { dayChangeText, readingAction, readingHeadlines, weekRhythm } from '../src/domain/reading.js';
+import { dayChangeText, readingAction, readingHeadlines, weekRhythm, zodiacElementText } from '../src/domain/reading.js';
 import { READING_ACTIONS } from '../src/content/reading-actions.js';
 import { parseShare } from '../src/site/pages/share.js';
 
@@ -41,13 +41,30 @@ test('주간 해설은 주별 실제 요일 흐름을 담고 제목이 같은 �
   for (let i = 0; i < 7; i++) assert.ok(new Set(rows.map((r) => r.cats[i].text)).size >= 11);
 });
 
-test('같은 날짜의 띠 해설은 띠 이름을 빼도 문단 전체가 중복되지 않는다', () => {
+test('한영 일간 366일에서 같은 날짜의 12띠 해설에 완전히 같은 문장이 없다', () => {
   const names = new RegExp(`${ANIMAL.join('|')}띠`, 'g');
-  for (let d = 0; d < 60; d++) {
-    const o = addDays(START, d);
-    const texts = Array.from({ length: 12 }, (_, t) => ttiDay(t, o).text.replace(names, '띠'));
-    assert.equal(new Set(texts).size, 12, JSON.stringify(o));
-  }
+  for (const lang of ['ko', 'en']) withLanguage(lang, () => {
+    for (let d = 0; d < 366; d++) {
+      const date = addDays(START, d);
+      const sentences = new Set();
+      for (let t = 0; t < 12; t++) {
+        const reading = ttiDay(t, date);
+        const text = reading.text.replace(names, '띠');
+        for (const sentence of text.split(/(?<=[.!?])\s+/)) {
+          if (sentence.length < 15) continue;
+          assert.ok(!sentences.has(sentence), `${lang} ${JSON.stringify(date)}: ${sentence}`);
+          sentences.add(sentence);
+        }
+      }
+    }
+  });
+});
+
+test('띠별 근거의 천간 오행 문구는 마지막 낱말의 받침에 맞춰 조사를 붙인다', () => {
+  assert.match(zodiacElementText(0, 2), /비용·관리를/);
+  assert.match(zodiacElementText(0, 3), /책임·절차를/);
+  assert.match(zodiacElementText(0, 1), /표현·실행을/);
+  assert.doesNotMatch(withLanguage('en', () => zodiacElementText(0, 2)), /[가-힣]/);
 });
 
 test('같은 일진이 60일 뒤 돌아와도 띠별 활용 예시가 그대로 반복되지 않는다', () => {

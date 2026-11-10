@@ -17,6 +17,7 @@ import { playExample } from '../play-examples.js';
 import { yearGuide } from '../year-guide.js';
 import { nextTools } from '../tool-navigation.js';
 import { dayBox, weekBox, monthBox } from '../period-boxes.js';
+import { PERIOD_SCORE_LIMITS } from '../../engine/fortune.js';
 import { guideLinks, periodExample } from './guides.js';
 
 const BAND = (s) => (s >= 75 ? ['high', siteText('대길')] : s >= 60 ? ['good', siteText('길')] : s >= 45 ? ['mid', siteText('평')] : ['low', siteText('주의')]);
@@ -30,8 +31,8 @@ export function toolBlock(mode, ctx, extra = {}) {
   const data = `data-tool="${mode}" data-date="${ctx.todayISO}"${extra.year ? ` data-year="${extra.year}"` : ''}`;
   const label = { today: siteText('오늘의 운세 보기'), tomorrow: siteText('내일의 운세 보기'), week: siteText('이번 주 운세 보기'), month: siteText('이달의 운세 보기'), year: `${extra.year}${siteText("년 운세 보기")}`, lifetime: siteText('평생 운세 보기'), compatibility: siteText('궁합 보기'), manseryeok: siteText('사주 원국 계산'), story: siteText('내 인생 캐릭터 보기'), rank: siteText('내 사주 순위 보기'), home: siteText('오늘의 운세 보기') }[mode];
   const form = pair
-    ? `<form class="pform card pair-form" id="tool-form" novalidate><h2 class="form-title">${siteText("두 사람의 사주 입력")}</h2><div class="pair-grid">${personFields('a', ctx, siteText('나'))}${personFields('b', ctx, siteText('상대'))}</div><div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT()}</form>`
-    : `<form class="pform card" id="tool-form" novalidate><h2 class="form-title">${siteText("내 사주 입력")}</h2>${personFields('a', ctx)}<div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT()}${mode === 'home' ? `<a class="note" href="/today/#public-example">${tr('입력 전에 결과 예시와 읽는 법 보기', 'See a worked example before entering your details')}</a>` : ''}</form>`;
+    ? `<form class="pform card pair-form" id="tool-form" novalidate><h2 class="form-title">${siteText("두 사람의 사주 입력")}</h2><div class="pair-grid">${personFields('a', siteText('나'))}${personFields('b', siteText('상대'))}</div><div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT()}</form>`
+    : `<form class="pform card" id="tool-form" novalidate><h2 class="form-title">${siteText("내 사주 입력")}</h2>${personFields('a')}<div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT()}${mode === 'home' ? `<a class="note" href="/today/#public-example">${tr('입력 전에 결과 예시와 읽는 법 보기', 'See a worked example before entering your details')}</a>` : ''}</form>`;
   const empty = `<div class="result" id="result" aria-live="polite">${mode === 'home' ? '' : siteText('<div class="result-empty card"><p><b>생년월일시를 입력하면 결과가 여기에 나타납니다.</b></p><p class="muted">이 기기에 저장을 선택하면 다음 방문에도 입력 정보를 불러올 수 있습니다.</p><noscript><p>운세 계산은 브라우저에서 이루어지므로 자바스크립트를 켜 주세요.</p></noscript></div>')}</div>`;
   const saved = mode === 'home' ? `<section class="saved-entry card" data-saved-entry hidden><div><h2>${tr('오늘은 어떤 하루일까요?', 'What does today hold?')}</h2><p class="hint" data-saved-summary></p></div><button class="btn" type="button" data-saved-result>${tr('저장한 정보로 오늘 운세 보기', 'See today with saved details')}</button><button class="link-btn" type="button" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('정보 수정·저장 관리', 'Edit details & storage')}</button></section>` : '';
   return `<section class="tool ${pair ? 'tool-pair' : ''} ${mode === 'home' ? 'tool-home' : ''}" id="tool" ${data} aria-label="${siteText("운세 계산기")}">${saved}${form}${empty}</section>`;
@@ -50,7 +51,14 @@ function hero(h1, lead, eyebrow) {
   return `<header class="page-hero">${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}<h1>${esc(h1)}</h1><p class="lead">${esc(lead)}</p></header>`;
 }
 const HOW = {
-  today: [siteText('오늘의 일진 천간·지지가 일간에게 어떤 십신인지 계산합니다.'), siteText('일진 지지가 원국의 년지·월지·일지·시지와 합·충·형·원진을 이루는지 봅니다.'), siteText('일진 오행이 용신·희신인지 기신인지에 따라 전체 흐름을 가감합니다.'), siteText('일진 70% · 월운 20% · 세운 10%를 합쳐 0~100점으로 환산합니다.')],
+  get today() {
+    return [
+      siteText('오늘의 일진 천간·지지가 일간에게 어떤 십신인지 계산합니다.'),
+      siteText('일진 지지가 원국의 년지·월지·일지·시지와 합·충·형·원진을 이루는지 봅니다.'),
+      siteText('일진 오행이 용신·희신인지 기신인지에 따라 전체 흐름을 가감합니다.'),
+      tr(`일진 70% · 월운 20% · 세운 10%를 합산해 점수로 환산하고, 표시 점수는 ${PERIOD_SCORE_LIMITS.join('~')}점으로 제한합니다.`, `Combine the day cycle (70%), month cycle (20%) and year cycle (10%), then convert and limit the displayed score to ${PERIOD_SCORE_LIMITS.join('–')}.`),
+    ];
+  },
   tomorrow: [siteText('내일 날짜의 일진으로 오늘의 운세와 같은 규칙을 적용합니다.'), siteText('십신·합충형·12운성·신살·용신 여부를 분야별 가중치로 더합니다.'), siteText('일진 70% · 월운 20% · 세운 10% 비중으로 점수를 냅니다.')],
   week: [siteText('월요일부터 일요일까지 날마다 일진 점수를 계산합니다.'), siteText('일곱 날의 요인을 평균해 주간 분야별 점수를 냅니다.'), siteText('분야마다 점수가 가장 높은 요일을 골라 보여 줍니다.')],
   month: [siteText('그 달 15일의 절기 월주를 대표 월운으로 씁니다.'), siteText('월운 60% · 그달 모든 일진 평균 25% · 세운 15%로 합칩니다.'), siteText('날짜별 종합 점수로 좋은 날 4개와 조심할 날 3개를 고릅니다.')],
@@ -65,11 +73,11 @@ function howBlock(mode) {
   return `<section class="prose how"><h2>${siteText("이렇게 계산합니다")}</h2><ol>${HOW[mode].map((t) => `<li>${esc(siteText(t))}</li>`).join('')}</ol><p><a href="/about/">${siteText("계산 규칙 전체 보기")}</a></p></section>`;
 }
 function related(items) {
-  return `<section class="related"><h2>${siteText("함께 보면 좋은 운세")}</h2><div class="cards">${items.map(([href, t, d]) => `<a class="card link-card" href="${href}"><b>${esc(t)}</b><span>${esc(d)}</span></a>`).join('')}</div></section>`;
+  return `<div class="cards">${items.map((tool) => `<a class="card link-card" href="${tool.path}"><b>${esc(tool.nav)}</b><span>${esc(tool.desc)}</span></a>`).join('')}</div>`;
 }
 function relatedFor(path, ctx) {
   const mode = path.startsWith('/year/') ? 'year' : Object.keys(TOOLS).find(key => TOOLS[key].path === path);
-  return related(nextTools(mode, ctx.today).map(t => [t.path, t.nav, t.h1]));
+  return related(nextTools(mode, ctx.today));
 }
 
 function webApp(tool, ctx) {
@@ -85,7 +93,7 @@ function toolPage(key, ctx, opts = {}) {
     path: t.path, title: t.title, description: t.desc, crumbs: opts.crumbs || [[t.nav, t.path]], section: t.path,
     tool: true, share: false, ld: [webApp(t, ctx), faqLd(faq)],
     supplement: `${opts.example || ''}${opts.guide || ''}${guideLinks()}${adSlot(ctx, 'inline')}`,
-    body: `${hero(t.h1, t.lead, FREE_ACCESS.summary)}${top}${opts.example ? `<p class="note"><a href="#public-example">${tr('결과 예시와 읽는 법', 'See a worked example and reading guide')}</a></p>` : ''}${toolBlock(mode, ctx, opts)}<div class="info-panels">${disclosure('tool-method', siteText('계산 방법과 점수 기준'), howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', siteText('관련 운세와 더 알아보기'), extraAfter) : ''}${disclosure('tool-faq', siteText('자주 묻는 질문'), faqBlock(faq), 'help')}${disclosure('tool-related', siteText('다른 운세 둘러보기'), relatedFor(t.path, ctx))}</div>`,
+    body: `${hero(t.h1, t.lead, FREE_ACCESS.summary)}${top}${opts.example ? `<p class="note"><a href="#public-example">${tr('결과 예시와 읽는 법', 'See a worked example and reading guide')}</a></p>` : ''}${toolBlock(mode, ctx, opts)}<div class="info-panels">${disclosure('tool-method', siteText('계산 방법과 점수 기준'), howBlock(mode === 'year' ? 'year' : mode))}${extraAfter ? disclosure('tool-more', siteText('관련 운세와 더 알아보기'), extraAfter) : ''}${disclosure('tool-faq', siteText('자주 묻는 질문'), faqBlock(faq, null), 'help')}${disclosure('tool-related', siteText('다른 운세 둘러보기'), relatedFor(t.path, ctx))}</div>`,
   };
 }
 

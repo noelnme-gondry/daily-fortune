@@ -5,7 +5,8 @@ test.beforeEach(async ({ context }) => { await context.route('https://**/*', rou
 const ready = async (page, path = '/today/') => { await page.goto(path); await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true'); };
 const fill = async (page, prefix = 'a', name = '나', year = '1990') => {
   await page.locator(`#${prefix}-name`).fill(name);
-  for (const [key, value] of [['y', year], ['m', '5'], ['d', '15']]) await page.locator(`#${prefix}-${key}`).selectOption(value);
+  await page.locator(`#${prefix}-y`).fill(year);
+  for (const [key, value] of [['m', '5'], ['d', '15']]) await page.locator(`#${prefix}-${key}`).selectOption(value);
   await page.locator(`#${prefix}-time`).fill('12:00');
 };
 const people = page => page.evaluate(async () => (await import('/src/client/profile.js')).listPeople());
@@ -53,7 +54,7 @@ test('관리 메뉴에서 추가·수정·선택·삭제하고 현재 결과와 
   await expect(page.locator('#a-notime')).toBeChecked();
   await expect(page.locator('#result .chart-head')).toContainText('가족');
   await open(page); await page.locator('[data-edit-person]').click();
-  await page.locator('#person-name').fill('가족 수정'); await page.locator('#person-y').selectOption('1988');
+  await page.locator('#person-name').fill('가족 수정'); await page.locator('#person-y').fill('1988');
   await page.locator('#person-editor [type=submit]').click();
   await expect(page.locator('.profile-list')).toContainText('가족 수정');
   await page.locator('#profile-manager [data-close-dialog]').click();

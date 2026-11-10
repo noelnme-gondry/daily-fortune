@@ -14,7 +14,8 @@ async function ready(page, path) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
 }
 async function fill(page, birth = input) {
-  for (const key of ['y', 'm', 'd']) await page.locator(`#a-${key}`).selectOption(String(birth[key]));
+  await page.locator(`#a-y`).fill(String(birth.y));
+  for (const key of ['m', 'd']) await page.locator(`#a-${key}`).selectOption(String(birth[key]));
   await page.locator(`[name="a-gender"][value="${birth.gender}"]`).check();
   await page.locator('#a-notime').uncheck();
   await page.locator('#a-time').fill(birth.time);

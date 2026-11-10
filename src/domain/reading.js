@@ -1,9 +1,10 @@
-import { hash, toUTC, DAY_MS } from '../engine/core.js';
+import { hash, toUTC, DAY_MS, josa } from '../engine/core.js';
 import { tr } from '../i18n/runtime.js';
 import { READING_ACTIONS, SHORT_READING_LABELS, ZODIAC_RELATION, ELEMENT_THEME } from '../content/reading-actions.js';
 import { READING_HEADLINES } from '../content/reading-headlines.js';
 import { LEGACY_READING_LABELS, LEGACY_READING_HEADLINES } from '../content/reading-share-legacy.js';
 import { zodiacOutlook } from './zodiac-outlook.js';
+import { ZODIAC_DAY_SCENES, ZODIAC_DAY_TOPICS } from '../content/zodiac-day-scenes.js';
 
 const localized = (pair) => tr(...pair);
 const FACTOR_THEME = {
@@ -97,7 +98,20 @@ export function zodiacElementText(e, es) {
   const branch = localized(ELEMENT_THEME[e]), stem = localized(ELEMENT_THEME[es]);
   return e === es
     ? tr(`천간과 지지의 오행은 모두 ${branch}에 초점을 둡니다.`, `Both stem and branch elements emphasize ${branch}.`)
-    : tr(`지지의 오행은 ${branch}, 천간의 오행은 ${stem}을 함께 살피게 합니다.`, `The branch element emphasizes ${branch}, alongside ${stem} from the stem element.`);
+    : tr(`지지의 오행은 ${branch}, 천간의 오행은 ${josa(stem, "을/를")} 함께 살피게 합니다.`, `The branch element emphasizes ${branch}, alongside ${stem} from the stem element.`);
+}
+
+export function zodiacDayReading(focus, score, cycle, offset) {
+  const scenes = ZODIAC_DAY_SCENES[focus];
+  // 같은 일진이 60일 뒤 돌아올 때에도 같은 장면으로 돌아가지 않게 한 칸 더 옮긴다.
+  const position = cycle + Math.floor(cycle / 60) + offset;
+  const scene = scenes[((position % scenes.length) + scenes.length) % scenes.length];
+  const [headlines, favorable, careful, action, watch] = scene;
+  const turn = Math.floor(position / scenes.length);
+  const headline = localized(headlines[((turn % headlines.length) + headlines.length) % headlines.length]);
+  const outlook = `${localized(ZODIAC_DAY_TOPICS[focus])} · ${localized(score >= 60 ? favorable : careful)}`;
+  const advice = localized(action), caution = localized(watch);
+  return { headline, outlook, advice, caution, text: `${outlook} ${advice} ${caution}` };
 }
 
 export function zodiacReading({ rel, e, es, score, cycle, offset = 0, headlineOffset = 0, identity = '' }) {

@@ -13,7 +13,11 @@ async function birth(page, prefix, date, calendar = 'solar') {
   const form = prefix === 'tj' ? page.locator('#tojeong-tool form') : page.locator('#tool-form');
   if (prefix !== 'tj') await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await form.locator(`input[name="${prefix}-${prefix === 'tj' ? 'calendar' : 'cal'}"][value="${calendar}"]`).check();
-  for (const [key, value] of Object.entries(date)) await page.locator(`#${prefix}-${key}`).selectOption(String(value));
+  for (const [key, value] of Object.entries(date)) {
+    const field = page.locator(`#${prefix}-${key}`);
+    if (key === 'y' && prefix !== 'tj') await field.fill(String(value));
+    else await field.selectOption(String(value));
+  }
   if (prefix !== 'tj') await page.locator(`#${prefix}-notime`).check();
   return form;
 }
@@ -36,6 +40,27 @@ for (const lang of ['', '/en']) {
     await form.locator('[type="submit"]').click();
     await expect(page.locator('#result .ring')).toBeVisible();
     await expect(page.locator('#tool-form-error')).toBeHidden();
+  });
+
+  test(`${lang || 'ko'}: 모바일 연도 직접 입력은 네 자리 오류를 안내하고 정상 생일 계산으로 복구한다`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 900 });
+    await page.goto(`${lang}/today/`);
+    const form = await birth(page, 'a', { m: 5, d: 15 });
+    const year = form.getByRole('textbox', { name: lang ? 'Birth year' : '태어난 해' });
+    await expect(year).toHaveValue('');
+    await expect(year).toHaveAttribute('inputmode', 'numeric');
+    await year.fill('199');
+    await form.locator('[type="submit"]').click();
+    await expect(page.locator('#tool-form-error')).toContainText(lang ? 'four digits' : '숫자 네 자리');
+    await expect(year).toBeFocused();
+    await expect(year).toHaveAttribute('aria-invalid', 'true');
+    await year.fill('1970');
+    await expect(year).toBeFocused();
+    await form.locator('[type="submit"]').click();
+    await expect(page.locator('#result .ring')).toBeVisible();
+    await expect(page.locator('#tool-form-error')).toBeHidden();
+    await expect(year).not.toHaveAttribute('aria-invalid', 'true');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   });
 
   test(`${lang || 'ko'}: 토정비결도 미래 생일을 계산 성공으로 집계하지 않는다`, async ({ page }) => {

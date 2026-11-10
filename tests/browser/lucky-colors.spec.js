@@ -33,7 +33,8 @@ test.beforeEach(async ({ context, page }) => {
 async function calculate(page, path, profile = input) {
   await page.goto(path);
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
-  for (const field of ['y', 'm', 'd']) await page.locator(`#a-${field}`).selectOption(String(profile[field]));
+  await page.locator(`#a-y`).fill(String(profile.y));
+  for (const field of ['m', 'd']) await page.locator(`#a-${field}`).selectOption(String(profile[field]));
   await page.locator(`[name="a-gender"][value="${profile.gender}"]`).check();
   await page.locator('#a-notime').uncheck();
   await page.locator('#a-time').fill(profile.time);

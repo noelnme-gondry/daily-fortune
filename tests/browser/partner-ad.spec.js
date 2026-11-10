@@ -140,6 +140,9 @@ async function calculateResult(page, path, variant = 'A') {
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#tool + .partner-ad, #tojeong-tool + .partner-ad')).toHaveCount(1);
   await expect(page.locator('[data-share-page]')).toHaveCount(0);
+  if (/^\/(?:en\/)?saju-ranking\//.test(path)) {
+    await page.getByRole('button', { name: /^(내 순위 공개|Reveal my rank)$/ }).click();
+  }
   await expect(page.getByRole('button', { name: /^(링크 복사|Copy link)$/ })).toHaveCount(1);
 }
 
@@ -586,7 +589,7 @@ test('광고 로드 실패·GA 미설정에서도 운세를 계산하고 공유�
   await expect.poll(async () => (await slotEvents(page, 'lucky')).length).toBe(1);
   await page.evaluate(() => { delete window.gtag; });
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
-  await page.locator('#a-y').selectOption('1993');
+  await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
   await page.locator('#a-notime').check();

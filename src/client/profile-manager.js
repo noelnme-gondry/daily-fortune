@@ -2,7 +2,7 @@ import { tr, isEnglish } from '../i18n/runtime.js';
 import { esc } from '../site/util.js';
 import { languagePath } from '../site/locale.js';
 import { personFields } from '../site/birth-form.js';
-import { todayKST, buildChart } from '../engine/index.js';
+import { buildChart } from '../engine/index.js';
 import { wireBirthForm, fillForm, readForm, check, syncTime } from './birth-form.js';
 import { listPeople, savePerson, deletePerson, selectPerson, profileLabel, toEngine } from './profile.js';
 import { showProfileGuide } from './profile-navigation.js';
@@ -23,7 +23,7 @@ export async function openProfiles(opener) {
   }
   function edit(person) {
     feedback.textContent = '';
-    content.innerHTML = `<form id="person-editor" class="pform" novalidate><h3>${person ? tr('저장 정보 수정', 'Edit saved details') : tr('새로운 사람', 'New person')}</h3>${personFields('person', { today: todayKST() })}<p class="form-error" data-person-error role="alert" hidden></p><div class="profile-editor-actions"><button class="btn" type="submit">${tr('저장', 'Save')}</button><button class="sbtn" type="button" data-cancel-edit>${tr('취소', 'Cancel')}</button></div><p class="hint">${tr('저장을 누르면 표시 이름과 출생 정보를 이 기기에 보관합니다.', 'Save keeps this display name and birth details on this device.')}</p></form>`;
+    content.innerHTML = `<form id="person-editor" class="pform" novalidate><h3>${person ? tr('저장 정보 수정', 'Edit saved details') : tr('새로운 사람', 'New person')}</h3>${personFields('person')}<p class="form-error" data-person-error role="alert" hidden></p><div class="profile-editor-actions"><button class="btn" type="submit">${tr('저장', 'Save')}</button><button class="sbtn" type="button" data-cancel-edit>${tr('취소', 'Cancel')}</button></div><p class="hint">${tr('저장을 누르면 표시 이름과 출생 정보를 이 기기에 보관합니다.', 'Save keeps this display name and birth details on this device.')}</p></form>`;
     const form = content.querySelector('form');
     wireBirthForm(form, ['person']);
     if (person) fillForm(form, 'person', person.profile); else syncTime(form, 'person');

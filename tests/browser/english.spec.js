@@ -9,7 +9,7 @@ test.beforeEach(async ({ context }) => { await context.route('https://**/*', (ro
 async function calculate(page) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').fill('Alex');
-  await page.locator('#a-y').selectOption('1993');
+  await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
   await page.locator('#a-time').fill('03:40');
@@ -47,6 +47,12 @@ test('all English calculators render English results and keep internal links in 
   for (const path of paths) {
     await page.goto(`/en${path}`);
     await calculate(page);
+    if (path === '/saju-ranking/') {
+      await page.getByRole('button', { name: 'Reveal my rank' }).click();
+      await expect(page.locator('.rank-character')).toBeVisible();
+      await expect(page.locator('.rank-specialty')).toContainText('My specialty');
+      await expect(page.locator('.rank-plot-marker')).toBeVisible();
+    }
     expect((await page.locator('#result').textContent()).match(/[가-힣]+/g), path).toBeNull();
     const links = await page.locator('#result a[href^="/"]').evaluateAll((items) => items.map((item) => item.getAttribute('href')));
     expect(links.every((href) => href.startsWith('/en/')), path).toBe(true);

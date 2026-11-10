@@ -1,6 +1,7 @@
 // 사이트 렌더러: 경로 → HTML. 빌드(정적 생성), 개발 서버, 운영 서버가 모두 이 모듈을 쓴다.
 import { todayKST, isoDate, ANIMAL_SLUG, STEM_SLUG, TG_SLUG, EL_SLUG, sexagenary, iljuSlug, pillarKo, pillarH, pillarLabel, yearPillar, ANIMAL } from '../engine/index.js';
 import { SINSAL, ILJU_TAG, SIPSIN, GLOSSARY } from '../content/knowledge.js';
+import { PERIOD_SCORE_LIMITS } from '../engine/fortune.js';
 import T from '../content/text.js';
 import { SITE, TOOLS, ABOUT, TTI_COPY, FREE_ACCESS } from '../content/pages.js';
 import { TOJEONG } from '../content/tojeong.js';
@@ -168,7 +169,7 @@ function llmsTxt(ctx, routes, page) {
 
 > ${SITE.description}
 
-${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일시와 성별로 사주 원국(년주·월주·일주·시주)을 세우고, 기간의 간지(일진·월운·세운·대운)가 원국과 맺는 십신·합충형·12운성·신살·용신 관계를 0~100점 점수와 해설로 바꿉니다. 같은 입력이면 항상 같은 결과가 나오며(난수 미사용), 계산은 사용자의 브라우저에서 이루어집니다. 계산 규칙은 ${site}/about/ 에 공개되어 있습니다.
+${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일시와 성별로 사주 원국(년주·월주·일주·시주)을 세우고, 기간의 간지(일진·월운·세운·대운)가 원국과 맺는 십신·합충형·12운성·신살·용신 관계를 점수와 해설로 바꿉니다. 기간 운세의 표시 점수는 ${PERIOD_SCORE_LIMITS.join('~')}점으로 제한합니다. 입력과 보는 날짜가 같으면 결과도 같으며, 계산은 사용자의 브라우저에서 이루어집니다. 계산 규칙은 ${site}/about/ 에 공개되어 있습니다.
 
 주요 사실:
 - 영어판 K-Fortune: ${site}/en/ — 동일한 기능·계산으로 영어 화면과 결과 해설을 제공합니다. 브라우저 기본 언어가 한국어가 아니면 영어판으로 연결되며, 직접 선택한 언어를 우선합니다.

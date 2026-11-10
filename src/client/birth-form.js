@@ -10,7 +10,7 @@ export function syncTime(form, who, want) {
   if (!f('branch')) return;
   const mode = $(`input[name="${who}-tmode"]:checked`, form).value;
   const noTime = f('notime').checked;
-  const { off, note } = f('y').value && f('m').value && f('d').value
+  const { off, note } = f('y').validity.valid && f('m').value && f('d').value
     ? birthTimesFor({ calendar: $(`input[name="${who}-cal"]:checked`, form).value, leap: f('leap').checked, y: +f('y').value, m: +f('m').value, d: +f('d').value })
     : { off: 540, note: '' };
   const opts = birthTimeOptions(off);
@@ -32,7 +32,7 @@ export function fillForm(form, who, p) {
   f('name').value = p.name || '';
   const g = $(`input[name="${who}-gender"][value="${p.gender}"]`, form); if (g) g.checked = true;
   const c = $(`input[name="${who}-cal"][value="${p.calendar}"]`, form); if (c) c.checked = true;
-  if ([...f('y').options].some((o) => +o.value === p.y)) f('y').value = String(p.y);
+  f('y').value = p.y ? String(p.y) : '';
   f('m').value = String(p.m); f('d').value = String(p.d);
   f('leap').checked = !!p.leap; f('leap').disabled = p.calendar !== 'lunar';
   const branch = p.timeMode === 'branch';
@@ -49,7 +49,7 @@ export function readForm(form, who) {
     gender: $(`input[name="${who}-gender"]:checked`, form).value,
     calendar: $(`input[name="${who}-cal"]:checked`, form).value,
     leap: f('leap').checked,
-    y: +f('y').value, m: +f('m').value, d: +f('d').value,
+    y: f('y').validity.patternMismatch ? NaN : +f('y').value, m: +f('m').value, d: +f('d').value,
     timeMode: mode,
     time: mode === 'exact' ? f('time').value : null,
     timeBranch: mode === 'branch' ? f('branch').value : null,

@@ -65,6 +65,24 @@ for (const lang of ['ko', 'en']) {
     if (prefix) for (const body of [html, scores, zodiac, hub]) assert.doesNotMatch(body, /[가-힣]/);
   });
 
+  test(`${lang}: 오늘 계산 안내와 관련 카드, 문의 본문을 중복 없이 표시한다`, () => {
+    const today = main(site.render(`${prefix}/today/`));
+    const about = main(site.render(`${prefix}/about/`));
+    const contact = main(site.render(`${prefix}/contact/`));
+    assert.match(today, /id="a-y" inputmode="numeric"/);
+    assert.match(today, prefix ? /8–99/ : /8~99점/);
+    assert.match(about, prefix ? /8–99/ : /8~99점/);
+    const faqTitle = prefix ? 'Frequently asked questions' : '자주 묻는 질문';
+    assert.equal(today.split(faqTitle).length - 1, 1);
+    const related = today.match(/id="tool-related"[^>]*>([\s\S]*?)<\/section>/)[1];
+    assert.doesNotMatch(related, /<h2/);
+    const cards = [...related.matchAll(/<b>([^<]+)<\/b><span>([^<]+)<\/span>/g)];
+    assert.equal(cards.length, 3);
+    assert.ok(cards.every(([, title, description]) => title !== description && description.length > title.length));
+    assert.doesNotMatch(contact, new RegExp(`href="${prefix}/contact/"`));
+    assert.match(contact, prefix ? /K-Fortune/ : /make your own day/);
+  });
+
   test(`${lang}: 대표 URL의 검색 메타·canonical·hreflang·H1과 편집한 가이드 수정일을 확인한다`, () => {
     for (const path of ['/', '/today/', '/tti/today/']) {
       const html = site.render(`${prefix}${path}`);
