@@ -5,10 +5,14 @@ import { esc, attr, abs } from './util.js';
 import { uiIcon } from './icons.js';
 import { ttiNav } from './tti-nav.js';
 import { partnerAdSlot } from './partner-ad.js';
-import { tr } from '../i18n/runtime.js';
+import { tr, withLanguage } from '../i18n/runtime.js';
 import { languagePath, localizedLinks, localizedHref } from './locale.js';
 import { allowsAds } from './ad-policy.js';
 import { PUBLISHER } from '../content/publisher.js';
+
+const koreanBrand = withLanguage('ko', () => ({ name: BRAND.name, alt: BRAND.alt, description: SITE.description }));
+const englishBrand = withLanguage('en', () => ({ name: BRAND.name, alt: BRAND.alt }));
+const siteNames = { name: koreanBrand.name, alternateName: [koreanBrand.alt, englishBrand.name, englishBrand.alt] };
 
 const labels = {
   '오늘의 운세': 'Today', '내일 운세': 'Tomorrow', '내일의 운세': 'Tomorrow',
@@ -59,14 +63,18 @@ function crumbsHtml(crumbs) {
 
 export function graph(page, ctx) {
   const url = abs(ctx, page.canonicalPath || page.path);
-  const org = { '@type': 'Organization', '@id': `${ctx.site}/#org`, name: BRAND.name, alternateName: BRAND.alt, url: `${ctx.site}/`, parentOrganization: { '@type': 'Organization', name: PUBLISHER.name }, contactPoint: { '@type': 'ContactPoint', email: PUBLISHER.email, contactType: 'customer support', url: `${ctx.site}/contact/` }, logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png?v=sun`, width: 512, height: 512 } };
+  const root = `${ctx.site}/`;
+  const orgId = `${root}#org`;
+  const websiteId = `${root}#website`;
+  const org = { '@type': 'Organization', '@id': orgId, ...siteNames, url: root, parentOrganization: { '@type': 'Organization', name: PUBLISHER.name }, contactPoint: { '@type': 'ContactPoint', email: PUBLISHER.email, contactType: 'customer support', url: `${root}contact/` }, logo: { '@type': 'ImageObject', url: `${root}icon-512.png?v=sun`, width: 512, height: 512 } };
   const nodes = [org];
-  if (page.path === '/') {
-    nodes.push({ '@type': 'WebSite', '@id': `${ctx.site}/#website`, url: `${ctx.site}/`, name: BRAND.name, alternateName: BRAND.alt, description: SITE.description, inLanguage: tr('ko-KR', 'en'), isAccessibleForFree: true, publisher: { '@id': `${ctx.site}/#org` } });
+  // /en/은 별도 웹사이트가 아니라 같은 사이트의 영어 홈페이지다.
+  if (page.path === '/' && ctx.lang !== 'en') {
+    nodes.push({ '@type': 'WebSite', '@id': websiteId, url: root, ...siteNames, description: koreanBrand.description, inLanguage: ['ko-KR', 'en'], isAccessibleForFree: true, publisher: { '@id': orgId } });
   }
   const webpage = {
     '@type': page.pageType || 'WebPage', '@id': `${url}#webpage`, url, name: page.title, description: page.description, inLanguage: tr('ko-KR', 'en'),
-    isPartOf: { '@type': 'WebSite', '@id': `${ctx.site}/#website`, name: BRAND.name, url: `${ctx.site}/` },
+    isPartOf: { '@type': 'WebSite', '@id': websiteId, name: siteNames.name, url: root },
     dateModified: page.modified || ctx.buildDate, isAccessibleForFree: true,
   };
   if (page.crumbs && page.crumbs.length) {
@@ -75,15 +83,16 @@ export function graph(page, ctx) {
     nodes.push({ '@type': 'BreadcrumbList', '@id': `${url}#breadcrumb`, itemListElement: all.map(([n, p], i) => ({ '@type': 'ListItem', position: i + 1, name: n, item: abs(ctx, p) })) });
   }
   nodes.push(webpage);
-  for (const n of page.ld || []) if (n) nodes.push(n);
   const localize = (value, key) => {
     if (Array.isArray(value)) return value.map((item) => localize(item));
     if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, localize(item, key)]));
     if (ctx.lang === 'en' && key === 'inLanguage') return 'en';
+    if (value === orgId || value === websiteId) return value;
     if (typeof value === 'string' && value.startsWith(`${ctx.site}/`)) return `${ctx.site}${localizedHref(value.slice(ctx.site.length), ctx)}`;
     return value;
   };
-  return localize({ '@context': 'https://schema.org', '@graph': nodes });
+  for (const n of page.ld || []) if (n) nodes.push(ctx.lang === 'en' ? localize(n) : n);
+  return { '@context': 'https://schema.org', '@graph': nodes };
 }
 
 function gaSnippet(id, page) {
