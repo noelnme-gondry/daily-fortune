@@ -96,7 +96,8 @@ export function combine(parts) {
 }
 
 const sumMap = (m) => { let s = 0; m.forEach((v) => { s += v; }); return s; };
-const scoreOf = (raw, [mean, width]) => clamp(Math.round(60 + 40 * Math.tanh((raw - mean) / width)), 8, 99);
+export const PERIOD_SCORE_LIMITS = Object.freeze([8, 99]);
+const scoreOf = (raw, [mean, width]) => clamp(Math.round(60 + 40 * Math.tanh((raw - mean) / width)), ...PERIOD_SCORE_LIMITS);
 export function scoresOf(comb, kind) {
   const raws = comb.acc.map(sumMap);
   const cats = raws.map((r) => scoreOf(r, CAL[kind].cat));

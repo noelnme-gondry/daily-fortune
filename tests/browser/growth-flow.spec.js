@@ -12,7 +12,7 @@ async function ready(page, path = '/today/') {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
 }
 async function fill(page) {
-  await page.locator('#a-y').selectOption('1990');
+  await page.locator('#a-y').fill('1990');
   await page.locator('#a-m').selectOption('5');
   await page.locator('#a-d').selectOption('17');
   await page.locator('[name="a-gender"][value="M"]').check();

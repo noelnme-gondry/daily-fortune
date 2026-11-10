@@ -68,7 +68,6 @@ export default {
   "오늘의 일진 천간·지지가 일간에게 어떤 십신인지 계산합니다.": "Calculate the Ten Gods of today’s stem and branch relative to the Day Master.",
   "일진 지지가 원국의 년지·월지·일지·시지와 합·충·형·원진을 이루는지 봅니다.": "Check combinations, clashes, punishments and resentment between the day branch and each natal branch.",
   "일진 오행이 용신·희신인지 기신인지에 따라 전체 흐름을 가감합니다.": "Adjust for whether the daily element supports or challenges the chart’s selected balance.",
-  "일진 70% · 월운 20% · 세운 10%를 합쳐 0~100점으로 환산합니다.": "Combine day 70%, month 20% and year 10%, then convert to the displayed score.",
   "내일 날짜의 일진으로 오늘의 운세와 같은 규칙을 적용합니다.": "Apply the same rules as today’s reading to tomorrow’s day cycle.",
   "십신·합충형·12운성·신살·용신 여부를 분야별 가중치로 더합니다.": "Add area-weighted Ten Gods, combinations, clashes, life stages, symbolic stars and useful elements.",
   "일진 70% · 월운 20% · 세운 10% 비중으로 점수를 냅니다.": "Use day 70%, month 20% and year 10%.",

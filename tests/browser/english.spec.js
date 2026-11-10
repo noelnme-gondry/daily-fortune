@@ -9,7 +9,7 @@ test.beforeEach(async ({ context }) => { await context.route('https://**/*', (ro
 async function calculate(page) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').fill('Alex');
-  await page.locator('#a-y').selectOption('1993');
+  await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
   await page.locator('#a-time').fill('03:40');

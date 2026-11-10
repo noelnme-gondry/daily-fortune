@@ -15,7 +15,7 @@ test('띠 일간·월간은 생활 속 운과 행동을 먼저 설명하고 전�
       assert.ok(r.advice?.length > 10);
       assert.ok(r.caution?.length > 10);
       assert.equal(r.text, `${r.outlook} ${r.advice} ${r.caution}`);
-      assert.match(r.text, /대인운|협업운|재물운|업무운|학업/);
+      assert.match(r.text, /대인운|협업운|재물운|업무운|이동운|학업/);
       assert.doesNotMatch(r.text, JARGON);
       assert.equal(r.cats, undefined, '일간에 계산하지 않은 분야 점수를 추가하지 않는다');
     }

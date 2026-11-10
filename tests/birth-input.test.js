@@ -15,7 +15,7 @@ test('현재 날짜를 기준으로 양력·음력 생일을 검증한다', () =
   assert.match(birthDateError(lunar, today), /미래/);
   assert.match(birthDateError({ calendar: 'lunar', y: 2021, m: 4, d: 10, leap: true }, today), /존재하지 않는 음력/);
   assert.match(birthDateError({ calendar: 'solar', y: 2026, m: 2, d: 30 }, today), /없습니다/);
-  assert.match(birthDateError({ calendar: 'solar', y: 2026, m: 0, d: 0 }, today), /모두 선택/);
+  assert.match(birthDateError({ calendar: 'solar', y: 2026, m: 0, d: 0 }, today), /모두 입력/);
   assert.match(birthDateError({ calendar: 'solar', y: 1990, m: 13, d: 1 }, today), /확인/);
   assert.match(birthDateError({ calendar: 'solar', y: 1899, m: 1, d: 1 }, today), /확인/);
   assert.match(withLanguage('en', () => birthDateError({ ...today, d: 25 }, today)), /future/);

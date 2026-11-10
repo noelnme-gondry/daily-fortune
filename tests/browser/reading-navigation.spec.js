@@ -5,7 +5,8 @@ const date = { y: 2026, m: 11, d: 5 };
 const input = { calendar: 'solar', gender: 'M', y: 1990, m: 5, d: 15, time: '12:00' };
 const ready = page => expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
 const fill = async (page, name = '가족 예시') => {
-  for (const key of ['y', 'm', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
+  await page.locator(`#a-y`).fill(String(input.y));
+  for (const key of ['m', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
   await page.locator('#a-name').fill(name); await page.locator('#a-time').fill(input.time);
   await page.locator('[name="a-gender"][value="M"]').check();
 };
@@ -88,7 +89,7 @@ test('저장 목록에서 고른 가족이 기간 이동 뒤에도 선택되어 
   await page.locator('#save-device').check(); await page.locator('#tool-form [type=submit]').click();
   await expect(page.locator('[data-storage-status]')).toContainText('저장했습니다');
   await page.locator('[data-dismiss-profile-guide]').click();
-  await page.locator('#a-name').fill('두 번째 가족'); await page.locator('#a-y').selectOption('1960');
+  await page.locator('#a-name').fill('두 번째 가족'); await page.locator('#a-y').fill('1960');
   await page.locator('#tool-form [type=submit]').click();
   await expect(page.locator('#a-saved-person option')).toHaveCount(3);
   const id = await page.locator('#a-saved-person option').filter({ hasText: '첫 가족' }).getAttribute('value');

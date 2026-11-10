@@ -586,7 +586,7 @@ test('광고 로드 실패·GA 미설정에서도 운세를 계산하고 공유�
   await expect.poll(async () => (await slotEvents(page, 'lucky')).length).toBe(1);
   await page.evaluate(() => { delete window.gtag; });
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
-  await page.locator('#a-y').selectOption('1993');
+  await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
   await page.locator('#a-notime').check();

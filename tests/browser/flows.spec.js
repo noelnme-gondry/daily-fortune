@@ -20,7 +20,7 @@ async function ready(page, path) {
 }
 async function calculate(page, persist = false) {
   await page.locator('#a-name').fill('검증');
-  await page.locator('#a-y').selectOption('1993');
+  await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
   await page.locator('input[name="a-tmode"][value="branch"]').check();
@@ -34,7 +34,7 @@ async function calculateExact(page) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').fill('검증');
   await page.locator('input[name="a-gender"][value="F"]').check();
-  await page.locator('#a-y').selectOption('1993');
+  await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
   await page.locator('#a-notime').uncheck();
@@ -120,7 +120,7 @@ test('평생 주요 시기의 연도를 누르면 실제 점수와 선정 이유
   await page.locator('[data-dialog="life-event-caution-2035"]').click();
   await expect(page.getByRole('dialog')).toContainText('건강 점수가 아니라 종합 점수');
   await page.getByRole('button', { name: '닫기', exact: true }).click();
-  await page.locator('#a-y').selectOption('1991');
+  await page.locator('#a-y').fill('1991');
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   const updated = buildChart({ gender: 'F', calendar: 'solar', y: 1991, m: 1, d: 28, time: '03:40' });
@@ -250,7 +250,7 @@ test('시각과 시진은 서로 같은 시간대로 바뀌고 서머타임 날�
   await page.locator('input[name="a-tmode"][value="branch"]').check();
   await expect(page.locator('#a-branch')).toHaveValue('11');
   await expect(page.locator('#a-branch option:checked')).toHaveText('해시 · 21:30~23:30');
-  await page.locator('#a-y').selectOption('1987');
+  await page.locator('#a-y').fill('1987');
   await page.locator('#a-m').selectOption('7');
   await page.locator('#a-d').selectOption('10');
   await expect(page.locator('#a-branch option').first()).toHaveText('해시 · 00:00~00:30 (전날 일주)');
@@ -333,7 +333,7 @@ test('직업 도감: 계열별 6종 · 몰락형 상세 · 키보드 복귀 · �
 test('나쁜 운세 챕터: 몰락 캐릭터와 실패 서사·낮은 분야의 점수 표시', async ({ page }) => {
   await ready(page, '/life-story/');
   await page.getByRole('radio', { name: '남성', exact: true }).check();
-  await page.locator('#a-y').selectOption('1980');
+  await page.locator('#a-y').fill('1980');
   await page.locator('#a-m').selectOption('6');
   await page.locator('#a-d').selectOption('1');
   await page.locator('input[name="a-tmode"][value="branch"]').check();
@@ -388,7 +388,7 @@ test('명예의 전당은 시간 제외 기준으로 고정되고 모든 분야�
     }
     await page.locator('[data-leader-category]').selectOption('total');
     const before = await page.locator('.leader-button').allTextContents();
-    await page.locator('#a-y').selectOption(kind === 'four' ? '1991' : '1992');
+    await page.locator('#a-y').fill(kind === 'four' ? '1991' : '1992');
     await page.locator(`input[name="a-gender"][value="${kind === 'four' ? 'M' : 'F'}"]`).check();
     await completeProfile(page);
     await page.locator('button[type="submit"]').click();

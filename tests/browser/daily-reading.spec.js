@@ -16,7 +16,8 @@ for (const lang of ['ko', 'en']) {
     const chart = buildChart(input);
     await page.goto(`${prefix}/today/`);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
-    for (const key of ['y', 'm', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
+    await page.locator(`#a-y`).fill(String(input.y));
+    for (const key of ['m', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
     await page.locator('[name="a-gender"][value="F"]').check();
     await page.locator('#a-time').fill(input.time);
     await page.locator('#tool-form [type="submit"]').click();

@@ -16,7 +16,8 @@ async function calculate(page) {
   await page.goto('/compatibility/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   for (const [side, input] of [['a', a], ['b', b]]) {
-    for (const field of ['y', 'm', 'd']) await page.locator(`#${side}-${field}`).selectOption(String(input[field]));
+    await page.locator(`#${side}-y`).fill(String(input.y));
+    for (const field of ['m', 'd']) await page.locator(`#${side}-${field}`).selectOption(String(input[field]));
     await page.locator(`input[name="${side}-gender"][value="${input.gender}"]`).check();
     await page.locator(`#${side}-time`).fill(input.time);
   }
@@ -104,7 +105,7 @@ test('추천 계산 실패는 재시도 가능하고 새 입력은 진행 중인
   await section.locator('[data-match-retry]').click();
   await expect(section.locator('.leader-button')).toHaveCount(5, { timeout: 20000 });
   await section.locator('[data-match-base="b"]').click();
-  await page.locator('#a-y').selectOption('2000');
+  await page.locator('#a-y').fill('2000');
   await page.locator('#a-notime').check();
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();

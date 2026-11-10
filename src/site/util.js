@@ -18,7 +18,8 @@ export const link = (href, text, cls = '') => `<a href="${attr(href)}"${cls ? ` 
 
 export function faqBlock(faq, title = tr('자주 묻는 질문', 'Frequently asked questions')) {
   if (!faq || !faq.length) return '';
-  return `<section class="faq" aria-labelledby="faq-h"><h2 id="faq-h">${esc(title)}</h2>${faq.map((f, i) => `<div class="faq-item"><h3><button type="button" class="faq-button" data-disclosure aria-expanded="true" aria-controls="faq-answer-${i}">${esc(f.q)}${uiIcon('plus')}</button></h3><p id="faq-answer-${i}">${esc(f.a)}</p></div>`).join('')}</section>`;
+  const tag = title ? 'section' : 'div';
+  return `<${tag} class="faq"${title ? ` aria-labelledby="faq-h"><h2 id="faq-h">${esc(title)}</h2>` : '>'}${faq.map((f, i) => `<div class="faq-item"><h3><button type="button" class="faq-button" data-disclosure aria-expanded="true" aria-controls="faq-answer-${i}">${esc(f.q)}${uiIcon('plus')}</button></h3><p id="faq-answer-${i}">${esc(f.a)}</p></div>`).join('')}</${tag}>`;
 }
 export function disclosure(id, title, body, icon = 'book') {
   return `<section class="disclosure"><h2><button class="disclosure-button" type="button" data-disclosure aria-expanded="true" aria-controls="${id}">${uiIcon(icon)}<span>${esc(title)}</span>${uiIcon('plus')}</button></h2><div class="disclosure-body" id="${id}">${body}</div></section>`;

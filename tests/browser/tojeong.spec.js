@@ -48,7 +48,7 @@ test('토정비결 기기 저장·다른 탭 복원·삭제는 사주 저장본�
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').fill('사주 보존');
   await page.getByRole('radio', { name: '여성', exact: true }).check();
-  await page.locator('#a-y').selectOption('1989');
+  await page.locator('#a-y').fill('1989');
   await page.locator('input[name="a-tmode"][value="branch"]').check();
   await page.locator('#a-branch').selectOption('3');
   await page.locator('#save-device').check();

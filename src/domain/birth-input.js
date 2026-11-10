@@ -16,7 +16,8 @@ export const BIRTH_TIME_HINT = bilingual({
 });
 
 export function birthDateError(p, today = todayKST()) {
-  if (!p.y || !p.m || !p.d) return tr('생년월일을 모두 선택해 주세요.', 'Select your birth year, month and day.');
+  if (Number.isNaN(p.y)) return tr('태어난 해를 숫자 네 자리로 입력해 주세요.', 'Enter your birth year as four digits.');
+  if (!p.y || !p.m || !p.d) return tr('생년월일을 모두 입력해 주세요.', 'Enter your birth year, month and day.');
   if (![p.y, p.m, p.d].every(Number.isInteger) || p.y < BIRTH_YEAR_MIN || p.m < 1 || p.m > 12 || p.d < 1) {
     return tr('생년월일을 확인해 주세요.', 'Check your birth date.');
   }

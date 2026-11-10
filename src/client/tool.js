@@ -112,7 +112,7 @@ export async function mount(root) {
       const dateInputs = ['y', 'm', 'd'].map(id => $(`#${person}-${id}`, form));
       const emptyInputs = dateInputs.filter(input => !input.value);
       const input = readForm(form, person);
-      const invalid = emptyInputs.length ? emptyInputs : check({ ...input, noTime: true })
+      const invalid = dateInputs[0].validity.patternMismatch ? [dateInputs[0]] : emptyInputs.length ? emptyInputs : check({ ...input, noTime: true })
         ? dateInputs : !input.noTime && input.timeMode === 'exact' && !input.time ? [$(`#${person}-time`, form)] : dateInputs;
       for (const input of invalid) { input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-errormessage', el.id); }
       (invalid.find(input => !input.value) || invalid.at(-1)).focus();

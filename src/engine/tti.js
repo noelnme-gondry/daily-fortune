@@ -8,7 +8,7 @@ import {
 } from './core.js';
 import { yearPillar, monthPillar, dayPillar } from './calendar.js';
 import { bandOf } from './fortune.js';
-import { readingAction, readingCycle, zodiacReading, zodiacRelationText, zodiacElementText } from '../domain/reading.js';
+import { readingAction, readingCycle, zodiacReading, zodiacDayReading, zodiacFocus, zodiacRelationText, zodiacElementText } from '../domain/reading.js';
 import { zodiacCategoryOutlook, zodiacYearSummary } from '../domain/zodiac-outlook.js';
 
 const REL_W = { '합': 14, '삼합': 10, '같음': -3, '없음': 0, '충': -14, '형': -8, '원진': -8, '해': -5, '파': -4 };
@@ -108,21 +108,18 @@ function ttiDayState(tti, dp, mp) {
 export function ttiDay(tti, o) {
   const dp = dayPillar(o), mp = monthPillar(o), cycle = readingCycle(o);
   const state = ttiDayState(tti, dp, mp);
-  const { rel, score } = state;
-  const context = { ...state, cycle, offset: sceneOffset(tti, dp), identity: 'zodiac-day' };
-  const action = zodiacReading(context);
-  // 서로 다른 합충도 같은 행동 주제를 고를 수 있다. 같은 날짜·주제·점수대의
-  // 앞선 띠 수만큼 제목만 순환하여 목록에서 제목이 겹치지 않게 한다.
-  let headlineOffset = 0;
+  const { rel, e, es, score } = state;
+  const focus = zodiacFocus(rel, e, es);
+  // 같은 날짜·분야는 띠 순서대로 다른 장면을 배정한다. 조회 순서나 표시 언어와 무관하다.
+  let offset = 0;
   for (let t = 0; t < tti; t++) {
-    const otherState = ttiDayState(t, dp, mp);
-    const other = zodiacReading({ ...otherState, cycle, offset: sceneOffset(t, dp), identity: 'zodiac-day' });
-    if (other.id === action.id && (otherState.score >= 60) === (score >= 60)) headlineOffset++;
+    const other = ttiDayState(t, dp, mp);
+    if (zodiacFocus(other.rel, other.e, other.es) === focus) offset++;
   }
   const key = `ttid${tti}|${o.y}-${o.m}-${o.d}`;
   const a = animalName(tti);
   const band = bandOf(score);
-  const { text, headline, outlook, advice, caution } = zodiacReading({ ...context, headlineOffset });
+  const { text, headline, outlook, advice, caution } = zodiacDayReading(focus, score, cycle, offset);
   const E = T.element[(BR_EL[tti] + 4) % 5];
   return { tti, animal: a, score, band, rel, headline, outlook, advice, caution, text, color: pick(E.color, key + 'c'), number: pick(E.number, key + 'n') };
 }

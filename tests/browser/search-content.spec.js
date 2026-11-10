@@ -13,7 +13,8 @@ test.beforeEach(async ({ context, page }) => {
 async function enter(page, input = EXAMPLE_INPUT) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').fill('가상비밀');
-  for (const key of ['y', 'm', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
+  await page.locator(`#a-y`).fill(String(input.y));
+  for (const key of ['m', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
   await page.locator('#a-time').fill(input.time);
 }
 const events = (page) => page.evaluate(() => window.searchEvents.filter((e) => e[0] === 'event'));
@@ -217,7 +218,7 @@ test('만세력 예시와 사용자 원국 일치, 실패한 음력 윤달은 �
   expect(chars.slice(0, 4).join('')).toBe(c.cols.slice().reverse().map((p) => pillarH(p)[0]).join(''));
   expect(chars.slice(4).join('')).toBe(c.cols.slice().reverse().map((p) => pillarH(p)[1]).join(''));
   await page.locator('[name="a-cal"][value="lunar"]').check();
-  await page.locator('#a-y').selectOption('2021');
+  await page.locator('#a-y').fill('2021');
   await page.locator('#a-m').selectOption('4');
   await page.locator('#a-leap').check();
   await completeProfile(page);
