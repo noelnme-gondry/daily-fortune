@@ -97,28 +97,50 @@ export async function mount(root) {
 
   wireBirthForm(form, pair ? ['a', 'b'] : ['a']);
 
+  function focusResult() {
+    const summary = $('#reading-summary', out);
+    summary.focus({ preventScroll: true });
+    // 페이지 이동 직후에는 스타일과 글꼴이 적용되면서 결과의 위치가 바뀐다.
+    const scroll = () => document.fonts.ready.then(() => {
+      if (document.activeElement === summary) summary.scrollIntoView({ block: 'start' });
+    });
+    if (document.readyState === 'complete') scroll();
+    else window.addEventListener('load', scroll, { once: true });
+  }
+
   function showError(msg, person = 'a') {
     let el = $('.form-error', form);
-    if (!el) { el = document.createElement('p'); el.id = 'tool-form-error'; el.className = 'form-error'; el.setAttribute('role', 'alert'); $('.form-actions', form).after(el); }
     form.querySelectorAll('[aria-invalid]').forEach(input => { input.removeAttribute('aria-invalid'); input.removeAttribute('aria-errormessage'); });
-    el.textContent = msg;
-    el.hidden = !msg;
-    if (msg) {
-      form.hidden = false;
-      root.querySelectorAll('[data-edit-profile]').forEach(button => button.setAttribute('aria-expanded', 'true'));
-      stopMatches?.();
-      clearResultWithPartnerAd(out);
-      root.classList.remove('has-result');
-      currentInputs = null;
-      const dateInputs = ['y', 'm', 'd'].map(id => $(`#${person}-${id}`, form));
-      const emptyInputs = dateInputs.filter(input => !input.value);
-      const input = readForm(form, person);
-      const invalid = dateInputs[0].validity.patternMismatch ? [dateInputs[0]] : emptyInputs.length ? emptyInputs : check({ ...input, noTime: true })
-        ? dateInputs : !input.noTime && input.timeMode === 'exact' && !input.time ? [$(`#${person}-time`, form)] : dateInputs;
-      for (const input of invalid) { input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-errormessage', el.id); }
-      (invalid.find(input => !input.value) || invalid.at(-1)).focus();
-      track('form_error', { tool: mode, entry_point: originEntry });
+    if (!msg) {
+      if (el) { el.hidden = true; el.textContent = ''; }
+      return;
     }
+    if (!el) {
+      el = document.createElement('p');
+      el.id = 'tool-form-error';
+      el.className = 'form-error';
+      el.setAttribute('role', 'alert');
+    }
+    form.hidden = false;
+    root.querySelectorAll('[data-edit-profile]').forEach(button => button.setAttribute('aria-expanded', 'true'));
+    stopMatches?.();
+    clearResultWithPartnerAd(out);
+    root.classList.remove('has-result');
+    currentInputs = null;
+    const dateInputs = ['y', 'm', 'd'].map(id => $(`#${person}-${id}`, form));
+    const emptyInputs = dateInputs.filter(input => !input.value);
+    const input = readForm(form, person);
+    const invalid = dateInputs[0].validity.patternMismatch ? [dateInputs[0]] : emptyInputs.length ? emptyInputs : check({ ...input, noTime: true })
+      ? dateInputs : !input.noTime && input.timeMode === 'exact' && !input.time ? [$(`#${person}-time`, form)] : dateInputs;
+    const target = invalid.find(input => !input.value) || invalid.at(-1);
+    const field = target.closest('.field');
+    field.querySelector('legend').after(el);
+    el.hidden = false;
+    el.textContent = msg;
+    for (const input of invalid) { input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-errormessage', el.id); }
+    target.focus({ preventScroll: true });
+    field.scrollIntoView({ block: 'nearest' });
+    track('form_error', { tool: mode, entry_point: originEntry });
   }
 
   function render(a, b, source) {
@@ -209,18 +231,19 @@ export async function mount(root) {
     sessionStorage.removeItem('myod:calc-handoff');
     if (handoff?.path === location.pathname && Date.now() - handoff.at >= 0 && Date.now() - handoff.at < 60000) { restoreOrigin = 'form'; originEntry = 'home'; }
   } catch { /* 분석용 출처 전달 실패는 계산을 막지 않는다. */ }
-  if (entryPoint !== 'home' && a0 && (!pair || b0)) render(a0, b0, restoreOrigin);
+  const restoredResult = entryPoint !== 'home' && a0 && (!pair || b0) && render(a0, b0, restoreOrigin);
   const savedEntry = $('[data-saved-entry]', root);
   if (savedEntry && a0 && !check(a0)) {
+    const restored = readForm(form, 'a');
     savedEntry.hidden = false;
     form.hidden = true;
     const calendar = a0.calendar === 'lunar' ? tr('음력', 'Lunar') : tr('양력', 'Solar');
     const gender = a0.gender === 'F' ? tr('여성', 'Female') : tr('남성', 'Male');
     const time = a0.noTime ? tr('시간 모름', 'Time unknown') : a0.timeMode === 'branch' ? tr('시진 입력', 'Hour-period input') : a0.time;
-    $('[data-saved-summary]', savedEntry).textContent = `${calendar} ${a0.y}.${a0.m}.${a0.d} · ${gender} · ${time} · ${tr('불러온 정보가 맞는지 확인해 주세요.', 'Check that these restored details are yours.')}`;
+    $('[data-saved-summary]', savedEntry).textContent = `${calendar} ${a0.y}.${a0.m}.${a0.d} · ${gender} · ${time}`;
     $('[data-saved-result]', savedEntry).addEventListener('click', () => {
       track('saved_result_open', { tool: mode });
-      if (render(readForm(form, 'a'), null, restoreOrigin)) out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (render(restored, null, restoreOrigin)) focusResult();
     });
   }
   const slots = pair ? ['a', 'b'] : ['a'];
@@ -340,7 +363,7 @@ export async function mount(root) {
         const path = languagePath('/today/', isEnglish() ? 'en' : 'ko');
         try { sessionStorage.setItem('myod:calc-handoff', JSON.stringify({ path, at: Date.now() })); } catch { /* 접근 제한 */ }
         location.href = path;
-      } else if (render(a, null, 'form')) out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (render(a, null, 'form')) focusResult();
       return;
     }
     if (render(a, b, 'form')) {
@@ -350,5 +373,6 @@ export async function mount(root) {
     } finally { submitting = false; }
   });
   root.dataset.ready = 'true';
+  if (restoredResult && entryPoint === 'today' && originEntry === 'home') focusResult();
   if (location.hash.startsWith('#reading-')) requestAnimationFrame(() => syncReadingNavigation(out, location.hash, true));
 }

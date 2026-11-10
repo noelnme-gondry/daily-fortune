@@ -87,7 +87,7 @@ export function luckyRow(l) {
 const same = (a, b) => a.y === b.y && a.m === b.m && a.d === b.d;
 
 function periodOverview(r, when, banner = true, scope = 'reading') {
-  return `<div class="reading-overview" data-result-summary id="${scope}-summary" tabindex="-1">${reportHead(r, when)}${luckyRow(r.lucky)}${banner ? luckyBanner(reportColorPalettes(r.lucky)) : ''}</div>${readingAreaLinks(r.cats, scope)}`;
+  return `<div class="reading-overview" data-result-summary id="${scope}-summary" role="region" aria-label="${tr('종합 운세', 'Overall reading')}" tabindex="-1">${reportHead(r, when)}${luckyRow(r.lucky)}${banner ? luckyBanner(reportColorPalettes(r.lucky)) : ''}</div>${readingAreaLinks(r.cats, scope)}`;
 }
 
 let dailySequence = 0;

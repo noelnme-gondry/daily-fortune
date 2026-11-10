@@ -141,7 +141,9 @@ for (const lang of ['', '/en']) test(`${lang || 'ko'} 320px 관리 화면과 읽
 });
 
 test('홈 첫 저장 후 이동한 결과에 안내가 한 번 나오고 선택한 가족을 다시 연다', async ({ page }) => {
-  await ready(page, '/'); await fill(page); await page.locator('#save-device').check(); await page.locator('#tool-form [type=submit]').click();
+  await ready(page, '/');
+  await page.locator('.name-disclosure > summary').click();
+  await fill(page); await page.locator('#save-device').check(); await page.locator('#tool-form [type=submit]').click();
   await expect(page).toHaveURL(/\/today\/$/); await expect(page.locator('[data-profile-coach]')).toBeVisible();
   await page.locator('[data-dismiss-profile-guide]').click();
   await open(page); await page.locator('[data-add-person]').click(); await fill(page, 'person', '아빠', '1961');

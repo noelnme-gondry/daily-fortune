@@ -5,7 +5,17 @@ import { BIRTH_TIME_HINT } from '../domain/birth-input.js';
 
 export const profilePicker = p => `<div class="profile-picker" hidden><label for="${p}-saved-person">${tr('저장한 사람 선택', 'Choose a saved person')}</label><select class="input" id="${p}-saved-person" data-profile-picker="${p}"><option value="">${tr('직접 입력 · 새 사람', 'Enter details · new person')}</option></select><button class="link-btn" type="button" data-manage-profiles aria-controls="profile-manager" aria-haspopup="dialog">${tr('목록 관리', 'Manage people')}</button></div>`;
 
-export function personFields(p, legend) {
+export const birthTimeHint = p => `<p class="hint" id="${p}-time-hint" data-time-hint>${BIRTH_TIME_HINT.exact}</p>`;
+
+export function displayNameField(p, collapsible = false) {
+  const label = tr('표시 이름 (선택)', 'Display name (optional)');
+  const input = `<input class="input" id="${p}-name" maxlength="12" autocomplete="off" aria-describedby="${p}-name-hint"${collapsible ? ` aria-labelledby="${p}-name-label"` : ''} placeholder="${tr('예: 나, 엄마, 동생', 'e.g. Me, Mum, Alex')}">`;
+  const hint = `<span class="hint" id="${p}-name-hint">${tr('저장 목록과 결과에 표시합니다. 실명은 필요 없어요.', 'Used in your saved list and results. A nickname is fine.')}</span>`;
+  if (collapsible) return `<details class="name-disclosure"><summary id="${p}-name-label">${label}</summary><div class="field">${input}${hint}</div></details>`;
+  return `<div class="field field-name"><label for="${p}-name">${label}</label>${input}${hint}</div>`;
+}
+
+export function personFields(p, legend, { deferDetails = false } = {}) {
   const ms = [...Array(12).keys()].map((i) => `<option value="${i + 1}">${i + 1}${tr("월", "")}</option>`).join('');
   const ds = [...Array(31).keys()].map((i) => `<option value="${i + 1}">${i + 1}${tr("일", "")}</option>`).join('');
   return `<fieldset class="person" data-person="${p}">
@@ -24,8 +34,8 @@ export function personFields(p, legend) {
       <input class="input" type="time" id="${p}-time" aria-label="${tr("태어난 시각", "Birth time")}" aria-describedby="${p}-time-hint">
       <select class="input" id="${p}-branch" aria-label="${tr("태어난 시진", "Two-hour birth period")}" aria-describedby="${p}-time-hint" hidden>${birthTimeOptions().map((t) => `<option value="${t.value}"${t.value === '6' ? ' selected' : ''}>${t.label}</option>`).join('')}</select>
       <label class="check"><input type="checkbox" id="${p}-notime">${tr(" 시간을 몰라요", " Time unknown")}</label>
-      <p class="hint" id="${p}-time-hint" data-time-hint>${BIRTH_TIME_HINT.exact}</p>
+      ${deferDetails ? '' : birthTimeHint(p)}
     </fieldset>
-    <div class="field field-name"><label for="${p}-name">${tr('표시 이름 (선택)', 'Display name (optional)')}</label><input class="input" id="${p}-name" maxlength="12" autocomplete="off" placeholder="${tr('예: 나, 엄마, 동생', 'e.g. Me, Mum, Alex')}"><span class="hint">${tr('저장 목록과 결과에 표시합니다. 실명은 필요 없어요.', 'Used in your saved list and results. A nickname is fine.')}</span></div>
+    ${deferDetails ? '' : displayNameField(p)}
   </fieldset>`;
 }

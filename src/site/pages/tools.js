@@ -11,7 +11,7 @@ import { esc, faqBlock, faqLd, disclosure } from '../util.js';
 import { animalIcon, uiIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
 import { adSlot } from '../layout.js';
-import { personFields } from '../birth-form.js';
+import { birthTimeHint, displayNameField, personFields } from '../birth-form.js';
 import { dayExample, manseExample, yearExample, lifetimeExample, compatibilityExample } from '../public-examples.js';
 import { playExample } from '../play-examples.js';
 import { yearGuide } from '../year-guide.js';
@@ -28,14 +28,15 @@ const HINT = () => `<div class="storage-options"><label class="check"><input typ
 
 export function toolBlock(mode, ctx, extra = {}) {
   const pair = mode === 'compatibility';
+  const home = mode === 'home';
   const data = `data-tool="${mode}" data-date="${ctx.todayISO}"${extra.year ? ` data-year="${extra.year}"` : ''}`;
   const label = { today: siteText('오늘의 운세 보기'), tomorrow: siteText('내일의 운세 보기'), week: siteText('이번 주 운세 보기'), month: siteText('이달의 운세 보기'), year: `${extra.year}${siteText("년 운세 보기")}`, lifetime: siteText('평생 운세 보기'), compatibility: siteText('궁합 보기'), manseryeok: siteText('사주 원국 계산'), story: siteText('내 인생 캐릭터 보기'), rank: siteText('내 사주 순위 보기'), home: siteText('오늘의 운세 보기') }[mode];
   const form = pair
     ? `<form class="pform card pair-form" id="tool-form" novalidate><h2 class="form-title">${siteText("두 사람의 사주 입력")}</h2><div class="pair-grid">${personFields('a', siteText('나'))}${personFields('b', siteText('상대'))}</div><div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT()}</form>`
-    : `<form class="pform card" id="tool-form" novalidate><h2 class="form-title">${siteText("내 사주 입력")}</h2>${personFields('a')}<div class="form-actions"><button class="btn" type="submit">${label}</button></div>${HINT()}${mode === 'home' ? `<a class="note" href="/today/#public-example">${tr('입력 전에 결과 예시와 읽는 법 보기', 'See a worked example before entering your details')}</a>` : ''}</form>`;
-  const empty = `<div class="result" id="result" aria-live="polite">${mode === 'home' ? '' : siteText('<div class="result-empty card"><p><b>생년월일시를 입력하면 결과가 여기에 나타납니다.</b></p><p class="muted">이 기기에 저장을 선택하면 다음 방문에도 입력 정보를 불러올 수 있습니다.</p><noscript><p>운세 계산은 브라우저에서 이루어지므로 자바스크립트를 켜 주세요.</p></noscript></div>')}</div>`;
-  const saved = mode === 'home' ? `<section class="saved-entry card" data-saved-entry hidden><div><h2>${tr('오늘은 어떤 하루일까요?', 'What does today hold?')}</h2><p class="hint" data-saved-summary></p></div><button class="btn" type="button" data-saved-result>${tr('저장한 정보로 오늘 운세 보기', 'See today with saved details')}</button><button class="link-btn" type="button" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('정보 수정·저장 관리', 'Edit details & storage')}</button></section>` : '';
-  return `<section class="tool ${pair ? 'tool-pair' : ''} ${mode === 'home' ? 'tool-home' : ''}" id="tool" ${data} aria-label="${siteText("운세 계산기")}">${saved}${form}${empty}</section>`;
+    : `<form class="pform card" id="tool-form" novalidate><h2 class="form-title">${home ? tr('출생 정보 입력', 'Enter your birth details') : siteText("내 사주 입력")}</h2>${personFields('a', null, { deferDetails: home })}<div class="form-actions"><button class="btn" type="submit">${label}</button></div>${home ? birthTimeHint('a') + displayNameField('a', true) : ''}${HINT()}${home ? `<a class="note" href="/today/#public-example">${tr('오늘 운세 결과 예시 보기', 'See an example of today’s reading')}</a>` : ''}</form>`;
+  const result = `<div class="result" id="result" aria-live="polite">${home ? '' : siteText('<div class="result-empty card"><p><b>생년월일시를 입력하면 결과가 여기에 나타납니다.</b></p><p class="muted">이 기기에 저장을 선택하면 다음 방문에도 입력 정보를 불러올 수 있습니다.</p><noscript><p>운세 계산은 브라우저에서 이루어지므로 자바스크립트를 켜 주세요.</p></noscript></div>')}</div>`;
+  const saved = home ? `<section class="saved-entry card" data-saved-entry hidden><div><h2>${tr('불러온 출생 정보', 'Restored birth details')}</h2><p class="hint" data-saved-summary></p></div><button class="btn" type="button" data-saved-result>${tr('이 정보로 오늘 운세 보기', 'See today’s fortune with these details')}</button><button class="link-btn" type="button" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('정보 수정·저장 관리', 'Edit details & storage')}</button></section>` : '';
+  return `<section class="tool ${pair ? 'tool-pair' : ''} ${home ? 'tool-home' : ''}" id="tool" ${data} aria-label="${siteText("운세 계산기")}">${saved}${form}${result}</section>`;
 }
 
 /* ── 날짜 정보 상자 ───────────────────────────── */
@@ -176,10 +177,10 @@ export function home(ctx) {
   const sj = samjaeYear(y);
   const body = `
     <section class="home-hero">
-      <div class="home-intro"><p class="eyebrow">${esc(SITE.tagline)}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
+      <div class="home-intro"><p class="eyebrow">${esc(SITE.tagline)}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p><a href="/tti/today/">${tr('생년월일 없이 띠별 운세 보기', 'Browse zodiac readings without a birth date')}</a></div>
       ${toolBlock('home', ctx)}
-      <div class="home-discovery"><h2>${tr('어떤 이야기가 궁금하세요?', 'What would you like to explore?')}</h2><nav class="purpose-list" aria-label="${tr('목적별 운세', 'Find your reading')}">
-        ${[['/today/', tr('오늘 무엇을 준비할까요?', 'What should I prepare for today?'), tr('일·공부·관계에서 살필 점', 'Work, study and relationships')], ['/lifetime/', tr('나는 어떤 기질일까요?', 'What are my natural tendencies?'), tr('원국·오행·평생의 흐름', 'Your chart, elements and life cycles')], ['/compatibility/', tr('두 사람은 어떻게 다를까요?', 'How do two people differ?'), tr('소통과 생활 방식의 차이', 'Communication and everyday habits')]].map(([href, title, desc]) => `<a href="${href}"><span><b>${title}</b><small>${desc}</small></span>${uiIcon('arrow')}</a>`).join('')}
+      <div class="home-discovery"><h2 id="home-discovery-title">${tr('운세와 사주 둘러보기', 'Browse readings')}</h2><nav class="purpose-list" aria-labelledby="home-discovery-title">
+        ${[[TOOLS.today, tr('직장·금전·연애 등 일곱 분야', 'Seven areas, including work, money and love')], [TOOLS.lifetime, tr('타고난 기질과 10년 단위의 대운', 'Temperament and ten-year cycles')], [TOOLS.compatibility, tr('두 사람의 소통·경제·가정 궁합', 'How two charts compare in communication, finances and home life')]].map(([tool, desc]) => `<a href="${tool.path}"><span><b>${esc(tool.nav)}</b><small>${desc}</small></span>${uiIcon('arrow')}</a>`).join('')}
       </nav><p class="note">${tr('사주는 전통 해석을 참고하는 도구입니다. 점수는 사건의 확률이나 사람의 가치를 뜻하지 않습니다.', 'Saju offers traditional interpretations for reflection. Scores are not event probabilities or a measure of anyone’s worth.')}</p>
       </div>
     </section>

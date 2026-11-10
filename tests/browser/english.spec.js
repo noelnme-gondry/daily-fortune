@@ -83,6 +83,7 @@ test('all English calculators render English results and keep internal links in 
 test('English home input, result sharing and locale switch preserve the selected result', async ({ page }) => {
   await page.goto('/en/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('.name-disclosure > summary').click();
   await page.locator('#a-name').fill('Alex');
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();

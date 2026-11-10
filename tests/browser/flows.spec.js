@@ -605,7 +605,8 @@ test('홈의 입력과 목적 탐색이 재미 카드보다 먼저 보인다', a
   const purpose = await page.locator('.purpose-list').boundingBox();
   expect(purpose.x).toBeGreaterThan(form.x);
   await expect(page.locator('.home-feature')).toHaveCount(3);
-  const name = await page.locator('#a-name').boundingBox();
+  await expect(page.locator('#a-name')).toBeHidden();
+  const name = await page.locator('.name-disclosure > summary').boundingBox();
   const gender = await page.locator('.field-gender .seg').boundingBox();
   expect(name.y).toBeGreaterThan(gender.y);
   expect((await page.locator('#a-y').boundingBox()).y).toBeLessThan(gender.y);
