@@ -218,10 +218,11 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .home-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
 @media (max-width: 900px) { .home-hero { grid-template-columns: minmax(0, 1fr); } }
 .home-intro { display: grid; grid-column: 1 / -1; gap: 12px; padding-top: 8px; max-width: 72ch; }
-.home-discovery { display: grid; gap: 24px; min-width: 0; }
+.home-intro > a { justify-self: start; font-size: 14px; }
+.home-discovery { display: grid; gap: 16px; min-width: 0; }
 .home-discovery h2 { font-size: 22px; }
 .purpose-list { display: grid; }
-.purpose-list a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 88px; padding: 16px 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
+.purpose-list a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 72px; padding: 12px 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
 .purpose-list span { display: grid; gap: 4px; }
 .purpose-list small { color: var(--ink-2); font-size: 14px; }
 .purpose-list .ui-icon { flex: none; color: var(--accent); }
@@ -241,19 +242,17 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .home-feature-icon .ui-icon { width: 27px; height: 27px; }
 .home-feature > .ui-icon { color: var(--accent); }
 .home-hero .tool-home { gap: 0; }
-.home-hero .tool-home { grid-template-columns: minmax(0, 1fr); }
-.home-hero .person { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; }
-.home-hero .field { align-content: start; }
-.home-hero .field-gender .seg { margin-top: 6px; }
-.home-hero .seg { height: 44px; }
-.home-hero .seg span { height: 42px; padding-block: 0; display: grid; place-items: center; }
-.home-hero .field-birth, .home-hero .field-time { grid-column: 1 / -1; }
+.home-hero .person { gap: 16px; }
+.home-hero .field-gender .seg { max-inline-size: 16rem; }
+.home-hero .seg label { display: grid; }
 .home-hero .field-birth { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: center; }
-.home-hero .field-birth .check { grid-column: 1 / -1; }
-.home-hero .pform { gap: 16px; }
+.home-hero .field-birth > :is(.check, .form-error) { grid-column: 1 / -1; }
+.home-hero .field-birth .check:has(:disabled) { display: none; }
 .home-hero .storage-options { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
 .home-hero .storage-options .hint { flex-basis: 100%; }
-.home-hero .pform > .hint { font-size: 11px; }
+.home-hero .pform > .hint:not([data-time-hint]) { font-size: 11px; }
+.name-disclosure > summary { min-height: 44px; align-content: center; cursor: pointer; color: var(--accent); font-size: 14px; }
+.name-disclosure[open] > summary { margin-bottom: 4px; }
 .home-hero .result:empty { display: none; }
 .home-hero .tool-home.has-result { grid-column: 1 / -1; }
 .reading-guides { display: grid; gap: 0; border-block: 1px solid var(--line); }
@@ -367,6 +366,7 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .field { display: grid; gap: 6px; border: 0; margin: 0; padding: 0; min-width: 0; }
 .field > label, .field > legend { font-size: 13px; color: var(--ink-2); letter-spacing: 0.02em; padding: 0; }
 .input { height: 44px; width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); padding: 0 12px; min-width: 0; }
+.input[aria-invalid="true"] { border-color: var(--seal); }
 select.input { padding-right: 4px; }
 .ymd { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 6px; }
 .seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--bg); }
@@ -1152,9 +1152,12 @@ body:has(dialog[open]) { overflow: hidden; }
   .zodiac-year-table th, .zodiac-year-table td { padding: 12px; }
   .zodiac-year-link { gap: 8px; }
   .zodiac-year-link .animal-icon { width: 40px; height: 40px; }
+  main.wrap:has(> .home-hero) { padding-top: 16px; }
+  .home-hero { gap: 16px; }
+  .home-intro { gap: 8px; padding-top: 0; }
+  .home-hero .pform { padding: 16px; gap: 12px; }
+  .home-hero .person { gap: 12px; }
   .home-hero .field-birth { grid-template-columns: minmax(0, 1fr); }
-  .home-hero { gap: 20px; }
-  .home-discovery { gap: 20px; }
   .home-feature { grid-template-columns: 48px minmax(0, 1fr) 16px; gap: 12px; }
   .home-feature > img, .home-feature-icon { width: 48px; height: 48px; }
 }

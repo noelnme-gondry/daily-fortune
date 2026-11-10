@@ -8,6 +8,7 @@ test.beforeEach(async ({ context }) => { await context.route('https://**/*', rou
 for (const lang of ['ko', 'en']) {
   const prefix = lang === 'en' ? '/en' : '';
   test(`${lang}: 무료운세 홈의 서비스 탐색·오늘 입력·저장 복원·띠별 선택을 유지한다`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${prefix}/`);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     await expect(page.locator('.home-services')).toContainText(withLanguage(lang, () => FREE_ACCESS.description));
@@ -16,11 +17,21 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('.home-tools a')).toHaveCount(10);
     const button = page.locator('#tool-form [type="submit"]');
     await expect(button).toHaveText(lang === 'ko' ? '오늘의 운세 보기' : 'See today’s fortune');
+    await expect(button).toBeInViewport({ ratio: 1 });
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    const name = page.locator('#a-name');
+    await expect(name).toBeHidden();
     await completeProfile(page);
+    await page.locator('.name-disclosure > summary').press('Enter');
+    const nickname = lang === 'ko' ? '운세 예시' : 'Saju sample';
+    await name.fill(nickname);
     await page.locator('#save-device').check();
     await button.click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/today/$`));
     await expect(page.locator('#result .daily-cat')).toHaveCount(7);
+    await expect(page.locator('#reading-summary')).toBeFocused();
+    await expect(page.locator('#result [data-result-heading]')).toBeInViewport();
+    await expect(name).toHaveValue(nickname);
     await page.goto(`${prefix}/`);
     await expect(page.locator('[data-saved-entry]')).toBeVisible();
     await expect(page.locator('#tool-form')).toBeHidden();
@@ -47,6 +58,31 @@ for (const lang of ['ko', 'en']) {
     }
   });
 
+  test(`${lang}: 좁은 홈에서 생일과 시각 오류를 입력 옆에서 확인하고 시간 미상으로 계산한다`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto(`${prefix}/`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    const submit = page.locator('#tool-form [type="submit"]');
+    const error = page.getByRole('alert');
+    await submit.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#a-y')).toBeFocused();
+    await expect(page.locator('.field-birth').getByRole('alert')).toBeInViewport();
+    await expect(page.locator('#a-y')).toHaveAttribute('aria-errormessage', 'tool-form-error');
+    await completeProfile(page);
+    await page.locator('#a-time').fill('');
+    await submit.click();
+    await expect(page.locator('#a-time')).toBeFocused();
+    await expect(page.locator('.field-time').getByRole('alert')).toBeInViewport();
+    await expect(error).toContainText(lang === 'ko' ? '시간을 몰라요' : 'Time unknown');
+    await page.locator('#a-notime').check();
+    await submit.click();
+    await expect(page.locator('#result .daily-cat')).toHaveCount(7);
+    await expect(page.locator('#reading-summary')).toBeFocused();
+    await expect(page.locator('#result [data-result-heading]')).toBeInViewport();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  });
+
   test(`${lang}: 가이드 허브와 두 문맥 링크는 개인·띠별 결과에 정확히 연결된다`, async ({ page }) => {
     await page.goto(`${prefix}/guides/`);
     await page.locator(`.guide-tool-nav a[href="${prefix}/"]`).click();
@@ -65,3 +101,21 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('main .tti-row')).toHaveCount(12);
   });
 }
+
+test('홈의 저장 정보 버튼은 편집 중인 생일 대신 카드에 표시된 생일로 계산한다', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await completeProfile(page);
+  await page.locator('#save-device').check();
+  await page.locator('#tool-form [type="submit"]').click();
+  await expect(page).toHaveURL(/\/today\/$/);
+  await page.goto('/');
+  const saved = page.locator('[data-saved-entry]');
+  await expect(saved.locator('[data-saved-summary]')).toContainText('1990.1.1');
+  await saved.locator('[data-edit-profile]').click();
+  await page.locator('#a-y').fill('1985');
+  await saved.locator('[data-saved-result]').click();
+  await page.locator('.chart-disclosure > summary').click();
+  await expect(page.locator('#result .chart-head')).toContainText('1990.01.01');
+  await expect(page.locator('#a-y')).toHaveValue('1985');
+});

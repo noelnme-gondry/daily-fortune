@@ -56,7 +56,7 @@ export function readForm(form, who) {
     noTime: f('notime').checked,
   };
 }
-export const check = (p) => birthDateError(p) || (!p.noTime && p.timeMode === 'exact' && !/^\d{1,2}:\d{2}$/.test(p.time || '') ? tr("태어난 시각을 입력하거나 ‘시간을 몰라요’를 선택해 주세요.", "Enter a birth time or select “I don’t know the time”.") : '');
+export const check = (p) => birthDateError(p) || (!p.noTime && p.timeMode === 'exact' && !/^\d{1,2}:\d{2}$/.test(p.time || '') ? tr("태어난 시각을 입력하거나 ‘시간을 몰라요’를 선택해 주세요.", "Enter a birth time or select “Time unknown”.") : '');
 
 export function wireBirthForm(form, people) {
   people.forEach((p) => {
