@@ -9,7 +9,11 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/build-site.mjs",
+    "build:current": "vite build && node scripts/build-site.mjs",
+    "build": "npm run build:current && node scripts/release-assets.mjs restore",
+    "build:release": "npm run build:current && node scripts/release-assets.mjs verify",
+    "release:prepare": "npm run build:current && node scripts/release-assets.mjs capture",
+    "release:prune": "node scripts/release-assets.mjs prune",
     "start": "node server.js",
     "test": "node --test tests/*.test.js",
     "test:browser": "playwright test",
