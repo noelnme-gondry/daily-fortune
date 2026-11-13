@@ -1,4 +1,5 @@
-// 운영 서버(Railway): 해시 자산은 dist에서, 페이지 HTML은 한국 날짜 기준으로 즉석 렌더링해 하루 동안 캐시한다.
+// 운영 서버(Railway): 빌드에서 복원한 과거 해시 자산도 dist/assets에서 원래 바이트로 제공한다.
+// 페이지 HTML은 현재 manifest로 한국 날짜 기준으로 즉석 렌더링해 하루 동안 캐시한다.
 // 오늘·내일·띠별 오늘의 운세처럼 날짜가 바뀌는 페이지도 재배포 없이 매일 갱신된다.
 import express from 'express';
 import compression from 'compression';
@@ -93,4 +94,4 @@ app.get(/.*/, (req, res, next) => {
 app.use(express.static(dist, { index: false, maxAge: '1d' }));
 app.use((req, res) => res.status(404).type('html').send(current().site.notFound(req.path.startsWith('/en/') ? 'en' : 'ko')));
 
-app.listen(PORT, () => console.log(`${BRAND.name} 서버가 ${PORT} 포트에서 실행 중입니다 (${SITE})`));
+const server = app.listen(PORT, () => console.log(`${BRAND.name} 서버가 ${server.address().port} 포트에서 실행 중입니다 (${SITE})`));

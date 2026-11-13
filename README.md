@@ -20,6 +20,12 @@ npm start        # 운영 서버 (dist 자산 + 날짜별 즉석 렌더링)
 
 GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint → 단위 테스트 → 빌드 → 브라우저 테스트를 실행합니다.
 
+### 배포 간 해시 자산 보존
+
+`release-assets/`에는 이전 HTML이 참조하는 `/assets/` 원본을 SHA-256별 gzip 파일로 보관합니다. 현재 HTML의 진입점은 계속 현재 `dist/.vite/manifest.json`에서만 선택합니다. 일반 빌드는 보관된 자산을 복원하고, Railway·CI의 `build:release`는 새 빌드가 준비된 릴리즈와 일치하는지도 검사합니다.
+
+자산이 변경되는 릴리즈는 `npm run release:prepare`로 준비하고, 생성된 catalog와 blob을 소스 변경과 함께 검토해야 합니다. 보존 묶음이 Git에 포함되지 않으면 깨끗한 배포에 전달되지 않습니다. 준비·검증 명령은 커밋이나 배포를 수행하지 않습니다. 배포 확인 이후의 기록·30일 보존·정리 절차와 제한은 [자산 보존 운영 안내](docs/release-assets.md)를 따릅니다.
+
 캐릭터 그림을 추가·교체하면 `node scripts/gen-thumbs.mjs`로 카드용 384px 썸네일(`public/characters/384/`)을 다시 만듭니다.
 
 브랜드 이름과 문구는 `src/content/brand.js`, 승인된 해 로고 원본은 `assets/brand/sun-logo.png`에서 관리합니다. 변경 후 `node scripts/gen-brand.mjs`로 로고·파비콘·홈 화면 아이콘·공유 이미지를 다시 만듭니다.

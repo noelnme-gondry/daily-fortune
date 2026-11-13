@@ -1,0 +1,534 @@
+{
+  "version": 1,
+  "currentRelease": "5f339593c443251232f08a4daf8236963957a310726a4df6ff65c6496bf2f542",
+  "activeRelease": null,
+  "releases": [
+    {
+      "id": "5f339593c443251232f08a4daf8236963957a310726a4df6ff65c6496bf2f542",
+      "preparedAt": "2026-11-13T03:50:27.841Z",
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z",
+      "retiredAt": null,
+      "sourceRevision": "ebfe1e084eeda631e4bcfc2860d55ef4534623b0",
+      "provenance": "local release preparation",
+      "manifest": {
+        "_birth-form-Di73uYVS.js": {
+          "file": "assets/birth-form-Di73uYVS.js",
+          "name": "birth-form",
+          "imports": [
+            "src/client/main.js",
+            "_terms-Df8hdotJ.js",
+            "_story-B3yAy9gr.js"
+          ]
+        },
+        "_korean-lunar-NK9q0LnC.js": {
+          "file": "assets/korean-lunar-NK9q0LnC.js",
+          "name": "korean-lunar"
+        },
+        "_lunar-Cyjw6xOv.js": {
+          "file": "assets/lunar-Cyjw6xOv.js",
+          "name": "lunar"
+        },
+        "_ranking-pagination-Be7kel-l.js": {
+          "file": "assets/ranking-pagination-Be7kel-l.js",
+          "name": "ranking-pagination",
+          "imports": [
+            "src/client/main.js",
+            "_util-dAv3f1Ek.js"
+          ]
+        },
+        "_reading-preferences-Dm5iNx5z.js": {
+          "file": "assets/reading-preferences-Dm5iNx5z.js",
+          "name": "reading-preferences",
+          "imports": [
+            "src/client/main.js",
+            "_story-B3yAy9gr.js"
+          ]
+        },
+        "_story-B3yAy9gr.js": {
+          "file": "assets/story-B3yAy9gr.js",
+          "name": "story",
+          "imports": [
+            "src/client/main.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js"
+          ]
+        },
+        "_terms-Df8hdotJ.js": {
+          "file": "assets/terms-Df8hdotJ.js",
+          "name": "terms",
+          "imports": [
+            "src/client/main.js"
+          ]
+        },
+        "_tool-DplcR3bz.js": {
+          "file": "assets/tool-DplcR3bz.js",
+          "name": "tool",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_story-B3yAy9gr.js",
+            "_birth-form-Di73uYVS.js",
+            "_terms-Df8hdotJ.js",
+            "src/client/profile.js",
+            "_reading-preferences-Dm5iNx5z.js",
+            "_util-dAv3f1Ek.js"
+          ],
+          "dynamicImports": [
+            "src/client/rank-tool.js",
+            "src/client/story-tool.js",
+            "src/client/compat-tool.js",
+            "src/client/life-tool.js"
+          ]
+        },
+        "_util-dAv3f1Ek.js": {
+          "file": "assets/util-dAv3f1Ek.js",
+          "name": "util",
+          "imports": [
+            "src/client/main.js"
+          ]
+        },
+        "src/client/card.js": {
+          "file": "assets/card-vujUwOP3.js",
+          "name": "card",
+          "src": "src/client/card.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js"
+          ]
+        },
+        "src/client/compat-tool.js": {
+          "file": "assets/compat-tool-BNAk9fPv.js",
+          "name": "compat-tool",
+          "src": "src/client/compat-tool.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_terms-Df8hdotJ.js",
+            "_tool-DplcR3bz.js",
+            "_birth-form-Di73uYVS.js",
+            "_util-dAv3f1Ek.js",
+            "_story-B3yAy9gr.js",
+            "_ranking-pagination-Be7kel-l.js",
+            "src/client/profile.js",
+            "_reading-preferences-Dm5iNx5z.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js"
+          ]
+        },
+        "src/client/life-tool.js": {
+          "file": "assets/life-tool-LoEXFxTk.js",
+          "name": "life-tool",
+          "src": "src/client/life-tool.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_tool-DplcR3bz.js",
+            "_terms-Df8hdotJ.js",
+            "_birth-form-Di73uYVS.js",
+            "_util-dAv3f1Ek.js",
+            "_story-B3yAy9gr.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js",
+            "src/client/profile.js",
+            "_reading-preferences-Dm5iNx5z.js"
+          ]
+        },
+        "src/client/main.js": {
+          "file": "assets/main-DS2wYslW.js",
+          "name": "main",
+          "src": "src/client/main.js",
+          "isEntry": true,
+          "dynamicImports": [
+            "src/client/card.js",
+            "src/client/tti-client.js",
+            "src/client/profile.js",
+            "src/client/profile-manager.js",
+            "src/client/tti-client.js",
+            "src/client/tojeong-client.js",
+            "_tool-DplcR3bz.js"
+          ]
+        },
+        "src/client/profile-manager.js": {
+          "file": "assets/profile-manager-C13U0ae5.js",
+          "name": "profile-manager",
+          "src": "src/client/profile-manager.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_util-dAv3f1Ek.js",
+            "_birth-form-Di73uYVS.js",
+            "_story-B3yAy9gr.js",
+            "src/client/profile.js",
+            "_terms-Df8hdotJ.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js"
+          ]
+        },
+        "src/client/profile.js": {
+          "file": "assets/profile-BPdev6Uk.js",
+          "name": "profile",
+          "src": "src/client/profile.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js"
+          ]
+        },
+        "src/client/rank-tool.js": {
+          "file": "assets/rank-tool-Dd-6_ACt.js",
+          "name": "rank-tool",
+          "src": "src/client/rank-tool.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_tool-DplcR3bz.js",
+            "_birth-form-Di73uYVS.js",
+            "_terms-Df8hdotJ.js",
+            "_util-dAv3f1Ek.js",
+            "_ranking-pagination-Be7kel-l.js",
+            "_story-B3yAy9gr.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js",
+            "src/client/profile.js",
+            "_reading-preferences-Dm5iNx5z.js"
+          ]
+        },
+        "src/client/story-tool.js": {
+          "file": "assets/story-tool-B4orMZYh.js",
+          "name": "story-tool",
+          "src": "src/client/story-tool.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_util-dAv3f1Ek.js",
+            "_terms-Df8hdotJ.js",
+            "_story-B3yAy9gr.js",
+            "_birth-form-Di73uYVS.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js"
+          ]
+        },
+        "src/client/tojeong-client.js": {
+          "file": "assets/tojeong-client-D9qMibTh.js",
+          "name": "tojeong-client",
+          "src": "src/client/tojeong-client.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "_korean-lunar-NK9q0LnC.js",
+            "_util-dAv3f1Ek.js",
+            "src/client/main.js",
+            "_reading-preferences-Dm5iNx5z.js",
+            "src/client/profile.js",
+            "_story-B3yAy9gr.js",
+            "_lunar-Cyjw6xOv.js"
+          ]
+        },
+        "src/client/tti-client.js": {
+          "file": "assets/tti-client-AbWecJ0Z.js",
+          "name": "tti-client",
+          "src": "src/client/tti-client.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_util-dAv3f1Ek.js",
+            "_terms-Df8hdotJ.js",
+            "src/client/profile.js"
+          ]
+        },
+        "src/styles/main.css": {
+          "file": "assets/style--wsqADf_.css",
+          "src": "src/styles/main.css",
+          "isEntry": true
+        }
+      },
+      "files": [
+        "assets/birth-form-Di73uYVS.js",
+        "assets/card-vujUwOP3.js",
+        "assets/compat-matches.worker-CYaB76aS.js",
+        "assets/compat-tool-BNAk9fPv.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/life-tool-LoEXFxTk.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-DS2wYslW.js",
+        "assets/profile-BPdev6Uk.js",
+        "assets/profile-manager-C13U0ae5.js",
+        "assets/rank-tool-Dd-6_ACt.js",
+        "assets/ranking-pagination-Be7kel-l.js",
+        "assets/reading-preferences-Dm5iNx5z.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/story-tool-B4orMZYh.js",
+        "assets/style--wsqADf_.css",
+        "assets/terms-Df8hdotJ.js",
+        "assets/tojeong-client-D9qMibTh.js",
+        "assets/tool-DplcR3bz.js",
+        "assets/tti-client-AbWecJ0Z.js",
+        "assets/util-dAv3f1Ek.js"
+      ]
+    }
+  ],
+  "assets": {
+    "assets/birth-form-Di73uYVS.js": {
+      "sha256": "d4472cde559cecd133666783340c98952b2563eaec92496f2f13c9445b3a298e",
+      "bytes": 314394,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-DS2wYslW.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/terms-Df8hdotJ.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/card-vujUwOP3.js": {
+      "sha256": "5a63811ed8f36c6c8886413bc29c2c429e3c9e3e195d40dbecdf6545920f2280",
+      "bytes": 2705,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-DS2wYslW.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/compat-matches.worker-CYaB76aS.js": {
+      "sha256": "889be24d5045e9558b757c1614876b3e875dc57844aa7b3394619bd6b0a757b1",
+      "bytes": 453983,
+      "mime": "text/javascript",
+      "references": [],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/compat-tool-BNAk9fPv.js": {
+      "sha256": "669305a43158d6e070434846494893c4bf34f1ddc6386b5b401dede0e85f62ed",
+      "bytes": 13095,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-Di73uYVS.js",
+        "assets/compat-matches.worker-CYaB76aS.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-DS2wYslW.js",
+        "assets/profile-BPdev6Uk.js",
+        "assets/ranking-pagination-Be7kel-l.js",
+        "assets/reading-preferences-Dm5iNx5z.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/terms-Df8hdotJ.js",
+        "assets/tool-DplcR3bz.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/korean-lunar-NK9q0LnC.js": {
+      "sha256": "a49cb84fa5da1a6c8a62c4bce54c8978037bd793f23b2253690a84458f6a1616",
+      "bytes": 18137,
+      "mime": "text/javascript",
+      "references": [],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/life-tool-LoEXFxTk.js": {
+      "sha256": "1bfad007c17ef9c61459a07eef3556ce80b923badec7a56cffb6d18e7919a5b3",
+      "bytes": 17396,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-Di73uYVS.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-DS2wYslW.js",
+        "assets/profile-BPdev6Uk.js",
+        "assets/reading-preferences-Dm5iNx5z.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/terms-Df8hdotJ.js",
+        "assets/tool-DplcR3bz.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/lunar-Cyjw6xOv.js": {
+      "sha256": "5792b41510eddf466515518a54e82757884d51f7791a6d16f6e586604fbf7ad3",
+      "bytes": 307789,
+      "mime": "text/javascript",
+      "references": [],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/main-DS2wYslW.js": {
+      "sha256": "bb6716966c071e96b13c52661bfdb53ad65a71a760b00d6d34ff1ec22ccc8467",
+      "bytes": 33472,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-Di73uYVS.js",
+        "assets/card-vujUwOP3.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/profile-BPdev6Uk.js",
+        "assets/profile-manager-C13U0ae5.js",
+        "assets/reading-preferences-Dm5iNx5z.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/terms-Df8hdotJ.js",
+        "assets/tojeong-client-D9qMibTh.js",
+        "assets/tool-DplcR3bz.js",
+        "assets/tti-client-AbWecJ0Z.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/profile-BPdev6Uk.js": {
+      "sha256": "086ebf2e79b2d6723984956555faed6dfb686ed17c1587bfb9f51a0814c769f7",
+      "bytes": 5640,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-DS2wYslW.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/profile-manager-C13U0ae5.js": {
+      "sha256": "a3667531d99375f0d1ccceb25d8a74b88802b7aca084d9f5523d66d4dcf4204d",
+      "bytes": 9897,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-Di73uYVS.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-DS2wYslW.js",
+        "assets/profile-BPdev6Uk.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/terms-Df8hdotJ.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/rank-tool-Dd-6_ACt.js": {
+      "sha256": "29b36c000e36ef64163a7304e69b1c681b09c80e80c0ea233626c52f8bc6d947",
+      "bytes": 172888,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-Di73uYVS.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-DS2wYslW.js",
+        "assets/profile-BPdev6Uk.js",
+        "assets/ranking-pagination-Be7kel-l.js",
+        "assets/reading-preferences-Dm5iNx5z.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/terms-Df8hdotJ.js",
+        "assets/tool-DplcR3bz.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/ranking-pagination-Be7kel-l.js": {
+      "sha256": "9bd36e24aed7c41a5b94f419aaead8493c9b4720a42dceeb6cf44c0985242432",
+      "bytes": 1693,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-DS2wYslW.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/reading-preferences-Dm5iNx5z.js": {
+      "sha256": "4d02942bf7a1ed357caf99478afa871a05160921a3e77a285979a5e12a97e1ac",
+      "bytes": 3055,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-DS2wYslW.js",
+        "assets/story-B3yAy9gr.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/story-B3yAy9gr.js": {
+      "sha256": "481f5c831c1aa32ca057820c9dd44252d914d8d38d49660cd9a48bcfb5584d1e",
+      "bytes": 23118,
+      "mime": "text/javascript",
+      "references": [
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-DS2wYslW.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/story-tool-B4orMZYh.js": {
+      "sha256": "d763047636648b770bbbecce5ef88412304f9492821be6b725bd48a6477140b2",
+      "bytes": 10690,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-Di73uYVS.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-DS2wYslW.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/terms-Df8hdotJ.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/style--wsqADf_.css": {
+      "sha256": "6d90307d5b857bcc85a07a03f4e4f65b9a10e2f18e004e44edd72953a7321553",
+      "bytes": 76061,
+      "mime": "text/css",
+      "references": [],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/terms-Df8hdotJ.js": {
+      "sha256": "9b5e6dbc21d378a2794ee1d3ea5033dc29fd909784d59e8fbd98d98a5ab3d40b",
+      "bytes": 3694,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-DS2wYslW.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/tojeong-client-D9qMibTh.js": {
+      "sha256": "4db9a5237f550c8a46eb4e1a0667fc42c8da591358cb745696e72b4dd074ce0b",
+      "bytes": 21775,
+      "mime": "text/javascript",
+      "references": [
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-DS2wYslW.js",
+        "assets/profile-BPdev6Uk.js",
+        "assets/reading-preferences-Dm5iNx5z.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/tool-DplcR3bz.js": {
+      "sha256": "010e916a242c9de85bbaa935fefc053f2a4ed8a0f88d9b76ec49ba90054b245f",
+      "bytes": 259999,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-Di73uYVS.js",
+        "assets/compat-tool-BNAk9fPv.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/life-tool-LoEXFxTk.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-DS2wYslW.js",
+        "assets/profile-BPdev6Uk.js",
+        "assets/rank-tool-Dd-6_ACt.js",
+        "assets/ranking-pagination-Be7kel-l.js",
+        "assets/reading-preferences-Dm5iNx5z.js",
+        "assets/story-B3yAy9gr.js",
+        "assets/story-tool-B4orMZYh.js",
+        "assets/terms-Df8hdotJ.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/tti-client-AbWecJ0Z.js": {
+      "sha256": "5028b9db4fcbb99ba653879243e94792cefbfe564ca72fadf131fb4494f23782",
+      "bytes": 1520,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-DS2wYslW.js",
+        "assets/profile-BPdev6Uk.js",
+        "assets/terms-Df8hdotJ.js",
+        "assets/util-dAv3f1Ek.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    },
+    "assets/util-dAv3f1Ek.js": {
+      "sha256": "0e02259bedb4e53944de5428953882e60a23f1419c55eece72aeb34e2d5e998f",
+      "bytes": 849,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-DS2wYslW.js"
+      ],
+      "lastReferencedAt": "2026-11-13T03:50:27.841Z"
+    }
+  }
+}
