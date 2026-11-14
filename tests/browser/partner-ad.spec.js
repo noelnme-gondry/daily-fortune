@@ -455,6 +455,7 @@ for (const variant of ['A', 'B']) {
     await completeProfile(page);
     await page.locator('button[type="submit"]').click();
     await expect(page.locator('#result .chart-card')).toBeAttached();
+    await page.locator('[data-result-summary] [data-result-heading]').scrollIntoViewIfNeeded();
     await expect.poll(() => page.evaluate(() => window.adEvents.filter((e) => e[1] === 'result_view').length)).toBe(1);
     // 계산 후 자동 스크롤과 충돌하지 않도록 안정된 지면으로 이동하고 실제 노출을 확인한다.
     // 이 검사는 이벤트 구분·중복을 검증하며, 50% 경계는 아래 별도 검사에서 확인한다.
