@@ -1,8 +1,16 @@
+export async function editProfile(page) {
+  const form = page.locator('#tool-form');
+  if (await form.count() && !await form.isVisible()) await page.locator('[data-edit-profile]:visible').first().click();
+}
+
 // 기존 계산 시나리오도 브라우저 기본값에 기대지 않고 입력값을 명시한다.
 export async function completeProfile(page) {
+  await editProfile(page);
   for (const who of ['a', 'b', 'tj']) {
     const year = page.locator(`#${who}-y`);
     if (!await year.count()) continue;
+    const gender = page.locator(`[name="${who}-gender"]`);
+    if (await gender.count() && !await page.locator(`[name="${who}-gender"]:checked`).count()) await page.locator(`[name="${who}-gender"][value="M"]`).check();
     for (const [field, value] of [['y', '1990'], ['m', '1'], ['d', '1']]) {
       const input = page.locator(`#${who}-${field}`);
       if (await input.inputValue()) continue;

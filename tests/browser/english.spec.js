@@ -1,4 +1,4 @@
-import { completeProfile } from './helpers/profile.js';
+import { completeProfile, editProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { todayKST } from '../../src/engine/core.js';
 import { calculateTojeong } from '../../src/domain/tojeong.js';
@@ -8,6 +8,7 @@ test.beforeEach(async ({ context }) => { await context.route('https://**/*', (ro
 
 async function calculate(page) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await editProfile(page);
   await page.locator('#a-name').fill('Alex');
   await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');

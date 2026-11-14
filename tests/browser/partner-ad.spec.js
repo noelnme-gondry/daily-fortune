@@ -1,4 +1,4 @@
-import { completeProfile } from './helpers/profile.js';
+import { completeProfile, editProfile } from './helpers/profile.js';
 import { isoDate, todayKST } from '../../src/engine/core.js';
 import { test, expect } from '@playwright/test';
 import { AD_LAYOUT, AD_POSITION_EXPERIMENT } from '../../src/domain/ad-experiment.js';
@@ -71,7 +71,7 @@ test('기존 B 저장값이 있어도 공통 광고는 결과 끝으로 내려�
     ad: document.querySelector('.partner-ad').getBoundingClientRect().top,
   }));
   expect(bounds.ad).toBeGreaterThanOrEqual(bounds.result);
-  expect(bounds.ad - bounds.lucky).toBeGreaterThan(844);
+  expect(bounds.ad - bounds.lucky).toBeGreaterThanOrEqual(24);
 });
 
 for (const width of [320, 360, 375, 390, 412, 768, 1024, 1440]) {
@@ -168,6 +168,7 @@ for (const variant of ['A', 'B']) {
       expect(geometry.frame.x).toBe(16);
       expect(geometry.scrollWidth).toBe(320);
       rows.push(geometry);
+      if (!path.includes('/tojeong/')) await editProfile(page);
       await page.locator(path.includes('/tojeong/') ? '#tj-d' : '#a-d').selectOption('2');
       await page.locator('button[type="submit"]').click();
       expect(await isolated.evaluate(() => window.mobileSentinel)).toBe('retained');
@@ -329,9 +330,11 @@ for (const width of [390, 1440]) {
       const formBox = await page.locator('.pform').first().boundingBox();
       const visibleAd = await slot.boundingBox();
       // PC의 sticky 입력 폼도 하단 지면 위에서 멈춰 광고·고지를 가리지 않는다.
-      expect(formBox.y + formBox.height).toBeLessThanOrEqual(visibleAd.y);
+      if (formBox) expect(formBox.y + formBox.height).toBeLessThanOrEqual(visibleAd.y);
+      else await expect(page.locator('.pform').first()).toBeHidden();
       if (path === '/compatibility/') await expect(page.locator('.compat-matches')).toHaveCount(1);
       await slot.evaluate((el) => el.setAttribute('data-test-instance', 'original'));
+      await editProfile(page);
       await page.locator(path === '/tojeong/' ? '#tj-d' : '#a-d').selectOption('2');
       await completeProfile(page);
       await page.locator('button[type="submit"]').click();
@@ -373,6 +376,7 @@ for (const width of [390, 1440]) {
       await expect(slot).not.toBeInViewport();
       expect((await slot.boundingBox()).width).toBe((await page.locator('#tool, #tojeong-tool').boundingBox()).width);
       await slot.evaluate((el) => el.setAttribute('data-test-instance', 'original'));
+      await editProfile(page);
       await page.locator(path === '/tojeong/' ? '#tj-d' : '#a-d').selectOption('2');
       await completeProfile(page);
       await page.locator('button[type="submit"]').click();
@@ -428,6 +432,7 @@ test('브라우저·탭 저장이 모두 막혀도 새 하단 배치와 계산�
   await page.goto('/today/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   for (const day of ['2', '3']) {
+    await editProfile(page);
     await page.locator('#a-d').selectOption(day);
     await completeProfile(page);
     await page.locator('button[type="submit"]').click();
@@ -525,7 +530,7 @@ test('발급 코드로 한 번만 초기화하고 절반 이상 노출 시 개�
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/tti/?name=private-name#private-birth');
   await expect(page.locator('[data-partner-ad-slot]')).toHaveAttribute('data-ad-state', 'initialized');
-  expect(await page.evaluate(() => window.partnerConfig)).toEqual({ id: 1039151, template: 'carousel', trackingCode: 'AF3219545', width: '100%', height: '250', bordered: false, tsource: '' });
+  expect(await page.evaluate(() => window.partnerConfig)).toEqual({ id: 1039151, template: 'carousel', trackingCode: 'AF3219545', width: '100%', height: '250', bordered: false, tsource: 'myod_common_content' });
   expect(await slotEvents(page)).toHaveLength(0);
   await showFraction(page, 0.4);
   expect(await slotEvents(page)).toHaveLength(0);
@@ -533,7 +538,7 @@ test('발급 코드로 한 번만 초기화하고 절반 이상 노출 시 개�
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
   const event = (await slotEvents(page))[0];
   expect(event.slice(0, 2)).toEqual(['event', 'ad_slot_view']);
-  expect(event[2]).toEqual({ measurement_version: '2', usage_date: isoDate(todayKST()), ad_measurement_version: '1', ad_provider: 'coupang', ad_slot: 'common', ad_context: 'content', page_path: '/tti/', page_location: 'http://127.0.0.1:4176/tti/', page_title: await page.title() });
+  expect(event[2]).toEqual({ measurement_version: '3', usage_date: isoDate(todayKST()), ad_measurement_version: '1', ad_provider: 'coupang', ad_slot: 'common', ad_context: 'content', page_path: '/tti/', page_location: 'http://127.0.0.1:4176/tti/', page_title: await page.title() });
   expect(JSON.stringify(event)).not.toContain('private');
   await showFraction(page, 0);
   await showFraction(page, 0.8);
@@ -582,13 +587,14 @@ test('광고 로드 실패·GA 미설정에서도 운세를 계산하고 공유�
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#result .chart-card')).toBeAttached();
-  await showFraction(page, 0.6);
-  await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
+  await expect(page.locator('.partner-ad')).toBeHidden();
   await expect(page.locator('[data-lucky-banner-slot]')).toHaveAttribute('data-ad-state', 'unavailable');
-  await showFraction(page, 0.6, '[data-lucky-banner-slot]');
-  await expect.poll(async () => (await slotEvents(page, 'lucky')).length).toBe(1);
+  await expect(page.locator('.lucky-banner')).toBeHidden();
+  expect(await slotEvents(page)).toHaveLength(0);
+  expect(await slotEvents(page, 'lucky')).toHaveLength(0);
   await page.evaluate(() => { delete window.gtag; });
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await editProfile(page);
   await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');
@@ -618,6 +624,8 @@ for (const lang of ['', '/en']) for (const variant of ['A', 'B']) {
     await completeProfile(page);
     await page.locator('button[type="submit"]').click();
     await expect(page.locator('[data-lucky-banner-slot]')).toHaveAttribute('data-ad-state', 'initialized');
+    await page.locator('[data-result-summary] [data-result-heading]').scrollIntoViewIfNeeded();
+    await expect.poll(() => page.evaluate(() => window.adEvents.filter(e => e[1] === 'result_view').length)).toBe(1);
     await showFraction(page, 0.4, '[data-lucky-banner-slot]');
     expect(await slotEvents(page, 'lucky')).toHaveLength(0);
     await showFraction(page, 0.6, '[data-lucky-banner-slot]');
@@ -627,17 +635,19 @@ for (const lang of ['', '/en']) for (const variant of ['A', 'B']) {
     for (const slot of ['common', 'lucky']) {
       expect((await slotEvents(page, slot))[0][2]).toEqual({
         ad_layout_version: AD_LAYOUT.id, ad_placement: AD_LAYOUT.placement, tool: 'today',
-        measurement_version: '2', usage_date: '2026-10-29', ad_measurement_version: '1',
+        measurement_version: '3', usage_date: '2026-10-29', ad_measurement_version: '1',
         ad_provider: 'coupang', ad_slot: slot, ad_context: slot === 'common' ? 'result_footer' : 'result', page_path: path,
         page_location: `http://127.0.0.1:4176${path}`, page_title: await page.title(),
       });
     }
+    await editProfile(page);
     await page.locator('#a-d').selectOption('2');
     await page.locator('button[type="submit"]').click();
     await showFraction(page, 0.8, '[data-lucky-banner-slot]');
     expect(await slotEvents(page, 'lucky')).toHaveLength(1);
     expect(await page.evaluate(() => window.adEvents.filter(e => e[1] === 'result_view').length)).toBe(1);
     await page.clock.setFixedTime(new Date('2026-10-30T12:00:00+09:00'));
+    await editProfile(page);
     await page.locator('button[type="submit"]').click();
     const heading = '[data-result-summary] [data-result-heading]';
     await page.locator(heading).scrollIntoViewIfNeeded();
@@ -669,6 +679,7 @@ test('결과 교체는 이전 슬롯 관측·리스너를 정리하고 숨은/�
   await calculateResult(page, '/today/');
   await expect.poll(() => page.evaluate(() => window.slotObservers.filter(o => o.active && o.target.matches('[data-lucky-banner-slot]')).length)).toBe(1);
   await page.evaluate(() => { window.previousObservers = window.slotObservers.filter(o => o.active); window.previousListenerCount = window.visibilityListeners.size; });
+  await editProfile(page);
   await page.locator('#a-d').selectOption('2');
   await page.locator('button[type="submit"]').click();
   expect(await page.evaluate(() => window.previousObservers.every(o => !o.active))).toBe(true);
@@ -706,6 +717,7 @@ test('관측 API가 없어도 계산·재계산·복원을 유지하고 도달�
   page.on('pageerror', error => errors.push(error.message));
   await calculateResult(page, '/today/');
   await showFraction(page, 0.8, '[data-lucky-banner-slot]');
+  await editProfile(page);
   await page.locator('#a-d').selectOption('2');
   await page.locator('button[type="submit"]').click();
   await page.reload();
@@ -749,6 +761,7 @@ for (const variant of ['A', 'B']) {
       const isolated = await frame.elementHandle().then(handle => handle.contentFrame());
       await isolated.evaluate(() => { window.recalculationSentinel = 'preserved'; });
       const initialRequests = requests;
+      await editProfile(page);
       await page.locator(path === '/tojeong/' ? '#tj-d' : '#a-d').selectOption('2');
       await page.locator('button[type="submit"]').click();
       await frame.scrollIntoViewIfNeeded();

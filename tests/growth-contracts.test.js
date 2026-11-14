@@ -41,7 +41,7 @@ test('도구별 다음 행동은 기존 도구 정의에서 파생되고 KR/EN�
   for (const lang of ['ko', 'en']) withLanguage(lang, () => {
     const all = toolNavigation(today);
     assert.equal(new Set(all.map(t => t.path)).size, all.length);
-    assert.equal(nextTools('today', today)[0].path, '/tomorrow/');
+    assert.deepEqual(nextTools('today', today).map(t => t.path), ['/life-story/', '/saju-ranking/', '/tomorrow/']);
     assert.equal(nextTools('year', today)[0].path, '/month/');
     assert.ok(all.every(t => t.nav && !t.nav.includes('undefined')));
   });

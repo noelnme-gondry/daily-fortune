@@ -10,6 +10,8 @@ import { JOB_BY_ID } from '../../content/character-jobs.js';
 import { READINGS } from '../../content/tojeong-readings.js';
 import { tojeongHeadline } from '../../content/tojeong.js';
 import { TOJEONG_RANGE } from '../../domain/tojeong.js';
+import { TOOLS } from '../../content/pages.js';
+import { TOJEONG } from '../../content/tojeong.js';
 import { readingHeadlines } from '../../domain/reading.js';
 import { TG, sexagenary, iljuSlug, pillarH, COMPAT_HEADLINES, TIERS, parseISO } from '../../engine/index.js';
 import { SHARE_KINDS, cleanName, ADJ_FLAT } from '../share-codec.js';
@@ -103,6 +105,8 @@ export function sharePage(q, ctx) {
   const title = generic ? siteText('공유된 운세 결과') : `${c.kicker} — ${c.big}`;
   const desc = generic ? siteText('친구가 공유한 사주 운세 결과입니다. 내 생년월일시로 나의 운세도 확인해 보세요.') : `${c.title}${siteText(" · 나의 결과도 확인해 보세요. 생년월일시로 보는 무료 사주 운세, ")}${BRAND.name}.`;
   const others = [['/life-story/', siteText('사주로 본 내 인생은?')], ['/saju-ranking/', siteText('내 사주 랭킹')], ['/today/', siteText('오늘의 운세')], ['/tojeong/', siteText('무료 토정비결')], ['/compatibility/', siteText('사주 궁합')]].filter(([h]) => h !== c.tool).slice(0, 4);
+  const descriptions = new Map(Object.values(TOOLS).map(t => [t.path, t.lead.split(/(?<=[.!?])\s+/)[0]]));
+  descriptions.set('/tojeong/', TOJEONG.description);
   return {
     path: '/share/', canonicalPath: c.tool, title, ogTitle: title, description: desc, noindex: true, noAds: true, crumbs: [], share: false,
     gaTitle: `${siteText("공유 카드 — ")}${SHARE_KINDS[c.kind] ? SHARE_KINDS[c.kind].label : siteText('일반')}`, ogImage: OG[c.kind] || '/og-default.png',
@@ -119,7 +123,7 @@ export function sharePage(q, ctx) {
         <a class="btn" href="${c.tool}" data-ga-cta="share_landing">${generic ? siteText('내 운세 보기') : `${siteText("나의 ")}${esc(c.label)}${siteText(" 보기")}`}</a>
         ${c.more ? `<a class="btn ghost" href="${c.more[0]}">${esc(c.more[1])}</a>` : ''}
         <p class="muted">${siteText("생년월일시만 넣으면 바로 계산됩니다. 입력한 정보는 서버로 전송되지 않습니다.")}</p>
-        <div class="cards">${others.map(([h, t]) => `<a class="card link-card" href="${h}"><b>${siteValue(t)}</b><span>${siteText("무료로 바로 확인")}</span></a>`).join('')}</div>
+        <div class="cards">${others.map(([h, t]) => `<a class="card link-card" href="${h}"><b>${siteValue(t)}</b><span>${esc(descriptions.get(h))}</span></a>`).join('')}</div>
       </div>
     </section>`,
   };

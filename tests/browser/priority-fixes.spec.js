@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { editProfile } from './helpers/profile.js';
 
 test.beforeEach(async ({ context, page }) => {
   await context.route('https://**/*', route => route.abort());
@@ -10,6 +11,7 @@ test.beforeEach(async ({ context, page }) => {
 });
 
 async function birth(page, prefix, date, calendar = 'solar') {
+  if (prefix !== 'tj') await editProfile(page);
   const form = prefix === 'tj' ? page.locator('#tojeong-tool form') : page.locator('#tool-form');
   if (prefix !== 'tj') await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await form.locator(`input[name="${prefix}-${prefix === 'tj' ? 'calendar' : 'cal'}"][value="${calendar}"]`).check();
@@ -18,7 +20,7 @@ async function birth(page, prefix, date, calendar = 'solar') {
     if (key === 'y' && prefix !== 'tj') await field.fill(String(value));
     else await field.selectOption(String(value));
   }
-  if (prefix !== 'tj') await page.locator(`#${prefix}-notime`).check();
+  if (prefix !== 'tj') { await page.locator(`[name="${prefix}-gender"][value="M"]`).check(); await page.locator(`#${prefix}-notime`).check(); }
   return form;
 }
 
@@ -59,7 +61,7 @@ for (const lang of ['', '/en']) {
     await form.locator('[type="submit"]').click();
     await expect(page.locator('#result .ring')).toBeVisible();
     await expect(page.locator('#tool-form-error')).toBeHidden();
-    await expect(year).not.toHaveAttribute('aria-invalid', 'true');
+    await expect(form.locator('#a-y')).not.toHaveAttribute('aria-invalid', 'true');
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   });
 

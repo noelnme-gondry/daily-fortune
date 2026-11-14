@@ -14,7 +14,7 @@ import { chartCard, dayView, weekView, monthView, yearView, manseOverview, manse
 import { resultShareHtml, wireShare } from './share.js';
 import { shareUrl, characterCode, SHARE_KINDS, cleanName } from '../site/share-codec.js';
 import { track, trackInputStart } from './analytics.js';
-import { syncTime, fillForm, readForm, check, wireBirthForm } from './birth-form.js';
+import { syncTime, fillForm, readForm, check, inputErrorField, wireBirthForm } from './birth-form.js';
 import { renderResultWithPartnerAd, clearResultWithPartnerAd } from './partner-ad.js';
 import { readingNavigation, nextToolsHtml } from '../site/tool-navigation.js';
 import { wireReadingNavigation, syncReadingNavigation } from './reading-navigation.js';
@@ -94,6 +94,14 @@ export async function mount(root) {
   let currentChart;
   let selectedDateButton;
   let submitting = false;
+  let editing = false;
+  const narrowScreen = window.matchMedia('(max-width: 900px)');
+  function syncFormVisibility() {
+    if (!root.classList.contains('has-result')) return;
+    form.hidden = narrowScreen.matches && !editing;
+    root.querySelectorAll('[data-edit-profile]').forEach(button => button.setAttribute('aria-expanded', String(!form.hidden)));
+  }
+  narrowScreen.addEventListener('change', syncFormVisibility);
 
   wireBirthForm(form, pair ? ['a', 'b'] : ['a']);
 
@@ -130,9 +138,9 @@ export async function mount(root) {
     const dateInputs = ['y', 'm', 'd'].map(id => $(`#${person}-${id}`, form));
     const emptyInputs = dateInputs.filter(input => !input.value);
     const input = readForm(form, person);
-    const invalid = dateInputs[0].validity.patternMismatch ? [dateInputs[0]] : emptyInputs.length ? emptyInputs : check({ ...input, noTime: true })
-      ? dateInputs : !input.noTime && input.timeMode === 'exact' && !input.time ? [$(`#${person}-time`, form)] : dateInputs;
-    const target = invalid.find(input => !input.value) || invalid.at(-1);
+    const errorField = inputErrorField(input);
+    const invalid = errorField === 'gender' ? [...form.querySelectorAll(`[name="${person}-gender"]`)] : errorField === 'birth_time' ? [$(`#${person}-time`, form)] : dateInputs[0].validity.patternMismatch ? [dateInputs[0]] : emptyInputs.length ? emptyInputs : dateInputs;
+    const target = errorField === 'gender' ? invalid[0] : invalid.find(input => !input.value) || invalid.at(-1);
     const field = target.closest('.field');
     field.querySelector('legend').after(el);
     el.hidden = false;
@@ -140,7 +148,7 @@ export async function mount(root) {
     for (const input of invalid) { input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-errormessage', el.id); }
     target.focus({ preventScroll: true });
     field.scrollIntoView({ block: 'nearest' });
-    track('form_error', { tool: mode, entry_point: originEntry });
+    track('form_error', { tool: mode, entry_point: originEntry, error_field: errorField });
   }
 
   function render(a, b, source) {
@@ -180,17 +188,27 @@ export async function mount(root) {
       html += rankTool.rankView(res, ca, leaderRank);
     }
     if (!pair && mode !== 'manseryeok') html += `<details class="chart-disclosure"><summary>${tr('내 사주 원국과 오행 자세히', 'Explore your birth chart and Five Elements')}</summary>${chartCard(ca, a, today)}</details>`;
-    html += nextToolsHtml(mode, today);
-    html += `<div class="result-actions"><button type="button" class="link-btn" data-edit-profile aria-controls="tool-form" aria-expanded="${!form.hidden}">${tr('입력 정보 수정·저장', 'Edit or save your details')}</button><span class="hint">${tr('이 기기에 저장하면 다음 방문에 바로 볼 수 있어요.', 'Save on this device for quicker access next time.')}</span></div>`;
+    html += '<div class="result-action-group">';
     const share = shareFor(mode, res, ca, cb, today, yr);
     if (share) {
       const shareHtml = resultShareHtml();
       html += rankTool ? `<div class="rank-share" id="rank-share" data-rank-locked hidden>${shareHtml}</div>` : shareHtml;
     }
+    html += nextToolsHtml(mode, today);
+    html += `<div class="result-actions"><button type="button" class="link-btn" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('입력 정보 수정·저장', 'Edit or save your details')}</button><button type="button" class="sbtn" data-save-result>${tr('다음에 바로 보기: 이 기기에 저장', 'Save on this device for next time')}</button><span class="hint" data-result-storage role="status"></span></div>`;
+    if (a.noTime || b?.noTime) html += `<p class="hint">${tr('시간 모름으로 시주를 제외했습니다. 시간을 알면 입력 정보에서 추가할 수 있어요.', 'The unknown birth time omits the hour pillar. Add the time in your details when available.')}</p>`;
+    html += '</div>';
     if (pair) html += compatTool.compatMatchesShell(ca, cb);
     stopMatches?.();
     const readingDate = isoDate(res?.date || today);
     renderResultWithPartnerAd(out, html, { tool: mode, calc_origin: source, reading_date: readingDate });
+    const summary = out.querySelector('.report-head') || out.querySelector('[data-result-summary]');
+    summary?.after(out.querySelector('.result-action-group'));
+    const banner = out.querySelector('.lucky-banner');
+    if (banner) {
+      const chart = out.querySelector('.chart-disclosure');
+      if (chart) chart.before(banner); else out.append(banner);
+    }
     applyReadingPreferences(out);
     syncReadingNavigation(out);
     currentInputs = { a, b };
@@ -198,9 +216,13 @@ export async function mount(root) {
     if (mode === 'rank') rankTool.mountRankLeaders($('.rank-leaders', out), leaderRank);
     if (pair) stopMatches = compatTool.mountCompatMatches($('.compat-matches', out), { a: toEngine(a), b: toEngine(b) }, { a: ca, b: cb }, today);
     root.classList.add('has-result');
+    // 좁은 화면에서는 결과 아래에 입력 폼을 반복하지 않는다. PC는 옆의 편집 폼을 유지한다.
+    editing = false;
+    syncFormVisibility();
     if (share) wireShare($('.result-share', out), share);
     const ev = { tool: mode, calc_origin: source, entry_point: originEntry, reading_date: readingDate };
     track('calc_result', ev);
+    if (source === 'form') track('calc_complete', ev);
     // 기존 이벤트 이름은 유지하되 개인 결과·등급은 분석 도구로 보내지 않는다.
     if (mode === 'story') track('story_result');
     if (mode === 'rank') track('rank_result');
@@ -217,7 +239,7 @@ export async function mount(root) {
   finally { form.inert = false; }
   persist.checked = !!savedA;
   try { const preference = sessionStorage.getItem('ohaeng:save-device'); if (preference !== null) persist.checked = preference === 'true'; } catch { /* 접근 제한 */ }
-  persist.addEventListener('change', () => { try { sessionStorage.setItem('ohaeng:save-device', String(persist.checked)); } catch { /* 접근 제한 */ } });
+  persist.addEventListener('change', () => { track('profile_save_toggle', { tool: mode, save_enabled: persist.checked }); try { sessionStorage.setItem('ohaeng:save-device', String(persist.checked)); } catch { /* 접근 제한 */ } });
   const legacy = ['a', 'b'].map(takeLegacy);
   if (legacy.some(Boolean)) storageStatus.textContent = tr("이전 버전에서 자동 저장된 입력을 불러왔습니다. 다음 방문에도 쓰려면 ‘이 기기에 저장’을 선택하세요.", "Loaded details saved by an earlier version. Select “Save on this device” to keep them for future visits.");
   let a0 = sessionLoad('a') || savedA || legacy[0];
@@ -282,13 +304,13 @@ export async function mount(root) {
   }
   for (const slot of slots) picker(slot).addEventListener('change', async event => {
     if (!event.target.value) {
-      fillForm(form, slot, { gender: 'M', calendar: 'solar', y: 0, m: 0, d: 0 });
+      fillForm(form, slot, { gender: '', calendar: 'solar', y: 0, m: 0, d: 0 });
       $(`#${slot}-time`, form).value = '';
       if (slot === 'a') a0 = null; else b0 = null;
       currentInputs = null; currentChart = null; stopMatches?.(); clearResultWithPartnerAd(out); root.classList.remove('has-result');
       return;
     }
-    try { applyPerson(await selectPerson(event.target.value, slot), slot); }
+    try { applyPerson(await selectPerson(event.target.value, slot), slot); track('profile_select', { tool: mode, selection_source: 'form' }); }
     catch { storageStatus.textContent = tr('선택한 사람을 불러오지 못했습니다. 목록 관리에서 다시 확인해 주세요.', 'Could not load this person. Check Manage people and try again.'); }
   });
   document.addEventListener('profile-selected', event => applyPerson(event.detail.profile, event.detail.slot));
@@ -296,7 +318,19 @@ export async function mount(root) {
   try { await refreshPeople(); } catch { /* 계산은 저장소 없이도 동작한다. */ }
   await showProfileGuide();
   root.addEventListener('click', event => {
+    const saveButton = event.target.closest('[data-save-result]');
+    if (saveButton && !saveButton.disabled && currentInputs) {
+      saveButton.disabled = true;
+      persist.checked = true;
+      persist.dispatchEvent(new window.Event('change'));
+      remember(currentInputs.a, currentInputs.b).then(saved => {
+        const status = $('[data-result-storage]', out);
+        if (status) status.textContent = storageStatus.textContent;
+        saveButton.disabled = saved;
+      });
+    }
     if (event.target.closest('[data-edit-profile]')) {
+      editing = true;
       form.hidden = false;
       root.querySelectorAll('[data-edit-profile]').forEach(button => button.setAttribute('aria-expanded', 'true'));
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -343,13 +377,15 @@ export async function mount(root) {
       await refreshPeople();
       picker('a').value = a0.profileId; if (b) picker('b').value = b0.profileId;
       storageStatus.textContent = tr("이 기기에 저장했습니다.", "Saved on this device.");
+      track('profile_save', { tool: mode, save_status: 'success' });
       if (entryPoint !== 'home') await showProfileGuide();
       return true;
-    } catch { storageStatus.textContent = tr("기기 저장에 실패했습니다. 결과는 계산되었지만 새로 방문하면 입력이 사라질 수 있습니다.", "Could not save on this device. Your result is ready, but your details may be lost when you return."); return false; }
+    } catch { track('profile_save', { tool: mode, save_status: 'failed' }); storageStatus.textContent = tr("기기 저장에 실패했습니다. 결과는 계산되었지만 새로 방문하면 입력이 사라질 수 있습니다.", "Could not save on this device. Your result is ready, but your details may be lost when you return."); return false; }
   }
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (submitting) return;
+    track('calc_attempt', { tool: mode, entry_point: originEntry });
     const a = readForm(form, 'a');
     const b = pair ? readForm(form, 'b') : null;
     const errA = check(a), errB = b && check(b);

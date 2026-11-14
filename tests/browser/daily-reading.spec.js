@@ -35,7 +35,9 @@ for (const lang of ['ko', 'en']) {
       for (let i = 0; i < expected.cats.length; i++) {
         const card = cards.nth(i), cat = expected.cats[i];
         await expect(card).toBeVisible();
-        await expect(card.locator('h3')).toHaveText(cat.name);
+        await expect(card).not.toHaveAttribute('open', '');
+        await card.locator(':scope > summary').press('Enter');
+        await expect(card.locator('.daily-cat-name')).toHaveText(cat.name);
         await expect(card.locator('.num')).toHaveText(`${cat.score}${lang === 'ko' ? '점' : ' points'}`);
         for (const field of ['outlook', 'opportunity', 'caution', 'action']) {
           await expect(card.locator(`[data-daily-${field}]`)).toBeVisible();

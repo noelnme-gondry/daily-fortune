@@ -12,7 +12,7 @@ export function track(name, params = {}) {
       } catch { /* 저장 차단 */ }
     }
     if (typeof window.gtag === 'function') window.gtag('event', name, {
-      ...adExperimentParams(), measurement_version: '2', usage_date: isoDate(todayKST()), ...params,
+      ...adExperimentParams(), measurement_version: '3', usage_date: isoDate(todayKST()), ...params,
       ...(entrySource ? { entry_source: entrySource } : {}),
     });
   } catch (e) { /* 분석 실패는 무시 */ }
@@ -33,6 +33,12 @@ export function trackInputStart(form, tool, entryPoint = tool) {
 export function initAutoEvents() {
   if (document.querySelector('.share-cta')) track('share_landing_view', { content_type: 'shared_result' });
   document.addEventListener('click', (e) => {
+    const summary = e.target.closest('#result details > summary');
+    if (summary && !summary.parentElement.open) {
+      const kind = summary.parentElement.classList.contains('reading-basis') ? 'basis' : summary.parentElement.classList.contains('daily-cat') ? 'area_detail' : 'chart_detail';
+      track('reading_detail_open', { detail_type: kind, tool: summary.closest('[data-tool]')?.dataset.tool });
+    }
+    if (e.target.closest('#result .chapter-card')) track('story_card_open', { tool: 'story' });
     const faq = e.target.closest('.faq-button');
     if (faq?.getAttribute('aria-expanded') === 'false') track('faq_open', { question: faq.textContent.slice(0, 90) });
     const a = e.target.closest('a');

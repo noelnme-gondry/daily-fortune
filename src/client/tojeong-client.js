@@ -59,7 +59,7 @@ export async function mountTojeong(root) {
       for (const input of inputs) { input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-errormessage', 'tj-error'); }
       (inputs.find(input => !input.value) || inputs[2]).focus();
     }
-    track('form_error', { tool: 'tojeong', entry_point: 'tojeong' });
+    track('form_error', { tool: 'tojeong', entry_point: 'tojeong', error_field: inputError ? 'birth_date' : 'reading_load' });
   };
   let latest = 0;
   async function render(p, source) {
@@ -72,6 +72,7 @@ export async function mountTojeong(root) {
     catch (e) { showError(e instanceof TojeongInputError ? inputError(e.message) : tr('토정비결을 계산하지 못했습니다. 입력을 확인해 주세요.', 'The Tojeong reading could not be calculated. Check your entries.'), true); return false; }
     const dateError = birthDateError(p);
     if (dateError) { showError(dateError, true); return false; }
+    if (source === 'form') track('calc_submit', { tool: 'tojeong', entry_point: 'tojeong' });
     out.setAttribute('aria-busy', 'true');
     try {
       const r = await reading(result.code);
@@ -81,6 +82,7 @@ export async function mountTojeong(root) {
       wireShare(out.querySelector('.result-share'), shareFor(result, r, p.name));
       field('error').hidden = true;
       track('calc_result', { tool: 'tojeong', calc_origin: source, entry_point: 'tojeong', reading_date: isoDate(todayKST()) });
+      if (source === 'form') track('calc_complete', { tool: 'tojeong', calc_origin: source, entry_point: 'tojeong', reading_date: isoDate(todayKST()) });
       return true;
     } catch {
       if (token === latest) showError(tr('토정비결 해설을 불러오지 못했습니다. 네트워크 연결을 확인한 뒤 다시 시도해 주세요.', 'The Tojeong reading could not be loaded. Check your network connection and try again.'));
@@ -99,7 +101,7 @@ export async function mountTojeong(root) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const p = read();
-    track('calc_submit', { tool: 'tojeong', entry_point: 'tojeong' });
+    track('calc_attempt', { tool: 'tojeong', entry_point: 'tojeong' });
     if (!(await render(p, 'form'))) return;
     const temporary = sessionSave('tojeong', p);
     if (persist.checked) {

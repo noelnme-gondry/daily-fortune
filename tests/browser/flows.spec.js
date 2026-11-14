@@ -1,4 +1,4 @@
-import { completeProfile } from './helpers/profile.js';
+import { completeProfile, editProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { todayKST } from '../../src/engine/core.js';
 import { buildChart, lifetime, month, year, sajuRank } from '../../src/engine/index.js';
@@ -15,10 +15,12 @@ async function ready(page, path) {
   await page.goto(path);
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('#tool-form')).not.toHaveAttribute('inert', '');
+  await editProfile(page);
   // 시각 입력과 시진 선택 중 하나만 보인다(저장된 방식에 따라 다름)
   await expect(page.locator('#a-time:visible, #a-branch:visible')).toHaveCount(1);
 }
 async function calculate(page, persist = false) {
+  await editProfile(page);
   await page.locator('#a-name').fill('검증');
   await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');
@@ -32,6 +34,7 @@ async function calculate(page, persist = false) {
 }
 async function calculateExact(page) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await editProfile(page);
   await page.locator('#a-name').fill('검증');
   await page.locator('input[name="a-gender"][value="F"]').check();
   await page.locator('#a-y').fill('1993');
@@ -594,16 +597,15 @@ test('결과 이미지 저장에도 해 로고가 로드되고 PNG가 생성된�
   await expect(page.locator('#result')).toContainText('이미지 다운로드를 시작했습니다.');
 });
 
-test('홈의 입력과 목적 탐색이 재미 카드보다 먼저 보인다', async ({ page }) => {
+test('홈의 재미 카드는 입력 옆에 있고 모바일에서는 입력 아래에 이어진다', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await ready(page, '/');
   const hero = await page.locator('.home-hero').boundingBox();
   const features = await page.locator('.home-features').boundingBox();
   const form = await page.locator('#tool-form').boundingBox();
   expect(hero.height).toBeLessThan(1100);
-  expect(features.y).toBeGreaterThan(form.y + form.height);
-  const purpose = await page.locator('.purpose-list').boundingBox();
-  expect(purpose.x).toBeGreaterThan(form.x);
+  expect(features.x).toBeGreaterThan(form.x + form.width);
+  expect(features.y).toBeLessThan(form.y + form.height);
   await expect(page.locator('.home-feature')).toHaveCount(3);
   await expect(page.locator('#a-name')).toBeHidden();
   const name = await page.locator('.name-disclosure > summary').boundingBox();
@@ -612,6 +614,7 @@ test('홈의 입력과 목적 탐색이 재미 카드보다 먼저 보인다', a
   expect((await page.locator('#a-y').boundingBox()).y).toBeLessThan(gender.y);
   for (const width of [320, 768, 1024]) {
     await page.setViewportSize({ width, height: 960 });
+    if (width <= 900) expect((await page.locator('.home-features').boundingBox()).y).toBeGreaterThan((await page.locator('#tool-form').boundingBox()).y);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   }
 });

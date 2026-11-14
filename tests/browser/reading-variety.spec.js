@@ -1,4 +1,4 @@
-import { completeProfile } from './helpers/profile.js';
+import { completeProfile, editProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { buildChart, day, week, ttiDay, ttiMonths, todayKST, isoDate, addDays } from '../../src/engine/index.js';
 import { withLanguage } from '../../src/i18n/runtime.js';
@@ -17,6 +17,7 @@ for (const lang of ['ko', 'en']) {
     for (const mode of ['today', 'tomorrow', 'week']) {
       await page.goto(`${prefix}/${mode}/`);
       await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+      await editProfile(page);
       await page.locator('input[name="a-gender"][value="F"]').check();
       await page.locator('#a-y').fill('1993');
       await page.locator('#a-m').selectOption('1');

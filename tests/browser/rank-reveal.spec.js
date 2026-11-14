@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { completeProfile } from './helpers/profile.js';
+import { completeProfile, editProfile } from './helpers/profile.js';
 
 test('내 순위를 공개하고 재계산하면 점과 등급 캐릭터, 특기가 새 결과에 맞춰 바뀐다', async ({ page, context }) => {
   await context.route('https://**/*', (route) => route.abort());
@@ -47,6 +47,7 @@ test('내 순위를 공개하고 재계산하면 점과 등급 캐릭터, 특기
   await expect(page.locator('#rank-details')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 
+  await editProfile(page);
   await page.locator('#a-notime').check();
   await submit.click();
   await expect(reveal).toBeVisible();

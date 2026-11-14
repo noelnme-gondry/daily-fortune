@@ -5,6 +5,7 @@ import { withLanguage } from '../../src/i18n/runtime.js';
 import { AD_POSITION_EXPERIMENT } from '../../src/domain/ad-experiment.js';
 import { EL_SLUG } from '../../src/engine/core.js';
 import { LUCKY_BANNERS } from '../../src/content/lucky-banners.js';
+import { editProfile } from './helpers/profile.js';
 
 const date = { y: 2026, m: 10, d: 27 };
 const input = { calendar: 'solar', y: 1993, m: 1, d: 28, gender: 'F', time: '03:40' };
@@ -21,7 +22,7 @@ const sdkStub = `window.partnerCalls = []; window.PartnersCoupang = { G: functio
   frame.width = options.width; frame.height = options.height;
   options.container.append(frame);
 } };`;
-const bannerConfig = element => ({ ...LUCKY_BANNERS[EL_SLUG[element]], width: '100%', height: '320', bordered: false, tsource: '' });
+const bannerConfig = (element, tool = 'today') => ({ ...LUCKY_BANNERS[EL_SLUG[element]], width: '100%', height: '320', bordered: false, tsource: `myod_lucky_${tool}` });
 
 test.beforeEach(async ({ context, page }) => {
   await context.route('https://**/*', route => route.abort());
@@ -33,6 +34,7 @@ test.beforeEach(async ({ context, page }) => {
 async function calculate(page, path, profile = input) {
   await page.goto(path);
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await editProfile(page);
   await page.locator(`#a-y`).fill(String(profile.y));
   for (const field of ['m', 'd']) await page.locator(`#a-${field}`).selectOption(String(profile[field]));
   await page.locator(`[name="a-gender"][value="${profile.gender}"]`).check();
@@ -51,6 +53,8 @@ async function checkBannerArea(page) {
   await expect(area.locator('a, button, img, li')).toHaveCount(0);
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
+    if (width <= 900) await expect(page.locator('#tool-form')).toBeHidden();
+    else await expect(page.locator('#tool-form')).toBeVisible();
     const box = await area.boundingBox();
     const result = await page.locator('#result').boundingBox();
     expect(box.width).toBe(Math.min(result.width, 784));
@@ -71,7 +75,8 @@ for (const lang of ['ko', 'en']) {
     for (const [path, report] of periods) {
       await calculate(page, `${prefix}${path}`);
       const color = withLanguage(lang, () => report().lucky.color);
-      await expect(page.locator('#result > .reading-overview > .report-head + .lucky + .lucky-banner')).toHaveCount(1);
+      await expect(page.locator('#result > .reading-overview > .lucky')).toHaveCount(1);
+      expect(await page.locator('#result > .lucky-banner').evaluate(el => el.previousElementSibling.matches('.daily-cats, .cats, .months'))).toBe(true);
       await expect(page.locator('#result .lucky > div:first-child b')).toHaveText(color);
       await expect(page.locator('#result [data-lucky-banner-slot]')).toHaveAttribute('data-lucky-banner-slot', EL_SLUG[withLanguage(lang, () => report().lucky.el)]);
       await expect(page.locator('#tool + .partner-ad')).toHaveCount(1);
@@ -87,9 +92,8 @@ for (const lang of ['ko', 'en']) {
       await calculate(page, `${prefix}${path}`);
       const colors = withLanguage(lang, () => [chart.roles.yong, chart.roles.hee].map(e => T.element[e].color.join(' · ')));
       await expect(page.locator('#result .lucky-palettes dd')).toHaveText(colors);
-      await expect(page.locator(path === '/lifetime/'
-        ? '.life > .reading-overview > section + .lucky-colors + .lucky-banner'
-        : '#result > .reading-overview > .chart-card + .lucky-colors + .lucky-banner')).toHaveCount(1);
+      await expect(page.locator('#result > .lucky-banner')).toHaveCount(1);
+      await expect(page.locator('#result .reading-overview > .lucky-colors')).toHaveCount(1);
       await expect(page.locator('#result [data-lucky-banner-slot]')).toHaveAttribute('data-lucky-banner-slot', EL_SLUG[chart.roles.yong]);
       await checkBannerArea(page);
       await page.locator('#a-notime').check();
@@ -124,7 +128,7 @@ test('실제 결과가 목·화·토·금·수로 바뀌면 오늘·평생운·�
       const slot = page.locator('[data-lucky-banner-slot]');
       await expect(slot).toHaveAttribute('data-lucky-banner-slot', EL_SLUG[element]);
       await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
-      expect(await page.evaluate(() => window.partnerCalls.at(-1))).toEqual(bannerConfig(element));
+      expect(await page.evaluate(() => window.partnerCalls.at(-1))).toEqual(bannerConfig(element, path.slice(1, -1)));
       await expect(slot.locator('iframe')).toHaveCount(1);
     }
   }
@@ -160,7 +164,7 @@ test('기존 B 저장값도 총운·행운색 순서와 결과 뒤 공통 배너
   for (const path of ['/today/', '/lifetime/']) {
     await calculate(page, path);
     await expect(page.locator('#tool + .partner-ad')).toHaveCount(1);
-    await expect(page.locator('.reading-overview > section + .lucky, .reading-overview > section + .lucky-colors')).toHaveCount(1);
+    await expect(page.locator('.reading-overview > .lucky, .reading-overview > .lucky-colors')).toHaveCount(1);
     await expect(page.locator('[data-partner-ad-slot]')).toHaveCount(1);
   }
 });

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { buildChart, day } from '../../src/engine/index.js';
+import { editProfile } from './helpers/profile.js';
 
 const profile = { gender: 'M', calendar: 'solar', y: 1990, m: 5, d: 17, time: '14:30' };
 test.beforeEach(async ({ context, page }) => {
@@ -12,6 +13,7 @@ async function ready(page, path = '/today/') {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
 }
 async function fill(page) {
+  await editProfile(page);
   await page.locator('#a-y').fill('1990');
   await page.locator('#a-m').selectOption('5');
   await page.locator('#a-d').selectOption('17');
@@ -50,12 +52,12 @@ test('KST 자정을 지난 재계산은 새 날짜의 실제 점수와 공유 �
   await expect(page.locator('#public-example')).toHaveAttribute('data-example-date', '2026-10-21');
 });
 
-test('시간 미입력 오류는 생일이 아닌 시간 필드에 연결한다', async ({ page }) => {
+test('시각 공란은 오류 없이 시간 미상으로 계산한다', async ({ page }) => {
   await ready(page); await fill(page);
   await page.locator('#a-time').fill('');
   await submit(page);
-  await expect(page.locator('#a-time')).toBeFocused();
-  await expect(page.locator('#a-time')).toHaveAttribute('aria-errormessage', 'tool-form-error');
+  await expect(page.locator('#result .report-head')).toBeVisible();
+  await expect(page.locator('.form-error:visible')).toHaveCount(0);
   await expect(page.locator('#a-y')).not.toHaveAttribute('aria-invalid');
 });
 test('홈 제출 뒤 오늘 페이지의 결과에도 홈 진입과 직접 입력 출처를 유지한다', async ({ page }) => {

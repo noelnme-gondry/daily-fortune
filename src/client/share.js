@@ -3,6 +3,7 @@ import { tr, isEnglish } from '../i18n/runtime.js';
 import { track } from './analytics.js';
 import { uiIcon } from '../site/icons.js';
 import { BRAND } from '../content/brand.js';
+import { trackedShareUrl } from '../domain/share-tracking.js';
 
 const KAKAO_KEY = import.meta.env.VITE_KAKAO_JS_KEY || '';
 const KAKAO_SDK = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js';
@@ -39,9 +40,10 @@ export function resultShareHtml() {
 export function wireShare(el, opts) {
   el.querySelectorAll('[data-share]').forEach((button) => { if (!button.querySelector('svg')) button.insertAdjacentHTML('afterbegin', uiIcon(button.dataset.share)); });
   const say = (m) => { const t = el.querySelector('.toast'); if (t) t.textContent = m; };
+  const urlFor = method => trackedShareUrl(opts.url, method, opts.kind || 'page');
   const socialUrls = {
-    x: `https://twitter.com/intent/tweet?text=${enc(opts.title)}&url=${enc(opts.url)}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${enc(opts.url)}`,
+    x: `https://twitter.com/intent/tweet?text=${enc(opts.title)}&url=${enc(urlFor('x'))}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${enc(urlFor('facebook'))}`,
   };
   // 공개 페이지 링크는 유지하되, 개인 결과 URL은 GA 자동 이탈 클릭 수집 대상인 href에 넣지 않는다.
   for (const [method, url] of Object.entries(socialUrls)) {
@@ -54,6 +56,7 @@ export function wireShare(el, opts) {
     const b = e.target.closest('[data-share]');
     if (!b) return;
     const method = b.dataset.share;
+    const url = urlFor(method);
     track('share', { method, content_type: opts.kind || 'page', item_id: location.pathname });
     const outcome = (status, completionType) => track(`share_${status}`, {
       method, content_type: opts.kind || 'page', item_id: location.pathname,
@@ -67,18 +70,18 @@ export function wireShare(el, opts) {
     if (method === 'x' || method === 'facebook' || method === 'band') { outcome('handoff', 'external_link'); return; }
     e.preventDefault();
     if (method === 'copy') {
-      try { await navigator.clipboard.writeText(opts.url); say(tr("링크를 복사했습니다.", "Link copied.")); outcome('complete', 'clipboard'); }
-      catch (er) { outcome('failed'); window.prompt(tr("아래 링크를 복사하세요", "Copy the link below"), opts.url); }
+      try { await navigator.clipboard.writeText(url); say(tr("링크를 복사했습니다.", "Link copied.")); outcome('complete', 'clipboard'); }
+      catch (er) { outcome('failed'); window.prompt(tr("아래 링크를 복사하세요", "Copy the link below"), url); }
     } else if (method === 'native') {
-      try { await navigator.share({ title: opts.title, text: opts.text, url: opts.url }); outcome('complete', 'native_api'); }
+      try { await navigator.share({ title: opts.title, text: opts.text, url }); outcome('complete', 'native_api'); }
       catch (er) { outcome(er.name === 'AbortError' ? 'cancel' : 'failed'); }
     } else if (method === 'kakao') {
       try {
         const Kakao = await loadKakao();
         Kakao.Share.sendDefault({
           objectType: 'feed',
-          content: { title: opts.title, description: opts.text || BRAND.descriptor, imageUrl: `${location.origin}${isEnglish() ? (opts.image || '/og-default.png').replace(/\.png$/, '-en.png') : (opts.image || '/og-default.png')}?v=sun`, link: { mobileWebUrl: opts.url, webUrl: opts.url } },
-          buttons: [{ title: opts.card ? tr("결과 보기", "View result") : tr("바로 가기", "Open page"), link: { mobileWebUrl: opts.url, webUrl: opts.url } }],
+          content: { title: opts.title, description: opts.text || BRAND.descriptor, imageUrl: `${location.origin}${isEnglish() ? (opts.image || '/og-default.png').replace(/\.png$/, '-en.png') : (opts.image || '/og-default.png')}?v=sun`, link: { mobileWebUrl: url, webUrl: url } },
+          buttons: [{ title: opts.card ? tr("결과 보기", "View result") : tr("바로 가기", "Open page"), link: { mobileWebUrl: url, webUrl: url } }],
         });
         outcome('handoff', 'kakao_sdk');
       } catch (er) { outcome('failed'); say(tr("카카오톡 공유를 불러오지 못했습니다. 링크 복사를 이용해 주세요.", "Could not load KakaoTalk sharing. Please copy the link instead.")); }
