@@ -1,4 +1,4 @@
-import { completeProfile } from './helpers/profile.js';
+import { completeProfile, editProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { EXAMPLE_INPUT, MANSE_BOUNDARIES } from '../../src/site/public-examples.js';
 import { buildChart, day, year, yearMonths, pillarH } from '../../src/engine/index.js';
@@ -12,6 +12,7 @@ test.beforeEach(async ({ context, page }) => {
 
 async function enter(page, input = EXAMPLE_INPUT) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await editProfile(page);
   await page.locator('#a-name').fill('가상비밀');
   await page.locator(`#a-y`).fill(String(input.y));
   for (const key of ['m', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
@@ -157,6 +158,7 @@ test('오늘·내일 공개 예시에서 직접 계산하면 같은 점수가 �
   const c = buildChart({ ...EXAMPLE_INPUT });
   for (const mode of ['today', 'tomorrow']) {
     await page.goto(`/${mode}/`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     const example = page.locator('#public-example');
     const [y, m, d] = (await example.getAttribute('data-example-date')).split('-').map(Number);
     const expected = day(c, { y, m, d }, mode);
@@ -175,6 +177,7 @@ test('오늘·내일 공개 예시에서 직접 계산하면 같은 점수가 �
     expect(JSON.stringify(logged)).not.toMatch(/가상비밀|1990|14:30|score_band/);
     await page.locator('[data-delete-profile]').click();
     await page.locator('[data-confirm-delete-all]').click();
+    await expect(page.locator('[data-storage-status]')).toContainText('삭제했습니다');
   }
 });
 

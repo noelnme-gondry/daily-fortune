@@ -1,13 +1,16 @@
 import { test, expect } from '@playwright/test';
 import { buildChart, compat, todayKST } from '../../src/engine/index.js';
+import { editProfile } from './helpers/profile.js';
 
 test.beforeEach(async ({ context }) => { await context.route('https://**/*', route => route.abort()); });
 const ready = async (page, path = '/today/') => { await page.goto(path); await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true'); };
 const fill = async (page, prefix = 'a', name = '나', year = '1990') => {
+  if (prefix === 'a' || prefix === 'b') await editProfile(page);
   await page.locator(`#${prefix}-name`).fill(name);
   await page.locator(`#${prefix}-y`).fill(year);
   for (const [key, value] of [['m', '5'], ['d', '15']]) await page.locator(`#${prefix}-${key}`).selectOption(value);
   await page.locator(`#${prefix}-time`).fill('12:00');
+  await page.locator(`[name="${prefix}-gender"][value="M"]`).check();
 };
 const people = page => page.evaluate(async () => (await import('/src/client/profile.js')).listPeople());
 const open = async page => { await page.locator('.profiles-tab').click(); await expect(page.locator('[data-add-person]')).toBeVisible(); };

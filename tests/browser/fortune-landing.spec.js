@@ -12,8 +12,9 @@ for (const lang of ['ko', 'en']) {
     await page.goto(`${prefix}/`);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     await expect(page.locator('.home-services')).toContainText(withLanguage(lang, () => FREE_ACCESS.description));
-    const order = await page.evaluate(() => ['.home-services', '.reading-guides', '.reading-guide-links', '.home-features'].map(s => document.querySelector(s).getBoundingClientRect().top));
+    const order = await page.evaluate(() => ['.home-services', '.reading-guides', '.reading-guide-links'].map(s => document.querySelector(s).getBoundingClientRect().top));
     expect(order.slice(1).every(top => top > order[0])).toBe(true);
+    expect(await page.locator('.home-features').evaluate(el => el.getBoundingClientRect().top)).toBeLessThan(order[0]);
     await expect(page.locator('.home-tools a')).toHaveCount(10);
     const button = page.locator('#tool-form [type="submit"]');
     await expect(button).toHaveText(lang === 'ko' ? '오늘의 운세 보기' : 'See today’s fortune');
@@ -58,12 +59,11 @@ for (const lang of ['ko', 'en']) {
     }
   });
 
-  test(`${lang}: 좁은 홈에서 생일과 시각 오류를 입력 옆에서 확인하고 시간 미상으로 계산한다`, async ({ page }) => {
+  test(`${lang}: 좁은 홈에서 생일 오류를 입력 옆에서 확인하고 시각 공란으로 계산한다`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 });
     await page.goto(`${prefix}/`);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     const submit = page.locator('#tool-form [type="submit"]');
-    const error = page.getByRole('alert');
     await submit.focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('#a-y')).toBeFocused();
@@ -71,11 +71,6 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('#a-y')).toHaveAttribute('aria-errormessage', 'tool-form-error');
     await completeProfile(page);
     await page.locator('#a-time').fill('');
-    await submit.click();
-    await expect(page.locator('#a-time')).toBeFocused();
-    await expect(page.locator('.field-time').getByRole('alert')).toBeInViewport();
-    await expect(error).toContainText(lang === 'ko' ? '시간을 몰라요' : 'Time unknown');
-    await page.locator('#a-notime').check();
     await submit.click();
     await expect(page.locator('#result .daily-cat')).toHaveCount(7);
     await expect(page.locator('#reading-summary')).toBeFocused();

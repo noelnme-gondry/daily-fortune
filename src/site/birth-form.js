@@ -27,9 +27,9 @@ export function personFields(p, legend, { deferDetails = false } = {}) {
       <label class="check"><input type="checkbox" id="${p}-leap" disabled>${tr(" 음력 윤달", " Lunar leap month")}</label>
     </fieldset>
     <fieldset class="field field-gender"><legend>${tr("성별", "Gender")}</legend>
-      <div class="seg"><label><input type="radio" name="${p}-gender" value="F"><span>${tr("여성", "Female")}</span></label><label><input type="radio" name="${p}-gender" value="M" checked><span>${tr("남성", "Male")}</span></label></div>
+      <div class="seg"><label><input type="radio" name="${p}-gender" value="F" required><span>${tr("여성", "Female")}</span></label><label><input type="radio" name="${p}-gender" value="M" required><span>${tr("남성", "Male")}</span></label></div>
     </fieldset>
-    <fieldset class="field field-time"><legend>${tr("태어난 시각", "Birth time")}</legend>
+    <fieldset class="field field-time"><legend>${tr("태어난 시각 (선택)", "Birth time (optional)")}</legend>
       <div class="seg seg-time"><label><input type="radio" name="${p}-tmode" value="exact" checked><span>${tr("시각 입력", "Enter a time")}</span></label><label><input type="radio" name="${p}-tmode" value="branch"><span>${tr("시진만 알아요", "I know the birth period")}</span></label></div>
       <input class="input" type="time" id="${p}-time" aria-label="${tr("태어난 시각", "Birth time")}" aria-describedby="${p}-time-hint">
       <select class="input" id="${p}-branch" aria-label="${tr("태어난 시진", "Two-hour birth period")}" aria-describedby="${p}-time-hint" hidden>${birthTimeOptions().map((t) => `<option value="${t.value}"${t.value === '6' ? ' selected' : ''}>${t.label}</option>`).join('')}</select>

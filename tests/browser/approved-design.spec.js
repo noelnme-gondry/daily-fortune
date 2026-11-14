@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { buildChart, day, lifetime, compat, branchRels, BR_H } from '../../src/engine/index.js';
 import { DEEP_EXAMPLE_INPUT as input, PARTNER_EXAMPLE_INPUT as partner } from '../../src/site/public-examples.js';
 import { withLanguage } from '../../src/i18n/runtime.js';
+import { editProfile } from './helpers/profile.js';
 
 const date = { y: 2026, m: 10, d: 24 };
 test.beforeEach(async ({ context, page }) => {
@@ -14,6 +15,7 @@ async function ready(page, path) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
 }
 async function fill(page, birth = input) {
+  await editProfile(page);
   await page.locator(`#a-y`).fill(String(birth.y));
   for (const key of ['m', 'd']) await page.locator(`#a-${key}`).selectOption(String(birth[key]));
   await page.locator(`[name="a-gender"][value="${birth.gender}"]`).check();
@@ -29,7 +31,7 @@ for (const lang of ['ko', 'en']) {
     await page.setViewportSize({ width: 390, height: 844 });
     await ready(page, `${prefix}/`);
     await expect(page.locator('#tool-form')).toBeVisible();
-    const order = await page.evaluate(() => ['#tool-form', '.purpose-list', '.home-features'].map(s => document.querySelector(s).getBoundingClientRect().top));
+    const order = await page.evaluate(() => ['#tool-form', '.home-features', '.home-services'].map(s => document.querySelector(s).getBoundingClientRect().top));
     expect(order[0]).toBeLessThan(order[1]); expect(order[1]).toBeLessThan(order[2]);
     expect(order[0]).toBeLessThan(600);
     await fill(page); await page.locator('#save-device').check(); await submit(page);
@@ -76,6 +78,7 @@ for (const lang of ['ko', 'en']) {
     await relation.press('Enter');
     await expect(panel).toBeHidden();
     await expect(chart.locator('.is-related')).toHaveCount(0);
+    await editProfile(page);
     await page.locator('#a-notime').check(); await submit(page);
     await expect(page.locator('[data-chart-branch="hour"]')).toHaveCount(0);
     await expect(chart.locator('[data-chart-relation*="hour"]')).toHaveCount(0);

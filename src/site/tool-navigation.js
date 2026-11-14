@@ -16,8 +16,8 @@ export function readingNavigation(mode, today) {
 }
 export function nextTools(mode, today) {
   const order = {
-    home: ['tomorrow', 'week', 'month'],
-    today: ['tomorrow', 'week', 'month'],
+    home: ['story', 'rank', 'tomorrow'],
+    today: ['story', 'rank', 'tomorrow'],
     tomorrow: ['week', 'today', 'month'],
     week: ['month', 'today', 'tomorrow'],
     month: [`year${today.y}`, 'week', 'today'],

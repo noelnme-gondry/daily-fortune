@@ -18,7 +18,7 @@
   --water: #27345a;
   --f-display: 'Hahmlet', 'Noto Serif KR', serif;
   --f-hanja: 'Noto Serif KR', 'Hahmlet', serif;
-  --f-body: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --f-body: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --r: 12px;
   --page-gutter: 16px;
   --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -43,6 +43,7 @@ h1, h2, h3, h4 { font-family: var(--f-display); font-weight: 500; text-wrap: bal
 p { margin: 0; }
 button, input, select { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.reading-overview[tabindex="-1"]:focus { outline: none; }
 [hidden] { display: none !important; }
 .wrap { max-width: 1160px; margin: 0 auto; padding-inline: var(--page-gutter); }
 .muted { color: var(--ink-2); }
@@ -58,7 +59,7 @@ button, input, select { font: inherit; color: inherit; }
 .site-head { background: var(--paper); border-bottom: 1px solid var(--line); }
 .head-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 12px 4px; }
 .language-switch { display: flex; gap: 4px; margin-left: auto; font-size: 12px; }
-.language-switch a { display: inline-flex; align-items: center; min-height: 36px; padding: 4px 8px; border-radius: 6px; text-decoration: none; color: var(--ink-2); }
+.language-switch a { display: inline-flex; align-items: center; min-height: 44px; padding: 4px 8px; border-radius: 6px; text-decoration: none; color: var(--ink-2); }
 .language-switch a[aria-current] { background: var(--sunk); color: var(--ink); font-weight: 500; }
 @media (max-width: 900px) {
   html[lang="en"] .brand-name small { max-width: 230px; }
@@ -74,7 +75,7 @@ button, input, select { font: inherit; color: inherit; }
 .gnav a { display: flex; align-items: center; justify-content: center; flex: 1; min-height: 48px; padding: 8px 10px; color: var(--ink-2); text-decoration: none; font-size: 14px; line-height: 1.4; border-bottom: 2px solid transparent; text-align: center; }
 .gnav a:hover { color: var(--ink); }
 .gnav a[aria-current="page"] { color: var(--accent); font-weight: 600; border-bottom-color: var(--accent); }
-.gnav .profiles-tab { flex: 1; min-height: 48px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--ink-2); font: 500 14px/1.4 var(--f-body); padding: 8px; cursor: pointer; }
+.gnav .profiles-tab { flex: 1; min-height: 48px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--ink-2); font: 500 14px/1.4 var(--f-body); padding: 8px; cursor: pointer; white-space: nowrap; }
 .gnav .profiles-tab:hover { color: var(--accent); background: var(--accent-soft); }
 .all-menu { margin-left: auto; }
 .all-menu > summary { cursor: pointer; min-height: 48px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 14px; color: var(--accent); }
@@ -221,6 +222,7 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .home-intro > a { justify-self: start; font-size: 14px; }
 .home-discovery { display: grid; gap: 16px; min-width: 0; }
 .home-discovery h2 { font-size: 22px; }
+.home-discovery .home-features { grid-template-columns: minmax(0, 1fr); }
 .purpose-list { display: grid; }
 .purpose-list a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 72px; padding: 12px 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
 .purpose-list span { display: grid; gap: 4px; }
@@ -261,8 +263,8 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .reading-guides b { font-size: 15px; }
 .reading-guides span { font-size: 13px; color: var(--ink-2); }
 .home-services > .note { margin-bottom: 14px; }
-.reading-entry { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.reading-entry a { display: grid; gap: 6px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--paper); text-decoration: none; }
+.reading-entry { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.reading-entry a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
 .reading-entry a:hover { border-color: var(--accent); }
 .reading-entry b { font-size: 15px; }
 .reading-entry span { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
@@ -271,6 +273,12 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 /* 계산기 */
 .tool { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start; }
 .tool-home { grid-template-columns: minmax(0, 1fr); }
+.tool.has-result:has(> form[hidden]) { grid-template-columns: minmax(0, 1fr); }
+body:has(.tool.has-result) #public-example { display: none; }
+.calculator-intro .lead { font-size: 15px; line-height: 1.6; }
+.tool .field-birth { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: center; }
+.tool .field-birth > :is(.check, .form-error) { grid-column: 1 / -1; }
+.tool .field-birth .check:has(:disabled) { display: none; }
 .tojeong-layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); align-items: start; gap: 24px; }
 .tojeong-years { display: flex; flex-wrap: wrap; gap: 10px; }
 .tojeong-result { display: grid; gap: 20px; min-width: 0; }
@@ -464,6 +472,9 @@ select.input { padding-right: 4px; }
 .result-next a { display: inline-flex; align-items: center; min-height: 44px; padding: 9px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); text-decoration: none; font-size: 14px; }
 .result-next a:hover { border-color: var(--accent); background: var(--accent-soft); }
 .result-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
+.result-action-group { display: grid; gap: 12px; grid-column: 1 / -1; min-width: 0; }
+.result-action-group .result-share { margin: 0; }
+.result-actions [data-result-storage]:empty { display: none; }
 .saved-entry { padding: 24px; display: grid; gap: 16px; border-color: var(--accent); margin-bottom: 18px; }
 .saved-entry h2 { font-size: 24px; }
 .saved-entry .link-btn { justify-self: start; }
@@ -477,10 +488,16 @@ select.input { padding-right: 4px; }
 .daily-links a:hover, .relation-trigger[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
 .daily-cat { padding: clamp(20px, 3vw, 28px); min-width: 0; scroll-margin-top: 90px; }
 .daily-cat-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
-.daily-cat-head h3 { font-size: 22px; margin-right: auto; }
+.daily-cat-name { font: 500 22px/1.35 var(--f-display); margin-right: auto; }
 .daily-cat-head .num { font-size: 20px; font-weight: 700; color: var(--accent); }
 .daily-cat p { font-size: 15px; line-height: 1.85; text-wrap: pretty; }
 .daily-cat .daily-outlook { font-size: 16px; }
+.daily-cat > summary { cursor: pointer; list-style: none; min-height: 44px; }
+.daily-cat > summary::-webkit-details-marker { display: none; }
+.daily-cat > summary::after { content: '+'; display: block; color: var(--accent); text-align: right; font-size: 22px; }
+.daily-cat[open] > summary::after { content: '−'; }
+.daily-preview { display: block; font-size: 16px; line-height: 1.85; }
+.daily-cat[open] .daily-preview { display: none; }
 .daily-cat h4 { font: 600 14px/1.5 var(--f-body); margin-bottom: 8px; }
 .daily-aspects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-block: 22px; }
 .daily-action { padding: 16px 18px; background: var(--accent-soft); border-radius: 8px; }
@@ -698,6 +715,7 @@ select.input { padding-right: 4px; }
 .partner-ad-slot > ins { display: block; width: 100%; }
 .partner-ad-slot iframe { display: block; width: 100%; border: 0; }
 .partner-ad[data-ad-context="result_footer"] { padding-top: 24px; padding-bottom: 16px; border-top: 1px solid var(--line); }
+.partner-ad:has([data-ad-state="unavailable"]), .lucky-banner:has([data-ad-state="unavailable"]) { display: none; }
 .partner-ad[data-ad-context="result_footer"] .partner-ad-inner {
   padding-left: var(--ad-safe-left); padding-right: var(--ad-safe-right);
 }

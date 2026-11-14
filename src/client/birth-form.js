@@ -30,14 +30,14 @@ export function fillForm(form, who, p) {
   if (!p) return;
   const f = (id) => $(`#${who}-${id}`, form);
   f('name').value = p.name || '';
-  const g = $(`input[name="${who}-gender"][value="${p.gender}"]`, form); if (g) g.checked = true;
+  form.querySelectorAll(`input[name="${who}-gender"]`).forEach(g => { g.checked = g.value === p.gender; });
   const c = $(`input[name="${who}-cal"][value="${p.calendar}"]`, form); if (c) c.checked = true;
   f('y').value = p.y ? String(p.y) : '';
   f('m').value = String(p.m); f('d').value = String(p.d);
   f('leap').checked = !!p.leap; f('leap').disabled = p.calendar !== 'lunar';
   const branch = p.timeMode === 'branch';
   $(`input[name="${who}-tmode"][value="${branch ? 'branch' : 'exact'}"]`, form).checked = true;
-  f('time').value = !branch && p.time ? p.time : '12:00';
+  f('time').value = !branch && p.time ? p.time : '';
   f('notime').checked = !!p.noTime;
   syncTime(form, who, branch ? p.timeBranch : undefined);
 }
@@ -46,17 +46,18 @@ export function readForm(form, who) {
   const mode = $(`input[name="${who}-tmode"]:checked`, form).value;
   return {
     name: f('name').value.trim().slice(0, 12),
-    gender: $(`input[name="${who}-gender"]:checked`, form).value,
+    gender: $(`input[name="${who}-gender"]:checked`, form)?.value || '',
     calendar: $(`input[name="${who}-cal"]:checked`, form).value,
     leap: f('leap').checked,
     y: f('y').validity.patternMismatch ? NaN : +f('y').value, m: +f('m').value, d: +f('d').value,
     timeMode: mode,
     time: mode === 'exact' ? f('time').value : null,
     timeBranch: mode === 'branch' ? f('branch').value : null,
-    noTime: f('notime').checked,
+    noTime: f('notime').checked || (mode === 'exact' && !f('time').value),
   };
 }
-export const check = (p) => birthDateError(p) || (!p.noTime && p.timeMode === 'exact' && !/^\d{1,2}:\d{2}$/.test(p.time || '') ? tr("태어난 시각을 입력하거나 ‘시간을 몰라요’를 선택해 주세요.", "Enter a birth time or select “Time unknown”.") : '');
+export const check = (p) => birthDateError(p) || (!['M', 'F'].includes(p.gender) ? tr('성별을 선택해 주세요. 대운 방향 계산에 사용합니다.', 'Select a gender. It is used to calculate the luck-cycle direction.') : '') || (!p.noTime && p.timeMode === 'exact' && !/^\d{1,2}:\d{2}$/.test(p.time || '') ? tr("태어난 시각을 입력하거나 ‘시간을 몰라요’를 선택해 주세요.", "Enter a birth time or select “Time unknown”.") : '');
+export const inputErrorField = p => birthDateError(p) ? 'birth_date' : !['M', 'F'].includes(p.gender) ? 'gender' : !p.noTime && p.timeMode === 'exact' && !/^\d{1,2}:\d{2}$/.test(p.time || '') ? 'birth_time' : 'birth_date';
 
 export function wireBirthForm(form, people) {
   people.forEach((p) => {

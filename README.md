@@ -68,8 +68,8 @@ GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint →
 - PC 오른쪽 결과 열의 행운색 소품 배너는 `src/content/lucky-banners.js`에서 최대 너비 784px·높이 320px로 관리합니다. 모바일은 화면 너비에 맞추고 높이 320px를 유지합니다.
 - 발급된 배너 `1039151`(`AF3219545`, `carousel`)를 공식 `g.js`의 `PartnersCoupang.G`로 연결합니다. 스크립트는 비동기로 한 번 불러오며, 차단·실패해도 운세 기능은 계속 동작합니다. 기존 애드센스 설정과 별개입니다.
 - 배너 위에 수수료 고지를 표시하며 개인정보처리방침에도 쿠팡 광고를 안내합니다. 이름·생년월일시는 배너 설정과 광고 영역 이벤트에 넣지 않습니다.
-- `ad_slot_view`는 활성 탭에서 배너 영역의 **50% 이상**이 보일 때 같은 문서의 페이지 경로당 공통(`common`)·행운색(`lucky`) 슬롯을 각각 한 번 전송합니다. 체류시간 조건은 없으며 재계산·행운색 변경은 추가 도달로 세지 않습니다. 실험 대상 계산기에서는 성공한 결과가 나온 뒤부터 측정합니다. 띠 메뉴의 부분 이동은 새 경로에서 다시 측정하고, 뒤로가기로 이미 측정한 경로에 돌아오면 중복 전송하지 않습니다. 새로고침·문서 이동 시에는 다시 측정합니다. 광고 차단 여부와 무관한 **영역 도달 지표**이며, 쿠팡의 실제 노출·클릭·구매 집계가 아닙니다. GA4 미설정 시 전송하지 않습니다.
-- 광고 계약은 `ad_measurement_version=1`, 기존 전역 계약은 `measurement_version=2`입니다. `ad_context`는 일반 콘텐츠 `content`, 계산 후 공통 배너 `result_footer`, 행운색 배너 `result`를 구분합니다. 계산기 이벤트에 `ad_layout_version=result_footer_v1`, `ad_placement=after_reading`을 붙이며, 이 배치값은 공통 배너를 뜻합니다. 이전 실험 자료와 합쳐 비교하지 않습니다. 광고 이벤트의 URL에는 query·fragment를 넣지 않고 오행·행운색·점수도 보내지 않습니다.
+- `ad_slot_view`는 활성 탭에서 배너 영역의 **50% 이상**이 보일 때 같은 문서의 페이지 경로당 공통(`common`)·행운색(`lucky`) 슬롯을 각각 한 번 전송합니다. 체류시간 조건은 없으며 재계산·행운색 변경은 추가 도달로 세지 않습니다. 실험 대상 계산기에서는 성공한 결과가 나온 뒤부터 측정합니다. 띠 메뉴의 부분 이동은 새 경로에서 다시 측정하고, 뒤로가기로 이미 측정한 경로에 돌아오면 중복 전송하지 않습니다. 새로고침·문서 이동 시에는 다시 측정합니다. **영역 도달 지표**이며, 쿠팡의 실제 노출·클릭·구매 집계가 아닙니다. SDK 로드 실패로 접힌 지면과 GA4 미설정 환경에서는 전송하지 않습니다.
+- 광고 계약은 `ad_measurement_version=1`, 전역 계약은 `measurement_version=3`입니다. `ad_context`는 일반 콘텐츠 `content`, 계산 후 공통 배너 `result_footer`, 행운색 배너 `result`를 구분합니다. 계산기 이벤트에 `ad_layout_version=result_footer_v1`, `ad_placement=after_reading`을 붙이며, 이 배치값은 공통 배너를 뜻합니다. 이전 실험 자료와 합쳐 비교하지 않습니다. 광고 이벤트의 URL에는 query·fragment를 넣지 않고 오행·행운색·점수도 보내지 않습니다. 쿠팡 설정의 `tsource`에는 `myod_common_<tool>` 또는 `myod_lucky_<tool>`을 넣고 일반 문서는 `content`로 구분합니다. SDK 로드 실패 지면은 고지와 함께 접습니다.
 
 ## 공유
 
@@ -84,29 +84,43 @@ GitHub Actions(`.github/workflows/ci.yml`)가 PR과 `main` 푸시마다 lint →
 
 | 이벤트 | 매개변수 | 시점 |
 |--------|----------|------|
-| `calc_start` | `tool` | 첫 입력 변경 또는 첫 제출, 문서당 한 번. 저장 결과 자동 복원은 제외 |
-| `calc_submit` | `tool` | 계산기 폼 제출 |
-| `calc_result` | `tool`, `calc_origin`(form·saved·sample) | 계산 성공 후 결과 표시 |
-| `form_error` | `tool` | 날짜 오류 |
+| `calc_start` | `tool`, `entry_point` | 첫 입력 변경 또는 첫 제출, 문서당 한 번. 저장 결과 자동 복원은 제외 |
+| `calc_attempt` | `tool`, `entry_point` | 검증 전 제출 시도. 오류가 난 시도도 포함 |
+| `calc_submit` | `tool`, `entry_point` | 폼 검증 통과. 토정비결은 작괘 검증 후 해설 로드 전 |
+| `calc_result` | `tool`, `calc_origin`, `entry_point`, `reading_date` | 모든 계산 성공. `form`·`session_restore`·`device_restore`·`legacy_restore`·`date_refresh` 구분 |
+| `calc_complete` | `tool`, `calc_origin=form`, `entry_point`, `reading_date` | 직접 제출한 계산 성공만. 홈 제출 후 오늘 페이지로 넘긴 결과도 한 번 포함 |
+| `form_error` | `tool`, `entry_point`, `error_field` | `birth_date`·`gender`·`birth_time`·`reading_load`. 입력값이나 오류 원문은 전송하지 않음 |
 | `ad_slot_view` | `ad_provider`(coupang), `ad_slot`(common/lucky), `ad_context`(content/result_footer/result), `ad_measurement_version`(1), `page_path`, query·fragment 없는 `page_location` | 활성 탭에서 슬롯 영역 50% 이상 도달, 같은 문서의 경로·슬롯 유형당 한 번 |
 | `ad_experiment_exposure` | 과거 실험 매개변수 | 과거 자료 전용. 새 배치에서는 전송하지 않음 |
 | `result_view` | `ad_layout_version`, `ad_placement`, `tool`, `page_path`, `reading_date` | 활성 탭에서 결과의 첫 제목 50% 이상 도달, 같은 문서의 경로·운세 날짜당 한 번 |
+| `result_section_view` | `tool`, `calc_origin`, `reading_date`, `section`, `page_path` | 요약·공유·분야·원국·캐릭터의 작은 섹션 표지 50% 도달. 경로·운세 날짜·섹션당 한 번. 본문 완독 지표가 아님 |
+| `reading_area_select` | `tool`, `area` | 종합·분야 칩 선택. 분야 이름만 전송 |
+| `reading_detail_open` | `tool`, `detail_type`(basis·area_detail·chart_detail) | 결과의 접힌 상세 열기 |
+| `rank_reveal` / `story_card_open` | `tool` | 순위 공개 / 인생 캐릭터 카드 상세 열기. 순위·점수·캐릭터 식별자는 제외 |
+| `profile_save_toggle` | `tool`, `save_enabled` | 기기 저장 선택 변경 |
+| `profile_save` | `tool`(계산기), `save_status`, `save_action`(목록 관리) | 기기 저장 성공·실패. 목록 관리의 성공은 add·edit로 구분 |
+| `profile_select` | `tool`(계산기), `selection_source`(form·manager) | 저장한 사람 선택. 이름·프로필 ID는 제외 |
+| `saved_result_open` / `calendar_day_open` | `tool` | 저장 정보로 오늘 결과 열기 / 달력 날짜 상세 열기 |
+| `share_landing_view` | `content_type=shared_result` | 공유 결과 착지 페이지 열기 |
 | `story_result` | 개인 결과 값 없음 | 인생 캐릭터 결과 |
 | `rank_result` | 개인 결과 값 없음 | 사주 랭킹 결과 |
 | `compat_result` | 개인 결과 값 없음 | 궁합 결과 |
 | `share` | `method`(kakao·native·copy·x·facebook·band·image), `content_type`, `item_id` | 공유 버튼 클릭 (GA4 권장 이벤트) |
-| `share_image` | `content_type` | 결과 이미지 저장 완료 |
+| `share_image` | `content_type` | 결과 이미지 다운로드 시작. 실제 파일 저장 완료는 브라우저에서 확인할 수 없음 |
+| `share_complete` / `share_handoff` / `share_cancel` / `share_failed` | `method`, `content_type`, `item_id`, `completion_type`(해당 시) | API 완료·외부 서비스/다운로드 인계·취소·실패. 외부 게시나 실제 파일 저장 완료를 보장하지 않음 |
 | `tooltip_open` | `tip` | 정보 아이콘 설명 열기 |
 | `faq_open` | `question` | FAQ 펼치기 |
 | `select_content` | `content_type`(card·fun_card·cta·result_tab·share_landing·public_example), `item_id` | 카드·CTA·결과 탭·공유 카드 CTA 클릭 |
 
-한국 검색 이용 흐름은 국가 `South Korea`, 세션 채널 `Organic Search`, 랜딩 경로를 기준으로 `page_view → calc_start → calc_result`를 나눠 봅니다. 운영 GA4에 `calc_result → fortune_view` 수정 규칙이 적용되어 있다면 실제 수신 이벤트명인 `fortune_view`를 사용합니다. `calc_origin=form`은 직접 입력, `saved`는 저장 입력의 재계산, `sample`은 홈의 예시 계산입니다. `saved`만으로 재방문을 확정하지 않고 GA4의 재방문 사용자·세션 정보와 함께 확인합니다. 다음 기능 이용은 `select_content`의 `result_tab`과 후속 경로의 성공 이벤트로 구분합니다. 핵심 이벤트 합계는 구매나 고유 사용자 수가 아닙니다.
+한국 검색 이용 흐름은 국가 `South Korea`, 세션 채널 `Organic Search`, 랜딩 경로를 기준으로 `page_view → calc_start → calc_attempt → calc_submit → calc_complete → result_view → share`를 나눠 봅니다. `calc_result`는 자동 복원도 포함하므로 직접 계산 전환에는 `calc_complete`를 사용합니다. `calc_origin=form`은 직접 제출(홈에서 넘긴 결과 포함), `session_restore`·`device_restore`·`legacy_restore`는 각각 탭·기기·이전 버전 입력 복원, `date_refresh`는 KST 날짜 변경 뒤 재계산입니다. 공개 예시는 계산 이벤트를 보내지 않습니다. 저장 복원만으로 재방문을 확정하지 않고 GA4 사용자·세션 정보와 함께 봅니다. 코드가 보내는 이름은 `calc_result`이며 운영 GA4의 과거 `fortune_view` 수정 규칙 적용 여부는 별도 확인이 필요합니다.
+
+공유 URL에는 채널별 `utm_source=kakao|native|copy|x|facebook`, `utm_medium=share`, `utm_campaign=<공유 종류>`를 전송 직전에 붙입니다. UTM에 개인 입력이나 점수는 넣지 않습니다. 공통 이벤트에는 `measurement_version=3`·`usage_date`를 붙이며, 공유 랜딩 CTA에서 온 계산 이벤트에는 `entry_source=shared_result`를 붙입니다. 이전 버전과 비교할 때 배포 시점을 구분하세요.
 
 기존 `source` 맞춤 정의는 새 `calc_origin` 데이터를 자동으로 읽지 않습니다. 배포 후 관리 화면의 측정기준 연결을 별도 변경해야 하며, 과거 데이터와 새 데이터는 적용 시점을 구분합니다.
 
 실험 대상 페이지의 계산·공유 등 이벤트에도 같은 실험 매개변수를 붙입니다. 모바일(900px 이하)은 결과 중간의 중복 운세 메뉴를 숨기고, 위로 스크롤하면 기존 로고·주요 메뉴를 다시 표시합니다. 아래로 스크롤하면 헤더가 숨고 키보드 포커스가 들어오면 다시 나타납니다.
 
-`calc_result`·`share`를 GA4에서 **주요 이벤트(전환)**로 표시해 두면 유입 채널별 계산·공유 전환율을 볼 수 있습니다.
+직접 계산 전환은 `calc_complete`, 공유 시도는 `share`, 클립보드·공유 API 완료는 `share_complete`로 구분합니다. 핵심 이벤트 합계는 구매나 고유 사용자 수가 아닙니다. GA4 맞춤 정의 등록과 과거 이벤트 수정 규칙 확인은 [TODO.md](TODO.md)에 남겨 두었습니다.
 
 ## 구조
 

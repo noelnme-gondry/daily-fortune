@@ -23,7 +23,8 @@ for (const lang of ['ko', 'en']) {
     assert.ok(body.includes(FREE_ACCESS.description));
     const services = body.indexOf('class="box-sec home-services"');
     assert.ok(body.indexOf('id="tool"') < services);
-    for (const marker of ['class="reading-guides"', 'class="box-sec reading-guide-links"', 'class="home-features"']) assert.ok(services < body.indexOf(marker));
+    for (const marker of ['class="reading-guides"', 'class="box-sec reading-guide-links"']) assert.ok(services < body.indexOf(marker));
+    assert.ok(body.indexOf('class="home-features"') < services);
     const cards = body.match(/<div class="cards home-tools">([\s\S]*?)<\/div>/)[1];
     const paths = [...cards.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
     assert.equal(paths.length, 10);

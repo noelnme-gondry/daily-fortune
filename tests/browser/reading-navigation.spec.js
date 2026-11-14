@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { buildChart, day, week, month, year, addDays } from '../../src/engine/index.js';
+import { editProfile } from './helpers/profile.js';
 
 const date = { y: 2026, m: 11, d: 5 };
 const input = { calendar: 'solar', gender: 'M', y: 1990, m: 5, d: 15, time: '12:00' };
 const ready = page => expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
 const fill = async (page, name = '가족 예시') => {
+  await editProfile(page);
   await page.locator(`#a-y`).fill(String(input.y));
   for (const key of ['m', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
   await page.locator('#a-name').fill(name); await page.locator('#a-time').fill(input.time);
@@ -59,6 +61,7 @@ for (const prefix of ['', '/en']) {
       await page.setViewportSize({ width, height: 900 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
     }
+    await editProfile(page);
     await page.locator('[name="a-gender"][value="F"]').check(); await page.locator('#a-notime').check();
     await page.locator('#tool-form [type=submit]').click(); await page.locator('.chart-basis > summary').click();
     const c = buildChart({ ...input, gender: 'F', time: null });

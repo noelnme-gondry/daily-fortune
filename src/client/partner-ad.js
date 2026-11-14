@@ -10,11 +10,15 @@ const resultViewedPaths = new Set();
 let stopTracking;
 let stopLuckyTracking;
 let stopResultTracking;
+let stopSectionTracking = [];
+const sectionViewedPaths = new Set();
 let resultReady = false;
 let partnerSdk;
 
 // 재계산으로 결과 HTML을 교체해도 기존 광고 지면을 한 개만 유지한다.
 export function clearResultWithPartnerAd(out) {
+  stopSectionTracking.forEach(stop => stop?.());
+  stopSectionTracking = [];
   stopResultTracking?.();
   stopTracking?.();
   stopLuckyTracking?.();
@@ -26,6 +30,8 @@ export function clearResultWithPartnerAd(out) {
 }
 
 export function renderResultWithPartnerAd(out, html, resultParams = {}) {
+  stopSectionTracking.forEach(stop => stop?.());
+  stopSectionTracking = [];
   stopResultTracking?.();
   stopTracking?.();
   stopLuckyTracking?.();
@@ -43,7 +49,11 @@ export function renderResultWithPartnerAd(out, html, resultParams = {}) {
   if (ad) initPartnerAd();
   summary?.setAttribute('data-result-summary', '');
   const start = summary?.querySelector('[data-result-heading], h2, h3');
-  if (start) stopResultTracking = observeView(start, 'result_view', resultViewedPaths, { measurement_version: '2', ...resultParams }, `${location.pathname}:${resultParams.reading_date || ''}`);
+  if (start) stopResultTracking = observeView(start, 'result_view', resultViewedPaths, resultParams, `${location.pathname}:${resultParams.reading_date || ''}`);
+  for (const [section, selector] of [['summary', '[data-result-heading], .report-head h2, .tojeong-summary h2'], ['sharing', '.result-share'], ['areas', '.daily-intro'], ['chart', '.chart-disclosure > summary'], ['characters', '.story-board .sec-head']]) {
+    const target = out.querySelector(selector);
+    if (target) stopSectionTracking.push(observeView(target, 'result_section_view', sectionViewedPaths, { ...resultParams, section }, `${location.pathname}:${resultParams.reading_date || ''}:${section}`));
+  }
   if (!ad) return;
   if (share) {
     resultReady = true;
@@ -62,7 +72,7 @@ export function initPartnerAd() {
   const mount = () => slots.filter(slot => slot.isConnected).forEach(slot => {
     try {
       // 공식 g.js의 container 옵션으로 비동기 로드 후에도 지정한 지면에 삽입한다.
-      new window.PartnersCoupang.G({ ...JSON.parse(slot.dataset.partnerAdConfig), container: slot });
+      new window.PartnersCoupang.G({ ...JSON.parse(slot.dataset.partnerAdConfig), tsource: `myod_${slot.dataset.partnerAdSlot || 'lucky'}_${adExperimentParams().tool || 'content'}`, container: slot });
       slot.querySelector('iframe')?.setAttribute('title', tr("쿠팡 파트너스 상품 광고", "Coupang Partners product advertisement"));
       slot.dataset.adState = 'initialized';
     } catch (error) { slot.dataset.adState = 'unavailable'; }

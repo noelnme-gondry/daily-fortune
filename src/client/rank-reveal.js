@@ -1,4 +1,5 @@
 import { tr } from '../i18n/runtime.js';
+import { track } from './analytics.js';
 import { JOB_BY_ID } from '../content/character-jobs.js';
 import { TIPS } from '../content/tips.js';
 import { rankDistribution } from '../domain/rank-distribution.js';
@@ -62,6 +63,7 @@ export function wireRankReveal(out) {
   out.addEventListener('click', (event) => {
     const button = event.target.closest('[data-rank-reveal]');
     if (!button || button.getAttribute('aria-expanded') === 'true') return;
+    track('rank_reveal', { tool: 'rank' });
     out.querySelectorAll('[data-rank-locked]').forEach((el) => { el.hidden = false; });
     out.querySelector('[data-rank-intro]').hidden = true;
     button.setAttribute('aria-expanded', 'true');

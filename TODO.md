@@ -25,7 +25,12 @@
 - [ ] **관리 → 맞춤 정의**에서 이벤트 범위 측정기준 등록
   - [ ] `tool`, `calc_origin` (과거 `source`에서 전환 시 적용일 기록)
   - [ ] `method`, `content_type`, `item_id`, `tip`, `question`
+  - [ ] `entry_point`, `entry_source`, `error_field`, `measurement_version`
+  - [ ] `reading_date`, `usage_date`, `completion_type`, `page_path`, `section`
+  - [ ] `ad_slot`, `ad_context`, `ad_provider`, `ad_layout_version`, `ad_placement`, `ad_measurement_version`
+  - [ ] `area`, `detail_type`, `save_enabled`, `save_status`, `save_action`, `selection_source`
 - [ ] **관리 → 이벤트**의 기존 수정 규칙·핵심 이벤트 확인 (`calc_result → fortune_view`가 적용되어 있으면 수신 이벤트명 기준). 핵심 이벤트를 구매로 해석하지 않기
+- [ ] 직접 계산 전환을 `calc_complete`로 구분하고 `calc_result`의 자동 복원 포함 여부를 확인. 배포 전후 `measurement_version=2/3`을 구분
 - [ ] (선택) 데이터 보관 기간 14개월로 변경
 - 이벤트 전체 목록: README의 "GA4 이벤트" 표
 
@@ -38,6 +43,7 @@
   - [ ] `ADSENSE_SLOT_INLINE` — 계산기 아래, 백과 본문 중간
   - [ ] `ADSENSE_SLOT_BOTTOM` — 페이지 하단
 - [ ] **개인정보 보호 및 메시지**에서 유럽(EEA·영국·스위스) 동의 메시지(CMP) 켜기
+- [ ] 운영 CMP·Consent Mode 연동 상태와 GA4 동의 신호 확인(2026-11-14 코드 검토만으로 운영 설정은 미확인)
 - 광고를 잠시 끄려면 `ADSENSE_CLIENT=off`
 
 ## 4. 카카오톡 공유 (권장)

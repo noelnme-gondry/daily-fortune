@@ -6,6 +6,7 @@ import { buildChart } from '../engine/index.js';
 import { wireBirthForm, fillForm, readForm, check, syncTime } from './birth-form.js';
 import { listPeople, savePerson, deletePerson, selectPerson, profileLabel, toEngine } from './profile.js';
 import { showProfileGuide } from './profile-navigation.js';
+import { track } from './analytics.js';
 
 export async function openProfiles(opener) {
   const dialog = document.getElementById('profile-manager');
@@ -39,6 +40,7 @@ export async function openProfiles(opener) {
       busy = true; form.inert = true;
       try {
         await savePerson(input, person?.id);
+        track('profile_save', { save_status: 'success', save_action: person ? 'edit' : 'add' });
         await renderList();
         feedback.textContent = tr('이 기기에 저장했습니다.', 'Saved on this device.');
         content.querySelector('[data-add-person]').focus();
@@ -62,6 +64,7 @@ export async function openProfiles(opener) {
         busy = true; await deletePerson(data.confirmDelete); await renderList();
         feedback.textContent = tr('저장 정보를 삭제했습니다.', 'Saved person deleted.'); content.querySelector('[data-add-person]').focus();
       } else if (data.usePerson) {
+        track('profile_select', { selection_source: 'manager' });
         busy = true;
         const tojeong = document.getElementById('tojeong-tool');
         const saved = people.find(person => person.id === data.usePerson);
