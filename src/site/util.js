@@ -19,10 +19,15 @@ export const link = (href, text, cls = '') => `<a href="${attr(href)}"${cls ? ` 
 export function faqBlock(faq, title = tr('자주 묻는 질문', 'Frequently asked questions')) {
   if (!faq || !faq.length) return '';
   const tag = title ? 'section' : 'div';
-  return `<${tag} class="faq"${title ? ` aria-labelledby="faq-h"><h2 id="faq-h">${esc(title)}</h2>` : '>'}${faq.map((f, i) => `<div class="faq-item"><h3><button type="button" class="faq-button" data-disclosure aria-expanded="true" aria-controls="faq-answer-${i}">${esc(f.q)}${uiIcon('plus')}</button></h3><p id="faq-answer-${i}">${esc(f.a)}</p></div>`).join('')}</${tag}>`;
+  return `<${tag} class="faq"${title ? ` aria-labelledby="faq-h"><h2 id="faq-h">${esc(title)}</h2>` : '>'}${faq.map((f, i) => `<article class="faq-item"><h3>${esc(f.q)}</h3><p id="faq-answer-${i}">${esc(f.a)}</p></article>`).join('')}</${tag}>`;
 }
-export function disclosure(id, title, body, icon = 'book') {
-  return `<section class="disclosure"><h2><button class="disclosure-button" type="button" data-disclosure aria-expanded="true" aria-controls="${id}">${uiIcon(icon)}<span>${esc(title)}</span>${uiIcon('plus')}</button></h2><div class="disclosure-body" id="${id}">${body}</div></section>`;
+let explanationSequence = 0;
+export function detailDialog(id, title, body, buttonLabel = tr('자세히 보기', 'Read more')) {
+  id ||= `explanation-${++explanationSequence}`;
+  return `<button class="sbtn explanation-button" type="button" data-dialog="${id}" aria-haspopup="dialog" aria-controls="${id}">${esc(buttonLabel)} ${uiIcon('arrow')}</button><dialog class="explanation-dialog" id="${id}" aria-labelledby="${id}-title"><div class="dialog-bar"><h2 id="${id}-title">${esc(title)}</h2><button class="sbtn" type="button" data-close-dialog autofocus>${tr('닫기 ×', 'Close ×')}</button></div><div class="explanation-body">${body}</div></dialog>`;
+}
+export function disclosure(id, title, body) {
+  return `<section class="information-topic">${detailDialog(id, title, body, tr(`${title} 보기`, `Open ${title.toLowerCase()}`))}</section>`;
 }
 export function faqLd(faq) {
   if (!faq || !faq.length) return null;

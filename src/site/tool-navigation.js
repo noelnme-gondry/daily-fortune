@@ -12,7 +12,7 @@ export function toolNavigation(today) {
 }
 export function readingNavigation(mode, today) {
   const tools = toolNavigation(today);
-  return `<section class="reading-navigation" aria-label="${tr('기간과 풀이 선택', 'Choose a period or reading')}"><nav class="period-switch" aria-label="${tr('기간별 운세', 'Reading period')}"><b>${tr('기간', 'Period')}</b><div>${tools.filter(t => t.group === 'period').map(t => `<a href="${t.path}#reading-summary" data-period-link${t.key === mode ? ' aria-current="page"' : ''}>${esc(t.nav)}</a>`).join('')}</div></nav><details class="reading-more"><summary>${tr('사주·궁합 등 다른 풀이', 'Birth chart, compatibility and more')}</summary><nav aria-label="${tr('다른 풀이 선택', 'Other readings')}">${tools.filter(t => t.group === 'chart').map(t => `<a href="${t.path}"${t.key === mode ? ' aria-current="page"' : ''}>${esc(t.nav)}</a>`).join('')}</nav></details></section>`;
+  return `<section class="reading-navigation" aria-label="${tr('기간 선택', 'Choose a period')}"><nav class="period-switch" aria-label="${tr('날짜별 운세', 'Fortunes by date')}"><b>${tr('날짜별 운세', 'By date')}</b><div>${tools.filter(t => t.group === 'period').map(t => `<a href="${t.path}#reading-summary" data-period-link${t.key === mode ? ' aria-current="page"' : ''}>${esc(t.nav)}</a>`).join('')}</div></nav></section>`;
 }
 export function nextTools(mode, today) {
   const order = {

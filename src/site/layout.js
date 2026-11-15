@@ -1,4 +1,5 @@
 // 공통 HTML 뼈대: 메타 태그, Open Graph, JSON-LD(@graph), 헤더 내비게이션, 이동 경로, 푸터
+import { navigationGroups, groupedLinks } from './purpose-navigation.js';
 import { SITE } from '../content/pages.js';
 import { BRAND } from '../content/brand.js';
 import { esc, attr, abs } from './util.js';
@@ -31,17 +32,7 @@ const labels = {
 const label = (text) => tr(text, labels[text] || text.replace(/^(\d{4})년 (운세|띠별 운세|만세력)$/, (_, year, kind) => kind === '운세' ? year : `${year} ${kind === '띠별 운세' ? 'zodiac' : 'calendar'}`));
 
 export function navItems(ctx) {
-  const y = ctx.today.y;
-  return [
-    ['/today/', '오늘의 운세'], ['/tomorrow/', '내일 운세'], ['/week/', '주간'], ['/month/', '월간'],
-    [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/tojeong/', '무료 토정비결'], ['/life-story/', '내 인생 캐릭터'], ['/saju-ranking/', '사주 랭킹'],
-    ['/compatibility/', '궁합'], ['/tti/', '띠별 운세'], ['/manseryeok/', '만세력'], ['/saju/', '사주 백과'], ['/guides/', '운세 이용 가이드'],
-  ];
-}
-
-function navHtml(page, ctx) {
-  const current = (path) => page.path === path || page.section === path;
-  return navItems(ctx).map(([path, name]) => `<a href="${path}"${current(path) ? ' aria-current="page"' : ''}>${esc(label(name))}</a>`).join('');
+  return navigationGroups(ctx.today).flatMap(g => g.links.map(l => [l.path, l.name]));
 }
 
 function footerGroups(ctx) {
@@ -130,8 +121,8 @@ export function layout(page, ctx) {
   const img = `${ctx.site}${ctx.lang === 'en' ? image.replace(/\.png$/, '-en.png') : image}?v=sun`;
   const cfg = ctx.cfg;
   const ads = cfg.adsense && allowsAds(page);
-  const nav = navHtml(page, ctx);
-  const foot = footerGroups(ctx).map(([h, links]) => `<div><h2>${esc(label(h))}</h2><ul>${links.map(([p, n]) => `<li><a href="${p}">${esc(label(n))}</a></li>`).join('')}</ul></div>`).join('');
+  const groups = navigationGroups(ctx.today);
+  const foot = [...groups.map(g => [g.name, g.links.map(l => [l.path, l.name])]), footerGroups(ctx).at(-1)].map(([h, links]) => `<div><h2>${esc(label(h))}</h2><ul>${links.map(([p, n]) => `<li><a href="${p}">${esc(label(n))}</a></li>`).join('')}</ul></div>`).join('');
   const ld = JSON.stringify(graph(page, ctx)).replace(/</g, '\\u003c');
   return localizedLinks(`<!doctype html>
 <html lang="${ctx.lang || 'ko'}">
@@ -168,7 +159,7 @@ ${page.ogType === 'article' ? `<meta property="article:modified_time" content="$
 <link rel="manifest" href="${ctx.lang === 'en' ? '/en' : ''}/site.webmanifest?v=sun">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;600;700&family=Noto+Serif+KR:wght@600;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap">
 <link rel="stylesheet" href="${ctx.assets.css}">
 ${page.tool && ctx.assets.tool ? `<link rel="modulepreload" href="${ctx.assets.tool}">\n` : ''}<script type="application/ld+json">${ld}</script>
 ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-account" content="${attr(cfg.adsense.client)}">
@@ -178,13 +169,15 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
 <header class="site-head">
   <div class="wrap head-row">
     <a class="brand" href="/"><img class="brand-logo" src="${BRAND.logo}" alt="" width="48" height="48"><span class="brand-name"><b>${BRAND.name}</b><small>${BRAND.descriptor}</small></span></a>
+    <button type="button" class="profiles-tab link-btn" data-manage-profiles aria-haspopup="dialog" aria-controls="profile-manager">${tr('저장한 사람', 'Saved people')}</button>
     <nav class="language-switch" aria-label="${tr('언어 선택', 'Language')}"><a data-set-language="ko" href="${attr(languagePath(page.path, 'ko'))}" hreflang="ko" lang="ko"${ctx.lang !== 'en' ? ' aria-current="true"' : ''}>한국어</a><a data-set-language="en" href="${attr(languagePath(page.path, 'en'))}" hreflang="en" lang="en"${ctx.lang === 'en' ? ' aria-current="true"' : ''}>English</a></nav>
   </div>
   <div class="wrap gnav-row">
-    <nav class="gnav" aria-label="${tr('주요 메뉴', 'Main navigation')}">${[['/today/', tr('오늘', 'Today')], ['/lifetime/', tr('내 사주', 'My saju')], ['/compatibility/', tr('궁합', 'Compatibility')]].map(([path, name]) => `<a href="${path}"${page.path === path || (path === '/today/' && page.path === '/') ? ' aria-current="page"' : ''}>${name}</a>`).join('')}<button type="button" class="profiles-tab" data-manage-profiles aria-haspopup="dialog" aria-controls="profile-manager">${tr('저장한 사람', 'People')}</button></nav>
-    <details class="all-menu"><summary>${tr('전체', 'All')}</summary><nav class="menu-panel" aria-label="${tr('전체 메뉴', 'All navigation')}">${nav}</nav></details>
+    <nav class="gnav" aria-label="${tr('주요 메뉴', 'Main navigation')}">${groups.map(g => `<a href="${g.links[0].path}"${g.links.some(l => l.path === page.path) || (g === groups[0] && page.path === '/') ? ' aria-current="page"' : ''}><b>${esc([tr('날짜별 운세', 'By date'), tr('내 사주 이해', 'My saju'), tr('두 사람 궁합', 'Compatibility'), tr('캐릭터·랭킹', 'Characters & ranks'), tr('사주 읽는 법', 'Reading guide')][groups.indexOf(g)])}</b><small>${esc(g.note)}</small></a>`).join('')}</nav>
+    <button type="button" class="all-menu-button sbtn" data-dialog="site-menu" aria-haspopup="dialog" aria-controls="site-menu">${tr('전체 메뉴', 'All menus')}</button>
   </div>
 </header>
+<dialog id="site-menu" class="site-menu" aria-labelledby="site-menu-title"><div class="dialog-bar"><h2 id="site-menu-title">${tr('무엇을 살펴볼까요?', 'What would you like to explore?')}</h2><button class="sbtn" type="button" data-close-dialog autofocus>${tr('닫기 ×', 'Close ×')}</button></div><nav class="menu-panel" aria-label="${tr('전체 메뉴', 'All navigation')}">${groupedLinks(ctx.today, page.path)}</nav></dialog>
 <dialog id="profile-manager" class="profile-manager" aria-labelledby="profile-manager-title"><h2 id="profile-manager-title">${tr('저장한 사람', 'Saved people')}</h2></dialog>
 <aside class="profile-coach" data-profile-coach hidden role="status"><strong>${tr('저장한 사람은 여기서 관리하세요', 'Your people, all in one place')}</strong><p>${tr('위 메뉴의 ‘저장한 사람’에서 가족을 추가하고, 정보를 수정하거나 골라 볼 수 있어요.', 'Open People in the menu to add family, edit details, or choose whose reading to see.')}</p><div><button class="sbtn" type="button" data-manage-profiles aria-controls="profile-manager" aria-haspopup="dialog">${tr('저장한 사람 열기', 'Open People')}</button><button class="link-btn" type="button" data-dismiss-profile-guide>${tr('확인', 'Got it')}</button></div></aside>
 <main id="main" class="wrap">
