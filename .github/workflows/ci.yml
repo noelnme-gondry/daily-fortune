@@ -31,3 +31,10 @@ jobs:
       - run: npm run test:browser
         env:
           CI: 'true'
+      - name: Keep browser layout evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-layout-evidence
+          path: test-results/
+          retention-days: 7
