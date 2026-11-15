@@ -7,7 +7,7 @@ test.beforeEach(async ({ context }) => { await context.route('https://**/*', (ro
 
 for (const lang of ['ko', 'en']) {
   const prefix = lang === 'en' ? '/en' : '';
-  test(`${lang}: JS 없이도 연간 강점·주의점과 내일의 생활 해설을 읽고 근거를 펼친다`, async ({ page }) => {
+  test(`${lang}: JS 없이도 연간 강점·주의점과 내일의 생활 해설을 읽고 근거를 읽는다`, async ({ page }) => {
     const today = todayKST();
     const annual = withLanguage(lang, () => ttiYear(0, today.y));
     await page.goto(`${prefix}/tti/${today.y}/rat/`);
@@ -15,16 +15,13 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('.cats-static .cat > p')).toHaveText(annual.cats.map((c) => c.text));
     await expect(page.locator('.cats-static .cat-top .num')).toHaveText(annual.cats.map((c) => String(c.score)));
     const annualBasis = page.locator('main .tti-reading-basis').first();
-    await expect(annualBasis.locator('p').first()).not.toBeVisible();
-    await annualBasis.locator('summary').focus();
-    await page.keyboard.press('Enter');
+    await expect(annualBasis.locator('p').first()).toBeVisible();
     await expect(annualBasis.locator('p').first()).toHaveText(annual.basis);
     await expect(annualBasis.locator('p').first()).toBeVisible();
     const months = withLanguage(lang, () => ttiMonths(0, today.y));
     await expect(page.locator('[data-monthly-flow] article > p')).toHaveText(months.map((m) => m.text));
-    const monthBasis = page.locator('[data-monthly-flow] details').first();
-    await expect(monthBasis.locator('p')).not.toBeVisible();
-    await monthBasis.locator('summary').click();
+    const monthBasis = page.locator('[data-monthly-flow] .tti-reading-basis').first();
+    await expect(monthBasis.locator('p')).toBeVisible();
     await expect(monthBasis.locator('p')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 
@@ -34,9 +31,7 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('.tti-advice')).toContainText(tomorrow.advice);
     await expect(page.locator('.tti-caution')).toContainText(tomorrow.caution);
     const dailyBasis = page.locator('main .tti-reading-basis');
-    await expect(dailyBasis.locator('.tti-factors')).not.toBeVisible();
-    await dailyBasis.locator('summary').focus();
-    await page.keyboard.press('Enter');
+    await expect(dailyBasis.locator('.tti-factors')).toBeVisible();
     await expect(dailyBasis.locator('.tti-factors')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   });

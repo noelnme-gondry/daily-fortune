@@ -65,7 +65,7 @@ for (const lang of ['ko', 'en']) {
       await expect(cards.nth(i).locator('[data-daily-outlook]')).toHaveText(expected.cats[i].reading.outlook);
       await expect(cards.nth(i).locator('.num')).toHaveText(`${expected.cats[i].score}${lang === 'ko' ? '점' : ' points'}`);
     }
-    await page.locator('.chart-disclosure > summary').click();
+    await expect(page.locator('.chart-disclosure .chart-card')).toBeVisible();
     const chart = page.locator('.chart-card');
     const relation = chart.locator('[data-chart-relation="year,hour"]').filter({ hasText: lang === 'ko' ? '육합' : 'Six-combination' });
     await relation.click();
@@ -88,7 +88,7 @@ for (const lang of ['ko', 'en']) {
     // 다른 생일도 원국의 실제 관계와 동일하며 시안의 글자를 고정하지 않는다.
     const alternate = { ...input, y: 1993, m: 1, d: 28, time: '03:40' };
     await fill(page, alternate); await submit(page);
-    await page.locator('.chart-disclosure > summary').click();
+    await expect(page.locator('.chart-disclosure .chart-card')).toBeVisible();
     const c = buildChart(alternate);
     const pairs = c.cols.flatMap((a, i) => c.cols.slice(i + 1).flatMap(b => branchRels(a.b, b.b).map(kind => ({ a, b, kind }))));
     await expect(chart.locator('[data-chart-relation]')).toHaveCount(pairs.length);

@@ -35,8 +35,8 @@ for (const prefix of ['', '/en']) {
       const bottom = document.querySelector('#result .report-head').getBoundingClientRect().bottom;
       return { share: document.querySelector('#result .result-share').getBoundingClientRect().top - bottom, next: document.querySelector('.result-next').getBoundingClientRect().top - bottom };
     });
-    expect(geometry.share).toBeLessThan(100);
-    expect(geometry.next).toBeLessThan(650);
+    expect(geometry.share).toBeGreaterThan(100);
+    expect(geometry.next).toBeGreaterThan(geometry.share);
     await page.locator('[data-share="copy"]').click();
     const copied = new URL(await page.evaluate(() => window.copiedUrl));
     expect(copied.searchParams.get('utm_source')).toBe('copy');
@@ -48,7 +48,7 @@ for (const prefix of ['', '/en']) {
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     expect(await page.evaluate(() => window.critiqueEvents.some(e => e[1] === 'calc_complete'))).toBe(false);
     await page.locator('[data-reading-area][href="#reading-money"]').click();
-    await expect(page.locator('#reading-money')).toHaveAttribute('open', '');
+    await expect(page.locator('#reading-money [data-daily-outlook]')).toBeVisible();
     await expect(page.locator('#reading-money')).toBeFocused();
     await page.setViewportSize({ width: 1440, height: 900 });
     await expect(page.locator('#tool-form')).toBeVisible();
@@ -103,7 +103,7 @@ test('상단 저장·분야 펼침·섹션 도달은 개인 값을 보내지 않
   await expect(page.locator('[data-result-storage]')).toContainText('저장했습니다');
   await page.locator('[data-dismiss-profile-guide]').click();
   await page.locator('[data-reading-area][href="#reading-money"]').click();
-  await page.locator('#reading-money .reading-basis > summary').click();
+  await page.locator('#reading-money [data-dialog]').click();
   const events = await page.evaluate(() => window.critiqueEvents);
   for (const name of ['profile_save', 'reading_area_select', 'reading_detail_open', 'result_section_view']) expect(events.some(e => e[1] === name)).toBe(true);
   expect(JSON.stringify(events)).not.toMatch(/1990|1990-05-15|gender.*M|\bs=\d/);

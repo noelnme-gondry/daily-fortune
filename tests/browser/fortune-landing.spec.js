@@ -15,15 +15,15 @@ for (const lang of ['ko', 'en']) {
     const order = await page.evaluate(() => ['.home-services', '.reading-guides', '.reading-guide-links'].map(s => document.querySelector(s).getBoundingClientRect().top));
     expect(order.slice(1).every(top => top > order[0])).toBe(true);
     expect(await page.locator('.home-features').evaluate(el => el.getBoundingClientRect().top)).toBeLessThan(order[0]);
-    await expect(page.locator('.home-tools a')).toHaveCount(10);
+    await expect(page.locator('.home-purpose-groups > section')).toHaveCount(5);
     const button = page.locator('#tool-form [type="submit"]');
     await expect(button).toHaveText(lang === 'ko' ? '오늘의 운세 보기' : 'See today’s fortune');
     await expect(button).toBeInViewport({ ratio: 1 });
     expect(await page.evaluate(() => window.scrollY)).toBe(0);
     const name = page.locator('#a-name');
-    await expect(name).toBeHidden();
+    await expect(name).toBeVisible();
     await completeProfile(page);
-    await page.locator('.name-disclosure > summary').press('Enter');
+    await page.locator('#a-name').focus();
     const nickname = lang === 'ko' ? '운세 예시' : 'Saju sample';
     await name.fill(nickname);
     await page.locator('#save-device').check();
@@ -110,7 +110,7 @@ test('홈의 저장 정보 버튼은 편집 중인 생일 대신 카드에 표�
   await saved.locator('[data-edit-profile]').click();
   await page.locator('#a-y').fill('1985');
   await saved.locator('[data-saved-result]').click();
-  await page.locator('.chart-disclosure > summary').click();
+  await expect(page.locator('.chart-disclosure .chart-card')).toBeVisible();
   await expect(page.locator('#result .chart-head')).toContainText('1990.01.01');
   await expect(page.locator('#a-y')).toHaveValue('1985');
 });

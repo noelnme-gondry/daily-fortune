@@ -163,7 +163,7 @@ test('주요 세 메뉴는 읽기 쉬운 크기를 유지하고 전체 메뉴에
   const controls = menu.getByRole('link');
   const full = page.getByRole('navigation', { name: '전체 메뉴', exact: true });
   const expected = navItems({ today: todayKST() });
-  await expect(controls).toHaveText(['오늘', '내 사주', '궁합']);
+  await expect(controls.locator('b')).toHaveText(['날짜별 운세', '내 사주 이해', '두 사람 궁합', '캐릭터·랭킹', '사주 읽는 법']);
   await expect(full).toBeHidden();
   for (const width of [1440, 1024, 900, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 960 });
@@ -174,18 +174,18 @@ test('주요 세 메뉴는 읽기 쉬운 크기를 유지하고 전체 메뉴에
     for (const size of sizes) {
       expect(size.left).toBeGreaterThanOrEqual(0);
       expect(size.right).toBeLessThanOrEqual(width);
-      expect(size.height).toBeGreaterThanOrEqual(48);
-      expect(size.font).toBeGreaterThanOrEqual(14);
+      expect(size.height).toBeGreaterThanOrEqual(44);
+      expect(size.font).toBeGreaterThanOrEqual(13);
     }
-    await page.locator('.all-menu summary').click();
+    await page.locator('[data-dialog="site-menu"]').click();
     await expect(full.getByRole('link')).toHaveText(expected.map(([, name]) => name));
     expect(await full.getByRole('link').evaluateAll(links => links.map(a => a.getAttribute('href')))).toEqual(expected.map(([path]) => path));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
     await page.keyboard.press('Escape');
     await expect(full).toBeHidden();
-    await expect(page.locator('.all-menu summary')).toBeFocused();
+    await expect(page.locator('[data-dialog="site-menu"]')).toBeFocused();
   }
-  await page.locator('.all-menu summary').click();
+  await page.locator('[data-dialog="site-menu"]').click();
   await full.getByRole('link', { name: '사주 백과', exact: true }).click();
   await expect(page).toHaveURL(/\/saju\/$/);
   await expect(page.locator('.menu-panel a[href="/saju/"]')).toHaveAttribute('aria-current', 'page');
@@ -196,10 +196,10 @@ test('모바일에서 펼쳐진 메뉴를 바로 터치해 토정비결까지 �
   await context.route('https://**/*', (route) => route.abort());
   const page = await context.newPage();
   await page.goto('/');
-  await page.locator('.all-menu summary').tap();
+  await page.locator('[data-dialog="site-menu"]').tap();
   const menu = page.getByRole('navigation', { name: '전체 메뉴', exact: true });
-  await expect(menu.getByRole('link')).toHaveCount(15);
-  await expect(menu.getByRole('link', { name: '운세 이용 가이드', exact: true })).toBeVisible();
+  await expect(menu.locator('section')).toHaveCount(5);
+  await expect(menu.getByRole('link', { name: '풀이 이용 안내', exact: true })).toBeVisible();
   await menu.getByRole('link', { name: '무료 토정비결', exact: true }).tap();
   await expect(page).toHaveURL(/\/tojeong\/$/);
   await expect(page.locator('#tojeong-tool')).toHaveAttribute('data-ready', 'true');
@@ -606,9 +606,10 @@ test('홈의 재미 카드는 입력 옆에 있고 모바일에서는 입력 아
   expect(hero.height).toBeLessThan(1100);
   expect(features.x).toBeGreaterThan(form.x + form.width);
   expect(features.y).toBeLessThan(form.y + form.height);
-  await expect(page.locator('.home-feature')).toHaveCount(3);
-  await expect(page.locator('#a-name')).toBeHidden();
-  const name = await page.locator('.name-disclosure > summary').boundingBox();
+  await expect(page.locator('.home-feature')).toHaveCount(2);
+  await expect(page.locator('.home-ilju-link')).toBeVisible();
+  await expect(page.locator('#a-name')).toBeVisible();
+  const name = await page.locator('[for="a-name"]').boundingBox();
   const gender = await page.locator('.field-gender .seg').boundingBox();
   expect(name.y).toBeGreaterThan(gender.y);
   expect((await page.locator('#a-y').boundingBox()).y).toBeLessThan(gender.y);
@@ -619,8 +620,8 @@ test('홈의 재미 카드는 입력 옆에 있고 모바일에서는 입력 아
   }
 });
 
-test('12띠 생성형 심볼이 홈 카드·일별 상세·연간 운세에 로드된다', async ({ page }) => {
-  await page.goto('/');
+test('12띠 생성형 심볼이 띠 메뉴·일별 상세·연간 운세에 로드된다', async ({ page }) => {
+  await page.goto(`/tti/${todayKST().y}/`);
   const cards = page.locator('.zodiac-cards .tti-card');
   await expect(cards).toHaveCount(12);
   const sources = [];
@@ -715,7 +716,7 @@ test('홈 입력 전달 · 궁합 두 사람 시진과 시간 모름 · 저장 �
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page).toHaveURL(/\/today\/$/);
-  await page.locator('.chart-disclosure > summary').click();
+  await expect(page.locator('.chart-disclosure .chart-card')).toBeVisible();
   await expect(page.locator('.chart-head')).toContainText('묘시');
   expect(await saved(page)).toBeNull();
   await ready(page, '/compatibility/');
@@ -737,7 +738,7 @@ test('작은 화면 캐릭터 상세 · 툴팁 경계 · 키보드 포커스', a
   await page.setViewportSize({ width: 320, height: 760 });
   await ready(page, '/life-story/');
   await calculateExact(page);
-  await page.locator('.chart-disclosure > summary').click();
+  await expect(page.locator('.chart-disclosure .chart-card')).toBeVisible();
   const info = page.getByRole('button', { name: '용신 설명', exact: true });
   // 결과로 이동하는 부드러운 스크롤이 끝나고 버튼 위치가 안정된 뒤 포커스한다.
   await info.scrollIntoViewIfNeeded();

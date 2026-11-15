@@ -51,9 +51,7 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('dialog[open] .tti-caution')).toContainText(caution);
     const basis = page.locator('dialog[open] .tti-reading-basis');
     await expect(basis).not.toHaveAttribute('open', '');
-    await expect(basis.locator('.tti-factors')).not.toBeVisible();
-    await basis.locator('summary').focus();
-    await page.keyboard.press('Enter');
+    await expect(basis.locator('.tti-factors')).toBeVisible();
     await expect(basis.locator('.tti-factors')).toBeVisible();
     await page.keyboard.press('Escape');
     await page.goto(`${prefix}/tti/today/ox/`);

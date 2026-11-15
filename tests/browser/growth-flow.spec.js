@@ -121,7 +121,7 @@ for (const lang of ['', '/en']) {
     await detail.locator('[data-close-day]').click();
     await expect(detail).toBeHidden();
     await expect(button).toBeFocused();
-    await page.locator('.chart-disclosure > summary').click();
+    await expect(page.locator('.chart-disclosure .chart-card')).toBeVisible();
     await expect(page.locator('.chart-card')).toBeVisible();
     await expect(page.locator('.result-next a').first()).toHaveAttribute('href', `${lang}/year/2026/`);
   });

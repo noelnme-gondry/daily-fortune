@@ -25,7 +25,7 @@ for (const lang of ['ko', 'en']) {
       await page.locator('#tool-form [type="submit"]').click();
       await expect(page.locator('.cal .day-score')).not.toHaveCount(0);
       for (const ratio of await contrastRatios(page.locator('.cal :is(.dn, .ps, .day-score)'))) expect(ratio).toBeGreaterThanOrEqual(4.5);
-      await page.locator('.chart-disclosure > summary').click();
+      await expect(page.locator('.chart-disclosure .chart-card')).toBeVisible();
       for (const ratio of await contrastRatios(page.locator('#result .char small'))) expect(ratio).toBeGreaterThanOrEqual(4.5);
       await page.locator('[data-reading-script]').selectOption('hangul');
       for (const ratio of await contrastRatios(page.locator('#result .char-hanja'))) expect(ratio).toBeGreaterThanOrEqual(4.5);
