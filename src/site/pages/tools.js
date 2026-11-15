@@ -1,3 +1,4 @@
+import { groupedLinks } from '../purpose-navigation.js';
 import { elementName, animalName } from '../../i18n/terms.js';
 import { tr } from '../../i18n/runtime.js';
 import { siteText, siteValue } from '../copy.js';
@@ -5,10 +6,10 @@ import { siteText, siteValue } from '../copy.js';
 import { HOME, TOOLS, SITE, FREE_ACCESS, FREE_FAQ, yearTool } from '../../content/pages.js';
 import {
   ANIMAL_SLUG, EL_H, STEM_EL, BR_EL, addDays, pillarLabel,
-  yearPillar, ttiDay, ttiYear, samjaeYear,
+  yearPillar, ttiDay, samjaeYear,
 } from '../../engine/index.js';
 import { esc, faqBlock, faqLd, disclosure } from '../util.js';
-import { animalIcon, uiIcon } from '../icons.js';
+import { animalIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
 import { adSlot } from '../layout.js';
 import { birthTimeHint, displayNameField, personFields } from '../birth-form.js';
@@ -174,32 +175,17 @@ export function home(ctx) {
     ['/saju-ranking/', siteText('내 사주 랭킹'), siteText('518,400가지 사주 중 내 사주는 몇 위?')],
     ['/saju/ilju-ranking/', siteText('60일주 랭킹'), siteText('평균 점수가 가장 높은 일주는?')],
   ];
-  const features = `<div class="home-features">${fun.map(([h, t, d], i) => `<a class="card home-feature" href="${h}">${i === 0 ? '<img src="/characters/384/ranger.webp" width="72" height="72" alt="">' : `<span class="home-feature-icon">${uiIcon(i === 1 ? 'trophy' : 'book')}</span>`}<span><b>${siteValue(t)}</b><small>${d}</small></span>${uiIcon('arrow')}</a>`).join('')}</div>`;
-  const ty = [...Array(12).keys()].map((t) => ttiYear(t, y));
-  const sj = samjaeYear(y);
+  const features = `<div class="home-features">${fun.slice(0, 2).map(([h, t, d], i) => `<a class="card home-feature" href="${h}"><span><small>${i === 0 ? tr('나의 아홉 장면', 'Nine chapters of your life') : tr('순위보다 흥미로운 이유', 'The reasons behind your rank')}</small><b>${siteValue(t)}</b><span>${d}</span><strong>${tr('살펴보기', 'Explore')} ↗</strong></span><img src="/characters/384/${i === 0 ? 'ranger' : 'stargazer'}.webp" width="160" height="160" alt=""></a>`).join('')}</div><a data-ga-cta="fun_card" class="home-ilju-link" href="/saju/ilju-ranking/">${tr('60일주끼리 비교한 랭킹도 있어요', 'Compare the 60 day pillars too')} ↗</a>`;
   const body = `
     <section class="home-hero">
-      <div class="home-intro"><p class="eyebrow">${esc(SITE.tagline)}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p><a href="/tti/today/">${tr('생년월일 없이 띠별 운세 보기', 'Browse zodiac readings without a birth date')}</a></div>
+      <div class="home-intro"><p class="eyebrow">${tr('나를 알아가며, 오늘을 만들어요', 'Know yourself. Make today your own.')}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
       ${toolBlock('home', ctx)}
       <div class="home-discovery"><h2 id="home-discovery-title">${siteText('재미로 보는 사주')}</h2>${features}<p class="note">${tr('사주는 전통 해석을 참고하는 도구입니다. 점수는 사건의 확률이나 사람의 가치를 뜻하지 않습니다.', 'Saju offers traditional interpretations for reflection. Scores are not event probabilities or a measure of anyone’s worth.')}</p>
       </div>
     </section>
-    <section class="box-sec home-services" aria-labelledby="home-services-title"><div class="sec-head"><h2 id="home-services-title">${siteText("무료로 보는 사주와 운세")}</h2></div><p class="note">${esc(FREE_ACCESS.description)}</p><div class="cards home-tools">${cards.map(([h, t, d]) => `<a class="card link-card" href="${h}"><b>${siteValue(t)}</b><span>${d}</span></a>`).join('')}</div></section>
-    <nav class="reading-guides" aria-label="${tr('처음 읽는 분을 위한 안내', 'Guides for your first reading')}"><a href="/manseryeok/#public-example" data-ga-cta="reading_guide"><b>${tr('태어난 시간을 몰라도 볼 수 있나요?', 'Can I read my chart without a birth time?')}</b><span>${tr('같은 생일의 원국을 비교해 보세요.', 'Compare the charts for the same birthday.')}</span></a><a href="/year/${y + 1}/#public-example" data-ga-cta="reading_guide"><b>${tr(`${y + 1}년, 달마다 흐름이 다른 이유`, `Why each month of ${y + 1} reads differently`)}</b><span>${tr('월별 점수와 해설을 함께 읽어보세요.', 'Read monthly scores alongside the explanations.')}</span></a></nav>
+    <section class="box-sec home-services" aria-labelledby="home-services-title"><div class="sec-head"><h2 id="home-services-title">${tr('지금, 무엇이 궁금한가요?', 'What are you curious about?')}</h2></div><p class="note">${esc(FREE_ACCESS.description)}</p>${groupedLinks(o, '', 'purpose-groups home-purpose-groups')}</section>
+    <nav class="reading-guides" aria-label="${tr('처음 읽는 분을 위한 안내', 'Guides for your first reading')}"><a href="/saju/guide/"><b>${tr('처음 보는 사주, 어디부터 읽을까요?', 'New to saju? Start here.')}</b><span>${tr('일간·오행·대운을 쉬운 말로 알아보세요.', 'Learn about Day Masters, elements and cycles.')}</span></a><a href="/about/"><b>${tr('결과는 어떻게 계산하나요?', 'How is a reading calculated?')}</b><span>${tr('계산 기준과 해석의 범위를 확인하세요.', 'Explore the method and its limits.')}</span></a></nav>
     ${guideLinks()}
-    ${dayBox(o, siteText('오늘'))}
-    <section class="box-sec"><div class="sec-head"><h2>${siteText("띠별 오늘의 운세 · ")}${o.m}${siteText("월 ")}${o.d}${siteText("일")}</h2><a href="/tti/today/">${siteText("해설 보기")}</a></div>${ttiDayList(o, { short: true })}</section>
-    <section class="box-sec"><div class="sec-head"><h2>${y}${siteText("년 ")}${pillarLabel(yearPillar(y))}${siteText("년 띠별 운세")}</h2><a href="/tti/${y}/">${siteText("12띠 전체")}</a></div>
-      <p class="muted">${y}${siteText("년 삼재: ")}${sj.map((s) => `${animalName(s.tti)}${siteText("띠(")}${siteValue(s.name)})`).join(', ')}</p>
-      <div class="cards zodiac-cards">${ty.map((r) => `<a class="card link-card tti-card" href="/tti/${y}/${ANIMAL_SLUG[r.tti]}/">${animalIcon(r.tti)}<b>${siteValue(r.animal)}${siteText("띠 ")}<span class="num">${r.score}</span></b><span>${esc(r.headline)}</span></a>`).join('')}</div></section>
-    <section class="box-sec"><div class="sec-head"><h2>${siteText("사주 백과")}</h2><a href="/saju/">${siteText("전체 보기")}</a></div><div class="cards three">
-      <a class="card link-card" href="/saju/ilju/"><b>${siteText("60일주 총정리")}</b><span>${siteText("갑자일주부터 계해일주까지 성격·연애·직업")}</span></a>
-      <a class="card link-card" href="/saju/sipsin/"><b>${siteText("십신 뜻")}</b><span>${siteText("비견·식신·정재·정관·정인 등 10가지")}</span></a>
-      <a class="card link-card" href="/saju/ohaeng/"><b>${siteText("오행 상생상극")}</b><span>${siteText("목화토금수의 성격과 보완법")}</span></a>
-      <a class="card link-card" href="/saju/sinsal/"><b>${siteText("신살")}</b><span>${siteText("도화살·역마살·화개살·천을귀인")}</span></a>
-      <a class="card link-card" href="/saju/ilgan/"><b>${siteText("일간별 성격")}</b><span>${siteText("갑목부터 계수까지 10가지 일간")}</span></a>
-      <a class="card link-card" href="/saju/guide/"><b>${siteText("사주 보는 법")}</b><span>${siteText("원국 세우기부터 대운까지 7단계")}</span></a>
-    </div></section>
     ${faqBlock(HOME.faq)}`;
   return {
     path: '/', title: HOME.title, description: HOME.description, section: '/', tool: true, crumbs: [],
