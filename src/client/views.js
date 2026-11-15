@@ -1,3 +1,4 @@
+import { detailDialog } from '../site/util.js';
 // 계산 결과를 HTML로 그리는 함수들 (브라우저 전용, 순수 문자열 생성)
 import {
   STEM_H, BR_H, EL_H, STEM_EL, BR_EL, TG, TG_SLUG, iljuSlug, pillarKo, pillarLabel, isoDate,
@@ -20,7 +21,7 @@ const BAND = { high: '대길', good: '길', mid: '평', low: '주의' };
 export const band = (s) => `<span class="band band-${bandKey(s)}">${term(BAND[bandKey(s)])}</span>`;
 const tgLink = (t) => (TG.includes(t) ? `<a href="/saju/sipsin/${TG_SLUG[TG.indexOf(t)]}/">${term(t)}</a>` : term(t));
 const STRENGTHS = STRENGTH_BANDS.map(b => b.label);
-export const elChip = (role, el) => `<span class="chip el el-${el}"><em>${term(role)}</em><b>${elementName(el)}(${EL_H[el]})</b></span>`;
+export const elChip = (role, el) => `<span class="chip el el-${el}"><em>${term(role)}</em><b>${elementName(el)}(${EL_H[el]})</b>${tip(tr('용신은 균형을 돕도록 고른 오행, 희신은 그 방향을 거드는 오행, 기신은 반대 방향으로 보는 오행이에요. 이 서비스의 가중치와 계절 보정으로 정하며 학파마다 다를 수 있어요.', 'The useful element supports the model’s balancing direction; the supporting element assists it, and the challenging element works against it. The model uses weights and seasonal adjustments; schools may differ.'), tr('이 오행 역할의 뜻', 'Meaning of this element role'))}</span>`;
 const SS_LINK = { '도화살': 'dohwa', '역마살': 'yeokma', '화개살': 'hwagae', '천을귀인': 'cheoneul-gwiin', '문창귀인': 'munchang-gwiin', '양인살': 'yangin', '괴강살': 'gwegang', '백호살': 'baekho' };
 
 // 정보 아이콘 (서버 util.tip과 같은 마크업)
@@ -48,9 +49,9 @@ export function chartCard(c, profile, today) {
   return `<section class="chart-card card" aria-label="${tr('사주 원국', 'Saju birth chart')}">
     <div class="chart-head"><h2>${tr(`${esc(c.name || '나')}의 사주 원국`, c.name ? `${esc(c.name)}'s saju birth chart` : 'Your saju birth chart')} ${tip(TIPS.chart, tr('사주 원국 보는 법', 'How to read your birth chart'))}</h2><span class="muted">${birth}${p.calendar === 'lunar' ? tr(` (양력 ${isoDate(c.birth)})`, ` (Solar ${isoDate(c.birth)})`) : ` · ${c.lunarText}`} · ${c.gender === 'F' ? tr('여성', 'Female') : tr('남성', 'Male')}${c.dst ? tr(' · 서머타임 보정', ' · Daylight saving adjustment') : ''}</span></div>
     <div class="chart-body">
-      ${pillarTable(c, tip)}
+      <p class="chart-start">${tr('일간은 나를 읽는 기준 글자예요.', 'The Day Master is the reference character for reading you.')} <b>${STEM_H[c.dm]} · ${elementName(STEM_EL[c.dm])}</b> ${tip(tr('일간은 태어난 날의 위 글자입니다. 나머지 글자를 이 글자와 비교해 성향과 관계를 읽습니다.', 'The Day Master is the upper character of your birth day. Other characters are compared with it to interpret traits and relationships.'), tr('일간이란?', 'What is a Day Master?'))}</p>${pillarTable(c, tip)}
       <div class="meta">
-        <div><h3>${tr(`오행 분포 (겉글자 ${c.hasTime ? 8 : 6}자)`, `Five Elements (${c.hasTime ? 8 : 6} visible characters)`)} ${tip(TIPS.elements, tr('오행 분포 설명', 'Element distribution'))}</h3><div class="elbars">${elbars}</div></div>
+        <div><h3>${tr(`오행 분포 (겉글자 ${c.hasTime ? 8 : 6}자)`, `Five Elements (${c.hasTime ? 8 : 6} visible characters)`)} ${tip(tr('오행은 목·화·토·금·수, 다섯 성질로 글자를 분류하는 방식이에요. 아래 막대는 겉글자 개수이고, 0이라고 그 성질이나 재능이 없다는 뜻은 아니에요.', 'Five Elements classify characters as Wood, Fire, Earth, Metal or Water. These bars count visible characters; zero does not mean a missing personal quality.'), tr('오행 분포 설명', 'Element distribution'))}</h3><div class="elbars">${elbars}</div></div>
         <div><h3>${tr('일간 강약', 'Day Master strength')} — ${term(c.strengthLabel)} ${tip(TIPS.strength, tr('일간 강약 설명', 'Day Master strength explained'))}</h3><div class="gauge">${STRENGTHS.map((_, i) => `<span class="${i === si ? 'on' : ''}"></span>`).join('')}</div><div class="gauge-labels">${STRENGTHS.map((s, i) => `<span class="${i === si ? 'on' : ''}">${term(s)}</span>`).join('')}</div></div>
         <div><h3>${tr('용신 · 희신 · 기신', 'Useful, supporting & challenging elements')} ${tip(TIPS.roles, tr('용신 설명', 'Element roles'))}</h3><div class="chips">${elChip('용신', c.roles.yong)}${elChip('희신', c.roles.hee)}${elChip('기신', c.roles.gi)}</div></div>
         <div><h3>${tr('일주 · 신살 · 대운', 'Day pillar, symbolic stars & luck cycle')} ${tip(TIPS.extras, tr('일주·신살·대운 설명', 'Pillars, stars and cycles'))}</h3><div class="chips"><a class="chip" href="/saju/ilju/${iljuSlug(day)}/"><em>${tr('일주', 'Day pillar')}</em><b class="hz">${hz(day)}</b> ${tr(`${pillarKo(day)}일주`, pillarLabel(day))}</a>${ss.map((n) => (SS_LINK[n] ? `<a class="chip" href="/saju/sinsal/${SS_LINK[n]}/">${term(n)}</a>` : `<span class="chip">${term(n)}</span>`)).join('')}${cur ? `<span class="chip"><em>${tr('현재 대운', 'Current luck cycle')}</em><b class="hz">${hz(cur)}</b> ${tr(`${cur.age}세~`, `Age ${cur.age}+`)}</span>` : ''}</div></div>
@@ -64,7 +65,7 @@ export function chartCard(c, profile, today) {
 export function reportHead(r, when) {
   const low = [...r.cats].sort((a, b) => a.score - b.score)[0];
   const lead = r.overall.outlook || low?.text?.split(/(?<=[.!?])\s+/)[0] || r.overall.text;
-  return `<section class="report-head card">${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2 data-result-heading>${esc(r.overall.headline)}</h2><p>${esc(lead)}</p><details class="reading-basis"><summary>${tr('이 흐름이 나온 이유', 'How this reading was calculated')}</summary><p>${esc(r.overall.text)}</p></details><p class="score-note">${tr('점수는 이 서비스의 계산 기준이며, 성공 확률을 뜻하지 않습니다.', 'Scores reflect this service’s calculation rules, not a probability of success.')}</p></div></section>`;
+  return `<section class="report-head card">${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2 data-result-heading>${esc(r.overall.headline)}</h2><p>${esc(lead)}</p>${detailDialog(`reading-overall-${++tipSeq}`, tr('이 흐름이 나온 이유', 'How this reading was calculated'), `<p>${esc(r.overall.text)}</p>`)}<p class="score-note">${tr('점수는 이 서비스의 계산 기준이며, 성공 확률을 뜻하지 않습니다.', 'Scores reflect this service’s calculation rules, not a probability of success.')}</p></div></section>`;
 }
 export function catList(cats, withText = true, scope = null) {
   return `<section class="cats">${cats.map((c) => `<article class="cat"${scope ? ` id="${scope}-${c.key}" tabindex="-1" aria-labelledby="${scope}-${c.key}-title"` : ''}><div class="cat-top"><h3${scope ? ` id="${scope}-${c.key}-title"` : ''}>${c.name}</h3>${band(c.score)}<div class="track"><i style="width:${c.score}%"></i></div><span class="num">${c.score}</span></div>${withText && c.text ? `<p>${esc(c.text)}</p>` : ''}</article>`).join('')}</section>`;
@@ -73,13 +74,13 @@ export function readingAreaLinks(cats, scope = 'reading') {
   return `<nav class="daily-links area-switch" aria-label="${tr('분야별 운세 바로가기', 'Jump to a reading area')}">${scope === 'reading' ? `<a href="#reading-summary" data-reading-area>${tr('종합', 'Overview')}</a>` : ''}${cats.map(cat => `<a href="#${scope}-${cat.key}"${scope === 'reading' ? ' data-reading-area' : ''}>${esc(cat.name)}<b>${cat.score}${tr('점', ' pts')}</b></a>`).join('')}</nav>`;
 }
 function dailyCategories(cats, id) {
-  return `<section class="daily-cats" aria-labelledby="${id}-title"><div class="daily-intro"><h2 id="${id}-title">${tr('분야별 운세 자세히', 'Your reading in each area')}</h2><p class="muted">${tr('각 운의 흐름과 기회, 주의할 점을 함께 살펴보세요.', 'Explore the outlook, opportunities and cautions for each area.')}</p></div>
-    ${cats.map(cat => `<details class="daily-cat card" id="${id}-${cat.key}" tabindex="-1" aria-labelledby="${id}-${cat.key}-title"><summary><span class="daily-cat-head"><span class="daily-cat-name" id="${id}-${cat.key}-title">${esc(cat.name)}</span>${band(cat.score)}<b class="num">${cat.score}${tr('점', ' points')}</b></span><span class="daily-preview">${esc(cat.reading.outlook)}</span></summary>
+  return `<section class="daily-cats" aria-labelledby="${id}-title"><div class="daily-intro"><h2 id="${id}-title">${tr('분야별로 읽는 오늘', 'Today, area by area')}</h2></div>
+    ${cats.map(cat => `<article class="daily-cat card" id="${id}-${cat.key}" tabindex="-1" aria-labelledby="${id}-${cat.key}-title"><header class="daily-cat-head"><h3 class="daily-cat-name" id="${id}-${cat.key}-title">${esc(cat.name)}</h3><b class="num">${cat.score}${tr('점', ' points')}</b>${band(cat.score)}</header>
       <p class="daily-outlook" data-daily-outlook>${esc(cat.reading.outlook)}</p>
-      <div class="daily-aspects"><div><h4>${tr('활용할 기회', 'Opportunities')}</h4><p data-daily-opportunity>${esc(cat.reading.opportunity)}</p></div><div><h4>${tr('주의할 점', 'Take care')}</h4><p data-daily-caution>${esc(cat.reading.caution)}</p></div></div>
-      <div class="daily-action"><h4>${tr('하루의 제안', 'A suggestion for the day')}</h4><p data-daily-action>${esc(cat.reading.action)}</p></div>
-      <details class="reading-basis"><summary>${tr('해석 근거와 전날 비교', 'Reading basis and change from the previous day')}</summary>${cat.reading.basis ? `<p data-daily-basis>${esc(cat.reading.basis)}</p>` : ''}<p data-daily-change>${esc(cat.reading.change)}</p></details>
-    </details>`).join('')}</section>`;
+      <div class="daily-aspects"><section><h4>${tr('이렇게 드러날 수 있어요', 'How it may show up')}</h4><p data-daily-opportunity>${esc(cat.reading.opportunity)}</p></section><section><h4>${tr('치우치기 쉬운 쪽', 'When the balance tips')}</h4><p data-daily-caution>${esc(cat.reading.caution)}</p></section></div>
+      <p class="daily-action" data-daily-action>${esc(cat.reading.action)}</p>
+      ${detailDialog(`${id}-${cat.key}-basis`, tr('내 사주와 만난 요소', 'The factors meeting your chart'), `${cat.reading.basis ? `<p data-daily-basis>${esc(cat.reading.basis)}</p>` : ''}<p data-daily-change>${esc(cat.reading.change)}</p>`, tr('해석 근거·전날과 비교', 'Basis & change from yesterday'))}
+    </article>`).join('')}</section>`;
 }
 export function luckyRow(l) {
   return `<section class="lucky card" aria-label="${tr('오행 상징에 따른 참고 요소', 'Five Element symbolic references')}"><div><span>${tr('행운의 색', 'Lucky color')}</span><b>${l.color}</b></div><div><span>${tr('행운의 숫자', 'Lucky number')}</span><b class="num">${l.number}</b></div><div><span>${tr('참고 방향', 'Symbolic direction')}</span><b>${l.dir}</b></div><div><span title="${tr('용신·희신 오행에 연결된 시진이며 시간대별 운세 비교 결과가 아닙니다.', 'An interval associated with your useful or supporting element, not a comparison of hourly fortunes.')}">${tr('오행 참고 시간', 'Symbolic time')}</span><b>${l.time}</b></div></section>`;

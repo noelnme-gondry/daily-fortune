@@ -1,3 +1,4 @@
+import { track } from './analytics.js';
 // 공통 펼침 버튼과 라이트박스. 서버 본문은 JS 없이도 읽을 수 있다.
 export function collapseDisclosures(root = document) {
   root.querySelectorAll('[data-disclosure]').forEach((button) => {
@@ -20,7 +21,7 @@ export function initInteractions() {
     const trigger = event.target.closest('[data-dialog]');
     if (trigger) {
       const dialog = document.getElementById(trigger.dataset.dialog);
-      if (dialog) { event.preventDefault(); opener = trigger; dialog.showModal(); }
+      if (dialog) { event.preventDefault(); opener = trigger; dialog.showModal(); if (dialog.matches('.explanation-dialog')) track('reading_detail_open', { tool: trigger.closest('[data-tool]')?.dataset.tool || 'content', detail_type: trigger.closest('.daily-cat') ? 'area_detail' : trigger.closest('.chart-basis') ? 'chart_detail' : 'basis' }); }
     }
     const close = event.target.closest('[data-close-dialog]');
     if (close) close.closest('dialog').close();
