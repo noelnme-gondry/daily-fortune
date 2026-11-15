@@ -83,7 +83,7 @@ test('토정비결: MIT 원본 144괘와 1,728개 월별 해설이 손실 없이
 
 test('토정비결: 공개 진입·SEO·무료 FAQ·새해 경로가 연결된다', () => {
   const site = createSite({ site: 'https://unse.example', assets: { css: '/a.css', js: '/a.js' }, now: Date.UTC(2026, 9, 14) });
-  assert.ok(site.render('/').includes('<b>무료 토정비결</b>'));
+  assert.ok(site.render('/').includes('>무료 토정비결</a>'));
   // 올해 연도 주소는 같은 내용이라 /tojeong/으로 보내고, 해마다 다른 작괘 기준표를 싣는다.
   assert.equal(site.has('/tojeong/2026/'), false);
   assert.equal(site.redirect('/tojeong/2026/'), '/tojeong/');

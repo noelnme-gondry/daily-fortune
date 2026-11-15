@@ -25,12 +25,11 @@ for (const lang of ['ko', 'en']) {
     assert.ok(body.indexOf('id="tool"') < services);
     for (const marker of ['class="reading-guides"', 'class="box-sec reading-guide-links"']) assert.ok(services < body.indexOf(marker));
     assert.ok(body.indexOf('class="home-features"') < services);
-    const cards = body.match(/<div class="cards home-tools">([\s\S]*?)<\/div>/)[1];
+    const cards = body.slice(services, body.indexOf('class="reading-guides"'));
     const paths = [...cards.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
-    assert.equal(paths.length, 10);
-    assert.equal(new Set(paths).size, 10);
-    assert.deepEqual(paths.slice(0, 4), ['/today/', '/year/2026/', '/lifetime/', '/compatibility/'].map(path => `${prefix}${path}`));
-    for (const path of paths) assert.ok(site.has(path));
+    assert.equal(new Set(paths).size, paths.length);
+    for (const path of paths) assert.ok(site.has(path), path);
+    for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/year/2026/', '/year/2027/', '/lifetime/', '/compatibility/', '/life-story/', '/saju-ranking/', '/tojeong/', '/manseryeok/']) assert.ok(paths.includes(`${prefix}${path}`));
     if (!prefix) assert.equal(HOME.title, `무료운세 | 오늘의 운세·사주·궁합 - ${BRAND.name}`);
     assert.equal(site.page(`${prefix}/today/`).title, TOOLS.today.title, '오늘 제목은 유지');
   }));
@@ -74,9 +73,9 @@ for (const lang of ['ko', 'en']) {
     assert.match(today, prefix ? /8–99/ : /8~99점/);
     assert.match(about, prefix ? /8–99/ : /8~99점/);
     const faqTitle = prefix ? 'Frequently asked questions' : '자주 묻는 질문';
-    assert.equal(today.split(faqTitle).length - 1, 1);
+    assert.equal((today.match(new RegExp(`<h2[^>]*>${faqTitle}</h2>`, 'g')) || []).length, 1);
     const related = today.match(/id="tool-related"[^>]*>([\s\S]*?)<\/section>/)[1];
-    assert.doesNotMatch(related, /<h2/);
+    assert.equal((related.match(/<h2/g) || []).length, 1);
     const cards = [...related.matchAll(/<b>([^<]+)<\/b><span>([^<]+)<\/span>/g)];
     assert.equal(cards.length, 3);
     assert.ok(cards.every(([, title, description]) => title !== description && description.length > title.length));
