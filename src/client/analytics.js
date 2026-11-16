@@ -11,11 +11,13 @@ export function track(name, params = {}) {
         if (entry?.path === location.pathname && Date.now() - entry.at >= 0 && Date.now() - entry.at < 1800000) entrySource = 'shared_result';
       } catch { /* 저장 차단 */ }
     }
-    if (typeof window.gtag === 'function') window.gtag('event', name, {
+    if (typeof window.gtag !== 'function') return false;
+    window.gtag('event', name, {
       ...adExperimentParams(), measurement_version: '3', usage_date: isoDate(todayKST()), ...params,
       ...(entrySource ? { entry_source: entrySource } : {}),
     });
-  } catch (e) { /* 분석 실패는 무시 */ }
+    return true;
+  } catch (e) { return false; /* 분석 실패는 구매·계산을 막지 않는다. */ }
 }
 
 // 첫 입력 변경 또는 제출만 기록하며 입력값은 읽지 않는다.

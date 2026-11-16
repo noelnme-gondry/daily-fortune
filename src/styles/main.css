@@ -62,7 +62,15 @@
 .purchase-consent { align-items:flex-start; }.purchase-consent input { flex-shrink:0;margin-top:8px; }
 .purchase-status { margin-block:16px;color:var(--accent); }.purchase-order { display:flex;align-items:center;justify-content:space-between;gap:20px;margin-block:20px; }
 .purchase-order h2 { font-size:24px; }.purchase-order .btn { flex-shrink:0; }
-.purchase-report { border:0;width:100%;min-height:800px;margin-top:20px;background:var(--paper); }
+.purchase-report { display:block;border:0;width:100%;min-height:400px;margin:28px auto 0;background:var(--bg);max-width:900px; }
+.shop-contents { margin-block:32px; }.shop-contents h2 { font-size:25px;margin-bottom:20px; }
+.reading-contents { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px; }
+.reading-contents-cell { display:flex;flex-direction:column;justify-content:center;gap:10px;padding:24px;background:var(--paper);border:1px solid var(--line);border-radius:8px; }
+.reading-contents-cell strong { font-family:var(--f-display);font-size:21px;line-height:1.5; }.reading-contents-cell span { color:var(--ink-2);font-size:15px; }
+.reading-contents-cell:first-child { background:var(--accent-soft); }.reading-contents-closing { grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center; }
+.reading-contents-file { grid-column:1/-1;display:flex;justify-content:space-between;gap:16px;padding:12px 4px;color:var(--ink-2);font-size:14px; }
+.reading-contents.is-compact { grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;flex:1; }.is-compact .reading-contents-cell { padding:14px 10px; }.is-compact .reading-contents-cell:first-child { grid-column:1/-1; }.is-compact .reading-contents-cell strong { font-family:var(--f-body);font-size:15px; }.is-compact .reading-contents-closing { justify-content:flex-start; }.is-compact .reading-contents-file { flex-wrap:wrap;gap:4px 12px; }
+@media(max-width:760px) { .reading-contents { grid-template-columns:repeat(2,minmax(0,1fr)); }.reading-contents-cell { padding:18px 14px; }.reading-contents-cell strong { font-size:18px; }.reading-contents-closing { flex-direction:column;align-items:flex-start; } }
 .home-purchases { margin-block:48px; }.home-purchases>p { margin-top:12px; }
 @media(max-width:760px) {
   .shop-hero,.shop-purchase-grid { grid-template-columns:1fr;gap:24px; }.shop-hero { margin-bottom:28px; }

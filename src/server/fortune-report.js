@@ -5,15 +5,10 @@ import { birthDateError } from '../domain/birth-input.js';
 import { resolveBirthTime } from '../domain/birth-time.js';
 import { birthTimesFor } from '../engine/chart.js';
 import { fortuneProduct } from '../domain/fortune-products.js';
-import { chartCard } from '../client/views.js';
-import { lifeView } from '../client/life-tool.js';
-import { compatView } from '../client/compat-tool.js';
-import { tojeongView } from '../client/tojeong-view.js';
-import { esc } from '../site/util.js';
+import { tojeongPremium, lifetimePremium, compatibilityPremium, reportDocument } from './premium-report.js';
 import { withLanguage } from '../i18n/runtime.js';
 
 const readings = JSON.parse(readFileSync(new URL('../content/tojeong-144.json', import.meta.url), 'utf8'));
-const stylesheet = readFileSync(new URL('../styles/main.css', import.meta.url), 'utf8');
 export class PurchaseError extends Error {
   constructor(message, status = 400) { super(message); this.status = status; }
 }
@@ -56,23 +51,23 @@ export function createFortuneReport(input, today = todayKST()) {
       const r = calculateTojeong(people[0], targetYear), reading = readings[r.code];
       title = `${people[0].name || '나'}의 ${targetYear}년 토정비결`;
       summary = reading.chongun.split(/(?<=[.!?])\s+/)[0];
-      body = tojeongView(r, reading, people[0].name);
+      body = tojeongPremium(r, reading);
     } else {
       const charts = people.map(p => buildChart(engineInput(p)));
       if (product.id === 'lifetime') {
         const r = lifetime(charts[0], today);
         title = `${people[0].name || '나'}의 평생 사주`;
         summary = r.dayMaster.summary;
-        body = lifeView(r, charts[0], today) + chartCard(charts[0], people[0], today);
+        body = lifetimePremium(r, charts[0], people[0], today);
       } else {
         const r = compat(charts[0], charts[1], today);
         title = `${people[0].name || '나'}와 ${people[1].name || '상대'}의 궁합`;
         summary = r.headline;
-        body = compatView(r, charts[0], charts[1], today) + charts.map((c, i) => chartCard(c, people[i], today)).join('');
+        body = compatibilityPremium(r, charts[0], charts[1], people, today);
       }
     }
     const normalized = { productId: product.id, people, targetYear };
-    const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; base-uri 'none'; form-action 'none'"><title>${esc(title)}</title><style>${stylesheet}\n:root{color-scheme:light;--bg:#fcf8f5;--paper:#fffdfa;--sunk:#f1e8e1;--ink:#352e2b;--ink-2:#685c55;--line:#ded0c5;--accent:#79513e;--accent-soft:#f3e5d9;--on-accent:#fff;--seal:#b4362b;--wood:#2a6f55;--fire:#c2412d;--earth:#815b12;--metal:#68717a;--water:#27345a}body{background:var(--bg);color:var(--ink)}.download-report{max-width:1040px;margin:24px auto;padding:20px}.download-report>header{margin-bottom:28px}.download-report .box,.download-report .card{margin-block:16px}.download-report button,.download-report dialog,.download-report .tojeong-months{display:none!important}.download-report .tojeong-month-detail>section[hidden]{display:block!important}.download-report .tojeong-month-detail>section{margin-block:24px}.download-report .tip{border:0}.download-report footer{margin-top:32px;border-top:1px solid #d2d6ce;padding-top:16px}@media print{.download-report{padding:0;margin:0}.card,section{break-inside:auto}.chart-card{break-before:page}body{color-scheme:light}}</style><main class="download-report"><header><p>make your own day</p><h1>${esc(title)}</h1><p>풀이 기준일 ${isoDate(today)} · ${product.price}원 단건 구매</p></header>${body}<footer><p>사주는 전통 해석을 참고하는 콘텐츠입니다. 점수는 사건의 확률이나 사람의 가치를 뜻하지 않습니다.</p><p>이 파일에는 출생 정보가 포함되어 있습니다. 개인적으로 보관해 주세요.</p></footer></main></html>`;
+    const html = reportDocument(title, body, isoDate(today), product.id);
     return { product, normalized, title, summary, html };
   });
 }
