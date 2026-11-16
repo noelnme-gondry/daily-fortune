@@ -49,6 +49,7 @@ for (const lang of ['ko', 'en']) {
         await expect(basis.locator('[data-daily-basis]')).toHaveText(cat.reading.basis);
         await expect(basis.locator('[data-daily-change]')).toHaveText(cat.reading.change);
         await page.keyboard.press('Escape');
+        await expect(basis).toBeHidden();
       }
       const links = page.locator('#result .daily-links a');
       for (let i = 0; i < 7; i++) {
