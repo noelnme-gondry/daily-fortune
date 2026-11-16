@@ -19,7 +19,7 @@ async function enter(page) {
 
 test('홈에서 무료 토정비결 진입 · 12개월 키보드 선택 · 내년 복원', async ({ page }) => {
   await page.goto('/');
-  await page.locator('.home-tools a[href="/tojeong/"]').click();
+  await page.locator('.home-purpose-groups a[href="/tojeong/"]').click();
   await expect(page.locator('#tojeong-tool')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('input[type="time"], #a-time, input[name="a-gender"]')).toHaveCount(0);
   await enter(page);

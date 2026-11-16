@@ -28,7 +28,7 @@ for (const lang of ['ko', 'en']) {
       await completeProfile(page);
       await page.locator('button[type="submit"]').click();
       const expected = withLanguage(lang, () => mode === 'week' ? week(c, today) : day(c, mode === 'tomorrow' ? addDays(today, 1) : today, mode));
-      await expect(page.locator('#result .report-head h2')).toHaveText(expected.overall.headline);
+      await expect(page.locator('#result [data-result-heading]')).toHaveText(expected.overall.headline);
       if (mode === 'week') await expect(page.locator('#result .cats .cat > p')).toHaveText(expected.cats.map(cat => cat.text));
       else await expect(page.locator('#result [data-daily-action]')).toHaveText(expected.cats.map(cat => cat.reading.action));
       await expect(page.locator(mode === 'week' ? '#result .cat-top .num' : '#result .daily-cat-head .num')).toHaveText(expected.cats.map(cat => `${cat.score}${mode === 'week' ? '' : lang === 'ko' ? '점' : ' points'}`));
@@ -50,10 +50,6 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('dialog[open] .tti-advice')).toContainText(advice);
     await expect(page.locator('dialog[open] .tti-caution')).toContainText(caution);
     const basis = page.locator('dialog[open] .tti-reading-basis');
-    await expect(basis).not.toHaveAttribute('open', '');
-    await expect(basis.locator('.tti-factors')).not.toBeVisible();
-    await basis.locator('summary').focus();
-    await page.keyboard.press('Enter');
     await expect(basis.locator('.tti-factors')).toBeVisible();
     await page.keyboard.press('Escape');
     await page.goto(`${prefix}/tti/today/ox/`);

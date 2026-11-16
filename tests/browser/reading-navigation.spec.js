@@ -52,23 +52,31 @@ for (const prefix of ['', '/en']) {
   test(`${prefix || 'ko'}: 원국 근거는 실제 계산값과 시간 미상·역행을 설명한다`, async ({ page }) => {
     await page.goto(`${prefix}/manseryeok/`); await ready(page); await fill(page);
     await page.locator('#tool-form [type=submit]').click();
-    await page.locator('.chart-basis > summary').focus(); await page.keyboard.press('Enter');
+    await page.locator('.chart-basis [data-dialog]').nth(0).click();
     await expect(page.locator('[data-strength-evidence]')).toContainText('51.6%');
+    await page.keyboard.press('Escape');
+    await page.locator('.chart-basis [data-dialog]').nth(1).click();
     await expect(page.locator('[data-season-evidence]')).toContainText('+0.7');
+    await page.keyboard.press('Escape');
+    await page.locator('.chart-basis [data-dialog]').nth(2).click();
     await expect(page.locator('[data-cycle-evidence]')).toContainText('1997');
     await expect(page.locator('[data-current-cycle]')).toContainText('2017');
     for (const width of [320, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
     }
+    await page.keyboard.press('Escape');
     await editProfile(page);
     await page.locator('[name="a-gender"][value="F"]').check(); await page.locator('#a-notime').check();
-    await page.locator('#tool-form [type=submit]').click(); await page.locator('.chart-basis > summary').click();
+    await page.locator('#tool-form [type=submit]').click(); await page.locator('.chart-basis [data-dialog]').nth(0).click();
     const c = buildChart({ ...input, gender: 'F', time: null });
     await expect(page.locator('[data-strength-evidence]')).toContainText(`${(c.ratio * 100).toFixed(1)}%`);
+    await page.keyboard.press('Escape');
+    await page.locator('.chart-basis [data-dialog]').nth(2).click();
     await expect(page.locator('.chart-basis .note')).toContainText(prefix ? 'Time unknown' : '시간 미상');
     await expect(page.locator('[data-cycle-evidence]')).toContainText(prefix ? 'backward' : '역행');
-    await page.locator('.chart-basis a').click();
+    await page.keyboard.press('Escape');
+    await page.locator('.chart-basis > a').click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/about/#interpretation-differences$`));
     await expect(page.locator('#interpretation-differences')).toBeVisible();
   });

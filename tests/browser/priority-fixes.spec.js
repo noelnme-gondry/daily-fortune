@@ -77,7 +77,7 @@ for (const lang of ['', '/en']) {
   test(`${lang || 'ko'}: 홈 재미 카드 클릭을 정확히 한 번 기록한다`, async ({ page }) => {
     for (const path of ['/life-story/', '/saju-ranking/', '/saju/ilju-ranking/']) {
       await page.goto(`${lang}/`);
-      const card = page.locator(`.home-feature[href="${lang}${path}"]`);
+      const card = page.locator(`.home-discovery a[href="${lang}${path}"]`);
       // 페이지 이동 후 새 window가 생기므로 콘솔에서 해당 이벤트를 포착한다.
       const logged = [];
       await page.evaluate(() => { window.gtag = (...args) => console.log('priority-event:' + JSON.stringify(args)); });

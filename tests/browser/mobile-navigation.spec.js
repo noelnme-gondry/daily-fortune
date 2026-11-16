@@ -19,8 +19,8 @@ test('모바일 결과의 중복 운세 메뉴를 숨기고 상단 메뉴로 이
   await expect.poll(() => page.locator('.site-head').evaluate((el) => el.getBoundingClientRect().bottom)).toBeLessThanOrEqual(1);
   await page.evaluate(() => window.scrollTo(0, 1550));
   await expect.poll(() => page.locator('.site-head').evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
-  await page.locator('.all-menu summary').click();
-  await page.getByRole('navigation', { name: '전체 메뉴', exact: true }).getByRole('link', { name: '내일 운세', exact: true }).click();
+  await page.locator('[data-dialog="site-menu"]').click();
+  await page.getByRole('navigation', { name: '전체 메뉴', exact: true }).getByRole('link', { name: '내일의 운세', exact: true }).click();
   await expect(page).toHaveURL(/\/tomorrow\/$/);
   await expect(page.locator('#result .chart-card')).toBeAttached();
 });

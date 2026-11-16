@@ -169,7 +169,7 @@ export async function mount(root) {
       return false;
     }
     showError('');
-    let html = readingNavigation(tabMode, today) + readingControls();
+    let html = readingNavigation(tabMode, today) + readingControls() + `<button type="button" class="link-btn result-edit-top" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('출생 정보 수정', 'Edit birth details')}</button>`;
     let res;
     let leaderRank;
     if (mode === 'today') { res = day(ca, today, 'today'); html += dayView(res, { scope: 'reading' }); }
@@ -187,7 +187,7 @@ export async function mount(root) {
       leaderRank = rankTool.sajuRank(buildChart(toEngine({ ...a, noTime: true })), rankTool.RANK_TABLE);
       html += rankTool.rankView(res, ca, leaderRank);
     }
-    if (!pair && mode !== 'manseryeok') html += `<details class="chart-disclosure"><summary>${tr('내 사주 원국과 오행 자세히', 'Explore your birth chart and Five Elements')}</summary>${chartCard(ca, a, today)}</details>`;
+    if (!pair && mode !== 'manseryeok') html += `<section class="chart-disclosure">${chartCard(ca, a, today)}</section>`;
     html += '<div class="result-action-group">';
     const share = shareFor(mode, res, ca, cb, today, yr);
     if (share) {
@@ -195,19 +195,16 @@ export async function mount(root) {
       html += rankTool ? `<div class="rank-share" id="rank-share" data-rank-locked hidden>${shareHtml}</div>` : shareHtml;
     }
     html += nextToolsHtml(mode, today);
-    html += `<div class="result-actions"><button type="button" class="link-btn" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('입력 정보 수정·저장', 'Edit or save your details')}</button><button type="button" class="sbtn" data-save-result>${tr('다음에 바로 보기: 이 기기에 저장', 'Save on this device for next time')}</button><span class="hint" data-result-storage role="status"></span></div>`;
+    html += `<div class="result-actions"><button type="button" class="sbtn" data-save-result>${tr('다음에 바로 보기: 이 기기에 저장', 'Save on this device for next time')}</button><span class="hint" data-result-storage role="status"></span></div>`;
     if (a.noTime || b?.noTime) html += `<p class="hint">${tr('시간 모름으로 시주를 제외했습니다. 시간을 알면 입력 정보에서 추가할 수 있어요.', 'The unknown birth time omits the hour pillar. Add the time in your details when available.')}</p>`;
     html += '</div>';
     if (pair) html += compatTool.compatMatchesShell(ca, cb);
     stopMatches?.();
     const readingDate = isoDate(res?.date || today);
     renderResultWithPartnerAd(out, html, { tool: mode, calc_origin: source, reading_date: readingDate });
-    const summary = out.querySelector('.report-head') || out.querySelector('[data-result-summary]');
-    summary?.after(out.querySelector('.result-action-group'));
     const banner = out.querySelector('.lucky-banner');
     if (banner) {
-      const chart = out.querySelector('.chart-disclosure');
-      if (chart) chart.before(banner); else out.append(banner);
+      out.append(banner);
     }
     applyReadingPreferences(out);
     syncReadingNavigation(out);

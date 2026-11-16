@@ -36,27 +36,27 @@ for (const lang of ['ko', 'en']) {
         const card = cards.nth(i), cat = expected.cats[i];
         await expect(card).toBeVisible();
         await expect(card).not.toHaveAttribute('open', '');
-        await card.locator(':scope > summary').press('Enter');
         await expect(card.locator('.daily-cat-name')).toHaveText(cat.name);
         await expect(card.locator('.num')).toHaveText(`${cat.score}${lang === 'ko' ? '점' : ' points'}`);
         for (const field of ['outlook', 'opportunity', 'caution', 'action']) {
           await expect(card.locator(`[data-daily-${field}]`)).toBeVisible();
           await expect(card.locator(`[data-daily-${field}]`)).toHaveText(cat.reading[field]);
         }
-        const basis = card.locator('details');
+        const basis = card.locator('dialog');
         await expect(basis).not.toHaveAttribute('open', '');
-        await basis.locator('summary').focus();
+        await card.locator('[data-dialog]').focus();
         await page.keyboard.press('Enter');
         await expect(basis.locator('[data-daily-basis]')).toHaveText(cat.reading.basis);
         await expect(basis.locator('[data-daily-change]')).toHaveText(cat.reading.change);
-        await basis.locator('summary').press('Enter');
+        await page.keyboard.press('Escape');
+        await expect(basis).toBeHidden();
       }
       const links = page.locator('#result .daily-links a');
       for (let i = 0; i < 7; i++) {
         const target = await links.nth(i).getAttribute('href');
         await links.nth(i).focus();
         await page.keyboard.press('Enter');
-        await expect(page.locator(target)).toBeFocused();
+        await expect.poll(() => page.locator(target).evaluate(el => document.activeElement === el ? 'focused' : document.activeElement?.outerHTML.slice(0, 220))).toBe('focused');
       }
       for (const width of [320, 768, 1024, 1440]) {
         await page.setViewportSize({ width, height: 900 });

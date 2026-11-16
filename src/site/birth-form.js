@@ -1,17 +1,16 @@
 import { tr } from '../i18n/runtime.js';
-import { esc } from './util.js';
+import { esc, detailDialog } from './util.js';
 import { birthTimeOptions } from '../domain/birth-time.js';
 import { BIRTH_TIME_HINT } from '../domain/birth-input.js';
 
 export const profilePicker = p => `<div class="profile-picker" hidden><label for="${p}-saved-person">${tr('저장한 사람 선택', 'Choose a saved person')}</label><select class="input" id="${p}-saved-person" data-profile-picker="${p}"><option value="">${tr('직접 입력 · 새 사람', 'Enter details · new person')}</option></select><button class="link-btn" type="button" data-manage-profiles aria-controls="profile-manager" aria-haspopup="dialog">${tr('목록 관리', 'Manage people')}</button></div>`;
 
-export const birthTimeHint = p => `<p class="hint" id="${p}-time-hint" data-time-hint>${BIRTH_TIME_HINT.exact}</p>`;
+export const birthTimeHint = p => `<p class="hint" id="${p}-time-hint" data-time-hint>${BIRTH_TIME_HINT.exact}</p>${detailDialog(`${p}-time-method`, tr('출생 시간 계산 기준', 'Birth-time calculation rules'), `<p>${tr('한국 출생 당시의 시계 시각을 입력하세요. 30분 보정과 과거 표준시·서머타임을 자동 적용하며 해외 출생지·시간대는 변환하지 않습니다.', 'Enter the clock time recorded at birth in Korea. The 30-minute adjustment, historical standard time and daylight saving are applied automatically. Birth-country and birth-location corrections are not included.')}</p><p>${tr('시간을 모르면 시주를 제외하고 계산해요. 절기와 대운의 경계는 정오를 참고하므로 생시를 알게 되면 결과가 달라질 수 있어요.', 'Unknown time omits the hour pillar and uses noon for solar-term and cycle boundaries. Adding the actual time may change the result.')}</p><a href="/about/">${tr('계산 규칙 전체 보기', 'Read the full method')}</a>`, tr('출생 시간 계산 기준', 'Birth-time calculation rules'))}`;
 
-export function displayNameField(p, collapsible = false) {
+export function displayNameField(p) {
   const label = tr('표시 이름 (선택)', 'Display name (optional)');
-  const input = `<input class="input" id="${p}-name" maxlength="12" autocomplete="off" aria-describedby="${p}-name-hint"${collapsible ? ` aria-labelledby="${p}-name-label"` : ''} placeholder="${tr('예: 나, 엄마, 동생', 'e.g. Me, Mum, Alex')}">`;
+  const input = `<input class="input" id="${p}-name" maxlength="12" autocomplete="off" aria-describedby="${p}-name-hint" placeholder="${tr('예: 나, 엄마, 동생', 'e.g. Me, Mum, Alex')}">`;
   const hint = `<span class="hint" id="${p}-name-hint">${tr('저장 목록과 결과에 표시합니다. 실명은 필요 없어요.', 'Used in your saved list and results. A nickname is fine.')}</span>`;
-  if (collapsible) return `<details class="name-disclosure"><summary id="${p}-name-label">${label}</summary><div class="field">${input}${hint}</div></details>`;
   return `<div class="field field-name"><label for="${p}-name">${label}</label>${input}${hint}</div>`;
 }
 

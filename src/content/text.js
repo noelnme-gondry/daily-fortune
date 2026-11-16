@@ -3,6 +3,7 @@
 
 import { bilingual } from '../i18n/runtime.js';
 import english from './text.en.js';
+import { applyReadingEditorial } from './reading-editorial.js';
 
 const T = {};
 
@@ -507,4 +508,5 @@ T.compat = {
   },
 };
 
+applyReadingEditorial(T, english);
 export default bilingual(T, english);

@@ -33,7 +33,7 @@ test('본문 수정일·JSON-LD·article·sitemap이 일치하며 편집한 백�
     assert.ok(app.sitemap().includes(`<loc>https://makeyourownday-fortune.com${path}</loc><lastmod>${date}</lastmod>`));
   }
   assert.equal(contentModified('/saju/sipsin/'), '2026-10-24');
-  assert.equal(contentModified('/en/tti/2027/rat/'), '2026-10-20');
+  assert.equal(contentModified('/en/tti/2027/rat/'), '2026-11-16');
   assert.equal(app.page('/today/').modified, '2026-10-20');
 });
 test('도구별 다음 행동은 기존 도구 정의에서 파생되고 KR/EN에 같은 주소를 사용한다', () => {

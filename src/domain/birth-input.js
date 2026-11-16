@@ -6,13 +6,13 @@ import { tr, bilingual } from '../i18n/runtime.js';
 export const BIRTH_YEAR_MIN = 1900;
 export const BIRTH_YEAR_MAX = 2050;
 export const BIRTH_TIME_HINT = bilingual({
-  exact: '비워두면 시간 모름으로 계산합니다. 한국 출생 당시의 시계 시각에 30분 보정과 과거 서머타임을 적용하며 해외 출생지·시간대는 변환하지 않습니다.',
-  branch: '한국 출생 당시의 시계 기준 구간입니다. 해외 출생지·시간대는 변환하지 않습니다.',
-  none: '시주 없이 세 기둥으로 계산합니다. 대운 시작은 정오 기준의 참고값이며 출생 시각에 따라 달라질 수 있습니다.',
+  exact: '비워두면 시간 모름으로 계산해요.',
+  branch: '한국 출생 당시의 시계 기준으로 골라주세요.',
+  none: '태어난 시각을 제외한 세 기둥으로 읽어요.',
 }, {
-  exact: 'Leave blank if the birth time is unknown. Enter the clock time recorded at birth in Korea. The 30-minute adjustment and historical daylight saving are applied automatically. Birth-country and birth-location corrections are not included.',
-  branch: 'Intervals follow the clock time used at birth in Korea. Overseas birth locations and time zones are not converted.',
-  none: 'Uses three pillars without an hour pillar. The luck-cycle start uses noon as a reference and may change with the birth time.',
+  exact: 'Leave blank if your birth time is unknown.',
+  branch: 'Choose the clock interval recorded at birth in Korea.',
+  none: 'Uses three pillars without the birth-hour pillar.',
 });
 
 export function birthDateError(p, today = todayKST()) {

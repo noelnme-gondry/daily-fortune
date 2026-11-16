@@ -15,7 +15,7 @@ export function compatView(r, a, b, today) {
   const yl = (arr) => arr.length ? arr.map((it) => `<li><span class="y">${it.y}</span><span><span class="hz">${hz(it.pillar)}</span>年</span><span class="why">${esc(it.why)}</span></li>`).join('') : `<li>${tr('비교 기간에 추천할 만한 신호가 없습니다. 실제 결혼·출산 가능성을 뜻하지 않습니다.', 'No signal stands out in the comparison period. This does not assess the possibility of marriage or childbirth.')}</li>`;
   const mini = (c) => c.cols.slice().reverse().map((x) => `${STEM_H[x.s]}${BR_H[x.b]}`).join(' ');
   return `<section class="report-head card">${ring(r.total)}<div class="report-text"><div class="when"><span>${esc(r.nameA)} <span class="hz">${mini(a)}</span></span><span>×</span><span>${esc(r.nameB)} <span class="hz">${mini(b)}</span></span></div><h2>${r.headline}</h2><p>${esc(r.lines.join(' '))}</p></div></section>
-    ${catList(r.cats.map((c) => ({ ...c, name: `${c.name}${tr(" 궁합", " compatibility")}` })), false)}
+    ${catList(r.cats.map((c) => ({ ...c, name: `${c.name}${tr(" 궁합", " compatibility")}` })), true)}
     <div class="split">
       <section class="box card"><h3>${tr("오행 보완", "Element balance together")}</h3><div class="cmp-head"><span></span><span>${esc(r.nameA)}</span><span>${esc(r.nameB)}</span></div><div>${rows}</div>${r.complement.map((t) => `<p>${esc(t)}</p>`).join('')}<div class="chips">${elChip(`${esc(r.nameA)} ${term("용신")}`, a.roles.yong)}${elChip(`${esc(r.nameB)} ${term("용신")}`, b.roles.yong)}</div></section>
       <section class="box card"><h3>${tr("두 사람이 조심할 점", "What to watch together")}</h3><ul class="cautions">${r.cautions.map((c) => `<li><b>${esc(c.title)}</b><span>${esc(c.text)}</span></li>`).join('')}</ul></section>

@@ -76,7 +76,7 @@ for (const lang of ['ko', 'en']) {
       await calculate(page, `${prefix}${path}`);
       const color = withLanguage(lang, () => report().lucky.color);
       await expect(page.locator('#result > .reading-overview > .lucky')).toHaveCount(1);
-      expect(await page.locator('#result > .lucky-banner').evaluate(el => el.previousElementSibling.matches('.daily-cats, .cats, .months'))).toBe(true);
+      expect(await page.locator('#result > .lucky-banner').evaluate(el => el.previousElementSibling.matches('.result-action-group') && el === el.parentElement.lastElementChild)).toBe(true);
       await expect(page.locator('#result .lucky > div:first-child b')).toHaveText(color);
       await expect(page.locator('#result [data-lucky-banner-slot]')).toHaveAttribute('data-lucky-banner-slot', EL_SLUG[withLanguage(lang, () => report().lucky.el)]);
       await expect(page.locator('#tool + .partner-ad')).toHaveCount(1);

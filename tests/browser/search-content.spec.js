@@ -53,6 +53,8 @@ test('KR/EN 만세력 경계 표는 JS 없이 390px에서 탐색하고 유효한
 test('KR/EN 만세력 경계의 네 입력은 직접 계산한 원국과 일치한다', async ({ page }) => {
   for (const prefix of ['', '/en']) {
     await page.goto(`${prefix}/manseryeok/`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('#public-example')).toBeVisible();
     await page.locator('[data-ga-cta="public_example"]').click();
     for (const { input, times } of MANSE_BOUNDARIES) for (const time of times) {
       const birth = { ...input, time }, c = buildChart(birth);
@@ -66,6 +68,8 @@ test('KR/EN 만세력 경계의 네 입력은 직접 계산한 원국과 일치�
     }
     await page.locator('[data-delete-profile]').click();
     await page.locator('[data-confirm-delete-all]').click();
+    await expect(page.locator('[data-delete-all-confirm]')).toBeHidden();
+    await expect(page.locator('[data-storage-status]')).toContainText(prefix ? 'Deleted all saved people' : '저장한 사람과 나·상대 정보를 모두 삭제했습니다');
   }
 });
 
@@ -202,7 +206,7 @@ test('공개 예시 → 직접 입력 → 2027년 결과 → 다음 기능에서
   expect(first.filter((e) => e[1] === 'calc_start')).toHaveLength(1);
   expect(first.filter((e) => e[1] === 'calc_result').map((e) => e[2].calc_origin)).toEqual(['form', 'form']);
   expect(JSON.stringify(first)).not.toMatch(/가상비밀|1990|14:30|has_time|calendar|score_band|pct_bucket/);
-  await page.locator('.all-menu summary').click();
+  await page.locator('[data-dialog="site-menu"]').click();
   await page.locator('.menu-panel a[href="/manseryeok/"]').click();
   await expect(page.locator('#result .pillar-table')).toContainText('시간 모름');
   const next = await events(page);

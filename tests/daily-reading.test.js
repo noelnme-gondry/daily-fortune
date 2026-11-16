@@ -14,13 +14,13 @@ test('기존 일곱 운과 모든 점수대에 흐름·기회·주의점의 한�
   for (const cat of CATS) {
     assert.deepEqual(Object.keys(DAILY_OUTLOOK[cat]), Object.keys(DAILY_OVERVIEW));
     for (const band of Object.keys(DAILY_OVERVIEW)) for (const lang of ['ko', 'en']) withLanguage(lang, () => {
-      const reading = dailyReading(cat, band, { action: 'action', basis: 'basis', change: 'change' });
+      const reading = dailyReading(cat, band, { action: 'action', basis: 'A specific chart factor explains this reading in its own context.', change: 'change' });
       for (const field of ['outlook', 'opportunity', 'caution']) {
         assert.ok(reading[field].length > 40, `${lang} ${cat} ${band} ${field}`);
         assert.doesNotMatch(reading[field], /undefined|NaN|\[object Object\]/);
         if (lang === 'en') assert.doesNotMatch(reading[field], /[가-힣]/);
       }
-      assert.equal(reading.text, [reading.outlook, reading.opportunity, reading.caution, 'action', 'basis', 'change'].join(' '));
+      assert.equal(reading.text, [reading.outlook, reading.opportunity, reading.caution, 'action', 'change'].join(' '));
       assert.equal(dailyOverview(band), DAILY_OVERVIEW[band][lang === 'ko' ? 0 : 1]);
     });
   }
@@ -38,7 +38,8 @@ for (const lang of ['ko', 'en']) {
         assert.ok(r.overall.outlook.startsWith(dailyOverview(bandOf(r.overall.score))));
         for (let i = 0; i < r.cats.length; i++) {
           const cat = r.cats[i], band = bandOf(cat.score);
-          assert.equal(cat.reading.outlook, DAILY_OUTLOOK[cat.key][band][0][lang === 'ko' ? 0 : 1]);
+          assert.ok(cat.reading.outlook === cat.reading.basis || cat.reading.outlook === DAILY_OUTLOOK[cat.key][band][0][lang === 'ko' ? 0 : 1]);
+          assert.ok(DAILY_OUTLOOK[cat.key][band]);
           const diff = cat.score - previous.cats[i].score;
           assert.match(cat.reading.change, new RegExp(diff === 0 ? String(cat.score) : String(Math.abs(diff))));
           assert.ok(cat.reading.basis);
@@ -59,7 +60,7 @@ test('일간 카드의 본문은 펼쳐지고 근거만 접히며 사용자 문�
   assert.equal((html.match(/class="daily-cat card"/g) || []).length, 7);
   assert.doesNotMatch(html, / hidden|<script>|<img src=x>/);
   assert.match(html, /&lt;script&gt;/);
-  assert.match(html, /<details class="reading-basis">/);
+  assert.match(html, /<dialog class="explanation-dialog"/);
   const ids = [...(html + second).matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
   assert.equal(ids.length, new Set(ids).size, '주간·월간 상세를 함께 렌더해도 ID는 유일');
   for (const [, ref] of html.matchAll(/(?:href="#|aria-labelledby=")([^"]+)"/g)) assert.ok(ids.includes(ref), ref);
