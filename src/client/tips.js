@@ -38,7 +38,7 @@ export function initTips() {
     const b = e.target.closest('.info');
     if (b && hoverable && open && open.btn === b && !b.contains(e.relatedTarget) && document.activeElement !== b) hide();
   });
-  document.addEventListener('focusin', (e) => { const b = e.target.closest('.info'); if (b) show(b); });
+  document.addEventListener('focusin', (e) => { const b = e.target.closest('.info'); if (b && (hoverable || b.matches(':focus-visible'))) show(b); });
   document.addEventListener('focusout', (e) => { if (open && e.target === open.btn) hide(); });
   document.addEventListener('click', (e) => {
     const b = e.target.closest('.info');

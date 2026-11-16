@@ -169,7 +169,7 @@ export async function mount(root) {
       return false;
     }
     showError('');
-    let html = readingNavigation(tabMode, today) + readingControls() + `<button type="button" class="link-btn result-edit-top" data-edit-profile aria-controls="tool-form">${tr('출생 정보 수정', 'Edit birth details')}</button>`;
+    let html = readingNavigation(tabMode, today) + readingControls() + `<button type="button" class="link-btn result-edit-top" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('출생 정보 수정', 'Edit birth details')}</button>`;
     let res;
     let leaderRank;
     if (mode === 'today') { res = day(ca, today, 'today'); html += dayView(res, { scope: 'reading' }); }
@@ -195,7 +195,7 @@ export async function mount(root) {
       html += rankTool ? `<div class="rank-share" id="rank-share" data-rank-locked hidden>${shareHtml}</div>` : shareHtml;
     }
     html += nextToolsHtml(mode, today);
-    html += `<div class="result-actions"><button type="button" class="link-btn" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('입력 정보 수정·저장', 'Edit or save your details')}</button><button type="button" class="sbtn" data-save-result>${tr('다음에 바로 보기: 이 기기에 저장', 'Save on this device for next time')}</button><span class="hint" data-result-storage role="status"></span></div>`;
+    html += `<div class="result-actions"><button type="button" class="sbtn" data-save-result>${tr('다음에 바로 보기: 이 기기에 저장', 'Save on this device for next time')}</button><span class="hint" data-result-storage role="status"></span></div>`;
     if (a.noTime || b?.noTime) html += `<p class="hint">${tr('시간 모름으로 시주를 제외했습니다. 시간을 알면 입력 정보에서 추가할 수 있어요.', 'The unknown birth time omits the hour pillar. Add the time in your details when available.')}</p>`;
     html += '</div>';
     if (pair) html += compatTool.compatMatchesShell(ca, cb);

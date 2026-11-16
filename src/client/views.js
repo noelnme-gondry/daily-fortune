@@ -28,7 +28,7 @@ const SS_LINK = { '도화살': 'dohwa', '역마살': 'yeokma', '화개살': 'hwa
 let tipSeq = 0;
 export function tip(text, label = tr('설명 보기', 'Read explanation')) {
   const id = `tip-c${++tipSeq}`;
-  return `<span class="tipwrap"><button type="button" class="info" aria-label="${esc(label)}" aria-describedby="${id}" data-tip-id="${id}">i</button><span role="tooltip" id="${id}" class="tip">${esc(text)}</span></span>`;
+  return `<span class="tipwrap"><button type="button" class="info" aria-expanded="false" aria-label="${esc(label)}" aria-describedby="${id}" data-tip-id="${id}">i</button><span role="tooltip" id="${id}" class="tip">${esc(text)}</span></span>`;
 }
 
 export function ring(score) {

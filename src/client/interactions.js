@@ -11,7 +11,7 @@ export function initInteractions() {
   document.addEventListener('change', (event) => {
     if (event.target.matches('[data-job-family]')) document.querySelectorAll('[data-job-panel]').forEach((panel) => { panel.hidden = panel.dataset.jobPanel !== event.target.value; });
   });
-  let opener = null;
+  const openers = new WeakMap();
   document.addEventListener('click', (event) => {
     const button = event.target.closest('[data-disclosure]');
     if (button) {
@@ -21,7 +21,7 @@ export function initInteractions() {
     const trigger = event.target.closest('[data-dialog]');
     if (trigger) {
       const dialog = document.getElementById(trigger.dataset.dialog);
-      if (dialog) { event.preventDefault(); opener = trigger; dialog.showModal(); if (dialog.matches('.explanation-dialog')) track('reading_detail_open', { tool: trigger.closest('[data-tool]')?.dataset.tool || 'content', detail_type: trigger.closest('.daily-cat') ? 'area_detail' : trigger.closest('.chart-basis') ? 'chart_detail' : 'basis' }); }
+      if (dialog) { event.preventDefault(); openers.set(dialog, trigger); dialog.showModal(); if (dialog.matches('.explanation-dialog') && trigger.closest('#result')) track('reading_detail_open', { tool: trigger.closest('[data-tool]')?.dataset.tool || 'content', detail_type: trigger.closest('.daily-cat') ? 'area_detail' : trigger.closest('.chart-basis') ? 'chart_detail' : 'basis' }); }
     }
     const close = event.target.closest('[data-close-dialog]');
     if (close) close.closest('dialog').close();
@@ -40,5 +40,9 @@ export function initInteractions() {
     if (!dialog.contains(document.activeElement) || (!event.shiftKey && document.activeElement === last)) { event.preventDefault(); first.focus(); }
     else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
   });
-  document.addEventListener('close', () => { if (opener?.isConnected) opener.focus(); opener = null; }, true);
+  document.addEventListener('close', (event) => {
+    const opener = openers.get(event.target);
+    openers.delete(event.target);
+    if (opener?.isConnected && !document.querySelector('dialog[open]')) opener.focus();
+  }, true);
 }
