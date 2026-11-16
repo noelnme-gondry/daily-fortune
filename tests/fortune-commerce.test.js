@@ -74,7 +74,7 @@ test('최초 인증 콜백은 승인 전 거래 조회 없이 POST 승인하고 
   const gateway = createNicepayGateway(config, async (url, options) => {
     calls.push(options.method);
     assert.equal(url, 'https://pg.example/v1/payments/TEST_TID');
-    if (options.method === 'GET' && !calls.includes('POST')) return { ok: true, status: 200, json: async () => ({ resultCode: 'A118', resultMsg: '조회 결과데이터 없음' }) };
+    if (options.method === 'GET' && !calls.includes('POST')) return { ok: false, status: 404, json: async () => ({ resultCode: 'U107', resultMsg: '거래내역이 존재 하지 않습니다.' }) };
     if (options.method === 'POST') {
       assert.deepEqual(JSON.parse(options.body), { amount: 990 });
       assert.equal((await f.store.get(f.order.id)).tid, 'TEST_TID');
