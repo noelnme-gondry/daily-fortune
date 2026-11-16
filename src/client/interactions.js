@@ -1,23 +1,11 @@
 import { track } from './analytics.js';
-// 공통 펼침 버튼과 라이트박스. 서버 본문은 JS 없이도 읽을 수 있다.
-export function collapseDisclosures(root = document) {
-  root.querySelectorAll('[data-disclosure]').forEach((button) => {
-    const panel = document.getElementById(button.getAttribute('aria-controls'));
-    if (panel) { panel.hidden = true; button.setAttribute('aria-expanded', 'false'); }
-  });
-}
+// 본문은 바로 읽고, 상세한 근거와 도감은 별도 창에서 확인한다.
 export function initInteractions() {
-  collapseDisclosures();
   document.addEventListener('change', (event) => {
     if (event.target.matches('[data-job-family]')) document.querySelectorAll('[data-job-panel]').forEach((panel) => { panel.hidden = panel.dataset.jobPanel !== event.target.value; });
   });
   const openers = new WeakMap();
   document.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-disclosure]');
-    if (button) {
-      const panel = document.getElementById(button.getAttribute('aria-controls'));
-      if (panel) { panel.hidden = !panel.hidden; button.setAttribute('aria-expanded', String(!panel.hidden)); }
-    }
     const trigger = event.target.closest('[data-dialog]');
     if (trigger) {
       const dialog = document.getElementById(trigger.dataset.dialog);
@@ -32,7 +20,8 @@ export function initInteractions() {
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Tab') return;
-    const dialog = document.querySelector('dialog[open]');
+    const dialogs = [...document.querySelectorAll('dialog[open]')];
+    const dialog = dialogs.find(el => el.contains(document.activeElement)) || dialogs.at(-1);
     if (!dialog) return;
     const focusable = [...dialog.querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])')].filter((el) => el.getClientRects().length);
     const first = focusable[0], last = focusable.at(-1);
@@ -43,6 +32,7 @@ export function initInteractions() {
   document.addEventListener('close', (event) => {
     const opener = openers.get(event.target);
     openers.delete(event.target);
-    if (opener?.isConnected && !document.querySelector('dialog[open]')) opener.focus();
+    const dialogs = [...document.querySelectorAll('dialog[open]')];
+    if (opener?.isConnected && dialogs.every(dialog => dialog.contains(opener))) opener.focus();
   }, true);
 }
