@@ -91,7 +91,18 @@ function toolPage(key, ctx, opts = {}) {
   const top = opts.top || '';
   const extraAfter = opts.after || '';
   const faq = [...t.faq, FREE_FAQ];
-  const intro = t.lead.split(/(?<=[.!?])\s+/)[0];
+  const intro = {
+    today: tr('내 생년월일로 오늘의 흐름을 읽어보세요.', 'Explore today through your birth chart.'),
+    tomorrow: tr('내일의 흐름을 오늘 미리 살펴보세요.', 'Look ahead to tomorrow’s reading.'),
+    week: tr('월요일부터 일요일까지, 한 주의 흐름을 읽어요.', 'Explore your week, Monday through Sunday.'),
+    month: tr('한 달의 흐름과 날짜별 기운을 함께 살펴봐요.', 'See the month’s rhythm and daily scores.'),
+    year: tr(`${opts.year}년의 큰 흐름과 열두 달의 변화를 읽어요.`, `Explore ${opts.year} and its twelve monthly readings.`),
+    lifetime: tr('타고난 성향과 10년마다 바뀌는 흐름을 살펴봐요.', 'Explore natal traits and ten-year cycles.'),
+    compatibility: tr('두 사람의 닮은 점과 다른 점을 읽어보세요.', 'Discover your similarities and differences.'),
+    story: tr('내 사주를 아홉 장면의 캐릭터로 만나보세요.', 'Meet the nine characters of your life story.'),
+    rank: tr('가능한 사주 조합 속 내 위치와 그 이유를 알아봐요.', 'Find your place among chart combinations, and why.'),
+    manseryeok: tr('태어난 날의 여덟 글자와 오행 구성을 확인해요.', 'Explore your birth pillars and Five Elements.'),
+  }[mode] || t.lead.split(/(?<=[.!?])\s+/)[0];
   return {
     path: t.path, title: t.title, description: t.desc, crumbs: opts.crumbs || [[t.nav, t.path]], section: t.path,
     tool: true, share: false, ld: [webApp(t, ctx), faqLd(faq)],
