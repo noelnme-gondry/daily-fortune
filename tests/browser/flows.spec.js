@@ -163,7 +163,7 @@ test('주요 세 메뉴는 읽기 쉬운 크기를 유지하고 전체 메뉴에
   const menu = page.getByRole('navigation', { name: '주요 메뉴', exact: true });
   const controls = menu.getByRole('link');
   const full = page.getByRole('navigation', { name: '전체 메뉴', exact: true });
-  const expected = navItems({ today: todayKST() });
+  const expected = navItems({ today: todayKST(), cfg: { paidReadings: false } });
   await expect(controls.locator('b')).toHaveText(['무료 운세', '프리미엄 운세', '무료 도구', '캐릭터·랭킹', '사주 읽는 법']);
   await expect(full).toBeHidden();
   for (const width of [1440, 1024, 900, 768, 390, 320]) {

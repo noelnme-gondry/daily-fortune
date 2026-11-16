@@ -32,7 +32,7 @@ const labels = {
 const label = (text) => tr(text, labels[text] || text.replace(/^(\d{4})년 (운세|띠별 운세|만세력)$/, (_, year, kind) => kind === '운세' ? year : `${year} ${kind === '띠별 운세' ? 'zodiac' : 'calendar'}`));
 
 export function navItems(ctx) {
-  return navigationGroups(ctx.today).flatMap(g => g.links.map(l => [l.path, l.name]));
+  return navigationGroups(ctx.today, ctx.cfg.paidReadings).flatMap(g => g.links.map(l => [l.path, l.name]));
 }
 
 function footerGroups(ctx) {
@@ -121,7 +121,7 @@ export function layout(page, ctx) {
   const img = `${ctx.site}${ctx.lang === 'en' ? image.replace(/\.png$/, '-en.png') : image}?v=sun`;
   const cfg = ctx.cfg;
   const ads = cfg.adsense && allowsAds(page);
-  const groups = navigationGroups(ctx.today);
+  const groups = navigationGroups(ctx.today, ctx.cfg.paidReadings);
   const foot = [...groups.map(g => [g.name, g.links.map(l => [l.path, l.name])]), footerGroups(ctx).at(-1)].map(([h, links]) => `<div><h2>${esc(label(h))}</h2><ul>${links.map(([p, n]) => `<li><a href="${p}">${esc(label(n))}</a></li>`).join('')}</ul></div>`).join('');
   const ld = JSON.stringify(graph(page, ctx)).replace(/</g, '\\u003c');
   return localizedLinks(`<!doctype html>
@@ -177,7 +177,7 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
     <button type="button" class="all-menu-button sbtn" data-dialog="site-menu" aria-haspopup="dialog" aria-controls="site-menu">${tr('전체 메뉴', 'All menus')}</button></nav>
   </div>
 </header>
-<dialog id="site-menu" class="site-menu" aria-labelledby="site-menu-title"><div class="dialog-bar"><h2 id="site-menu-title">${tr('무엇을 살펴볼까요?', 'What would you like to explore?')}</h2><button class="sbtn" type="button" data-close-dialog autofocus>${tr('닫기 ×', 'Close ×')}</button></div><nav class="menu-panel" aria-label="${tr('전체 메뉴', 'All navigation')}">${groupedLinks(ctx.today, page.path)}</nav></dialog>
+<dialog id="site-menu" class="site-menu" aria-labelledby="site-menu-title"><div class="dialog-bar"><h2 id="site-menu-title">${tr('무엇을 살펴볼까요?', 'What would you like to explore?')}</h2><button class="sbtn" type="button" data-close-dialog autofocus>${tr('닫기 ×', 'Close ×')}</button></div><nav class="menu-panel" aria-label="${tr('전체 메뉴', 'All navigation')}">${groupedLinks(ctx.today, page.path, 'purpose-groups', ctx.cfg.paidReadings)}</nav></dialog>
 <dialog id="profile-manager" class="profile-manager" aria-labelledby="profile-manager-title"><h2 id="profile-manager-title">${tr('저장한 사람', 'Saved people')}</h2></dialog>
 <aside class="profile-coach" data-profile-coach hidden role="status"><strong>${tr('저장한 사람은 여기서 관리하세요', 'Your people, all in one place')}</strong><p>${tr('위 메뉴의 ‘저장한 사람’에서 가족을 추가하고, 정보를 수정하거나 골라 볼 수 있어요.', 'Open People in the menu to add family, edit details, or choose whose reading to see.')}</p><div><button class="sbtn" type="button" data-manage-profiles aria-controls="profile-manager" aria-haspopup="dialog">${tr('저장한 사람 열기', 'Open People')}</button><button class="link-btn" type="button" data-dismiss-profile-guide>${tr('확인', 'Got it')}</button></div></aside>
 <main id="main" class="wrap">
