@@ -113,11 +113,12 @@ export function createCommerceService({ config, store, gateway, now = Date.now }
         return full ? order : publicOrder(order);
       });
     },
-    async payment(id, owner) {
+    async payment(id, owner, method = 'card') {
       ready();
+      if (typeof method !== 'string' || !(config.methods || ['card']).includes(method)) throw new PurchaseError('이용할 수 없는 결제수단입니다. 결제수단을 다시 선택해 주세요.');
       const o = await owned(id, owner, store); sameShop(o);
       if (o.status !== 'PENDING' || o.tid || now() - o.createdAt > 24 * 60 * 60 * 1000) throw new PurchaseError('구매 보관함에서 주문 상태를 확인해 주세요.', 409);
-      return { clientId: config.clientId, method: 'card', orderId: o.id, amount: o.amount, goodsName: `운세 ${o.productId === 'lifetime' ? '평생 사주' : o.productId === 'tojeong' ? '토정비결' : '궁합'}`, returnUrl: `${config.origin}/api/commerce/nicepay/return?state=${o.state}` };
+      return { clientId: config.clientId, method, orderId: o.id, amount: o.amount, goodsName: `운세 ${o.productId === 'lifetime' ? '평생 사주' : o.productId === 'tojeong' ? '토정비결' : '궁합'}`, returnUrl: `${config.origin}/api/commerce/nicepay/return?state=${o.state}` };
     },
   };
 }
@@ -149,7 +150,7 @@ export function createCommerceRouter({ config = nicepayConfig(), store, gateway 
   router.get('/config', async (req, res) => {
     let enabled = config.enabled;
     if (enabled) try { await orders?.ready?.(); } catch { enabled = false; }
-    res.json({ enabled, mode: config.mode });
+    res.json({ enabled, mode: config.mode, methods: config.methods || ['card'] });
   });
   router.post('/preview', (req, res, next) => {
     try { const r = createFortuneReport(req.body); res.json({ productId: r.product.id, title: r.title, summary: r.summary, amount: r.product.price, people: r.normalized.people, targetYear: r.normalized.targetYear }); } catch (e) { next(e); }
@@ -157,7 +158,7 @@ export function createCommerceRouter({ config = nicepayConfig(), store, gateway 
   router.post('/orders', async (req, res, next) => { try { const order = await service.create(req.body, req.fortuneOwner); res.status(201).json(publicOrder(order)); } catch (e) { next(e); } });
   router.get('/orders', async (req, res, next) => { try { res.json(await service.list(req.fortuneOwner)); } catch (e) { next(e); } });
   router.get('/orders/:id', async (req, res, next) => { try { res.json(await service.get(req.params.id, req.fortuneOwner)); } catch (e) { next(e); } });
-  router.post('/orders/:id/payment', async (req, res, next) => { try { res.json(await service.payment(req.params.id, req.fortuneOwner)); } catch (e) { next(e); } });
+  router.post('/orders/:id/payment', async (req, res, next) => { try { res.json(await service.payment(req.params.id, req.fortuneOwner, req.body?.method)); } catch (e) { next(e); } });
   router.get('/orders/:id/report', async (req, res, next) => {
     try {
       const o = await service.get(req.params.id, req.fortuneOwner, true);

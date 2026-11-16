@@ -1,6 +1,7 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import path from 'node:path';
 import { PurchaseError } from './fortune-report.js';
+import { nicepayMethods } from '../domain/payment-methods.js';
 
 export const sha256 = value => createHash('sha256').update(value).digest('hex');
 export function matchesSignature(actual, expected) {
@@ -18,10 +19,10 @@ export function nicepayConfig(env = process.env) {
   const storageReady = databaseConfigured ? !!databaseUrl : !!directory;
   const approvalModel = (env.NICEPAY_APPROVAL_MODEL || 'server').toLowerCase();
   const provider = (env.PAYMENTS_PROVIDER || 'nicepay').toLowerCase();
-  const cardAllowed = (env.NICEPAY_METHODS || 'card').split(',').map(m => m.trim().toLowerCase()).includes('card');
+  const methods = nicepayMethods(env.NICEPAY_METHODS);
   const liveAllowed = mode !== 'live' || ['true', '1'].includes(env.PAYMENTS_LIVE_ENABLED);
-  const enabled = ['sandbox', 'live'].includes(mode) && !!clientId && !!secretKey && !!origin && storageReady && approvalModel === 'server' && provider === 'nicepay' && cardAllowed && liveAllowed;
-  return { enabled, mode, origin, clientId, secretKey, directory: databaseConfigured ? '' : directory, databaseUrl, base: mode === 'live' ? 'https://api.nicepay.co.kr' : 'https://sandbox-api.nicepay.co.kr' };
+  const enabled = ['sandbox', 'live'].includes(mode) && !!clientId && !!secretKey && !!origin && storageReady && approvalModel === 'server' && provider === 'nicepay' && methods.length > 0 && liveAllowed;
+  return { enabled, mode, origin, clientId, secretKey, methods, directory: databaseConfigured ? '' : directory, databaseUrl, base: mode === 'live' ? 'https://api.nicepay.co.kr' : 'https://sandbox-api.nicepay.co.kr' };
 }
 export function createNicepayGateway(config, fetcher = fetch) {
   async function call(path, body) {

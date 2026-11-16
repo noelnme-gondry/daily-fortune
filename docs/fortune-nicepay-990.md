@@ -1,6 +1,6 @@
 # 운세 상품과 나이스페이 결제
 
-토정비결·평생 사주·궁합을 각각 990원(KRW) 단건 구매로 제공한다. 구독·빌링·자동 갱신을 구현하지 않는다. 미리보기 → 주문 확인 → 나이스페이 카드 결제 → 상세 풀이·운세 다운로드로 이어진다.
+토정비결·평생 사주·궁합을 각각 990원(KRW) 단건 구매로 제공한다. 구독·빌링·자동 갱신을 구현하지 않는다. 미리보기 → 주문 확인 → 나이스페이 카드·네이버페이(카드)·카카오페이 결제 → 상세 풀이·운세 다운로드로 이어진다.
 
 ## 진입점
 
@@ -18,7 +18,7 @@
 | `NICEPAY_SECRET_KEY` | 같은 상점의 **Basic 인증** 시크릿 키. 서버 전용 |
 | `NICEPAY_MODE` | `sandbox` 또는 `live`. 기본 sandbox |
 | `NICEPAY_APPROVAL_MODEL` | `server`. Client 승인 모델은 지원하지 않음 |
-| `NICEPAY_METHODS` | `card`. 현재 카드 결제창만 제공 |
+| `NICEPAY_METHODS` | `card,naverpayCard,kakaopay`. 목록에 설정한 수단만 구매·재시도 화면에 표시 |
 | `PAYMENTS_PROVIDER` | `nicepay` |
 | `PAYMENTS_LIVE_ENABLED` | 운영 실결제에서만 `true` 또는 `1`로 명시. 기본값은 비활성 |
 | `DATABASE_URL` | Fortune 앱 서비스에서 `${{Postgres.DATABASE_URL}}` 참조로 연결 |
@@ -38,7 +38,7 @@
 ### Railway 적용 순서
 
 1. Fortune와 같은 Railway 프로젝트에 Postgres 서비스를 준비한다. Fortune 앱 서비스 Variables에 `DATABASE_URL=${{Postgres.DATABASE_URL}}`을 연결한다. DB 서비스 이름이 다르면 실제 이름으로 참조한다. 다른 프로젝트의 MKT_Library 연결 그림만으로 Fortune 연결이 완료되지는 않는다.
-2. `SITE_URL=https://makeyourownday-fortune.com`, 같은 샌드박스 상점의 `NICEPAY_CLIENT_ID`와 `NICEPAY_SECRET_KEY`, `NICEPAY_MODE=sandbox`, `NICEPAY_APPROVAL_MODEL=server`, `NICEPAY_METHODS=card`, `PAYMENTS_PROVIDER=nicepay`, `PAYMENTS_LIVE_ENABLED=false`, `FORTUNE_PAID_READINGS=0`을 설정하고 배포한다. 기존 `NICEPAY_CLIENT_KEY`는 `NICEPAY_CLIENT_ID`로 맞춘다.
+2. `SITE_URL=https://makeyourownday-fortune.com`, 같은 샌드박스 상점의 `NICEPAY_CLIENT_ID`와 `NICEPAY_SECRET_KEY`, `NICEPAY_MODE=sandbox`, `NICEPAY_APPROVAL_MODEL=server`, `NICEPAY_METHODS=card,naverpayCard,kakaopay`, `PAYMENTS_PROVIDER=nicepay`, `PAYMENTS_LIVE_ENABLED=false`, `FORTUNE_PAID_READINGS=0`을 설정하고 배포한다. 기존 `NICEPAY_CLIENT_KEY`는 `NICEPAY_CLIENT_ID`로 맞춘다.
 3. `/healthz` 응답과 `/api/commerce/config`의 `enabled: true`, `mode: sandbox`를 확인한다. `/shop/`에서 PC·모바일 테스트 결제, 취소, 주문 재조회와 다운로드를 검증한다.
 4. 실제 판매를 열 때 운영 상점 키로 교체하고 `NICEPAY_MODE=live`, `PAYMENTS_LIVE_ENABLED=true`, `FORTUNE_PAID_READINGS=1`을 설정한 뒤 다시 배포한다. 후자는 기존 세 운세 진입점도 구매 화면으로 전환하는 설정이다.
 5. 저장소의 Railway 빌드는 `npm run build:release`, 실행은 `npm start`다. GitHub 자동 배포가 연결되어 있으면 main 변경으로 배포가 시작되지만 환경변수와 볼륨은 코드 머지만으로 설정되지 않는다. 현재 계정에서 자동 배포·변수·볼륨이 설정되어 있는지는 별도 확인이 필요하다.
@@ -46,7 +46,7 @@
 ### 주문 처리
 
 1. 서버가 상품·동의·출생 입력을 검증하고 고정 가격 990원으로 주문과 결과 스냅샷을 저장한다. 동일 브라우저·동일 상품·동일 대상의 중복 주문은 재사용한다.
-2. 브라우저는 `https://pay.nicepay.co.kr/v1/js/`의 `AUTHNICE.requestPay`를 호출한다. 서버가 돌려준 주문번호·금액·상품명·returnUrl만 사용한다.
+2. 브라우저에서 결제수단을 선택하면 서버가 허용 목록을 검증한 뒤 `https://pay.nicepay.co.kr/v1/js/`의 `AUTHNICE.requestPay`를 호출한다. 서버가 돌려준 단일 method·주문번호·금액·상품명·returnUrl만 사용한다. 쉼표 목록을 SDK method에 직접 넣지 않는다. `naverpayCard`의 대소문자를 보존하며 네이버페이는 카드 전액 결제(포인트 사용 불가)다. 상점의 해당 간편결제 계약 활성화 여부는 별도 확인이 필요하다.
 3. 나이스페이의 외부 POST 콜백은 별도 state와 SHA-256 인증 서명, 금액·상점·주문번호를 검증한다. PG 거래 조회의 주문번호도 대조한 후 승인 API를 호출한다.
 4. 승인 응답의 서명·거래번호·주문번호·KRW·990원·paid·잔액을 확인하고 구매 완료를 기록한다. 동시·중복 콜백은 한 번만 승인한다.
 5. 승인 응답이 유실되면 먼저 같은 거래를 재조회한다. 승인이 확인되면 복구하고, 여전히 불확실하면 망취소를 시도한다. 망취소도 실패하면 REVIEW 상태를 보존한다. 이미 저장한 거래번호는 재시작 후 PG 조회로 복구할 수 있다. REVIEW가 남으면 운영자가 상점 거래 내역과 주문번호를 대조한다.
@@ -58,11 +58,11 @@
 
 ## 검증과 출시 전 남은 작업
 
-- 2026-11-16 Postgres 변경 최종 검증: 단위·사이트 208건, lint, 482페이지 릴리스 빌드 및 과거 해시 자산 복원 통과. 계산 엔진과 골든값은 변경하지 않았다.
+- 2026-11-16 결제수단 추가 버전: 단위·사이트 214건, lint, 482페이지 릴리스 빌드 통과. 구매·재시도 화면에서 card / naverpayCard / kakaopay를 고를 수 있고 서버가 허용 목록을 검증한다. 계산 엔진과 골든값은 변경하지 않았다.
 - `tests/postgres-orders.test.js`: 내장 PostgreSQL 엔진(PGlite)에서 스키마 초기화·기존 테이블 보존·JSONB 파일 보존·소유권·불변 필드·거래번호 고유 제약·커밋·잠금 해제·취소 차단·DB 실패를 검증한다. PGlite는 단일 세션이므로 외부 Postgres의 다중 세션 잠금 경합과 Railway 접속 자체는 별도 검증이 필요하다.
 - `tests/fortune-commerce.test.js`: 가격, 입력, 동의, 중복 주문·승인, 서명·금액 위변조, 소유권, 미승인 차단, 재시작, 망취소, 취소 차단, 외부 콜백 쿠키, 실제 Express 다운로드 응답.
-- `tests/browser/purchase.spec.js`: 홈 진입, 세 상품 미리보기, 입력 수정, 동의·날짜 오류, 모의 승인 후 HTML 다운로드, 미승인 차단, 320px 화면.
-- 새 브라우저 검증 8건은 테스트 수집만 확인했다. 실행 통과로 보고하지 않는다.
+- `tests/browser/purchase.spec.js`: 홈 진입, 세 상품 미리보기, 입력 수정, 동의·날짜 오류, 모의 승인 후 HTML 다운로드, 미승인 차단, 320px 화면, 세 결제수단의 SDK 전달과 재시도 수단 변경. 12건 수집 확인, 결제수단 추가 후 실제 브라우저 실행은 미확인.
+- PR #49의 기존 버전은 GitHub CI에서 단위·사이트 208건, 전체 브라우저 232건, 키보드 반복 9건, lint와 릴리스 빌드가 통과했다. 이 통과 결과는 결제수단 추가 전 버전의 결과이며 새 버전의 브라우저 통과를 의미하지 않는다.
 - 이 실행 환경에서는 `npm run test:all`의 단위·사이트 검증은 가능하지만 로컬 포트 listen과 Chromium 기동이 EPERM으로 제한되어 브라우저 검증은 실행되지 않았다.
 - 나이스페이 실제 테스트 상점 키로 PC·모바일 인증/승인/취소·콜백 재시도·다운로드를 검증해야 한다. 실제 PG 요청은 수행하지 않았다.
 - 운영자 사업자 정보·상품 제공 및 환불 안내·개인정보 보관 기간을 확정하고, Fortune의 DB 참조 연결을 검증한 뒤 운영 전환해야 한다. 실제 PG 결제 및 운영 결제 전환은 별도 검증 후 진행한다.

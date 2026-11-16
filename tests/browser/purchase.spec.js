@@ -1,10 +1,19 @@
 import { test, expect } from '@playwright/test';
 
 const orderId = 'fortune_00000000-0000-4000-8000-000000000001';
+const methods = ['card', 'naverpayCard', 'kakaopay'];
 test.beforeEach(async ({ page }) => {
   // 회귀 검증이 실제 결제 상점 설정에 영향을 주지 않도록 공개 설정만 고정한다.
-  await page.route('**/api/commerce/config', route => route.fulfill({ json: { enabled: false, mode: 'sandbox' } }));
+  await page.route('**/api/commerce/config', route => route.fulfill({ json: { enabled: false, mode: 'sandbox', methods } }));
 });
+async function mockCheckout(page, enabledMethods = methods) {
+  await page.route('**/api/commerce/config', route => route.fulfill({ json: { enabled: true, mode: 'sandbox', methods: enabledMethods } }));
+  await page.addInitScript(() => {
+    window.AUTHNICE = { requestPay(p) { window.__nicepayRequested = { method: p.method, amount: p.amount, orderId: p.orderId }; p.fnError(); } };
+  });
+  await page.route('**/api/commerce/orders', route => route.fulfill({ json: { id: orderId, status: 'PENDING', amount: 990 } }));
+  await page.route(`**/api/commerce/orders/${orderId}/payment`, route => route.fulfill({ json: { clientId: 'S2_browser_test', method: route.request().postDataJSON().method, amount: 990, orderId, goodsName: '운세 평생 사주', returnUrl: 'http://127.0.0.1:4176/api/commerce/nicepay/return' } }));
+}
 async function fillPerson(page, who, year = '1990') {
   await page.locator(`#${who}-y`).fill(year);
   await page.locator(`#${who}-m`).selectOption('5');
@@ -73,4 +82,35 @@ test('320px에서도 상품 선택과 궁합 입력이 가로로 넘치지 않�
     await page.goto(url);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
+});
+
+for (const method of methods) test(`${method}: 선택한 결제수단이 서버 요청과 NICEPAY 호출까지 유지된다`, async ({ page }) => {
+  await mockCheckout(page);
+  await page.goto('/shop/lifetime/');
+  await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
+  await fillPerson(page, 'a'); await page.locator('#purchase-privacy').check();
+  await page.getByRole('button', { name: '미리보기·주문 확인', exact: true }).click();
+  await expect(page.getByLabel('결제수단', { exact: true }).locator('option')).toHaveCount(3);
+  await page.getByLabel('결제수단', { exact: true }).selectOption(method);
+  await page.locator('#purchase-confirm').check();
+  const button = page.getByRole('button', { name: '990원 결제하기', exact: true });
+  await expect(button).toBeEnabled();
+  const requested = page.waitForRequest(r => r.url().endsWith(`/orders/${orderId}/payment`));
+  await button.click();
+  expect((await requested).postDataJSON()).toEqual({ method });
+  await expect.poll(() => page.evaluate(() => window.__nicepayRequested)).toEqual({ method, amount: 990, orderId });
+  await expect(button).toBeEnabled();
+});
+
+test('미결제 주문도 설정된 간편결제만 표시하고 다른 수단으로 다시 시도한다', async ({ page }) => {
+  await mockCheckout(page, ['naverpayCard', 'kakaopay']);
+  await page.route(`**/api/commerce/orders/${orderId}`, route => route.fulfill({ json: { id: orderId, status: 'PENDING', amount: 990, title: '평생 사주', canPay: true } }));
+  await page.goto(`/shop/result/?orderId=${orderId}`);
+  const select = page.getByLabel('결제수단', { exact: true });
+  await expect(select.locator('option')).toHaveCount(2);
+  await expect(select).toHaveValue('naverpayCard');
+  await select.selectOption('kakaopay');
+  await page.getByRole('button', { name: '990원 결제 다시 시도', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__nicepayRequested)).toEqual({ method: 'kakaopay', amount: 990, orderId });
+  await expect(select).toBeEnabled();
 });

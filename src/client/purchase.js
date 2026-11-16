@@ -1,5 +1,6 @@
 import { readForm, wireBirthForm, syncTime } from './birth-form.js';
 import { esc } from '../site/util.js';
+import { NICEPAY_PAYMENT_METHODS } from '../domain/payment-methods.js';
 
 const $ = s => document.querySelector(s);
 async function api(path, body) {
@@ -21,24 +22,31 @@ function nicepaySdk() {
   });
   return sdkPromise;
 }
-async function payOrder(id) {
+function fillPaymentMethods(select, config) {
+  const methods = NICEPAY_PAYMENT_METHODS.filter(m => config.methods?.includes(m.id));
+  select.innerHTML = methods.length ? methods.map(m => `<option value="${m.id}">${m.label}</option>`).join('') : '<option value="">결제 준비 중</option>';
+  select.disabled = !config.enabled || !methods.length;
+}
+async function payOrder(id, method) {
   const sdk = await nicepaySdk();
-  const payment = await api(`/orders/${encodeURIComponent(id)}/payment`, {});
+  const payment = await api(`/orders/${encodeURIComponent(id)}/payment`, { method });
   return new Promise((resolve, reject) => sdk.requestPay({ ...payment, fnError: () => reject(new Error('결제가 완료되지 않았습니다. 구매 보관함에서 결제 상태를 확인하거나 다시 시도해 주세요.')) }));
 }
 async function mountProduct(root) {
   const id = root.dataset.fortuneProduct, pair = id === 'compatibility', dateOnly = id === 'tojeong';
-  const form = $('#purchase-form'), review = $('[data-purchase-review]'), button = $('[data-purchase-pay]'), confirm = $('#purchase-confirm');
+  const form = $('#purchase-form'), review = $('[data-purchase-review]'), button = $('[data-purchase-pay]'), confirm = $('#purchase-confirm'), method = $('#purchase-method');
   let config = { enabled: false }, input, busy = false;
   if (!dateOnly) { wireBirthForm(form, pair ? ['a', 'b'] : ['a']); for (const who of pair ? ['a', 'b'] : ['a']) syncTime(form, who); }
   else form.addEventListener('change', e => { if (e.target.name === 'a-cal') { $('#a-leap').disabled = e.target.value !== 'lunar'; if ($('#a-leap').disabled) $('#a-leap').checked = false; } });
   try {
     config = await api('/config');
+    fillPaymentMethods(method, config);
     $('[data-purchase-status]').textContent = !config.enabled ? '결제 준비 중입니다. 미리보기는 이용할 수 있습니다.' : config.mode === 'sandbox' ? '나이스페이 테스트 결제 환경입니다. 실제로 청구되지 않습니다.' : '나이스페이에서 결제합니다.';
   } catch { $('[data-purchase-status]').textContent = '결제 연결을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.'; }
   root.dataset.ready = 'true';
-  const update = () => { button.disabled = !config.enabled || !confirm.checked || busy; };
+  const update = () => { method.disabled = !config.enabled || !config.methods?.length || busy; button.disabled = method.disabled || !method.value || !confirm.checked || busy; };
   confirm.addEventListener('change', update);
+  method.addEventListener('change', update);
   form.addEventListener('submit', async e => {
     e.preventDefault(); if (busy) return;
     error('');
@@ -57,12 +65,12 @@ async function mountProduct(root) {
   });
   $('[data-purchase-edit]').addEventListener('click', () => { if (busy) return; review.hidden = true; form.hidden = false; input = null; error(''); $('[data-purchase-step="review"]').removeAttribute('aria-current'); $('[data-purchase-step="input"]').setAttribute('aria-current', 'step'); $('#a-y').focus(); });
   button.addEventListener('click', async () => {
-    if (busy || !input || !confirm.checked || !config.enabled) return;
+    if (busy || !input || !confirm.checked || !config.enabled || !method.value) return;
     busy = true; update(); error('');
     try {
       const order = await api('/orders', { ...input, purchaseConsent: true });
       if (order.status === 'PAID') { location.assign(`/shop/result/?orderId=${encodeURIComponent(order.id)}`); return; }
-      await payOrder(order.id);
+      await payOrder(order.id, method.value);
     } catch (e) { error(e.message); } finally { busy = false; update(); }
   });
 }
@@ -80,9 +88,13 @@ async function mountResult() {
     $('[data-purchase-result-status]').textContent = '결제가 완료되지 않았습니다.';
     $('[data-purchase-result-note]').textContent = order.status === 'CANCELLED' ? '취소된 주문입니다. 상품을 다시 선택해 주세요.' : '결제 상태 확인이 필요합니다. 잠시 후 페이지를 새로고침하거나 주문번호와 함께 운영자에게 문의해 주세요.';
     if (order.canPay) {
+      const config = await api('/config'), field = document.createElement('div'); field.className = 'field purchase-method';
+      field.innerHTML = '<label for="purchase-method">결제수단</label><select class="input" id="purchase-method" disabled></select>';
+      const method = field.querySelector('select'); fillPaymentMethods(method, config);
       const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'btn'; retry.textContent = '990원 결제 다시 시도';
-      retry.addEventListener('click', async () => { retry.disabled = true; error(''); try { await payOrder(id); } catch (e) { error(e.message); retry.disabled = false; } });
-      $('[data-purchase-result-note]').after(retry);
+      retry.disabled = method.disabled;
+      retry.addEventListener('click', async () => { retry.disabled = true; method.disabled = true; error(''); try { await payOrder(id, method.value); } catch (e) { error(e.message); retry.disabled = false; method.disabled = false; } });
+      $('[data-purchase-result-note]').after(field, retry);
     }
     return;
   }

@@ -16,7 +16,7 @@ const input = (productId = 'lifetime') => ({ productId, people: productId === 'c
 async function fixture(t) {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'fortune-commerce-test-'));
   t.after(() => rm(dir, { recursive: true, force: true }));
-  const config = { enabled: true, mode: 'sandbox', origin: 'https://fortune.example', clientId: 'S2_test_only', secretKey: 'unit-test-key', directory: dir };
+  const config = { enabled: true, mode: 'sandbox', origin: 'https://fortune.example', clientId: 'S2_test_only', secretKey: 'unit-test-key', directory: dir, methods: ['card', 'naverpayCard', 'kakaopay'] };
   const store = createOrderStore(dir), payments = new Map();
   let approvals = 0, cancellations = 0, failApproval = false, failCancel = false;
   const payment = (order, status = 'ready') => { const p = { resultCode: '0000', tid: 'TEST_TID', orderId: order.id, amount: 990, balanceAmt: status === 'cancelled' ? 0 : 990, currency: 'KRW', ediDate: '2026-11-16T12:00:00+09:00', status }; p.signature = sha256(`${p.tid}${p.amount}${p.ediDate}${config.secretKey}`); return p; };
@@ -152,7 +152,7 @@ async function request(app, url, { method = 'GET', cookie, body, external = fals
 test('실제 API: 설정 미완료는 503, 미리보기는 동의·동일 출처를 검증하고 전체 파일을 노출하지 않는다', async () => {
   const app = createCommerceRouter({ config: { ...nicepayConfig({}), origin: 'https://fortune.example' } });
   const config = await request(app, '/config');
-  assert.deepEqual(config.json(), { enabled: false, mode: 'sandbox' });
+  assert.deepEqual(config.json(), { enabled: false, mode: 'sandbox', methods: ['card'] });
   assert.match(String(config.headers['set-cookie']), /HttpOnly/); assert.match(String(config.headers['set-cookie']), /SameSite=Lax/);
   assert.equal((await request(app, '/orders', { method: 'POST', body: input() })).status, 503);
   assert.equal((await request(app, '/preview', { method: 'POST', body: input(), external: true })).status, 403);
@@ -181,6 +181,56 @@ test('실제 API: 외부 POST 콜백은 구매자 쿠키를 바꾸지 않으며 
 test('DB 연결 실패 시 공개 설정도 결제를 닫고 접속 정보를 노출하지 않는다', async () => {
   const app = createCommerceRouter({ config: { enabled: true, mode: 'sandbox', origin: 'https://fortune.example' }, store: { ready: async () => { throw new Error('postgres://secret@private-db/'); } } });
   const response = await request(app, '/config');
-  assert.deepEqual(response.json(), { enabled: false, mode: 'sandbox' });
+  assert.deepEqual(response.json(), { enabled: false, mode: 'sandbox', methods: ['card'] });
   assert.doesNotMatch(response.text, /secret|private-db/);
+});
+
+test('결제수단 설정은 세 SDK 값을 보존하고 간편결제만 허용한 상점도 열며 잘못된 목록은 닫는다', () => {
+  const env = { NICEPAY_CLIENT_ID: 'S2_test', NICEPAY_SECRET_KEY: 'test', SITE_URL: 'https://fortune.example', FORTUNE_ORDERS_DIR: '/tmp/fortune-test', NICEPAY_METHODS: 'card,naverpayCard,kakaopay' };
+  const config = nicepayConfig(env);
+  assert.equal(config.enabled, true);
+  assert.deepEqual(config.methods, ['card', 'naverpayCard', 'kakaopay']);
+  const easyOnly = nicepayConfig({ ...env, NICEPAY_METHODS: ' NAVERPAYCARD, kakaopay,naverpayCard ' });
+  assert.equal(easyOnly.enabled, true);
+  assert.deepEqual(easyOnly.methods, ['naverpayCard', 'kakaopay']);
+  for (const invalid of ['', 'card,', 'card,vbank', 'NICEPAY_METHODS']) assert.equal(nicepayConfig({ ...env, NICEPAY_METHODS: invalid }).enabled, false);
+});
+
+for (const method of ['card', 'naverpayCard', 'kakaopay']) test(`${method}: 선택한 결제수단을 SDK 요청에 전달하고 가격·주문·서버 복귀 주소를 유지한다`, async t => {
+  const f = await fixture(t);
+  const payment = await f.service.payment(f.order.id, 'owner-a', method);
+  assert.equal(payment.method, method);
+  assert.equal(payment.orderId, f.order.id);
+  assert.equal(payment.amount, 990);
+  assert.equal(payment.returnUrl, `https://fortune.example/api/commerce/nicepay/return?state=${f.order.state}`);
+  assert.equal(payment.secretKey, undefined);
+  assert.equal(f.approvals(), 0);
+});
+
+test('미설정 결제수단·잘못된 SDK 값·타인 주문은 결제 요청을 만들지 못한다', async t => {
+  const f = await fixture(t);
+  const restricted = createCommerceService({ config: { ...f.config, methods: ['naverpayCard'] }, store: f.store });
+  for (const method of ['card', 'kakaopay', 'naverpaycard', 'card,naverpayCard,kakaopay', '', null, ['naverpayCard']]) await assert.rejects(restricted.payment(f.order.id, 'owner-a', method), e => e.status === 400);
+  await assert.rejects(restricted.payment(f.order.id, 'owner-a'), e => e.status === 400);
+  await assert.rejects(restricted.payment(f.order.id, 'owner-b', 'naverpayCard'), e => e.status === 404);
+});
+
+test('실제 API: 공개 수단 목록과 선택한 결제수단을 연결하고 조작된 금액·수단을 차단한다', async t => {
+  const f = await fixture(t);
+  const app = createCommerceRouter({ config: f.config, store: f.store });
+  const config = await request(app, '/config');
+  assert.deepEqual(config.json(), { enabled: true, mode: 'sandbox', methods: ['card', 'naverpayCard', 'kakaopay'] });
+  assert.doesNotMatch(config.text, /unit-test-key|S2_test_only/);
+  const cookie = String(config.headers['set-cookie']).split(';')[0];
+  const created = await request(app, '/orders', { method: 'POST', cookie, body: input() });
+  const url = `/orders/${created.json().id}/payment`;
+  for (const method of f.config.methods) {
+    const response = await request(app, url, { method: 'POST', cookie, body: { method, amount: 1, clientId: 'other' } });
+    assert.equal(response.status, 200);
+    assert.equal(response.json().method, method);
+    assert.equal(response.json().amount, 990);
+    assert.equal(response.json().clientId, f.config.clientId);
+  }
+  assert.equal((await request(app, url, { method: 'POST', cookie, body: { method: 'vbank' } })).status, 400);
+  assert.equal((await request(app, url, { method: 'POST', cookie, body: {} })).json().method, 'card');
 });
