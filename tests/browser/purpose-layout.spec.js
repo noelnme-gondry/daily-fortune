@@ -75,11 +75,11 @@ test('설명 창은 항목별 근거를 보여주고 키보드로 닫으면 원�
     await expect(page.locator('dialog[open] .explanation-body p').first()).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page.locator('dialog[open]')).toHaveCount(0);
-    await expect(trigger).toBeFocused();
+    await expect.poll(() => trigger.evaluate(el => document.activeElement === el ? 'focused' : document.activeElement?.outerHTML.slice(0, 220))).toBe('focused');
     const next = page.locator('#result [data-edit-profile]');
     await next.focus();
     await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-    await expect(next).toBeFocused();
+    await expect.poll(() => next.evaluate(el => document.activeElement === el ? 'focused' : document.activeElement?.outerHTML.slice(0, 220))).toBe('focused');
   }
   await expect(page.locator('#result details,#result [data-disclosure]')).toHaveCount(0);
 });

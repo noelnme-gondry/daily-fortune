@@ -56,7 +56,7 @@ for (const lang of ['ko', 'en']) {
         const target = await links.nth(i).getAttribute('href');
         await links.nth(i).focus();
         await page.keyboard.press('Enter');
-        await expect(page.locator(target)).toBeFocused();
+        await expect.poll(() => page.locator(target).evaluate(el => document.activeElement === el ? 'focused' : document.activeElement?.outerHTML.slice(0, 220))).toBe('focused');
       }
       for (const width of [320, 768, 1024, 1440]) {
         await page.setViewportSize({ width, height: 900 });
