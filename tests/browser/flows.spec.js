@@ -275,20 +275,24 @@ test('IndexedDB 접근 실패를 표시하고 계산은 계속 동작', async ({
   await expect(page.locator('.report-head')).toBeVisible();
 });
 
-test('공통 설명과 FAQ는 버튼으로 열리고 ARIA 대상이 존재한다', async ({ page }) => {
+test('계산 방법과 FAQ는 별도 설명 창에서 읽고 닫으면 원래 버튼으로 돌아온다', async ({ page }) => {
   await ready(page, '/today/');
-  await page.evaluate(() => { window._events = []; window.gtag = (...args) => window._events.push(args); });
-  const method = page.getByRole('button', { name: '계산 방법과 점수 기준' });
-  await expect(method).toHaveAttribute('aria-expanded', 'false');
+  const method = page.getByRole('button', { name: '계산 방법과 점수 기준 보기' });
+  await expect(method).toHaveAttribute('aria-haspopup', 'dialog');
+  await expect(method).toHaveAttribute('aria-controls', 'tool-method');
   await method.click();
   await expect(page.locator('#tool-method')).toBeVisible();
-  await page.getByRole('button', { name: '자주 묻는 질문', exact: true }).click();
-  const q = page.getByRole('button', { name: '오늘의 운세는 어떤 기준으로 계산하나요?' });
-  await q.focus(); await page.keyboard.press('Enter');
-  await expect(q).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('Escape');
+  await expect(method).toBeFocused();
+  const faq = page.getByRole('button', { name: '자주 묻는 질문 보기', exact: true });
+  await faq.click();
+  await expect(page.locator('#tool-faq')).toBeVisible();
+  await expect(page.locator('#tool-faq h3').first()).toHaveText('오늘의 운세는 어떤 기준으로 계산하나요?');
   await expect(page.locator('#faq-answer-0')).toBeVisible();
-  expect(await page.evaluate(() => window._events.filter((e) => e[1] === 'faq_open').length)).toBe(1);
-  expect(await page.locator('[aria-controls]').evaluateAll((els) => els.every((e) => document.getElementById(e.getAttribute('aria-controls'))))).toBe(true);
+  await expect(page.locator('#tool-faq details')).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(faq).toBeFocused();
+  expect(await page.locator('[aria-controls]').evaluateAll((els) => els.every((e) => [...document.querySelectorAll('[id]')].filter(target => target.id === e.getAttribute('aria-controls')).length === 1))).toBe(true);
 });
 
 test('아홉 캐릭터 · 이미지/능력치/10년 데이터 · Escape 및 포커스 복귀', async ({ page }) => {
@@ -622,7 +626,7 @@ test('홈의 재미 카드는 입력 옆에 있고 모바일에서는 입력 아
 
 test('12띠 생성형 심볼이 띠 메뉴·일별 상세·연간 운세에 로드된다', async ({ page }) => {
   await page.goto(`/tti/${todayKST().y}/`);
-  const cards = page.locator('.zodiac-cards .tti-card');
+  const cards = page.locator('.zodiac-year-link');
   await expect(cards).toHaveCount(12);
   const sources = [];
   for (const card of await cards.all()) {

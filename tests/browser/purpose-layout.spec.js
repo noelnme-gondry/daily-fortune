@@ -38,10 +38,16 @@ for (const lang of ['ko', 'en']) for (const colorScheme of ['light', 'dark']) {
         await page.evaluate(() => window.scrollTo(0, 0));
         const overflow = await page.evaluate(() => ({ page: document.documentElement.scrollWidth, viewport: window.innerWidth, offenders: [...document.querySelectorAll('main *,header *')].filter(el => { const r = el.getBoundingClientRect(); return r.width > 0 && (r.right > window.innerWidth + 1 || r.left < -1) && window.getComputedStyle(el).position !== 'fixed' && !el.closest('.scroll-x,.table-wrap,.scroll-rail'); }).slice(0, 8).map(el => el.className) }));
         expect.soft(overflow.page, `${path}/${width}: ${JSON.stringify(overflow.offenders)}`).toBeLessThanOrEqual(width + 1);
+        const overlaps = await page.evaluate(() => [...document.querySelectorAll('.head-row,.gnav,.period-switch,.purpose-links,.evidence-grid,.rank-evidence')].flatMap(group => {
+          const items = [...group.children].filter(el => el.getClientRects().length && window.getComputedStyle(el).position !== 'absolute').map(el => ({ text: el.textContent.trim().slice(0, 35), rect: el.getBoundingClientRect() }));
+          return items.flatMap((a, index) => items.slice(index + 1).filter(b => Math.min(a.rect.right, b.rect.right) - Math.max(a.rect.left, b.rect.left) > 1 && Math.min(a.rect.bottom, b.rect.bottom) - Math.max(a.rect.top, b.rect.top) > 1).map(b => `${group.className}: ${a.text} / ${b.text}`));
+        }));
+        expect.soft(overlaps, `${path}/${width}: overlapping controls or cards`).toEqual([]);
         const navigation = await page.locator('.gnav a,.purpose-links a:visible').evaluateAll(links => links.map(a => ({ text: a.textContent.trim(), width: a.clientWidth, scroll: a.scrollWidth })));
         for (const item of navigation) expect.soft(item.scroll, `${path}/${width}: ${item.text}`).toBeLessThanOrEqual(item.width + 1);
         if ((width === 390 || width === 1440) && ['/', '/today/', '/lifetime/', '/compatibility/', '/saju-ranking/'].includes(path)) {
           await page.screenshot({ path: testInfo.outputPath(`${path.replaceAll('/', '') || 'home'}-${width}.png`), fullPage: true });
+          await page.screenshot({ path: testInfo.outputPath(`${path.replaceAll('/', '') || 'home'}-${width}-viewport.png`), fullPage: false });
         }
       }
       const ratios = await contrastRatios(page.locator('h1:visible,h2:visible,h3:visible,.daily-outlook:visible,.purpose-links a:visible,.period-switch a:visible,.home-feature b:visible'));
@@ -71,4 +77,27 @@ test('설명 창은 항목별 근거를 보여주고 키보드로 닫으면 원�
     await expect(trigger).toBeFocused();
   }
   await expect(page.locator('#result details')).toHaveCount(0);
+});
+
+
+test('터치로 용어 설명을 한 번 누르면 떠 있고 다시 누르면 닫힌다', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  await context.route('https://**/*', route => route.abort());
+  const page = await context.newPage();
+  await page.goto('http://127.0.0.1:4176/manseryeok/');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await completeProfile(page);
+  await page.locator('#tool-form [type=submit]').click();
+  const button = page.locator('#result .chart-start .info');
+  await button.tap();
+  await expect(button).toHaveAttribute('aria-expanded', 'true');
+  const tip = page.locator(`#${await button.getAttribute('data-tip-id')}`);
+  await expect(tip).toBeVisible();
+  const rect = await tip.boundingBox();
+  expect(rect.x).toBeGreaterThanOrEqual(0);
+  expect(rect.x + rect.width).toBeLessThanOrEqual(390);
+  await button.tap();
+  await expect(button).toHaveAttribute('aria-expanded', 'false');
+  await expect(tip).toBeHidden();
+  await context.close();
 });
