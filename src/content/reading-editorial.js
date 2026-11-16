@@ -45,6 +45,15 @@ export const CAREER_FACTORS = {
   역마: [['역마는 활동 반경과 환경 전환의 상징이에요. 자리에서 생각만 하기보다 다른 현장·사람을 접하며 관점을 넓히는 방향으로 읽어요.', 'Traveling Horse symbolizes changing environments and a wider sphere of activity: gaining perspective from different places and people.'], ['역마의 변화가 분산 쪽으로 기울면 새로운 요청으로 하던 일의 흐름이 자주 끊기는 모습으로 읽어요.', 'When Traveling Horse tips toward distraction, new demands can interrupt the continuity of existing work.']],
 };
 export function applyReadingEditorial(ko, en) {
+  const strength = {
+    극신강: ['나를 돕는 같은 오행과 나를 생하는 오행의 가중 비율이 가장 높은 구간이에요. 전통적으로는 자기 방향을 밀고 가는 힘이 두드러지는 구성으로 읽어요. 그 힘이 표현·활동·결과물로 이어지는지도 함께 살펴요.', 'The weighted share of peer and resource elements is in the highest band. Traditional interpretation emphasizes holding your own direction, alongside how that support is channeled into expression, activity and results.'],
+    신강: ['일간을 돕는 기운의 가중 비율이 높은 편이에요. 내 기준으로 판단하고 추진하는 주제가 두드러지는 구성으로 읽어요. 자기 기준을 유지하는 힘과 다른 관점을 받아들이는 여지를 함께 살펴요.', 'The weighted support ratio is relatively high. This is traditionally read through self-directed judgment and initiative, balanced with room for other perspectives.'],
+    중화: ['나를 돕는 기운의 가중 비율이 이 모델의 중간 구간에 있어요. 돕는 쪽과 다른 작용이 크게 치우치지 않았다는 뜻이에요. 다섯 오행의 겉글자 개수가 똑같다는 뜻은 아니에요.', 'The weighted support ratio falls in this model’s central band. Support and other influences are not sharply one-sided. This does not mean the five visible element counts are equal.'],
+    신약: ['일간을 돕는 기운보다 표현·재물·책임 쪽에 쓰이는 기운의 비중이 큰 편이에요. 여러 요구에 힘을 나누는 구성으로 읽어요. 나를 받쳐 주는 오행과 들어오는 대운을 함께 봐야 해석이 구체적이 돼요.', 'Expression, resources and responsibility take a larger share than the elements supporting the Day Master. The interpretation considers how support elements and incoming cycles balance these demands.'],
+    극신약: ['일간을 돕는 같은 오행과 생하는 오행의 가중 비율이 가장 낮은 구간이에요. 외부 요구에 힘이 많이 쓰이는 구성으로 읽고, 어떤 오행이 들어올 때 균형을 돕는지 함께 살펴요. 강약은 체력이나 의지의 등급이 아니에요.', 'The weighted share of peer and resource support is in the lowest band. Interpretation focuses on external demands and which incoming elements would support balance. This is not a rating of stamina or willpower.'],
+  };
+  for (const [name, pair] of Object.entries(strength)) { ko.strength[name] = pair[0]; en.strength[name] = pair[1]; }
+
   for (const [factor, rows] of Object.entries(CAREER_FACTORS)) {
     ko.cat.career.factor[factor] = rows.map(pair => pair[0]);
     en.cat.career.factor[factor] = rows.map(pair => pair[1]);
