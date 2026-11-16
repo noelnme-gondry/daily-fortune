@@ -3,5 +3,5 @@ const readonly = Object.fromEntries(['window', 'document', 'navigator', 'locatio
 export default [
   { ignores: ['node_modules/**', 'dist/**', '.legacy-local/**', '.agents/**', 'test-results/**', 'playwright-report/**', 'src/content/rank-table.js', 'src/content/rank-leaders.js'] },
   js.configs.recommended,
-  { files: ['**/*.js', '**/*.mjs'], languageOptions: { ecmaVersion: 'latest', sourceType: 'module', globals: readonly }, rules: { 'no-unused-vars': ['error', { args: 'none', caughtErrors: 'none', varsIgnorePattern: '^_' }] } },
+  { files: ['**/*.js', '**/*.mjs'], languageOptions: { ecmaVersion: 'latest', sourceType: 'module', globals: { ...readonly, AbortSignal: 'readonly' } }, rules: { 'no-unused-vars': ['error', { args: 'none', caughtErrors: 'none', varsIgnorePattern: '^_' }] } },
 ];

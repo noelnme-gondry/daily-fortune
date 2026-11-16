@@ -5,6 +5,7 @@ playwright-report/
 
 # Build output
 dist/
+data/fortune-orders/
 
 # Editor
 .vscode/

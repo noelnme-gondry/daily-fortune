@@ -1,6 +1,11 @@
 import fs from 'node:fs';
 import { defineConfig } from 'vite';
 import { handleLanguage } from './src/site/language-middleware.js';
+import { createCommerceRouter } from './src/server/fortune-commerce.js';
+
+function fortuneCommerce() {
+  return { name: 'fortune-commerce', configureServer(server) { server.middlewares.use('/api/commerce', createCommerceRouter()); } };
+}
 
 // 개발 서버: 페이지 HTML을 운영과 같은 렌더러(src/site/render.js)로 즉석 생성한다.
 const TEXT_ROUTES = {
@@ -83,7 +88,7 @@ function tojeongData() {
 
 export default defineConfig({
   publicDir: 'public',
-  plugins: [sitePages(), tojeongData()],
+  plugins: [fortuneCommerce(), sitePages(), tojeongData()],
   build: {
     outDir: 'dist',
     emptyOutDir: true,
