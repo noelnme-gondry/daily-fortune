@@ -19,11 +19,14 @@ export function about(ctx) {
       ${publisherLinks()}<p class="note">${esc(ABOUT.note)}</p><p class="updated">${siteText("최종 업데이트 ")}${ctx.buildDate}</p></article>`,
   };
 }
+function purchasePrivacy() {
+  return `<section class="prose" id="fortune-purchase"><h2>${tr('운세 상품 미리보기와 구매', 'Paid report previews and purchases')}</h2><p>${tr('미리보기와 구매 운세 생성에 동의하면 표시 이름·생년월일·달력·윤달 여부를 서버에서 처리합니다. 평생 사주와 궁합에는 성별·출생 시각도 사용합니다. 구매 시 주문번호·상품·금액·승인 거래번호와 운세 파일을 보관하고 다시 읽기와 다운로드에 사용합니다. 카드 정보는 나이스페이가 처리하며 사이트에는 보관하지 않습니다.', 'With your consent, report previews process your display name, birth date, calendar and leap-month choice on our server. Lifetime and compatibility reports also use gender and birth time. Purchased reports, order numbers, products, amounts and payment transaction IDs are retained for access and downloads. NICEPAY handles card details; this site does not store them.')}</p><p>${tr('구매 보관함은 임의의 구매자 식별자를 담은 HttpOnly 쿠키(fortune_buyer, 최대 1년)로 구분합니다. 쿠키를 삭제하면 주문 접근이 끊어지지만 서버 주문 기록은 삭제되지 않습니다. 주문·운세 보관 및 삭제 문의는 운영자에게 주문번호와 함께 요청해 주세요. 다운로드 파일에는 출생 정보가 포함됩니다.', 'The purchase library uses a random buyer identifier in an HttpOnly cookie (fortune_buyer, up to one year). Clearing cookies removes browser access but does not delete server orders. Contact the operator with your order number for retention and deletion requests. Downloaded reports contain birth details.')}</p></section>`;
+}
 export function privacy(ctx) {
   return {
-    path: '/privacy/', title: PRIVACY.title, description: `${SITE.name}${siteText(" 개인정보처리방침. 생년월일시 등 입력 정보는 서버로 전송되지 않으며 사용자 기기에만 저장됩니다.")}`,
+    path: '/privacy/', title: PRIVACY.title, description: tr(`${SITE.name} 개인정보처리방침. 무료 계산기의 기기 처리와 운세 상품의 서버 처리·보관, 결제·쿠키·광고·방문 통계 범위를 안내합니다.`, `${SITE.name} privacy policy: browser calculations, paid reports, payments, cookies, advertising and analytics.`),
     crumbs: [[PRIVACY.h1, '/privacy/']], section: '/privacy/',
-    body: `<article class="article">${hero(PRIVACY.h1, tr('출생 정보는 브라우저에서 계산하며, 광고·방문 통계의 외부 접속과 기기 저장 범위를 아래에 설명합니다.', 'Birth details are processed in your browser. External advertising and analytics requests and device storage are described below.'))}${PRIVACY.sections.map((s) => `<section class="prose"><h2>${esc(s.h)}</h2><p>${esc(s.text)}</p></section>`).join('')}${publisherLinks()}<p class="updated">${siteText("시행일 ")}${ctx.published} · ${tr('최종 수정', 'Last revised')} ${ctx.buildDate}</p></article>`,
+    body: `<article class="article">${hero(PRIVACY.h1, tr('무료 계산기는 브라우저에서 처리합니다. 운세 상품 구매 시 서버 처리·보관과 광고·방문 통계의 범위를 아래에 설명합니다.', 'Free tools process birth details in your browser. Paid report previews and purchases use server processing and storage, as explained below.'))}${PRIVACY.sections.map((s) => `<section class="prose"><h2>${esc(s.h)}</h2><p>${esc(s.text)}</p></section>`).join('')}${purchasePrivacy()}${publisherLinks()}<p class="updated">${siteText("시행일 ")}${ctx.published} · ${tr('최종 수정', 'Last revised')} ${ctx.buildDate}</p></article>`,
   };
 }
 

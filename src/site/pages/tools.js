@@ -1,4 +1,5 @@
 import { groupedLinks } from '../purpose-navigation.js';
+import { productCards } from './shop.js';
 import { elementName, animalName } from '../../i18n/terms.js';
 import { tr } from '../../i18n/runtime.js';
 import { siteText, siteValue } from '../copy.js';
@@ -194,6 +195,7 @@ export function home(ctx) {
       <div class="home-discovery"><h2 id="home-discovery-title">${siteText('재미로 보는 사주')}</h2>${features}<p class="note">${tr('사주는 전통 해석을 참고하는 도구입니다. 점수는 사건의 확률이나 사람의 가치를 뜻하지 않습니다.', 'Saju offers traditional interpretations for reflection. Scores are not event probabilities or a measure of anyone’s worth.')}</p>
       </div>
     </section>
+    ${ctx.lang === 'en' ? '<section class="box-sec home-purchases"><div class="sec-head"><h2>Keep your fortune as a report</h2><a href="/shop/">View all reports</a></div><p>Korean fortune reports: KRW 990 each as a one-time purchase, including a detailed reading and download.</p>' + productCards() + '</section>' : `<section class="box-sec home-purchases" aria-labelledby="home-purchases-title" lang="ko"><div class="sec-head"><h2 id="home-purchases-title">운세를 한 권으로 간직하세요</h2><a href="/shop/">상품 전체 보기</a></div><p>토정비결·평생 사주·궁합, 각각 990원 단건 결제. 상세 풀이와 운세 다운로드를 함께 제공합니다.</p>${productCards()}</section>`}
     <section class="box-sec home-services" aria-labelledby="home-services-title"><div class="sec-head"><h2 id="home-services-title">${tr('지금, 무엇이 궁금한가요?', 'What are you curious about?')}</h2></div><p class="note">${esc(FREE_ACCESS.description)}</p>${groupedLinks(o, '', 'purpose-groups home-purpose-groups')}</section>
     <nav class="reading-guides" aria-label="${tr('처음 읽는 분을 위한 안내', 'Guides for your first reading')}"><a href="/saju/guide/"><b>${tr('처음 보는 사주, 어디부터 읽을까요?', 'New to saju? Start here.')}</b><span>${tr('일간·오행·대운을 쉬운 말로 알아보세요.', 'Learn about Day Masters, elements and cycles.')}</span></a><a href="/about/"><b>${tr('결과는 어떻게 계산하나요?', 'How is a reading calculated?')}</b><span>${tr('계산 기준과 해석의 범위를 확인하세요.', 'Explore the method and its limits.')}</span></a></nav>
     ${guideLinks()}
