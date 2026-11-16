@@ -83,7 +83,7 @@ test('토정비결: MIT 원본 144괘와 1,728개 월별 해설이 손실 없이
 
 test('토정비결: 공개 진입은 미리보기·990원 구매이며 과거 작괘 자료는 보존된다', () => {
   const site = createSite({ site: 'https://unse.example', assets: {}, now: Date.UTC(2026, 9, 14) });
-  assert.match(site.render('/'), /href="\/shop\/tojeong\/"/);
+  assert.match(site.render('/'), /href="\/tojeong\/"/);
   assert.doesNotMatch(site.render('/'), />무료 토정비결<\/a>/);
   assert.equal(site.has('/tojeong/2026/'), false);
   assert.equal(site.redirect('/tojeong/2026/'), '/tojeong/');

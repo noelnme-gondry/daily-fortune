@@ -49,7 +49,7 @@ function routeTable(ctx) {
     const product = productPage(id, c, year);
     const name = { tojeong: tr(`${year}년 토정비결`, `${year} Tojeong`), lifetime: tr('평생 사주', 'Lifetime saju'), compatibility: tr('사주 궁합', 'Saju compatibility') }[id];
     return {
-      ...product, path: c.path,
+      ...product, path: c.path, canonicalPath: c.path,
       title: tr(`${name} 미리보기 · 상세 풀이 990원`, `${name} preview and premium report`),
       description: tr(`${name}의 일부 풀이를 미리 확인하세요. 개인별 상세 해설과 HTML 운세 파일은 990원 단건 결제로 제공합니다.`, `Preview your ${name} report. Detailed Korean readings and an HTML download cost KRW 990 as a one-time purchase.`),
       supplement: id === 'tojeong' ? yearGuide(year, c, c.path) : '',
@@ -158,7 +158,10 @@ export function createSite({ site, assets, now = Date.now() }) {
       return a ? `google.com, ${a.pub}, DIRECT, f08c47fec0942fa0\n` : '';
     },
     sitemap() {
-      const urls = routes.filter(r => !/\/shop\/(orders|result)\//.test(r.path)).map((r) => `  <url><loc>${site}${r.path}</loc><lastmod>${lastmod(r)}</lastmod><changefreq>${r.changefreq}</changefreq><priority>${r.priority.toFixed(1)}</priority></url>`).join('\n');
+      const urls = routes.filter(r => {
+        const p = page(r.path);
+        return !p.noindex && languagePath(p.canonicalPath || p.path, r.lang || 'ko') === r.path;
+      }).map((r) => `  <url><loc>${site}${r.path}</loc><lastmod>${lastmod(r)}</lastmod><changefreq>${r.changefreq}</changefreq><priority>${r.priority.toFixed(1)}</priority></url>`).join('\n');
       return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
     },
     robots() {

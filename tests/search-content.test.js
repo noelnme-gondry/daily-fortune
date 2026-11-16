@@ -130,9 +130,17 @@ test('오늘·내일의 공개 예시는 해당 날짜의 실제 개인 운세�
           const html = s.render(path);
           assert.ok(html.includes(`data-example-date="${isoDate(date)}"`), path);
           assert.ok(html.includes(`<b data-example-overall>${result.overall.score}${lang === 'en' ? ' points' : '점'}</b>`), path);
+          const previousDate = addDays(date, -1), previous = day(c, previousDate);
+          assert.ok(html.includes(`<time datetime="${isoDate(previousDate)}">${isoDate(previousDate)}</time>`), path);
           for (const cat of result.cats) {
-            assert.ok(html.includes(`<th scope="row">${cat.name}</th><td>${cat.score}${lang === 'en' ? ' points' : '점'}</td>`), path);
+            const before = previous.cats.find(item => item.key === cat.key).score;
+            const points = lang === 'en' ? ' points' : '점', delta = cat.score - before;
+            assert.ok(html.includes(`<tr data-day-area="${cat.key}"><th scope="row">${esc(cat.name)}</th><td>${before}${points}</td><td>${cat.score}${points}</td><td>${delta > 0 ? '+' : ''}${delta}${points}</td></tr>`), path);
+            for (const text of [cat.reading.basis, cat.reading.change, cat.reading.action]) assert.ok(html.includes(esc(text)), path);
           }
+          assert.equal((html.match(/data-day-reading=/g) || []).length, 7);
+          assert.ok(html.includes('aria-describedby="example-day-hint"'));
+          assert.match(html, lang === 'en' ? /not a growth rate or a probability/ : /증가율이나 성공 확률이 아닙니다/);
           assert.ok(html.includes(result.overall.text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')), path);
           assert.ok(html.includes('href="#public-example"'), path);
           assert.ok(html.includes('href="#tool" data-ga-cta="public_example"'), path);

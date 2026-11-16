@@ -20,6 +20,31 @@ async function enter(page, input = EXAMPLE_INPUT) {
 }
 const events = (page) => page.evaluate(() => window.searchEvents.filter((e) => e[0] === 'event'));
 
+test('오늘·내일의 KR/EN 날짜 비교와 분야 해설은 JS 없이 좁은 화면에서도 읽힌다', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 844 } });
+  await context.route('https://**/*', route => route.abort());
+  const page = await context.newPage();
+  try {
+    for (const prefix of ['', '/en']) for (const mode of ['today', 'tomorrow']) {
+      await page.goto(`http://127.0.0.1:4176${prefix}/${mode}/`);
+      const example = page.locator('#public-example');
+      await expect(example.locator('[data-day-area]')).toHaveCount(7);
+      await expect(example.locator('[data-day-reading]')).toHaveCount(7);
+      await expect(example.locator('thead time')).toHaveCount(2);
+      for (const reading of await example.locator('[data-day-reading]').all()) {
+        await expect(reading.locator('h4')).not.toBeEmpty();
+        for (const paragraph of await reading.locator('p').all()) await expect(paragraph).not.toBeEmpty();
+      }
+      const table = example.getByRole('region');
+      await table.focus();
+      await expect(table).toBeFocused();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+      await example.locator('[data-ga-cta="public_example"]').click();
+      await expect(page).toHaveURL(/#tool$/);
+    }
+  } finally { await context.close(); }
+});
+
 test('KR/EN 만세력 경계 표는 JS 없이 390px에서 탐색하고 유효한 ARIA 대상을 갖는다', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'ko-KR', javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   await context.route('https://**/*', (route) => route.abort());

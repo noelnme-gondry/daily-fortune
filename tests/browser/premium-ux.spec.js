@@ -95,11 +95,11 @@ test('전체 메뉴의 무료·프리미엄 분류와 기간 이름이 일관되
   const menu = page.locator('#site-menu');
   const premium = menu.locator('section').filter({ has: page.getByRole('heading', { name: '프리미엄 운세', exact: true }) });
   await expect(premium).toContainText('각 990원 · 단건 결제 · 다운로드 포함');
-  for (const [id, label] of [['tojeong', '토정비결'], ['lifetime', '평생 사주'], ['compatibility', '궁합']]) await expect(premium.locator(`a[href="/shop/${id}/"]`)).toHaveText(`${label} · 990원`);
+  for (const [id, label] of [['tojeong', '토정비결'], ['lifetime', '평생 사주'], ['compatibility', '궁합']]) await expect(premium.locator(`a[href="/${id}/"]`)).toHaveText(`${label} · 990원`);
   const free = menu.locator('section').filter({ has: page.getByRole('heading', { name: '무료 운세', exact: true }) });
   await expect(free.locator('a')).toHaveText(['오늘의 운세', '내일의 운세', '이번 주 운세', '이달의 운세', `${todayKST().y}년 운세`, `${todayKST().y + 1}년 운세`, '띠별 운세']);
   await expect(menu).not.toContainText('무료 토정비결');
-  await premium.locator('a[href="/shop/tojeong/"]').click();
+  await premium.locator('a[href="/tojeong/"]').click();
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
 });
 for (const width of [390, 1440]) test(`${width}px: 상단 프리미엄 운세는 상품 목록을 열고 각 상품에서 목록으로 돌아온다`, async ({ page }) => {
@@ -114,7 +114,7 @@ for (const width of [390, 1440]) test(`${width}px: 상단 프리미엄 운세는
   await expect(page.locator('#purchase-form')).toHaveCount(0);
   for (const [id, name] of [['tojeong', '토정비결'], ['lifetime', '평생 사주'], ['compatibility', '궁합']]) {
     await page.getByRole('link', { name: `${name} 선택`, exact: true }).click();
-    await expect(page).toHaveURL(new RegExp(`/shop/${id}/$`));
+    await expect(page).toHaveURL(url => url.pathname === `/${id}/`);
     await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
     await premium.click();
     await expect(page).toHaveURL(/\/shop\/$/);
