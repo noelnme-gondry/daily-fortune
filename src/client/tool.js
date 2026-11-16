@@ -152,6 +152,8 @@ export async function mount(root) {
   }
 
   function render(a, b, source) {
+    // 궁합에서 저장된 상대는 개인 풀이의 검증·요약·재계산에 포함하지 않는다.
+    b = pair ? b : null;
     const fresh = todayKST();
     const changed = isoDate(fresh) !== root.dataset.date;
     today = fresh;
