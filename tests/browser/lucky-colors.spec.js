@@ -53,8 +53,7 @@ async function checkBannerArea(page) {
   await expect(area.locator('a, button, img, li')).toHaveCount(0);
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    if (width <= 900) await expect(page.locator('#tool-form')).toBeHidden();
-    else await expect(page.locator('#tool-form')).toBeVisible();
+    await expect(page.locator('#tool-form')).toBeHidden();
     const box = await area.boundingBox();
     const result = await page.locator('#result').boundingBox();
     expect(box.width).toBe(Math.min(result.width, 784));
@@ -96,6 +95,7 @@ for (const lang of ['ko', 'en']) {
       await expect(page.locator('#result .reading-overview > .lucky-colors')).toHaveCount(1);
       await expect(page.locator('#result [data-lucky-banner-slot]')).toHaveAttribute('data-lucky-banner-slot', EL_SLUG[chart.roles.yong]);
       await checkBannerArea(page);
+      await editProfile(page);
       await page.locator('#a-notime').check();
       await page.locator('#tool-form [type="submit"]').click();
       const unknown = buildChart({ ...input, time: null });
@@ -148,6 +148,7 @@ test('발급 배너를 재계산해도 공통 배너·SDK를 중복 생성하지
   expect(await page.evaluate(() => window.partnerCalls)).toContainEqual(bannerConfig(day(chart, date).lucky.el));
   expect(await page.evaluate(() => window.partnerCalls.length)).toBe(2);
   await page.locator('[data-partner-ad-slot="common"]').evaluate(el => el.dataset.testInstance = 'original');
+  await editProfile(page);
   await page.locator('#a-d').selectOption('29');
   await page.locator('#tool-form [type="submit"]').click();
   await expect(slot).toHaveAttribute('data-ad-state', 'initialized');

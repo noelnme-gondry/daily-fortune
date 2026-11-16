@@ -13,8 +13,11 @@ export function syncReadingNavigation(root, hash = location.hash, focus = false)
     link.setAttribute('href', `${url.pathname}${url.search}${nextHash}`);
   });
   root.querySelectorAll('[data-reading-area]').forEach(link => {
-    if (target && link.getAttribute('href') === hash) link.setAttribute('aria-current', 'location');
-    else link.removeAttribute('aria-current');
+    if (link.getAttribute('href') === nextHash) {
+      link.setAttribute('aria-current', 'location');
+      const nav = link.closest('.reading-area-nav');
+      if (nav) nav.scrollLeft = Math.max(0, link.offsetLeft - (nav.clientWidth - link.offsetWidth) / 2);
+    } else link.removeAttribute('aria-current');
   });
   if (focus && target) {
     if (target.matches('details')) target.open = true;

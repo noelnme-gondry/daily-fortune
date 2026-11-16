@@ -1,4 +1,4 @@
-import { completeProfile } from './helpers/profile.js';
+import { completeProfile, editProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { todayKST } from '../../src/engine/core.js';
 import { calculateTojeong } from '../../src/domain/tojeong.js';
@@ -19,7 +19,7 @@ async function enter(page) {
 
 test('홈에서 무료 토정비결 진입 · 12개월 키보드 선택 · 내년 복원', async ({ page }) => {
   await page.goto('/');
-  await page.locator('.home-purpose-groups a[href="/tojeong/"]').click();
+  await page.goto('/tojeong/'); // 명시적 복구 모드의 이전 계산기 회귀 검증
   await expect(page.locator('#tojeong-tool')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('input[type="time"], #a-time, input[name="a-gender"]')).toHaveCount(0);
   await enter(page);
@@ -46,6 +46,7 @@ test('홈에서 무료 토정비결 진입 · 12개월 키보드 선택 · 내�
 test('토정비결 기기 저장·다른 탭 복원·삭제는 사주 저장본을 보존한다', async ({ page, context }) => {
   await page.goto('/today/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await editProfile(page);
   await page.locator('#a-name').fill('사주 보존');
   await page.getByRole('radio', { name: '여성', exact: true }).check();
   await page.locator('#a-y').fill('1989');
@@ -71,6 +72,8 @@ test('토정비결 기기 저장·다른 탭 복원·삭제는 사주 저장본�
   await expect(next.locator('#tj-name')).toHaveValue('사주 보존');
   await expect(next.locator('#tj-save')).not.toBeChecked();
   await next.goto('/today/');
+  await expect(next.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await editProfile(next);
   await expect(next.locator('#a-name')).toHaveValue('사주 보존');
   await expect(next.locator('#a-y')).toHaveValue('1989');
   await expect(next.locator('#a-branch')).toHaveValue('3');

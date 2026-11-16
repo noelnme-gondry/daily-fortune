@@ -5,6 +5,11 @@ import { tr } from '../i18n/runtime.js';
 import { esc } from './util.js';
 import { EXAMPLE_INPUT, exampleStart as start, exampleEnd as end } from './public-examples.js';
 
+export function homeStoryPreview(date) {
+  const story = lifeStory(buildChart({ ...EXAMPLE_INPUT }), date);
+  return `<span class="home-story-scenes">${story.stages.filter((_, i) => [0, 4, 8].includes(i)).map(stage => `<span data-example-stage="${stage.key}"><img src="/characters/384/${esc(stage.character.portrait)}.webp" width="144" height="144" loading="lazy" alt=""><small>${esc(stage.ages)}</small><span>${esc(stage.character.full)}</span></span>`).join('')}</span>`;
+}
+
 export function playExample(mode, date) {
   const c = buildChart({ ...EXAMPLE_INPUT });
   if (mode === 'rank') {

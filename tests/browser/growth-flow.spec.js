@@ -20,7 +20,7 @@ async function fill(page) {
   await page.locator('[name="a-gender"][value="M"]').check();
   await page.locator('#a-time').fill('14:30');
 }
-const submit = page => page.locator('#tool-form [type="submit"]').click();
+const submit = async page => { await editProfile(page); await page.locator('#tool-form [type="submit"]').click(); };
 
 test('미입력 생일은 계산하지 않고 생일 필드와 오류를 연결한다', async ({ page }) => {
   await ready(page);
@@ -33,6 +33,7 @@ test('잘못된 날짜를 제출하면 이전 결과와 공유를 제거하고 �
   await ready(page);
   await fill(page); await submit(page);
   await expect(page.locator('#result .report-head')).toBeVisible();
+  await editProfile(page);
   await page.locator('#a-m').selectOption('2');
   await page.locator('#a-d').selectOption('31');
   await submit(page);
@@ -54,6 +55,7 @@ test('KST 자정을 지난 재계산은 새 날짜의 실제 점수와 공유 �
 
 test('시각 공란은 오류 없이 시간 미상으로 계산한다', async ({ page }) => {
   await ready(page); await fill(page);
+  await editProfile(page);
   await page.locator('#a-time').fill('');
   await submit(page);
   await expect(page.locator('#result .report-head')).toBeVisible();
@@ -89,6 +91,7 @@ test('사주 삭제는 별도 토정비결 저장정보를 보존한다', async 
   });
   await fill(page); await page.locator('#save-device').check(); await submit(page);
   await expect(page.locator('[data-storage-status]')).toContainText('저장했습니다');
+  await editProfile(page);
   await page.locator('[data-delete-profile]').click();
   await page.locator('[data-confirm-delete-all]').click();
   await expect(page.locator('[data-storage-status]')).toContainText('삭제했습니다');
@@ -143,6 +146,7 @@ test('공유 취소와 복사를 분리하며 개인 입력·결과는 이벤트
     Object.defineProperty(navigator, 'clipboard', { value: { writeText: async text => { window.copied = text; } } });
   });
   await ready(page); await fill(page);
+  await editProfile(page);
   await page.locator('#a-name').fill('개인검증이름');
   await submit(page);
   await page.locator('[data-share="native"]').click();

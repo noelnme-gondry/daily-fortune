@@ -15,6 +15,17 @@ export const MANSE_BOUNDARIES = Object.freeze([
   { id: 'night', input: { gender: 'M', calendar: 'solar', y: 1999, m: 12, d: 31 }, times: ['23:20', '23:40'] },
 ]);
 const inputText = (p) => `${p.calendar === 'solar' ? siteText('양력') : siteText('음력')} ${p.y}${siteText("년 ")}${p.m}${siteText("월 ")}${p.d}${siteText("일, ")}${p.time || siteText('시간 모름')}, ${p.gender === 'M' ? siteText('남성') : siteText('여성')}`;
+
+export function homeReadingPreview(date) {
+  const reading = day(buildChart({ ...EXAMPLE_INPUT }), date);
+  return `<section class="home-reading" aria-labelledby="home-reading-title" data-reading-example-date="${isoDate(date)}">
+    <header><p class="note">${tr('가상 생년월일로 미리 읽는 운세', 'A reading from fictional birth details')}</p><h2 id="home-reading-title">${tr('오늘의 풀이를 먼저 만나보세요', 'A first look at today’s reading')}</h2><p class="home-reading-input">${esc(inputText(EXAMPLE_INPUT))}</p></header>
+    <div class="home-reading-overview"><div><p class="note">${isoDate(date)}</p><h3>${esc(reading.overall.headline)}</h3></div><p class="home-reading-score"><b data-example-score>${reading.overall.score}</b><span>${tr('종합 점수', 'Overall score')}</span></p><p data-example-outlook>${esc(reading.overall.outlook)}</p></div>
+    <dl class="home-reading-areas">${reading.cats.map(cat => `<div><dt>${esc(cat.name)}<span class="num" data-example-area-score="${cat.key}">${cat.score}${tr('점', ' pts')}</span></dt><dd>${esc(cat.reading.outlook)}</dd></div>`).join('')}</dl>
+    <p class="note">${tr('실제 이용자의 정보가 아닌 가상 사례입니다. 내 풀이는 출생 정보를 입력해 확인하세요. 점수는 성공 확률을 뜻하지 않습니다.', 'This is a fictional example, not a user’s information. Enter your birth details for your own reading. Scores are not probabilities of success.')}</p>
+    <a href="/today/#public-example">${tr('예시의 계산 근거까지 읽기', 'Read the example and its calculation basis')}</a>
+  </section>`;
+}
 const start = (title, date, input = EXAMPLE_INPUT) => `<section class="card box public-example" id="public-example" aria-labelledby="example-title"${date ? ` data-example-date="${isoDate(date)}"` : ''}><p class="eyebrow">${siteText("실제 엔진으로 계산한 가상 사례")}</p><h2 id="example-title">${title}</h2><p>${siteText("이 사례는 기능 설명을 위해 정한 가상의 입력이며 실존 인물이나 이용자의 저장 정보가 아닙니다.")}</p><h3>${siteText("입력 예시")}</h3><p>${inputText(input)}${siteText(". 출생 당시 한국 시계 시각을 입력한 사례입니다.")}</p>`;
 const end = () => `<h3>${siteText("해석의 한계")}</h3><p>${siteText("간지와 점수는 이 서비스의 계산 규칙에 따른 결과입니다. 성격이나 미래 사건이 사실로 확인되었다는 뜻이 아니며, 점수는 성공 확률이나 예측 정확도가 아닙니다.")}</p><p><a href="/about/#birth-rules">${siteText("입력·시간 경계 기준")}</a> · <a href="/about/#limits">${siteText("검증 범위와 해석의 한계")}</a></p><p class="cta"><a class="btn" href="#tool" data-ga-cta="public_example">${siteText("내 정보로 직접 이용하기")}</a></p></section>`;
 

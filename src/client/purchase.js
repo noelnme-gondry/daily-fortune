@@ -1,4 +1,5 @@
-import { readForm, wireBirthForm, syncTime } from './birth-form.js';
+import { readForm, fillForm, wireBirthForm, syncTime } from './birth-form.js';
+import { listPeople, profileLabel } from './profile.js';
 import { esc } from '../site/util.js';
 import { NICEPAY_PAYMENT_METHODS } from '../domain/payment-methods.js';
 
@@ -36,6 +37,34 @@ async function mountProduct(root) {
   const id = root.dataset.fortuneProduct, pair = id === 'compatibility', dateOnly = id === 'tojeong';
   const form = $('#purchase-form'), review = $('[data-purchase-review]'), button = $('[data-purchase-pay]'), confirm = $('#purchase-confirm'), method = $('#purchase-method');
   let config = { enabled: false }, input, busy = false;
+  const slots = pair ? ['a', 'b'] : ['a'];
+  const picker = who => form.querySelector(`[data-profile-picker="${who}"]`);
+  const populate = (profile, who) => { fillForm(form, who, profile); picker(who).value = profile.profileId || ''; };
+  async function refreshPeople() {
+    const people = await listPeople();
+    for (const who of slots) {
+      const select = picker(who), selected = select.value;
+      select.closest('.profile-picker').hidden = people.length === 0;
+      select.innerHTML = '<option value="">직접 입력 · 새 사람</option>' + people.map(p => `<option value="${esc(p.id)}">${esc(profileLabel(p.profile))} · ${p.profile.y}.${p.profile.m}.${p.profile.d}</option>`).join('');
+      select.value = people.some(p => p.id === selected) ? selected : '';
+    }
+  }
+  for (const who of slots) picker(who).addEventListener('change', async event => {
+    const selected = event.target.value;
+    if (!selected) { populate({ calendar: 'solar', gender: '', y: 0, m: 0, d: 0 }, who); return; }
+    try {
+      const person = (await listPeople()).find(p => p.id === selected);
+      if (person && picker(who).value === selected && !busy) populate({ ...person.profile, profileId: person.id }, who);
+    } catch { error('저장한 사람을 불러오지 못했습니다. 직접 입력하거나 다시 선택해 주세요.'); }
+  });
+  document.addEventListener('profiles-changed', () => { refreshPeople().catch(() => {}); });
+  document.addEventListener('profile-selected', event => {
+    const { profile, slot } = event.detail;
+    if (busy || !slots.includes(slot)) return;
+    if (!form.hidden) populate(profile, slot);
+    else { $('[data-purchase-edit]').click(); populate(profile, slot); }
+  });
+  try { await refreshPeople(); } catch { /* 저장소 없이 직접 입력할 수 있다. */ }
   if (!dateOnly) { wireBirthForm(form, pair ? ['a', 'b'] : ['a']); for (const who of pair ? ['a', 'b'] : ['a']) syncTime(form, who); }
   else form.addEventListener('change', e => { if (e.target.name === 'a-cal') { $('#a-leap').disabled = e.target.value !== 'lunar'; if ($('#a-leap').disabled) $('#a-leap').checked = false; } });
   try {

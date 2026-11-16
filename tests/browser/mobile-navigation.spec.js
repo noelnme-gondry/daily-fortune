@@ -13,8 +13,8 @@ test('모바일 결과의 중복 운세 메뉴를 숨기고 상단 메뉴로 이
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('#result .chart-card')).toBeAttached();
   await expect(page.getByRole('navigation', { name: '다른 운세 보기', includeHidden: true })).toBeHidden();
-  const resultTop = await page.locator('.site-head').evaluate((el) => el.offsetHeight + 12);
-  await expect.poll(() => page.locator('#result').evaluate((el) => Math.round(el.getBoundingClientRect().top))).toBe(resultTop);
+  await expect(page.locator('#reading-summary')).toBeFocused();
+  await expect(page.locator('#reading-summary [data-result-heading]')).toBeInViewport();
   await page.evaluate(() => window.scrollTo(0, 1700));
   await expect.poll(() => page.locator('.site-head').evaluate((el) => el.getBoundingClientRect().bottom)).toBeLessThanOrEqual(1);
   await page.evaluate(() => window.scrollTo(0, 1550));

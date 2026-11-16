@@ -121,13 +121,22 @@ test('설정이 없으면 결제는 닫히고 시크릿을 공개 설정에 넣�
   assert.equal(nicepayConfig({}).enabled, false);
   assert.equal(nicepayConfig({ NICEPAY_MODE: 'wrong' }).enabled, false);
 });
-test('유료 전환 설정에서 기존 세 진입점도 상세 풀이 대신 구매 화면이며 별도 무료 도구는 유지한다', () => {
-  const previous = process.env.FORTUNE_PAID_READINGS; process.env.FORTUNE_PAID_READINGS = '1';
+test('기본값과 유료 설정은 구매 흐름이며 명시적 0에서만 이전 계산기로 복구한다', () => {
+  const previous = process.env.FORTUNE_PAID_READINGS;
   try {
-    const s = createSite({ site: 'https://fortune.example', assets: {} });
-    for (const id of ['tojeong', 'lifetime', 'compatibility']) assert.match(s.render(`/${id === 'tojeong' ? 'tojeong' : id}/`), /data-fortune-product=/);
-    assert.match(s.render('/today/'), /id="tool-form"/);
-    assert.doesNotMatch(s.render('/shop/result/'), /data-purchase-download[^>]*href=/);
+    for (const setting of [undefined, '1']) {
+      if (setting === undefined) delete process.env.FORTUNE_PAID_READINGS;
+      else process.env.FORTUNE_PAID_READINGS = setting;
+      const s = createSite({ site: 'https://fortune.example', assets: {} });
+      for (const id of ['tojeong', 'lifetime', 'compatibility']) assert.match(s.render(`/${id}/`), /data-fortune-product=/);
+      assert.match(s.render('/today/'), /id="tool-form"/);
+      assert.doesNotMatch(s.render('/shop/result/'), /data-purchase-download[^>]*href=/);
+    }
+    process.env.FORTUNE_PAID_READINGS = '0';
+    const rollback = createSite({ site: 'https://fortune.example', assets: {} });
+    assert.match(rollback.render('/tojeong/'), /id="tojeong-form"/);
+    assert.match(rollback.render('/lifetime/'), /id="tool-form"/);
+    assert.match(rollback.render('/shop/lifetime/'), /data-fortune-product=/);
   } finally { if (previous === undefined) delete process.env.FORTUNE_PAID_READINGS; else process.env.FORTUNE_PAID_READINGS = previous; }
 });
 

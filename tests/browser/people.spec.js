@@ -14,7 +14,7 @@ const fill = async (page, prefix = 'a', name = '나', year = '1990') => {
 };
 const people = page => page.evaluate(async () => (await import('/src/client/profile.js')).listPeople());
 const open = async page => { await page.locator('.profiles-tab').click(); await expect(page.locator('[data-add-person]')).toBeVisible(); };
-const save = async page => { await page.locator('#save-device').check(); await page.locator('#tool-form [type=submit]').click(); await expect(page.locator('[data-storage-status]')).toContainText('저장했습니다'); };
+const save = async page => { await editProfile(page); await page.locator('#save-device').check(); await page.locator('#tool-form [type=submit]').click(); await expect(page.locator('[data-storage-status]')).toContainText('저장했습니다'); };
 
 test('서로 다른 세 사람을 계산해도 덮어쓰지 않고 새 탭과 궁합에서 선택한다', async ({ page, context }) => {
   await ready(page); await fill(page); await save(page);
@@ -30,6 +30,7 @@ test('서로 다른 세 사람을 계산해도 덮어쓰지 않고 새 탭과 �
   await next.locator('#a-saved-person').selectOption(list[0].id);
   await next.locator('#b-saved-person').selectOption(list[1].id);
   await expect(next.locator('#a-y')).toHaveValue('1990'); await expect(next.locator('#b-y')).toHaveValue('1960');
+  await next.locator('#tool-form [type=submit]').click();
   await expect(next.locator('#result')).toContainText('나'); await expect(next.locator('#result')).toContainText('엄마');
   const expected = compat(buildChart(list[0].profile), buildChart(list[1].profile), todayKST());
   await expect(next.locator('#result .report-head .val b')).toHaveText(String(expected.total));
@@ -47,7 +48,7 @@ test('저장한 가족을 토정비결에서도 재입력 없이 선택한다', 
   await expect(page.locator('#tojeong-result')).toHaveClass(/reading-large/);
 });
 
-test('관리 메뉴에서 추가·수정·선택·삭제하고 현재 결과와 저장본을 함께 갱신한다', async ({ page }) => {
+test('관리 메뉴 선택·수정은 보기 버튼으로 적용하고 저장본 삭제는 결과를 지운다', async ({ page }) => {
   await ready(page); await open(page);
   await page.locator('[data-add-person]').click(); await fill(page, 'person', '가족', '1987');
   await page.locator('#person-notime').check();
@@ -55,6 +56,8 @@ test('관리 메뉴에서 추가·수정·선택·삭제하고 현재 결과와 
   await expect(page.locator('.profile-list')).toContainText('가족');
   await page.locator('[data-use-person]').click();
   await expect(page.locator('#a-notime')).toBeChecked();
+  await expect(page.locator('#result .chart-head')).toHaveCount(0);
+  await page.locator('#tool-form [type=submit]').click();
   await expect(page.locator('#result .chart-head')).toContainText('가족');
   await open(page); await page.locator('[data-edit-person]').click();
   await page.locator('#person-name').fill('가족 수정'); await page.locator('#person-y').fill('1988');
@@ -62,6 +65,9 @@ test('관리 메뉴에서 추가·수정·선택·삭제하고 현재 결과와 
   await expect(page.locator('.profile-list')).toContainText('가족 수정');
   await page.locator('#profile-manager [data-close-dialog]').click();
   await expect(page.locator('#a-y')).toHaveValue('1988');
+  await expect(page.locator('#result .chart-head')).not.toContainText('가족 수정');
+  await editProfile(page);
+  await page.locator('#tool-form [type=submit]').click();
   await expect(page.locator('#result .chart-head')).toContainText('가족 수정');
   expect(await people(page)).toHaveLength(1);
   await open(page); await page.locator('[data-delete-person]').click();
@@ -72,6 +78,34 @@ test('관리 메뉴에서 추가·수정·선택·삭제하고 현재 결과와 
   await expect(page.locator('#result .chart-card')).toHaveCount(0);
   await page.reload(); await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('#a-y')).toHaveValue('');
+});
+
+test('다른 사람을 편집 중이어도 삭제한 사람의 적용 결과와 세션을 지운다', async ({ page }) => {
+  await ready(page); await fill(page, 'a', '적용한 사람', '1980'); await save(page);
+  const first = (await people(page))[0];
+  const second = await page.evaluate(async () => (await import('/src/client/profile.js')).savePerson({ name: '편집 중', gender: 'F', calendar: 'solar', y: 1995, m: 4, d: 3, noTime: true }));
+  await editProfile(page); await page.locator('#a-saved-person').selectOption(second.id);
+  await expect(page.locator('#a-y')).toHaveValue('1995');
+  await expect(page.locator('#result .applied-profile')).toContainText('적용한 사람');
+  await open(page); await page.locator(`[data-delete-person="${first.id}"]`).click();
+  await page.locator(`[data-confirm-delete="${first.id}"]`).click();
+  await expect(page.locator('#result .applied-profile')).toHaveCount(0);
+  expect(await page.evaluate(async () => (await import('/src/client/profile.js')).sessionLoad('a'))).toBeNull();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#a-y')).toHaveValue('1995');
+});
+
+test('저장본과 다른 생일로 제출한 임시 결과는 원래 사람을 삭제해도 보존한다', async ({ page }) => {
+  await ready(page); await fill(page, 'a', '원래 사람', '1980'); await save(page);
+  const first = (await people(page))[0];
+  await editProfile(page); await page.locator('#a-y').fill('1981'); await page.locator('#save-device').uncheck();
+  await page.locator('#tool-form [type=submit]').click();
+  await open(page); await page.locator(`[data-delete-person="${first.id}"]`).click();
+  await page.locator(`[data-confirm-delete="${first.id}"]`).click();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#result .applied-profile')).toContainText('1981.5.15');
+  await page.reload(); await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#a-y')).toHaveValue('1981');
 });
 
 test('기존 동의된 a/b는 목록으로 옮기고 토정비결과 미동의 세션을 구분한다', async ({ page }) => {
@@ -93,6 +127,7 @@ test('기존 동의된 a/b는 목록으로 옮기고 토정비결과 미동의 �
   await page.reload(); await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   expect((await people(page)).map(p => p.profile.name)).toEqual(['기존 사용자', '기존 상대']);
   await expect(page.locator('#a-name')).toHaveValue('미동의');
+  await editProfile(page);
   await page.locator('[data-delete-profile]').click(); await page.locator('[data-confirm-delete-all]').click();
   expect(await people(page)).toHaveLength(0);
   expect(await page.evaluate(async () => (await import('/src/client/profile.js')).load('tojeong'))).toMatchObject({ y: 1990 });
@@ -154,7 +189,11 @@ test('홈 첫 저장 후 이동한 결과에 안내가 한 번 나오고 선택�
   await page.locator('#profile-manager [data-close-dialog]').click();
   const id = (await people(page))[1].id;
   await ready(page, '/');
-  await page.locator('[data-edit-profile]').click(); await page.locator('#a-saved-person').selectOption(id);
+  await editProfile(page);
+  await page.locator('#a-saved-person').selectOption(id);
+  await expect(page.locator('#result .chart-head')).toHaveCount(0);
+  await page.locator('#tool-form [type=submit]').click();
+  await expect(page).toHaveURL(/\/today\/$/);
   await expect(page.locator('#result .chart-head')).toContainText('아빠');
   await expect(page.locator('[data-profile-coach]')).toBeHidden();
 });

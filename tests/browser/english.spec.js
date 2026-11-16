@@ -85,6 +85,7 @@ test('English home input, result sharing and locale switch preserve the selected
   await page.goto('/en/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-name').focus();
+  await editProfile(page);
   await page.locator('#a-name').fill('Alex');
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();

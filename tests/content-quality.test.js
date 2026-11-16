@@ -13,7 +13,8 @@ test('공개 계산 예시는 main 안에서 코드가 배치한 광고보다 �
     const example = html.indexOf('id="public-example"');
     assert.ok(example > html.indexOf('<main'), path);
     assert.ok(example < html.indexOf('</main>'), path);
-    assert.ok(example < html.indexOf('class="partner-ad"'), path);
+    if (html.includes('class="partner-ad"')) assert.ok(example < html.indexOf('class="partner-ad"'), path);
+    else assert.match(html, /data-fortune-product=|one-time purchase/, path);
   }
 });
 

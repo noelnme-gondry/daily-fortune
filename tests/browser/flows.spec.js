@@ -123,6 +123,7 @@ test('평생 주요 시기의 연도를 누르면 실제 점수와 선정 이유
   await page.locator('[data-dialog="life-event-caution-2035"]').click();
   await expect(page.getByRole('dialog')).toContainText('건강 점수가 아니라 종합 점수');
   await page.getByRole('button', { name: '닫기', exact: true }).click();
+  await editProfile(page);
   await page.locator('#a-y').fill('1991');
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();
@@ -163,7 +164,7 @@ test('주요 세 메뉴는 읽기 쉬운 크기를 유지하고 전체 메뉴에
   const controls = menu.getByRole('link');
   const full = page.getByRole('navigation', { name: '전체 메뉴', exact: true });
   const expected = navItems({ today: todayKST() });
-  await expect(controls.locator('b')).toHaveText(['날짜별 운세', '내 사주 이해', '두 사람 궁합', '캐릭터·랭킹', '사주 읽는 법']);
+  await expect(controls.locator('b')).toHaveText(['무료 운세', '프리미엄 운세', '무료 도구', '캐릭터·랭킹', '사주 읽는 법']);
   await expect(full).toBeHidden();
   for (const width of [1440, 1024, 900, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 960 });
@@ -200,9 +201,9 @@ test('모바일에서 펼쳐진 메뉴를 바로 터치해 토정비결까지 �
   const menu = page.getByRole('navigation', { name: '전체 메뉴', exact: true });
   await expect(menu.locator('section')).toHaveCount(5);
   await expect(menu.getByRole('link', { name: '풀이 이용 안내', exact: true })).toBeVisible();
-  await menu.getByRole('link', { name: '무료 토정비결', exact: true }).tap();
-  await expect(page).toHaveURL(/\/tojeong\/$/);
-  await expect(page.locator('#tojeong-tool')).toHaveAttribute('data-ready', 'true');
+  await menu.getByRole('link', { name: '토정비결 · 990원', exact: true }).tap();
+  await expect(page).toHaveURL(/\/shop\/tojeong\/$/);
+  await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
   await expect(page.getByRole('button', { name: /예시/ })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await context.close();
@@ -234,6 +235,7 @@ test('직접 입력은 저장 선택 없이 기기에 남기지 않고, 이전 l
   await ready(page, '/today/');
   await calculateExact(page);
   await expect(page.locator('#a-time')).toHaveValue('03:40');
+  await editProfile(page);
   await expect(page.locator('#a-time')).toBeVisible();
   expect(await saved(page)).toBeNull();
   await page.evaluate(() => { sessionStorage.clear(); localStorage.setItem('ohaeng:profile', JSON.stringify({ name: '이전값', gender: 'F', calendar: 'solar', y: 1993, m: 1, d: 28, time: '03:40', noTime: false })); });
@@ -249,6 +251,7 @@ test('직접 입력은 저장 선택 없이 기기에 남기지 않고, 이전 l
 
 test('시각과 시진은 서로 같은 시간대로 바뀌고 서머타임 날짜는 구간이 바뀐다', async ({ page }) => {
   await ready(page, '/today/');
+  await editProfile(page);
   await page.locator('#a-time').fill('23:10');
   await page.locator('input[name="a-tmode"][value="branch"]').check();
   await expect(page.locator('#a-branch')).toHaveValue('11');
@@ -346,6 +349,7 @@ test('직업 도감: 계열별 6종 · 몰락형 상세 · 키보드 복귀 · �
 test('나쁜 운세 챕터: 몰락 캐릭터와 실패 서사·낮은 분야의 점수 표시', async ({ page }) => {
   await ready(page, '/life-story/');
   await page.getByRole('radio', { name: '남성', exact: true }).check();
+  await editProfile(page);
   await page.locator('#a-y').fill('1980');
   await page.locator('#a-m').selectOption('6');
   await page.locator('#a-d').selectOption('1');
@@ -380,6 +384,7 @@ test('명예의 전당은 시간 제외 기준으로 고정되고 모든 분야�
   await ready(page, '/saju-ranking/');
   await calculateExact(page);
   for (const kind of ['four', 'three']) {
+    await editProfile(page);
     await page.locator('#a-notime').setChecked(kind === 'three');
     await completeProfile(page);
     await page.locator('button[type="submit"]').click();
@@ -401,6 +406,7 @@ test('명예의 전당은 시간 제외 기준으로 고정되고 모든 분야�
     }
     await page.locator('[data-leader-category]').selectOption('total');
     const before = await page.locator('.leader-button').allTextContents();
+    await editProfile(page);
     await page.locator('#a-y').fill(kind === 'four' ? '1991' : '1992');
     await page.locator(`input[name="a-gender"][value="${kind === 'four' ? 'M' : 'F'}"]`).check();
     await completeProfile(page);
@@ -426,11 +432,13 @@ test('개인 랭킹은 출생시간을 반영하고 명예의 전당 비교 점�
   const comparison = sajuRank(buildChart({ ...input, time: null }), RANK_TABLE);
   const cases = [{ time: '03:40' }, { time: null }, { time: '23:40' }, { timeBranch: 'n0' }];
   for (const time of cases) {
+    await editProfile(page);
     await page.locator('#a-notime').setChecked(time.time === null);
     if (time.timeBranch) {
       await page.locator('input[name="a-tmode"][value="branch"]').check();
       await page.locator('#a-branch').selectOption(time.timeBranch);
     } else if (time.time) {
+      await editProfile(page);
       await page.locator('input[name="a-tmode"][value="exact"]').check();
       await page.locator('#a-time').fill(time.time);
     }
@@ -607,15 +615,15 @@ test('결과 이미지 저장에도 해 로고가 로드되고 PNG가 생성된�
   await expect(page.locator('#result')).toContainText('이미지 다운로드를 시작했습니다.');
 });
 
-test('홈의 재미 카드는 입력 옆에 있고 모바일에서는 입력 아래에 이어진다', async ({ page }) => {
+test('홈은 입력 옆의 실제 운세 예시와 그 아래의 캐릭터 소개로 구분한다', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await ready(page, '/');
-  const hero = await page.locator('.home-hero').boundingBox();
+  const preview = await page.locator('.home-reading').boundingBox();
   const features = await page.locator('.home-features').boundingBox();
   const form = await page.locator('#tool-form').boundingBox();
-  expect(hero.height).toBeLessThan(1100);
-  expect(features.x).toBeGreaterThan(form.x + form.width);
-  expect(features.y).toBeLessThan(form.y + form.height);
+  expect(preview.x).toBeGreaterThan(form.x + form.width);
+  expect(Math.abs(preview.y - form.y)).toBeLessThan(2);
+  expect(features.y).toBeGreaterThan(Math.max(preview.y + preview.height, form.y + form.height));
   await expect(page.locator('.home-feature')).toHaveCount(2);
   await expect(page.locator('.home-ilju-link')).toBeVisible();
   await expect(page.locator('#a-name')).toBeVisible();
@@ -625,7 +633,7 @@ test('홈의 재미 카드는 입력 옆에 있고 모바일에서는 입력 아
   expect((await page.locator('#a-y').boundingBox()).y).toBeLessThan(gender.y);
   for (const width of [320, 768, 1024]) {
     await page.setViewportSize({ width, height: 960 });
-    if (width <= 900) expect((await page.locator('.home-features').boundingBox()).y).toBeGreaterThan((await page.locator('#tool-form').boundingBox()).y);
+    if (width <= 900) expect((await page.locator('.home-reading').boundingBox()).y).toBeGreaterThan((await page.locator('#tool-form').boundingBox()).y);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   }
 });
@@ -725,6 +733,7 @@ for (const width of [320, 768, 1024, 1440]) test(`${width}px 실제 도구 경�
 
 test('홈 입력 전달 · 궁합 두 사람 시진과 시간 모름 · 저장 복원', async ({ page }) => {
   await ready(page, '/');
+  await editProfile(page);
   await page.locator('input[name="a-tmode"][value="branch"]').check();
   await page.locator('#a-branch').selectOption('3');
   await completeProfile(page);
@@ -736,6 +745,7 @@ test('홈 입력 전달 · 궁합 두 사람 시진과 시간 모름 · 저장 �
   await ready(page, '/compatibility/');
   await page.locator('#b-notime').check();
   await expect(page.locator('#b-time')).toBeDisabled();
+  await editProfile(page);
   await page.locator('#save-device').check();
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();
@@ -774,12 +784,14 @@ test('작은 화면 캐릭터 상세 · 툴팁 경계 · 키보드 포커스', a
 
 test('잘못된 날짜는 저장하지 않고 음력 선택·시진 계산을 연결', async ({ page }) => {
   await ready(page, '/today/');
+  await editProfile(page);
   await page.locator('#a-m').selectOption('2'); await page.locator('#a-d').selectOption('31');
   await page.locator('#save-device').check();
   await completeProfile(page);
   await page.locator('button[type="submit"]').click();
   await expect(page.locator('.form-error')).toContainText('31일이 없습니다');
   expect(await saved(page)).toBeNull();
+  await editProfile(page);
   await page.locator('input[name="a-cal"][value="lunar"]').check();
   await page.locator('#a-d').selectOption('1');
   await page.locator('input[name="a-tmode"][value="branch"]').check();

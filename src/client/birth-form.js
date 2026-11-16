@@ -35,6 +35,7 @@ export function fillForm(form, who, p) {
   f('y').value = p.y ? String(p.y) : '';
   f('m').value = String(p.m); f('d').value = String(p.d);
   f('leap').checked = !!p.leap; f('leap').disabled = p.calendar !== 'lunar';
+  if (!f('time')) return;
   const branch = p.timeMode === 'branch';
   $(`input[name="${who}-tmode"][value="${branch ? 'branch' : 'exact'}"]`, form).checked = true;
   f('time').value = !branch && p.time ? p.time : '';

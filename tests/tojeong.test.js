@@ -81,32 +81,29 @@ test('토정비결: MIT 원본 144괘와 1,728개 월별 해설이 손실 없이
   assert.throws(() => tojeongView(result, { chongun: '누락' }), /누락/);
 });
 
-test('토정비결: 공개 진입·SEO·무료 FAQ·새해 경로가 연결된다', () => {
-  const site = createSite({ site: 'https://unse.example', assets: { css: '/a.css', js: '/a.js' }, now: Date.UTC(2026, 9, 14) });
-  assert.ok(site.render('/').includes('>무료 토정비결</a>'));
-  // 올해 연도 주소는 같은 내용이라 /tojeong/으로 보내고, 해마다 다른 작괘 기준표를 싣는다.
+test('토정비결: 공개 진입은 미리보기·990원 구매이며 과거 작괘 자료는 보존된다', () => {
+  const site = createSite({ site: 'https://unse.example', assets: {}, now: Date.UTC(2026, 9, 14) });
+  assert.match(site.render('/'), /href="\/shop\/tojeong\/"/);
+  assert.doesNotMatch(site.render('/'), />무료 토정비결<\/a>/);
   assert.equal(site.has('/tojeong/2026/'), false);
   assert.equal(site.redirect('/tojeong/2026/'), '/tojeong/');
-  assert.ok(site.render('/tojeong/').includes('병오(丙午)년') && site.render('/tojeong/').includes('태세수는 <b>16</b>'));
-  assert.ok(site.render('/tojeong/2027/').includes('정미(丁未)년'));
-  assert.ok(site.render('/tojeong/').includes('href="/tojeong/2027/"') && !site.render('/tojeong/2027/').includes('href="/tojeong/2026/"'));
-  assert.ok(!site.llms().includes('/tojeong/2026/'));
-  for (const path of ['/tojeong/', '/tojeong/2027/']) {
+  for (const [path, y, ganji] of [['/tojeong/', 2026, '병오(丙午)년'], ['/tojeong/2027/', 2027, '정미(丁未)년']]) {
     const html = site.render(path);
-    assert.ok(html.includes('id="tojeong-tool"'), path);
-    assert.ok(html.includes(`href="https://unse.example${path}"`));
+    assert.match(html, /data-fortune-product="tojeong"/);
+    assert.doesNotMatch(html, /id="tojeong-tool"/);
+    assert.ok(html.includes(ganji));
+    assert.ok(html.includes(`<option value="${y}" selected>`));
     assert.ok(site.sitemap().includes(`https://unse.example${path}`));
-    const graph = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1])['@graph'];
-    assert.equal(graph.find((n) => n['@type'] === 'WebApplication').offers.price, '0');
     assert.ok(!html.includes('id="a-time"'));
   }
-  assert.ok(!site.llms().includes('계산 기능은 제공하지 않습니다'));
-  assert.ok(site.llmsFull().includes('무료 토정비결'));
-  const next = createSite({ site: 'https://unse.example', assets: { css: '/a.css', js: '/a.js' }, now: Date.UTC(2026, 11, 31, 15) });
+  assert.ok(!site.llms().includes('/tojeong/2026/'));
+  assert.match(site.llmsFull(), /990원 단건 결제/);
+  const next = createSite({ site: 'https://unse.example', assets: {}, now: Date.UTC(2026, 11, 31, 15) });
   assert.ok(next.has('/tojeong/2028/'));
-  assert.ok(next.has('/tojeong/2026/') && !next.has('/tojeong/2027/'));
   assert.equal(next.redirect('/tojeong/2027/'), '/tojeong/');
-  assert.ok(next.render('/tojeong/').includes('data-year="2027"'));
+  const archive = next.render('/tojeong/2026/');
+  assert.match(archive, /2026년 토정비결 작괘 기준표/);
+  assert.doesNotMatch(archive, /id="tojeong-form"/);
 });
 
 test('토정비결 공유 카드: 괘 번호와 연도만 담고, 잘못된 값은 거부한다', async () => {

@@ -29,7 +29,7 @@ for (const lang of ['ko', 'en']) {
     const paths = [...cards.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
     assert.equal(new Set(paths).size, paths.length);
     for (const path of paths) assert.ok(site.has(path), path);
-    for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/year/2026/', '/year/2027/', '/lifetime/', '/compatibility/', '/life-story/', '/saju-ranking/', '/tojeong/', '/manseryeok/']) assert.ok(paths.includes(`${prefix}${path}`));
+    for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/year/2026/', '/year/2027/', '/shop/lifetime/', '/shop/compatibility/', '/life-story/', '/saju-ranking/', '/shop/tojeong/', '/manseryeok/']) assert.ok(paths.includes(`${prefix}${path}`));
     if (!prefix) assert.equal(HOME.title, `무료운세 | 오늘의 운세·사주·궁합 - ${BRAND.name}`);
     assert.equal(site.page(`${prefix}/today/`).title, TOOLS.today.title, '오늘 제목은 유지');
   }));
