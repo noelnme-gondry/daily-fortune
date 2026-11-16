@@ -1168,8 +1168,8 @@ body:has(dialog[open]) { overflow: hidden; }
 }
 
 /* 목적별 구조: 읽을 본문은 펼치고, 계산 상세는 맥락을 담은 별도 창으로 제공한다. */
-.gnav-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; }
-.gnav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: none; min-width: 0; }
+.gnav-row { display: block; }
+.gnav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)) auto; max-width: none; min-width: 0; }
 .gnav a { display: grid; align-content: center; justify-content: start; text-align: left; padding: 16px 10px; gap: 2px; color: var(--ink); }
 .gnav a b { font: 700 15px/1.5 var(--f-display); }
 .gnav a small { font-size: 12px; color: var(--ink-2); }
@@ -1249,18 +1249,22 @@ body:has(dialog[open]) { overflow: hidden; }
 .btn, .sbtn.primary { color: var(--on-accent); }
 @media (max-width: 1000px) { .gnav a small { display: none; } .gnav a b { font-size: 14px; } .evidence-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 760px) {
-  .gnav-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
-  .gnav { display: contents; }
+  .gnav-row { display: block; }
+  .gnav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
   .gnav a { min-height: 44px; padding: 8px 4px; justify-content: center; text-align: center; }
   .gnav a b { font: 500 13px/1.45 var(--f-body); }
   .gnav-row .all-menu-button { padding: 8px 4px; border: 0; background: transparent; font-size: 13px; }
-  .head-row { gap: 4px 10px; padding-block: 10px 4px; }
+  .head-row { gap: 6px; padding-block: 6px 2px; flex-wrap: nowrap; }
+  .head-row .brand { flex: 0 1 auto; min-width: 0; gap: 6px; }
+  .brand-logo { width: 32px; height: 32px; border-radius: 8px; }
+  .brand-name b { font-size: 16px; }
+  .language-switch a[aria-current] { display: none; }
   .brand-name small { display: none; }
   .head-row > .profiles-tab { font-size: 12px; }
   .head-row .language-switch { gap: 0; }
   .language-switch a { font-size: 11px; padding-inline: 4px; }
   .purpose-groups, .home-purpose-groups { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .home-intro { padding-top: 8px; }
+  .home-intro { padding-block: 0; gap: 6px; }
   .home-feature { grid-template-columns: minmax(0, 1fr) 112px; min-height: 210px; padding: 20px; gap: 12px; }
   .home-feature > img { width: 112px; height: 112px; }
   .home-feature b { font-size: 23px; }
@@ -1273,4 +1277,3 @@ body:has(dialog[open]) { overflow: hidden; }
   .rank-evidence { grid-template-columns: minmax(0, 1fr); }
   .site-menu { padding: 16px; }
 }
-@media (max-width: 380px) { .head-row .brand { flex: 1 0 100%; } .head-row > .profiles-tab { margin-left: 0; margin-right: auto; } }
