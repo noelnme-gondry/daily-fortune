@@ -67,7 +67,11 @@ for (const width of [390, 1024]) test(`${width}px 풀이 목차는 본문을 가
       const top = header.classList.contains('is-hidden') ? 0 : Math.max(0, header.getBoundingClientRect().bottom);
       return Math.abs(el.getBoundingClientRect().top - top) < 2;
     })).toBe(true);
-    await expect.poll(() => page.locator(target).evaluate(el => el.getBoundingClientRect().top >= document.querySelector('.reading-area-nav').getBoundingClientRect().bottom)).toBe(true);
+    // 카드의 여백·경계선이 아니라 실제 제목과 첫 문장이 메뉴 아래에 있는지 검사한다.
+    await expect.poll(() => page.locator(target).evaluate(el => {
+      const contentTop = Math.min(...[...el.querySelectorAll('h3, .daily-outlook')].map(node => node.getBoundingClientRect().top));
+      return contentTop - document.querySelector('.reading-area-nav').getBoundingClientRect().bottom;
+    })).toBeGreaterThanOrEqual(0);
   }
   await page.evaluate(() => {
     window.__readingScroll = [];
