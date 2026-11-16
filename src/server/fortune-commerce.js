@@ -3,6 +3,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { mkdir, readFile, writeFile, rename, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { createFortuneReport, PurchaseError } from './fortune-report.js';
+import { presentStoredReport, REPORT_CSP } from './premium-report.js';
 import { nicepayConfig, createNicepayGateway, sha256, matchesSignature, verifyNicepayPayment } from './nicepay.js';
 import { createPostgresOrderStore } from './postgres-orders.js';
 
@@ -29,7 +30,7 @@ export function createOrderStore(directory) {
     },
   };
 }
-const publicOrder = o => ({ id: o.id, productId: o.productId, title: o.title, amount: o.amount, status: o.status, createdAt: o.createdAt, canPay: o.status === 'PENDING' && !o.tid && Date.now() - o.createdAt < 86400000 });
+const publicOrder = o => ({ id: o.id, productId: o.productId, title: o.title, amount: o.amount, status: o.status, mode: o.mode, createdAt: o.createdAt, canPay: o.status === 'PENDING' && !o.tid && Date.now() - o.createdAt < 86400000 });
 
 export function createCommerceService({ config, store, gateway, now = Date.now }) {
   const locks = new Map();
@@ -175,9 +176,9 @@ export function createCommerceRouter({ config = nicepayConfig(), store, gateway,
     try {
       const o = await service.get(req.params.id, req.fortuneOwner, true);
       res.set('X-Robots-Tag', 'noindex, nofollow');
-      res.set('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; img-src data:; sandbox; base-uri 'none'; form-action 'none'; frame-ancestors 'self'");
+      res.set('Content-Security-Policy', `${REPORT_CSP}; sandbox; frame-ancestors 'self'`);
       if (req.query.download === '1') res.attachment(`fortune-${o.productId}-${o.id.slice(-8)}.html`);
-      res.type('html').send(o.html);
+      res.type('html').send(presentStoredReport(o));
     } catch (e) { next(e); }
   });
   router.use((err, req, res, next) => res.status(err.status || 500).json({ message: err instanceof PurchaseError ? err.message : '요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.' }));

@@ -2,6 +2,7 @@ import { readForm, fillForm, wireBirthForm, syncTime } from './birth-form.js';
 import { listPeople, profileLabel } from './profile.js';
 import { esc } from '../site/util.js';
 import { NICEPAY_PAYMENT_METHODS } from '../domain/payment-methods.js';
+import { trackCommerceStep, trackPurchase } from './purchase-analytics.js';
 
 const $ = s => document.querySelector(s);
 async function api(path, body) {
@@ -35,6 +36,7 @@ async function payOrder(id, method) {
 }
 async function mountProduct(root) {
   const id = root.dataset.fortuneProduct, pair = id === 'compatibility', dateOnly = id === 'tojeong';
+  trackCommerceStep('view_item', id);
   const form = $('#purchase-form'), review = $('[data-purchase-review]'), button = $('[data-purchase-pay]'), confirm = $('#purchase-confirm'), method = $('#purchase-method');
   let config = { enabled: false }, input, busy = false;
   const slots = pair ? ['a', 'b'] : ['a'];
@@ -85,6 +87,7 @@ async function mountProduct(root) {
     busy = true; const submit = form.querySelector('[type="submit"]'); submit.disabled = true;
     try {
       const p = await api('/preview', input);
+      trackCommerceStep('begin_checkout', id);
       $('[data-preview-title]').textContent = p.title; $('[data-preview-summary]').textContent = p.summary;
       $('[data-purchase-details]').innerHTML = `<div><dt>상품</dt><dd>${esc(p.title)}</dd></div>${p.people.map((v, i) => `<div><dt>${pair ? (i ? '상대' : '나') : '구매 대상'}</dt><dd>${esc(v.name || (i ? '상대' : '나'))} · ${v.calendar === 'lunar' ? '음력' : '양력'} ${v.leap ? '윤달 ' : ''}${v.y}.${v.m}.${v.d}${dateOnly ? '' : ` · ${v.gender === 'M' ? '남성' : '여성'} · ${v.noTime ? '시간 모름' : esc(v.timeMode === 'branch' ? `시진 ${v.timeBranch}` : v.time)}`}</dd></div>`).join('')}${p.targetYear ? `<div><dt>풀이 연도</dt><dd>${p.targetYear}년</dd></div>` : ''}<div><dt>제공 내용</dt><dd>전체 상세 풀이 + HTML 운세 파일</dd></div>`;
       form.hidden = true; review.hidden = false; confirm.checked = false;
@@ -132,11 +135,38 @@ async function mountResult() {
   const response = await fetch(url, { credentials: 'same-origin' });
   if (!response.ok) { const body = await response.json(); throw new Error(body.message); }
   const html = await response.text(), frame = $('[data-purchase-report]');
+  trackPurchase(order);
+  frame.addEventListener('load', () => {
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    doc.body.classList.add('report-embedded');
+    const main = doc.querySelector('main');
+    if (!main) return;
+    const resize = () => { frame.style.height = `${Math.ceil(main.getBoundingClientRect().height) + 8}px`; };
+    const observer = new window.ResizeObserver(resize);
+    observer.observe(main);
+    doc.fonts.ready.then(resize);
+    // 큰 iframe 안에서도 목차 링크가 바깥 페이지의 해당 장으로 이동한다.
+    doc.addEventListener('click', event => {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link) return;
+      const target = doc.getElementById(link.hash.slice(1));
+      if (!target) return;
+      event.preventDefault();
+      if (target.tagName === 'DETAILS') target.open = true;
+      resize();
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: window.scrollY + frame.getBoundingClientRect().top + target.getBoundingClientRect().top - 16, behavior: 'instant' });
+        target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true });
+      });
+    });
+    resize();
+    window.addEventListener('pagehide', () => observer.disconnect(), { once: true });
+  }, { once: true });
   frame.srcdoc = html; frame.hidden = false;
-  frame.addEventListener('load', () => { const doc = frame.contentDocument; if (doc) frame.style.height = `${doc.documentElement.scrollHeight + 24}px`; });
   const download = $('[data-purchase-download]'); download.href = `${url}?download=1`; download.hidden = false;
   $('[data-purchase-result-status]').textContent = '구매가 완료되었습니다.';
-  $('[data-purchase-result-note]').textContent = '상세 풀이를 읽고 운세 파일을 다운로드하세요. 저장한 HTML 파일은 인터넷 없이도 열 수 있습니다.';
+  $('[data-purchase-result-note]').textContent = '목차에서 읽고 싶은 이야기를 골라보세요. 운세 파일을 저장하면 인터넷 없이도 이어 읽을 수 있습니다.';
 }
 export async function mountPurchase() {
   try {

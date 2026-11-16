@@ -1,0 +1,35 @@
+/* 단독 파일과 구매 화면이 같은 색상·서체·장 구성을 공유한다. */
+.download-report { max-width:900px;margin:0 auto;padding:40px 24px 64px;font-size:17px;line-height:1.95; }
+.reading-cover { padding-bottom:32px; }.reading-cover h1 { font-size:clamp(30px,5vw,44px);margin:12px 0; }.reading-cover>p { color:var(--ink-2); }
+.reading-toc { display:flex;flex-wrap:wrap;gap:8px 24px;padding:20px 0;border-block:1px solid var(--line); }
+.reading-toc a { display:inline-flex;align-items:center;min-height:44px;text-decoration-thickness:1px; }
+.reading-chapter { padding-block:40px;border-bottom:1px solid var(--line);scroll-margin-top:24px; }
+.reading-chapter>h2 { font-size:clamp(26px,4vw,34px);margin-bottom:24px; }.reading-chapter h3 { font-size:23px;margin-bottom:16px; }.reading-chapter h4 { font-size:18px;margin-bottom:8px; }
+.reading-chapter p { max-width:68ch; }.reading-chapter p+p { margin-top:14px; }.reading-intro { font-size:22px;line-height:1.6; }
+.reading-prose { margin-top:24px; }.reading-topic { padding-block:28px; }.reading-topic+.reading-topic { border-top:1px solid var(--line); }
+.reading-topic blockquote { margin:20px 0;padding:0 0 0 20px;border-left:2px solid var(--line);color:var(--ink-2); }.reading-topic cite { display:block;font-size:14px;font-style:normal;margin-top:8px; }
+.reading-exercise { margin-top:24px;padding:22px 24px;background:var(--accent-soft);border-radius:8px; }.reading-exercise p { font-size:16px; }.reading-question { color:var(--accent);font-weight:700; }
+.reading-fold { border-bottom:1px solid var(--line);margin-top:16px; }.reading-fold>summary { cursor:pointer;padding:20px 8px;font-size:19px;min-height:56px; }.reading-fold>summary::marker { color:var(--accent); }.reading-fold>summary>span { display:block;margin-left:22px;font-size:15px;color:var(--ink-2); }.reading-fold-body { padding:4px 8px 28px; }.reading-fold[open]>summary { color:var(--accent); }
+.reading-month-help { margin-top:22px;padding-top:20px;border-top:1px dashed var(--line); }
+.reading-duo,.reading-plan { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin-block:28px; }.reading-plan { grid-template-columns:1fr;gap:32px; }
+.reading-duo>* { min-width:0; }.reading-duo ul { padding-left:20px; }.reading-duo li { margin-bottom:8px; }
+.reading-facts,.reading-terms { margin:24px 0; }.reading-facts>div,.reading-terms>div { padding:16px 0;border-bottom:1px solid var(--line); }.reading-facts dt,.reading-terms dt { font-weight:700;margin-bottom:6px; }.reading-facts dd,.reading-terms dd { margin:0;color:var(--ink-2); }
+.reading-table-wrap { overflow-x:auto;margin-block:24px; }.reading-table { width:100%;border-collapse:collapse;font-size:16px;text-align:left; }.reading-table caption { text-align:left;color:var(--ink-2);font-size:14px;padding-bottom:14px; }.reading-table th,.reading-table td { border-bottom:1px solid var(--line);padding:12px;white-space:nowrap; }.reading-table thead { background:var(--sunk); }.reading-table th:first-child { padding-left:8px; }
+.reading-score-head { display:flex;justify-content:space-between;gap:24px;align-items:baseline; }.reading-score-head>p:last-child { white-space:nowrap;color:var(--accent); }.reading-score-head strong { font-family:var(--f-display);font-size:32px;margin-right:4px; }
+.reading-score-list { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 24px;padding:16px 0; }.reading-score-list>div { display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-block:8px; }.reading-score-list dd { margin:0; }
+.reading-event-group { margin-top:36px; }.reading-year { padding:16px 0; }.reading-closing>h3:not(:first-child) { margin-top:32px; }
+.reading-watch { margin-top:28px; }.reading-watch>div { padding-block:16px;border-bottom:1px solid var(--line); }.reading-watch>div>p:first-child { color:var(--accent); }
+.reading-next { list-style:none;padding:0;display:grid;gap:24px;margin-block:32px; }.reading-next li { display:grid;gap:6px; }.reading-next b { font-family:var(--f-display);font-size:22px; }
+.reading-notes { border:1px solid var(--line);padding:24px;margin-top:28px;border-radius:8px; }.reading-notes small { display:block;color:var(--ink-2);margin-top:20px; }
+.reading-footer { font-size:14px;color:var(--ink-2);margin-top:32px; }
+.download-report button,.download-report dialog,.download-report .lucky-banner,.download-report .chart-actions,.download-report .tojeong-months { display:none!important; }
+.download-report .tip { border:0; }.download-report .chart-card { margin-top:24px; }.download-report .reading-legacy .box,.download-report .reading-legacy .card { margin-block:20px; }
+.reading-legacy .tojeong-month-detail>section { display:block!important;margin-block:24px; }.reading-legacy .life-event-more { display:none; }.reading-legacy .life-event-trigger { cursor:default; }
+.report-embedded .download-report { padding:0 0 32px; }.report-embedded .reading-cover { display:none; }
+@media(max-width:600px) {
+  .download-report { padding:24px 18px 48px; }.reading-duo { grid-template-columns:1fr;gap:24px; }.reading-chapter { padding-block:32px; }.reading-exercise { padding:18px; }.reading-score-list { grid-template-columns:1fr; }.reading-toc { gap:4px 18px;font-size:15px; }.reading-fold>summary { padding-inline:0; }.reading-fold-body { padding-inline:0; }
+}
+@media print {
+  :root { color-scheme:light;--bg:#fff;--paper:#fff;--sunk:#f1e8e1;--ink:#352e2b;--ink-2:#685c55;--line:#ded0c5;--accent:#79513e;--accent-soft:#f3e5d9; }
+  .download-report { max-width:none;padding:0;font-size:12pt; }.reading-toc { display:none; }.reading-fold::details-content { display:block;content-visibility:visible; }.reading-fold>* { display:block!important; }.reading-fold { break-inside:auto; }.reading-chapter h2,.reading-chapter h3 { break-after:avoid; }.reading-table-wrap { overflow:visible; }.reading-table { font-size:10pt; }
+}
