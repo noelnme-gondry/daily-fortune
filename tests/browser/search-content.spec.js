@@ -53,6 +53,8 @@ test('KR/EN 만세력 경계 표는 JS 없이 390px에서 탐색하고 유효한
 test('KR/EN 만세력 경계의 네 입력은 직접 계산한 원국과 일치한다', async ({ page }) => {
   for (const prefix of ['', '/en']) {
     await page.goto(`${prefix}/manseryeok/`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('#public-example')).toBeVisible();
     await page.locator('[data-ga-cta="public_example"]').click();
     for (const { input, times } of MANSE_BOUNDARIES) for (const time of times) {
       const birth = { ...input, time }, c = buildChart(birth);
@@ -66,6 +68,8 @@ test('KR/EN 만세력 경계의 네 입력은 직접 계산한 원국과 일치�
     }
     await page.locator('[data-delete-profile]').click();
     await page.locator('[data-confirm-delete-all]').click();
+    await expect(page.locator('[data-delete-all-confirm]')).toBeHidden();
+    await expect(page.locator('[data-storage-status]')).toContainText(prefix ? 'Deleted all saved people' : '저장한 사람과 나·상대 정보를 모두 삭제했습니다');
   }
 });
 
