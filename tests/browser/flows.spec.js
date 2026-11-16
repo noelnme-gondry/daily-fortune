@@ -335,6 +335,12 @@ test('직업 도감: 계열별 6종 · 몰락형 상세 · 키보드 복귀 · �
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.keyboard.press('Escape');
   await expect(trigger).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#job-catalog-body')).toBeVisible();
+  expect(await page.locator('#job-catalog-body').evaluate(dialog => dialog.contains(document.activeElement))).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#job-catalog-body')).toBeHidden();
+  await expect(page.getByRole('button', { name: '캐릭터 도감 · 60종' })).toBeFocused();
 });
 
 test('나쁜 운세 챕터: 몰락 캐릭터와 실패 서사·낮은 분야의 점수 표시', async ({ page }) => {

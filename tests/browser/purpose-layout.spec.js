@@ -28,7 +28,7 @@ for (const lang of ['ko', 'en']) for (const colorScheme of ['light', 'dark']) {
           await page.locator('#tool-form [type=submit]').click();
           await expect(page.locator('#result .chart-card, #result .report-head, #result .chapter-card').first()).toBeAttached();
           if (path === '/saju-ranking/') await page.locator('[data-rank-reveal]').click();
-          await expect(page.locator('#result details')).toHaveCount(0);
+          await expect(page.locator('#result details,#result [data-disclosure]')).toHaveCount(0);
           if (path === '/lifetime/') await expect(page.locator('#result .chart-svg')).toBeVisible();
           if (path === '/saju-ranking/') await expect(page.locator('.rank-distribution svg')).toBeVisible();
         }
@@ -76,7 +76,7 @@ test('설명 창은 항목별 근거를 보여주고 키보드로 닫으면 원�
     await page.keyboard.press('Escape');
     await expect(trigger).toBeFocused();
   }
-  await expect(page.locator('#result details')).toHaveCount(0);
+  await expect(page.locator('#result details,#result [data-disclosure]')).toHaveCount(0);
 });
 
 
