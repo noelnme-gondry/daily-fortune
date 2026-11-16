@@ -43,7 +43,7 @@ export const elSpan = (e, text) => `<span class="el el-${e}">${text}</span>`;
 let tipSeq = 0;
 export function tip(text, label = tr('설명 보기', 'Read explanation')) {
   const id = `tip-s${++tipSeq}`;
-  return `<span class="tipwrap"><button type="button" class="info" aria-label="${attr(label)}" aria-describedby="${id}" data-tip-id="${id}">i</button><span role="tooltip" id="${id}" class="tip">${esc(text)}</span></span>`;
+  return `<span class="tipwrap"><button type="button" class="info" aria-expanded="false" aria-label="${attr(label)}" aria-describedby="${id}" data-tip-id="${id}">i</button><span role="tooltip" id="${id}" class="tip">${esc(text)}</span></span>`;
 }
 
 // 캐릭터 그림: 카드·목록은 384px 썸네일(고해상도 화면은 원본), 상세 창은 640px 원본
