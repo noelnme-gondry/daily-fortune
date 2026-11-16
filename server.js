@@ -11,6 +11,7 @@ import { readAssets } from './src/site/assets.js';
 import { todayKST, isoDate } from './src/engine/core.js';
 import { BRAND } from './src/content/brand.js';
 import { handleLanguage } from './src/site/language-middleware.js';
+import { createCommerceRouter } from './src/server/fortune-commerce.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, 'dist');
@@ -30,6 +31,7 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', true);
 app.use(compression());
+app.use('/api/commerce', createCommerceRouter());
 
 // 헬스 체크 (railway.json healthcheckPath)
 app.get('/healthz', (req, res) => res.type('text').send('ok'));

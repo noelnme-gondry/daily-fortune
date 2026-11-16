@@ -25,12 +25,14 @@
     "compression": "^1.8.1",
     "express": "^5.2.1",
     "korean-lunar-calendar": "^0.3.6",
-    "lunar-javascript": "^1.7.7"
+    "lunar-javascript": "^1.7.7",
+    "pg": "8.23.0"
   },
   "overrides": {
     "body-parser": "2.4.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
     "eslint": "^10.12.0",
