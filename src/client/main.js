@@ -13,6 +13,10 @@ import { initProfileNavigation } from './profile-navigation.js';
 
 initLanguage();
 initProfileNavigation();
+if (document.querySelector('.fortune-shop')) import('./purchase.js').then(m => m.mountPurchase()).catch(() => {
+  const error = document.querySelector('[data-purchase-error]');
+  if (error) { error.hidden = false; error.textContent = '구매 화면을 불러오지 못했습니다. 새로고침해 주세요.'; }
+});
 
 initAdExperiment();
 initMobileHeader();
