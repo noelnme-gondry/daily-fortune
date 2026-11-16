@@ -658,7 +658,11 @@ test('12띠 생성형 심볼이 띠 메뉴·일별 상세·연간 운세에 로�
   }
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto('/');
-  await page.locator('.zodiac-cards').scrollIntoViewIfNeeded();
+  const zodiac = page.locator('.home-purpose-groups a[href="/tti/today/"]');
+  await zodiac.scrollIntoViewIfNeeded();
+  await expect(zodiac).toBeVisible();
+  await zodiac.click();
+  await expect(page.locator('main .tti-row')).toHaveCount(12);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 });
 
