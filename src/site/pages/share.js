@@ -1,3 +1,4 @@
+import { tr } from '../../i18n/runtime.js';
 import { siteText, displayPillar, siteValue } from '../copy.js';
 import { isEnglish, withLanguage } from '../../i18n/runtime.js';
 // 공유 카드 착지 페이지 (/share/?k=…). 허용된 값만 받아 카드로 보여 주고 "나도 해 보기"로 연결한다.
@@ -104,7 +105,7 @@ export function sharePage(q, ctx) {
   const c = card || { kind: 'today', tool: '/', label: BRAND.name, kicker: siteText('친구가 보낸 운세 결과'), big: BRAND.name, title: siteText('생년월일시로 보는 나의 사주 운세'), lines: [] };
   const title = generic ? siteText('공유된 운세 결과') : `${c.kicker} — ${c.big}`;
   const desc = generic ? siteText('친구가 공유한 사주 운세 결과입니다. 내 생년월일시로 나의 운세도 확인해 보세요.') : `${c.title}${siteText(" · 나의 결과도 확인해 보세요. 생년월일시로 보는 무료 사주 운세, ")}${BRAND.name}.`;
-  const others = [['/life-story/', siteText('사주로 본 내 인생은?')], ['/saju-ranking/', siteText('내 사주 랭킹')], ['/today/', siteText('오늘의 운세')], ['/tojeong/', siteText('무료 토정비결')], ['/compatibility/', siteText('사주 궁합')]].filter(([h]) => h !== c.tool).slice(0, 4);
+  const others = [['/life-story/', siteText('사주로 본 내 인생은?')], ['/saju-ranking/', siteText('내 사주 랭킹')], ['/today/', siteText('오늘의 운세')], ['/tojeong/', tr('토정비결 · 990원', 'Tojeong · KRW 990')], ['/compatibility/', siteText('사주 궁합')]].filter(([h]) => h !== c.tool).slice(0, 4);
   const descriptions = new Map(Object.values(TOOLS).map(t => [t.path, t.lead.split(/(?<=[.!?])\s+/)[0]]));
   descriptions.set('/tojeong/', TOJEONG.description);
   return {

@@ -38,7 +38,7 @@ export function navItems(ctx) {
 function footerGroups(ctx) {
   const y = ctx.today.y;
   return [
-    ['운세', [['/today/', '오늘의 운세'], ['/tomorrow/', '내일의 운세'], ['/week/', '이번 주 운세'], ['/month/', '이달의 운세'], [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/tojeong/', '무료 토정비결'], ['/compatibility/', '사주 궁합']]],
+    ['운세', [['/today/', '오늘의 운세'], ['/tomorrow/', '내일의 운세'], ['/week/', '이번 주 운세'], ['/month/', '이달의 운세'], [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/shop/tojeong/', '토정비결 · 990원'], ['/compatibility/', '사주 궁합']]],
     ['재미로 보는 사주', [['/life-story/', '사주로 본 내 인생은?'], ['/saju-ranking/', '내 사주 랭킹'], ['/saju/ilju-ranking/', '60일주 랭킹']]],
     ['띠·만세력', [['/tti/', '띠별 운세'], ['/tti/today/', '띠별 오늘의 운세'], [`/tti/${y}/`, `${y}년 띠별 운세`], ['/tti/samjae/', '삼재 띠 계산'], ['/tti/compatibility/', '띠 궁합표'], ['/manseryeok/', '만세력 계산기'], [`/manseryeok/${y}/`, `${y}년 만세력`]]],
     ['사주 백과', [['/saju/ilju/', '60일주'], ['/saju/ilgan/', '일간 10가지'], ['/saju/sipsin/', '십신'], ['/saju/ohaeng/', '오행'], ['/saju/sinsal/', '신살'], ['/saju/12unseong/', '12운성'], ['/saju/glossary/', '사주 용어 사전'], ['/saju/guide/', '사주 보는 법']]],
@@ -173,7 +173,7 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
     <nav class="language-switch" aria-label="${tr('언어 선택', 'Language')}"><a data-set-language="ko" href="${attr(languagePath(page.path, 'ko'))}" hreflang="ko" lang="ko"${ctx.lang !== 'en' ? ' aria-current="true"' : ''}>한국어</a><a data-set-language="en" href="${attr(languagePath(page.path, 'en'))}" hreflang="en" lang="en"${ctx.lang === 'en' ? ' aria-current="true"' : ''}>English</a></nav>
   </div>
   <div class="wrap gnav-row">
-    <nav class="gnav" aria-label="${tr('주요 메뉴', 'Main navigation')}">${groups.map(g => `<a href="${g.links[0].path}"${g.links.some(l => l.path === page.path) || (g === groups[0] && page.path === '/') ? ' aria-current="page"' : ''}><b>${esc([tr('날짜별 운세', 'By date'), tr('내 사주 이해', 'My saju'), tr('두 사람 궁합', 'Compatibility'), tr('캐릭터·랭킹', 'Characters & ranks'), tr('사주 읽는 법', 'Reading guide')][groups.indexOf(g)])}</b><small>${esc(g.note)}</small></a>`).join('')}
+    <nav class="gnav" aria-label="${tr('주요 메뉴', 'Main navigation')}">${groups.map(g => `<a href="${g.links[0].path}"${g.links.some(l => l.path === page.path) || (g === groups[0] && page.path === '/') ? ' aria-current="page"' : ''}><b>${esc([tr('무료 운세', 'Free fortunes'), tr('프리미엄 운세', 'Premium reports'), tr('무료 도구', 'Free tools'), tr('캐릭터·랭킹', 'Characters & ranks'), tr('사주 읽는 법', 'Reading guide')][groups.indexOf(g)])}</b><small>${esc(g.note)}</small></a>`).join('')}
     <button type="button" class="all-menu-button sbtn" data-dialog="site-menu" aria-haspopup="dialog" aria-controls="site-menu">${tr('전체 메뉴', 'All menus')}</button></nav>
   </div>
 </header>

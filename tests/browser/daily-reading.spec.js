@@ -1,3 +1,4 @@
+import { editProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { buildChart, day, addDays, isoDate } from '../../src/engine/index.js';
 import { withLanguage } from '../../src/i18n/runtime.js';
@@ -16,6 +17,7 @@ for (const lang of ['ko', 'en']) {
     const chart = buildChart(input);
     await page.goto(`${prefix}/today/`);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await editProfile(page);
     await page.locator(`#a-y`).fill(String(input.y));
     for (const key of ['m', 'd']) await page.locator(`#a-${key}`).selectOption(String(input[key]));
     await page.locator('[name="a-gender"][value="F"]').check();

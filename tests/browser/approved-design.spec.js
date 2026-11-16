@@ -42,10 +42,11 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('[data-saved-summary]')).toContainText('1990.5.15');
     await page.locator('[data-saved-result]').click();
     await expect(page.locator('#result .report-head')).toBeVisible();
-    await page.locator('[data-saved-entry] [data-edit-profile]').click();
+    await page.locator('#result [data-edit-profile]').click();
     await expect(page.locator('#a-y')).toBeFocused();
     await expect(page.locator('#a-time')).toHaveValue('14:00');
-    await expect(page.locator('[data-saved-entry] [data-edit-profile]')).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#result [data-edit-profile]')).toHaveAttribute('aria-expanded', 'true');
+    await editProfile(page);
     await page.locator('[data-delete-profile]').click();
     await page.locator('[data-confirm-delete-all]').click();
     await expect(page.locator('[data-saved-entry]')).toBeHidden();

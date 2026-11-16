@@ -67,10 +67,11 @@ export async function openProfiles(opener) {
         track('profile_select', { selection_source: 'manager' });
         busy = true;
         const tojeong = document.getElementById('tojeong-tool');
+        const calculator = document.getElementById('tool') || document.getElementById('purchase-form');
         const saved = people.find(person => person.id === data.usePerson);
-        const profile = tojeong ? { ...saved.profile, profileId: saved.id } : await selectPerson(data.usePerson);
+        const profile = tojeong || calculator ? { ...saved.profile, profileId: saved.id } : await selectPerson(data.usePerson);
         dialog.close();
-        if (document.getElementById('tool') || tojeong) document.dispatchEvent(new globalThis.CustomEvent('profile-selected', { detail: { profile, slot: 'a' } }));
+        if (calculator || tojeong) document.dispatchEvent(new globalThis.CustomEvent('profile-selected', { detail: { profile, slot: 'a' } }));
         else location.href = languagePath('/today/', isEnglish() ? 'en' : 'ko');
       }
     } catch { failure(); } finally { busy = false; }

@@ -287,7 +287,7 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .home-hero .person { gap: 16px; }
 .home-hero .field-gender .seg { max-inline-size: 16rem; }
 .home-hero .seg label { display: grid; }
-.home-hero .field-birth { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: center; }
+.home-hero .field-birth { grid-template-columns: minmax(0, 1fr); }
 .home-hero .field-birth > :is(.check, .form-error) { grid-column: 1 / -1; }
 .home-hero .field-birth .check:has(:disabled) { display: none; }
 .home-hero .storage-options { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
@@ -311,12 +311,12 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 @media (max-width: 560px) { .reading-entry { grid-template-columns: minmax(0, 1fr); } }
 
 /* 계산기 */
-.tool { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start; }
+.tool { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: start; }
 .tool-home { grid-template-columns: minmax(0, 1fr); }
 .tool.has-result:has(> form[hidden]) { grid-template-columns: minmax(0, 1fr); }
 body:has(.tool.has-result) #public-example { display: none; }
 .calculator-intro .lead { font-size: 15px; line-height: 1.6; }
-.tool .field-birth { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: center; }
+.tool .field-birth { display: grid; grid-template-columns: minmax(0, 1fr); }
 .tool .field-birth > :is(.check, .form-error) { grid-column: 1 / -1; }
 .tool .field-birth .check:has(:disabled) { display: none; }
 .tojeong-layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); align-items: start; gap: 24px; }
@@ -355,8 +355,9 @@ body:has(.tool.has-result) #public-example { display: none; }
 .tool-pair { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 900px) { .tool { grid-template-columns: minmax(0, 1fr); } }
 .pform { padding: 20px; display: grid; gap: 16px; align-content: start; }
-.tool:not(.tool-pair):not(.tool-home) .pform { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 24px); overflow-y: auto; }
-@media (max-width: 900px) { .tool .pform { position: static !important; max-height: none !important; overflow: visible !important; } .tool.has-result .result { order: -1; } }
+.applied-profile { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.applied-profile p { margin: 4px 0 0; color: var(--ink-2); overflow-wrap: anywhere; }
+.applied-profile .sbtn { flex-shrink: 0; }
 .form-title { font-size: 17px; }
 .person { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 14px; }
 .person-legend { font: 600 15px/1.4 var(--f-display); padding: 0 0 4px; }
@@ -416,7 +417,10 @@ body:has(.tool.has-result) #public-example { display: none; }
 .input { height: 44px; width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); padding: 0 12px; min-width: 0; }
 .input[aria-invalid="true"] { border-color: var(--seal); }
 select.input { padding-right: 4px; }
-.ymd { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 6px; }
+.field:has(> .ymd) { container-type: inline-size; }
+.ymd { display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ymd > .input { width: 100%; min-width: 0; }
+@container (max-width: 280px) { .ymd { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ymd > :first-child { grid-column: 1 / -1; } }
 .seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--bg); }
 .seg label { position: relative; }
 .seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }

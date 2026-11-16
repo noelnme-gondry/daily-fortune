@@ -13,7 +13,9 @@ import * as tti from './pages/tti.js';
 import * as manse from './pages/manse.js';
 import * as info from './pages/info.js';
 import { shopPage, productPage, ordersPage, resultPage } from './pages/shop.js';
-import { tojeongPage } from './pages/tojeong.js';
+import { tojeongPage, tojeongYearReference } from './pages/tojeong.js';
+import { lifetimeExample, compatibilityExample } from './public-examples.js';
+import { yearGuide } from './year-guide.js';
 import { sharePage } from './pages/share.js';
 import { config } from './config.js';
 import { withLanguage } from '../i18n/runtime.js';
@@ -43,7 +45,17 @@ function routeTable(ctx) {
   add('/month/', tools.month, { p: 0.8, cf: 'monthly', daily: true });
   add('/year/', tools.yearHub, { p: 0.7 });
   for (const yr of years) add(`/year/${yr}/`, (c) => tools.yearPage(yr, c), { p: 0.9 });
-  const paidPage = (id, year) => c => ({ ...productPage(id, c, year), path: c.path });
+  const paidPage = (id, year = y) => c => {
+    const product = productPage(id, c, year);
+    const name = { tojeong: tr(`${year}년 토정비결`, `${year} Tojeong`), lifetime: tr('평생 사주', 'Lifetime saju'), compatibility: tr('사주 궁합', 'Saju compatibility') }[id];
+    return {
+      ...product, path: c.path,
+      title: tr(`${name} 미리보기 · 상세 풀이 990원`, `${name} preview and premium report`),
+      description: tr(`${name}의 일부 풀이를 미리 확인하세요. 개인별 상세 해설과 HTML 운세 파일은 990원 단건 결제로 제공합니다.`, `Preview your ${name} report. Detailed Korean readings and an HTML download cost KRW 990 as a one-time purchase.`),
+      supplement: id === 'tojeong' ? yearGuide(year, c, c.path) : '',
+      body: product.body + (id === 'lifetime' ? lifetimeExample(c.today) : id === 'compatibility' ? compatibilityExample(c.today) : tojeongYearReference(year)),
+    };
+  };
   add('/tojeong/', ctx.cfg.paidReadings ? paidPage('tojeong') : tojeongPage, { p: 0.9 });
   for (const yr of years.filter(yr => yr !== y)) add(`/tojeong/${yr}/`, ctx.cfg.paidReadings && yr >= y ? paidPage('tojeong', yr) : (c) => tojeongPage(c, yr), { p: 0.8 });
   add('/lifetime/', ctx.cfg.paidReadings ? paidPage('lifetime') : tools.lifetime, { p: 0.9 });

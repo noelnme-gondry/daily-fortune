@@ -169,6 +169,7 @@ for (const variant of ['A', 'B']) {
       expect(geometry.scrollWidth).toBe(320);
       rows.push(geometry);
       if (!path.includes('/tojeong/')) await editProfile(page);
+      await editProfile(page);
       await page.locator(path.includes('/tojeong/') ? '#tj-d' : '#a-d').selectOption('2');
       await page.locator('button[type="submit"]').click();
       expect(await isolated.evaluate(() => window.mobileSentinel)).toBe('retained');

@@ -5,6 +5,7 @@ import { esc, faqBlock, faqLd, disclosure } from '../util.js';
 import { hero } from './tools.js';
 import { yearGuide } from '../year-guide.js';
 import { isEnglish, tr } from '../../i18n/runtime.js';
+
 import { profilePicker } from '../birth-form.js';
 
 function birthForm(ctx) {
@@ -34,7 +35,7 @@ const ymd = (d) => tr(`${d.y}년 ${d.m}월 ${d.d}일`, `${d.y}-${String(d.m).pad
 export const tojeongPath = (ctx, y) => (y === ctx.today.y ? '/tojeong/' : `/tojeong/${y}/`);
 
 // 연도마다 다른 작괘 기준표: 검색에 노출되는 해마다 고유한 내용이자 결과를 검산하는 표
-function yearTable(y) {
+export function tojeongYearReference(y) {
   const t = tojeongYearTable(y);
   return `<section class="card box tojeong-year-table" aria-labelledby="tj-table-h">
     <h2 id="tj-table-h">${tr(`${y}년 토정비결 작괘 기준표`, `${y} Tojeong calculation reference`)}</h2>
@@ -46,11 +47,31 @@ function yearTable(y) {
     </table></div>
     <h3>${tr('음력 출생 연도로 정해지는 상괘', 'Upper number by lunar birth year')}</h3>
     <ul class="tj-uppers">${t.uppers.map((u) => `<li><b>${tr(`상괘 ${u.upper}`, `Upper ${u.upper}`)}</b><span>${tr(`${u.years.slice().reverse().join(' · ')}년생`, `Born in ${u.years.slice().reverse().join(' · ')}`)}</span></li>`).join('')}</ul>
-    <p class="hint">${tr(`하괘는 음력 생일과 ${y}년 그 생일의 일진수로 정해져 날마다 다르므로 위 계산기에서 확인하세요. 윤달 생일은 같은 월의 평달로 봅니다.`, `The lower number depends on your lunar birthday and its day value in ${y}, so it varies by date. Use the calculator above to find it. Leap-month birthdays are treated as the regular month with the same number.`)}</p>
+    <p class="hint">${tr(`하괘는 음력 생일과 ${y}년 그 생일의 일진수로 정해져 날마다 다르므로 개인별 프리미엄 풀이에서 확인하세요. 윤달 생일은 같은 월의 평달로 봅니다.`, `The lower number depends on your lunar birthday and its day value in ${y}, so it varies by date. Find it in your personal premium report. Leap-month birthdays are treated as the regular month with the same number.`)}</p>
   </section>`;
 }
 
-export function tojeongPage(ctx, year) {
+export function tojeongReferencePage(ctx, year) {
+  const y = year ?? ctx.today.y, path = tojeongPath(ctx, y);
+  const { ganji } = tojeongYearTable(y);
+  const title = tr(`${y}년 토정비결 계산 자료`, `${y} Tojeong calculation reference`);
+  const description = tr(`${y}년 ${ko(ganji)}년의 작괘 기준표와 계산 방법을 보존한 자료입니다. 개인별 상세 풀이는 프리미엄 토정비결에서 제공합니다.`, `Archived calculation tables and methods for ${y} (${ganji}). Personal readings are available as premium reports.`);
+  const faq = [{ q: tr('토정비결은 어디까지 무료인가요?', 'Which parts of Tojeong are free?'), a: tr('일부 미리보기는 무료입니다. 총운·음력 12개월 상세 풀이와 다운로드는 990원 단건 결제로 제공합니다.', 'A partial preview is free. Detailed readings and an HTML download cost KRW 990 as a one-time purchase.') }, ...TOJEONG.faq.slice(1)];
+  return {
+    path, title, description, section: '/tojeong/', share: false,
+    supplement: yearGuide(y, ctx, path),
+    crumbs: [[tr('토정비결 · 990원', 'Tojeong · KRW 990'), '/shop/tojeong/'], [title, path]],
+    ld: [faqLd(faq), { '@type': 'Article', headline: title, description, url: `${ctx.site}${path}`, publisher: { '@id': `${ctx.site}/#org` } }],
+    body: `${hero(title, description, tr('지난 연도 계산 자료', 'Archived calculation reference'))}
+      <section class="card box"><h2>${tr('내 토정비결은 프리미엄에서 확인하세요', 'Get your personal premium reading')}</h2><p>${tr('개인별 풀이의 일부는 미리보기로 확인하고, 990원 단건 결제 후 총운·음력 12개월 상세 풀이와 운세 파일을 받을 수 있습니다.', 'Preview part of your reading, then purchase the annual outlook, all twelve lunar months and an HTML download for KRW 990.')}</p><a class="btn" href="/shop/tojeong/">${tr('토정비결 미리보기 · 990원', 'Preview Tojeong · KRW 990')}</a></section>
+      ${tojeongYearReference(y)}
+      <div class="info-panels">${disclosure('tojeong-method', tr('토정비결 계산 방법', 'How Tojeong is calculated'), `<section class="prose"><h2>${tr('144괘는 어떻게 구하나요?', 'How are the 144 combinations calculated?')}</h2><ol><li>${tr('음력 출생 연도로 세는나이를 구하고 보는 해의 태세수를 더해 8로 나눈 나머지를 상괘로 씁니다.', 'Calculate traditional counting age from the lunar birth year, add the target year’s year value, and divide by 8. The remainder gives the upper number.')}</li><li>${tr('보는 해의 음력 생월 날수(29일 또는 30일)에 월건수를 더해 6으로 나눈 나머지를 중괘로 씁니다.', 'Add the month value to the number of days (29 or 30) in the lunar birth month of the target year, then divide by 6. The remainder gives the middle number.')}</li><li>${tr('음력 생일에 보는 해 해당 생일의 일진수를 더해 3으로 나눈 나머지를 하괘로 씁니다.', 'Add the day value for the birthday in the target year to the lunar birthday number, then divide by 3. The remainder gives the lower number.')}</li></ol><p>${tr('나머지가 0이면 각각 8·6·3으로 바꾸며, 조합은 8×6×3=144가지입니다.', 'A remainder of 0 becomes 8, 6, or 3 respectively. This gives 8 × 6 × 3 = 144 combinations.')}</p><p>${esc(TOJEONG.convention)}</p><p>${tr('계산법 출처:', 'Calculation reference:')} <a href="${TOJEONG.encyclopedia}" target="_blank" rel="noopener">${tr('한국민족문화대백과사전 · 토정비결', 'Encyclopedia of Korean Culture · Tojeong Bigyeol')}</a></p></section>`)}
+      ${disclosure('tojeong-faq', tr('자주 묻는 질문', 'Frequently asked questions'), faqBlock(faq), 'help')}
+      ${disclosure('tojeong-source', tr('해설 출처와 이용 안내', 'Reading source and usage notes'), `<section class="prose"><h2>${tr('이곳의 해설은 어디서 왔나요?', 'Where do these readings come from?')}</h2><p>${tr(`<a href="${TOJEONG.source}" target="_blank" rel="noopener">molpass/mcp-tojeong</a>의 MIT 공개 한글 해설 144괘를 사용합니다.`, `These are English translations of the 144 Korean readings published under the MIT license by <a href="${TOJEONG.source}" target="_blank" rel="noopener">molpass/mcp-tojeong</a>.`)} ${esc(TOJEONG.editionNote)}</p><p>${tr('계산식은 한국민족문화대백과사전의 설명을 확인하고 구현을 테스트했습니다. 이 검증은 해설의 원전 정확성이나 미래 예측력을 보증하지 않습니다. 개인별 미리보기와 구매 풀이는 동의 후 서버에서 처리하며, 이 자료 페이지에는 출생 정보 입력창이 없습니다.', 'We checked the calculation method against the Encyclopedia of Korean Culture and tested its implementation. This does not establish the historical accuracy or predictive ability of the interpretations. Personal previews and purchased reports are processed on the server with consent. This reference page does not collect birth details.')}</p><p>Copyright © 2026 Lee, JungHoon. <a href="/licenses/mcp-tojeong.txt">${tr('MIT 라이선스 전문', 'Full MIT license')}</a></p><p>${esc(TOJEONG.readingNote)} ${tr('이 계산기는 운세를 확률이나 100점 점수로 바꾸지 않습니다.', 'This calculator does not convert fortune into probabilities or scores out of 100.')}</p><p>${tr(`<a href="/year/">사주로 보는 무료 신년운세</a>도 함께 살펴보세요.`, `You can also explore your <a href="/year/">free Saju annual reading</a>.`)}</p></section>`)}</div>`,
+  };
+}
+
+function legacyTojeongPage(ctx, year) {
   const y = year ?? ctx.today.y, path = tojeongPath(ctx, y), next = y > ctx.today.y;
   const { ganji } = tojeongYearTable(y);
   const title = next ? tr(`[무료] ${y}년 토정비결 — 내년 총운과 12개월 월별 풀이 미리 보기`, `${y} Tojeong — preview next year and all 12 lunar months`) : tr(TOJEONG.title.replace('] ', `] ${y}년 `), `${y} ${TOJEONG.title}`);
@@ -69,9 +90,14 @@ export function tojeongPage(ctx, year) {
         ${birthForm(ctx)}
         <div id="tojeong-result" class="tojeong-result" aria-live="polite"><section class="card tojeong-empty"><p class="eyebrow">${tr(`${y}년의 이야기`, `Your story for ${y}`)}</p><h2>${tr('총운부터 열두 달의 흐름까지', 'An annual outlook and twelve lunar months')}</h2><p>${tr('내 생일로 상괘·중괘·하괘를 구하면, 나에게 해당하는 한 해의 풀이가 펼쳐집니다.', 'Your birth date determines the upper, middle, and lower numbers that select your reading for the year.')}</p><ul><li>${tr('한 해를 아우르는 총운', 'An outlook for the whole year')}</li><li>${tr('음력 1~12월의 기회와 주의할 점', 'Opportunities and cautions for lunar months 1–12')}</li><li>${tr('내 괘가 나온 계산 근거', 'The calculation behind your reading')}</li></ul><p class="hint">${esc(TOJEONG.readingNote)}</p><noscript><p>${tr('계산하려면 자바스크립트를 켜 주세요.', 'Enable JavaScript to calculate your reading.')}</p></noscript></section></div>
       </section>
-      ${yearTable(y)}
+      ${tojeongYearReference(y)}
       <div class="info-panels">${disclosure('tojeong-method', tr('토정비결 계산 방법', 'How Tojeong is calculated'), `<section class="prose"><h2>${tr('144괘는 어떻게 구하나요?', 'How are the 144 combinations calculated?')}</h2><ol><li>${tr('음력 출생 연도로 세는나이를 구하고 보는 해의 태세수를 더해 8로 나눈 나머지를 상괘로 씁니다.', 'Calculate traditional counting age from the lunar birth year, add the target year’s year value, and divide by 8. The remainder gives the upper number.')}</li><li>${tr('보는 해의 음력 생월 날수(29일 또는 30일)에 월건수를 더해 6으로 나눈 나머지를 중괘로 씁니다.', 'Add the month value to the number of days (29 or 30) in the lunar birth month of the target year, then divide by 6. The remainder gives the middle number.')}</li><li>${tr('음력 생일에 보는 해 해당 생일의 일진수를 더해 3으로 나눈 나머지를 하괘로 씁니다.', 'Add the day value for the birthday in the target year to the lunar birthday number, then divide by 3. The remainder gives the lower number.')}</li></ol><p>${tr('나머지가 0이면 각각 8·6·3으로 바꾸며, 조합은 8×6×3=144가지입니다.', 'A remainder of 0 becomes 8, 6, or 3 respectively. This gives 8 × 6 × 3 = 144 combinations.')}</p><p>${esc(TOJEONG.convention)}</p><p>${tr('계산법 출처:', 'Calculation reference:')} <a href="${TOJEONG.encyclopedia}" target="_blank" rel="noopener">${tr('한국민족문화대백과사전 · 토정비결', 'Encyclopedia of Korean Culture · Tojeong Bigyeol')}</a></p></section>`)}
       ${disclosure('tojeong-faq', tr('자주 묻는 질문', 'Frequently asked questions'), faqBlock(faq), 'help')}
       ${disclosure('tojeong-source', tr('해설 출처와 이용 안내', 'Reading source and usage notes'), `<section class="prose"><h2>${tr('이곳의 해설은 어디서 왔나요?', 'Where do these readings come from?')}</h2><p>${tr(`<a href="${TOJEONG.source}" target="_blank" rel="noopener">molpass/mcp-tojeong</a>의 MIT 공개 한글 해설 144괘를 사용합니다.`, `These are English translations of the 144 Korean readings published under the MIT license by <a href="${TOJEONG.source}" target="_blank" rel="noopener">molpass/mcp-tojeong</a>.`)} ${esc(TOJEONG.editionNote)}</p><p>${tr('계산식은 한국민족문화대백과사전의 설명을 확인하고 구현을 테스트했습니다. 이 검증은 해설의 원전 정확성이나 미래 예측력을 보증하지 않습니다. 외부 MCP 서버에 연결하지 않으며 생년월일은 브라우저 안에서 처리합니다.', 'We checked the calculation method against the Encyclopedia of Korean Culture and tested its implementation. This does not establish the historical accuracy or predictive ability of the interpretations. We do not connect to an external MCP server; your birth date is processed in your browser.')}</p><p>Copyright © 2026 Lee, JungHoon. <a href="/licenses/mcp-tojeong.txt">${tr('MIT 라이선스 전문', 'Full MIT license')}</a></p><p>${esc(TOJEONG.readingNote)} ${tr('이 계산기는 운세를 확률이나 100점 점수로 바꾸지 않습니다.', 'This calculator does not convert fortune into probabilities or scores out of 100.')}</p><p>${tr(`<a href="/year/">사주로 보는 무료 신년운세</a>도 함께 살펴보세요.`, `You can also explore your <a href="/year/">free Saju annual reading</a>.`)}</p></section>`)}</div>`,
   };
+}
+
+// 명시적인 이전 버전 복구 설정에서만 기존 무료 계산기를 유지한다.
+export function tojeongPage(ctx, year) {
+  return ctx.cfg?.paidReadings ? tojeongReferencePage(ctx, year) : legacyTojeongPage(ctx, year);
 }

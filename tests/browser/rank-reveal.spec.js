@@ -7,6 +7,7 @@ test('내 순위를 공개하고 재계산하면 점과 등급 캐릭터, 특기
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/saju-ranking/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await editProfile(page);
   await page.locator('#a-y').fill('1993');
   await page.locator('#a-m').selectOption('1');
   await page.locator('#a-d').selectOption('28');

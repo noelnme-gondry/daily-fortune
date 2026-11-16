@@ -5,7 +5,7 @@ export function config() {
   const adClient = env('ADSENSE_CLIENT', 'ca-pub-3073450406371629').trim();
   const adsOn = adClient && adClient !== 'off';
   return {
-    paidReadings: env('FORTUNE_PAID_READINGS') === '1',
+    paidReadings: env('FORTUNE_PAID_READINGS') !== '0',
     gaId: /^G-[A-Z0-9]+$/i.test(env('GA_MEASUREMENT_ID').trim()) ? env('GA_MEASUREMENT_ID').trim() : '',
     adsense: adsOn ? {
       client: adClient,

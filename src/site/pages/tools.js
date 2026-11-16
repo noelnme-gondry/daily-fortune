@@ -163,7 +163,7 @@ export function yearHub(ctx) {
   return {
     path: '/year/', title: siteText('[무료] 신년운세 — 올해·내년 사주 총운과 월별 운세'), description: `${siteText('회원가입 없이 무료로 보는 ')}${ys.join(siteText('년·'))}${siteText("년 신년운세. 내 사주와 세운·대운으로 계산한 연간 총운과 분야별 점수, 1~12월 월별 운세를 연도별로 확인하세요. 토정비결과의 차이도 안내합니다.")}`,
     crumbs: [[siteText('신년운세'), '/year/']], section: '/year/',
-    body: `${hero(siteText('무료 신년운세'), siteText('신년운세는 그 해의 간지(세운)가 내 사주 원국과 맺는 관계로 한 해의 흐름을 봅니다. 연도를 골라 총운과 1~12월 월별 운세를 확인하세요.'), FREE_ACCESS.summary)}<div class="cards">${ys.map((y) => `<a class="card link-card" href="/year/${y}/"><b>${y}${siteText("년 운세")}</b><span>${pillarLabel(yearPillar(y))}${siteText("년 · ")}${animalName(yearPillar(y).b)}${siteText("띠 해")}</span></a>`).join('')}</div><p class="note">${siteText("이곳의 신년운세는 사주 방식으로 계산합니다. 144괘로 한 해를 읽으려면 ")}<a href="/tojeong/">${siteText("무료 토정비결")}</a>${siteText("을 이용하세요. ")}<a href="/about/#tojeong">${siteText("두 방식의 차이")}</a>${siteText("도 확인할 수 있습니다.")}</p>`,
+    body: `${hero(siteText('무료 신년운세'), siteText('신년운세는 그 해의 간지(세운)가 내 사주 원국과 맺는 관계로 한 해의 흐름을 봅니다. 연도를 골라 총운과 1~12월 월별 운세를 확인하세요.'), FREE_ACCESS.summary)}<div class="cards">${ys.map((y) => `<a class="card link-card" href="/year/${y}/"><b>${y}${siteText("년 운세")}</b><span>${pillarLabel(yearPillar(y))}${siteText("년 · ")}${animalName(yearPillar(y).b)}${siteText("띠 해")}</span></a>`).join('')}</div><p class="note">${siteText("이곳의 신년운세는 사주 방식으로 계산합니다. 144괘로 한 해를 읽으려면 ")}<a href="/tojeong/">${tr('토정비결 · 990원', 'Tojeong · KRW 990')}</a>${siteText("을 이용하세요. ")}<a href="/about/#tojeong">${siteText("두 방식의 차이")}</a>${siteText("도 확인할 수 있습니다.")}</p>`,
   };
 }
 
@@ -179,7 +179,7 @@ export function home(ctx) {
     [TOOLS.week.path, TOOLS.week.nav, siteText('요일별 점수와 분야별 최고의 요일')],
     [TOOLS.month.path, TOOLS.month.nav, siteText('월운과 날짜별 길일 달력')],
     [yearTool(y + 1).path, yearTool(y + 1).nav, siteText('내년 총운과 월별 운세')],
-    ['/tojeong/', siteText('무료 토정비결'), siteText('144괘로 보는 총운과 음력 열두 달의 풀이')],
+    ['/tojeong/', tr('토정비결 · 990원', 'Tojeong · KRW 990'), siteText('144괘로 보는 총운과 음력 열두 달의 풀이')],
     [TOOLS.manseryeok.path, TOOLS.manseryeok.nav, siteText('사주팔자 원국과 대운 바로 계산')],
   ];
   const fun = [
@@ -195,7 +195,7 @@ export function home(ctx) {
       <div class="home-discovery"><h2 id="home-discovery-title">${siteText('재미로 보는 사주')}</h2>${features}<p class="note">${tr('사주는 전통 해석을 참고하는 도구입니다. 점수는 사건의 확률이나 사람의 가치를 뜻하지 않습니다.', 'Saju offers traditional interpretations for reflection. Scores are not event probabilities or a measure of anyone’s worth.')}</p>
       </div>
     </section>
-    ${ctx.lang === 'en' ? '<section class="box-sec home-purchases"><div class="sec-head"><h2>Keep your fortune as a report</h2><a href="/shop/">View all reports</a></div><p>Korean fortune reports: KRW 990 each as a one-time purchase, including a detailed reading and download.</p>' + productCards() + '</section>' : `<section class="box-sec home-purchases" aria-labelledby="home-purchases-title" lang="ko"><div class="sec-head"><h2 id="home-purchases-title">운세를 한 권으로 간직하세요</h2><a href="/shop/">상품 전체 보기</a></div><p>토정비결·평생 사주·궁합, 각각 990원 단건 결제. 상세 풀이와 운세 다운로드를 함께 제공합니다.</p>${productCards()}</section>`}
+    ${ctx.lang === 'en' ? '<section class="box-sec home-purchases"><div class="sec-head"><h2>Premium fortune reports</h2><a href="/shop/">View all reports</a></div><p>Korean fortune reports: KRW 990 each as a one-time purchase, including a detailed reading and download.</p>' + productCards() + '</section>' : `<section class="box-sec home-purchases" aria-labelledby="home-purchases-title" lang="ko"><div class="sec-head"><h2 id="home-purchases-title">프리미엄 운세</h2><a href="/shop/">상품 전체 보기</a></div><p>토정비결·평생 사주·궁합. 일부 미리보기는 무료이며, 각각 990원 단건 결제 후 상세 풀이와 운세 다운로드를 제공합니다.</p>${productCards()}</section>`}
     <section class="box-sec home-services" aria-labelledby="home-services-title"><div class="sec-head"><h2 id="home-services-title">${tr('지금, 무엇이 궁금한가요?', 'What are you curious about?')}</h2></div><p class="note">${esc(FREE_ACCESS.description)}</p>${groupedLinks(o, '', 'purpose-groups home-purpose-groups')}</section>
     <nav class="reading-guides" aria-label="${tr('처음 읽는 분을 위한 안내', 'Guides for your first reading')}"><a href="/saju/guide/"><b>${tr('처음 보는 사주, 어디부터 읽을까요?', 'New to saju? Start here.')}</b><span>${tr('일간·오행·대운을 쉬운 말로 알아보세요.', 'Learn about Day Masters, elements and cycles.')}</span></a><a href="/about/"><b>${tr('결과는 어떻게 계산하나요?', 'How is a reading calculated?')}</b><span>${tr('계산 기준과 해석의 범위를 확인하세요.', 'Explore the method and its limits.')}</span></a></nav>
     ${guideLinks()}

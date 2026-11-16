@@ -1,3 +1,4 @@
+import { editProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { buildChart, day } from '../../src/engine/index.js';
 
@@ -12,6 +13,7 @@ test.beforeEach(async ({ context, page }) => {
 });
 
 async function birthDate(page) {
+  await editProfile(page);
   await page.locator('#a-y').fill('1990');
   await page.locator('#a-m').selectOption('5');
   await page.locator('#a-d').selectOption('15');
@@ -23,6 +25,7 @@ for (const prefix of ['', '/en']) {
     await page.goto(`${prefix}/today/`);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     await birthDate(page);
+    await editProfile(page);
     await page.locator('[name="a-gender"][value="F"]').check();
     await page.locator('#tool-form [type="submit"]').click();
     const result = day(buildChart({ gender: 'F', calendar: 'solar', y: 1990, m: 5, d: 15, time: null }), { y: 2026, m: 11, d: 14 });
@@ -51,7 +54,7 @@ for (const prefix of ['', '/en']) {
     await expect(page.locator('#reading-money [data-daily-outlook]')).toBeVisible();
     await expect(page.locator('#reading-money')).toBeFocused();
     await page.setViewportSize({ width: 1440, height: 900 });
-    await expect(page.locator('#tool-form')).toBeVisible();
+    await expect(page.locator('#tool-form')).toBeHidden();
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(page.locator('#tool-form')).toBeHidden();
     await page.locator('#result [data-edit-profile]').click();
@@ -76,7 +79,7 @@ test('성별은 명시적으로 선택하며 실패한 제출과 오류 필드�
   expect(events.some(e => e[1] === 'calc_submit' || e[1] === 'calc_complete')).toBe(false);
 });
 
-test('검색 유입 계산기는 모바일 첫 화면에서 폼과 제출 버튼에 도달한다', async ({ page }, testInfo) => {
+test('검색 유입 계산기는 모바일 첫 화면에서 입력을 시작하고 한 화면 안의 폼으로 제출한다', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   const rows = [];
   for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/year/2027/', '/lifetime/', '/life-story/', '/saju-ranking/']) {
@@ -88,7 +91,7 @@ test('검색 유입 계산기는 모바일 첫 화면에서 폼과 제출 버튼
   await testInfo.attach('landing-geometry', { body: JSON.stringify(rows, null, 2), contentType: 'application/json' });
   for (const row of rows) {
     expect(row.top, row.path).toBeLessThan(500);
-    expect(row.submit, row.path).toBeLessThanOrEqual(844);
+    expect(row.submit - row.top, row.path).toBeLessThanOrEqual(844);
   }
 });
 
@@ -97,6 +100,7 @@ test('상단 저장·분야 펼침·섹션 도달은 개인 값을 보내지 않
   await page.goto('/today/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await birthDate(page);
+  await editProfile(page);
   await page.locator('[name="a-gender"][value="M"]').check();
   await page.locator('#tool-form [type="submit"]').click();
   await page.locator('[data-save-result]').click();

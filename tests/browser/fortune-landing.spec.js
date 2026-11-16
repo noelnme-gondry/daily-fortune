@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { completeProfile } from './helpers/profile.js';
+import { completeProfile, editProfile } from './helpers/profile.js';
 import { FREE_ACCESS } from '../../src/content/pages.js';
 import { withLanguage } from '../../src/i18n/runtime.js';
 
@@ -108,6 +108,7 @@ test('홈의 저장 정보 버튼은 편집 중인 생일 대신 카드에 표�
   const saved = page.locator('[data-saved-entry]');
   await expect(saved.locator('[data-saved-summary]')).toContainText('1990.1.1');
   await saved.locator('[data-edit-profile]').click();
+  await editProfile(page);
   await page.locator('#a-y').fill('1985');
   await saved.locator('[data-saved-result]').click();
   await expect(page.locator('.chart-disclosure .chart-card')).toBeVisible();

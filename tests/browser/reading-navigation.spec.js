@@ -97,14 +97,18 @@ test('주간 날짜 상세의 분야 이동은 주간 결과와 섞이지 않는
 
 test('저장 목록에서 고른 가족이 기간 이동 뒤에도 선택되어 있다', async ({ page }) => {
   await page.goto('/today/'); await ready(page); await fill(page, '첫 가족');
+  await editProfile(page);
   await page.locator('#save-device').check(); await page.locator('#tool-form [type=submit]').click();
   await expect(page.locator('[data-storage-status]')).toContainText('저장했습니다');
   await page.locator('[data-dismiss-profile-guide]').click();
+  await editProfile(page);
   await page.locator('#a-name').fill('두 번째 가족'); await page.locator('#a-y').fill('1960');
   await page.locator('#tool-form [type=submit]').click();
   await expect(page.locator('#a-saved-person option')).toHaveCount(3);
   const id = await page.locator('#a-saved-person option').filter({ hasText: '첫 가족' }).getAttribute('value');
+  await editProfile(page);
   await page.locator('#a-saved-person').selectOption(id);
+  await page.locator('#tool-form [type=submit]').click();
   await page.locator('[data-period-link][href="/week/#reading-summary"]').click(); await ready(page);
   await expect(page.locator('#a-name')).toHaveValue('첫 가족');
   await expect(page.locator('#a-saved-person')).toHaveValue(id);

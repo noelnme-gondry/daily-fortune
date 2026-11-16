@@ -66,6 +66,7 @@ test('KR/EN 만세력 경계의 네 입력은 직접 계산한 원국과 일치�
       expect(chars.slice(4).join('')).toBe(c.cols.slice().reverse().map((p) => pillarH(p)[1]).join(''));
       await expect(page.locator('#a-d')).toHaveValue(String(input.d));
     }
+    await editProfile(page);
     await page.locator('[data-delete-profile]').click();
     await page.locator('[data-confirm-delete-all]').click();
     await expect(page.locator('[data-delete-all-confirm]')).toBeHidden();
@@ -128,6 +129,7 @@ test('KR/EN 월별 공개 해설은 직접 계산·재계산·저장 복원 결�
     await page.reload();
     await expect(page.locator('#result .mcard-top .num')).toHaveText(months.map((m) => String(m.score)));
     await expect.poll(async () => (await events(page)).filter((e) => e[1] === 'calc_result').map((e) => e[2].calc_origin)).toEqual(['session_restore']);
+    await editProfile(page);
     await page.locator('[data-delete-profile]').click();
     await page.locator('[data-confirm-delete-all]').click();
     await expect(page.locator('[data-storage-status]')).toContainText(prefix ? 'Deleted' : '삭제했습니다');
@@ -179,6 +181,7 @@ test('오늘·내일 공개 예시에서 직접 계산하면 같은 점수가 �
     const logged = (await events(page)).filter((e) => e[1] === 'calc_result');
     expect(logged.some((e) => e[2].calc_origin === 'form')).toBe(true);
     expect(JSON.stringify(logged)).not.toMatch(/가상비밀|1990|14:30|score_band/);
+    await editProfile(page);
     await page.locator('[data-delete-profile]').click();
     await page.locator('[data-confirm-delete-all]').click();
     await expect(page.locator('[data-storage-status]')).toContainText('삭제했습니다');
@@ -196,6 +199,7 @@ test('공개 예시 → 직접 입력 → 2027년 결과 → 다음 기능에서
   await page.locator('#tool-form button[type="submit"]').click();
   await expect(page.locator('#result .ring')).toHaveAttribute('aria-label', '종합 58점');
   await expect(page.locator('#result .mcard-top .num')).toHaveText(yearMonths(c, 2027).map((m) => String(m.score)));
+  await editProfile(page);
   await page.locator('#a-notime').check();
   await completeProfile(page);
   await page.locator('#tool-form button[type="submit"]').click();
@@ -224,6 +228,7 @@ test('만세력 예시와 사용자 원국 일치, 실패한 음력 윤달은 �
   const chars = await page.locator('#result .pillar-table .char').evaluateAll((nodes) => nodes.map((n) => n.firstChild.textContent));
   expect(chars.slice(0, 4).join('')).toBe(c.cols.slice().reverse().map((p) => pillarH(p)[0]).join(''));
   expect(chars.slice(4).join('')).toBe(c.cols.slice().reverse().map((p) => pillarH(p)[1]).join(''));
+  await editProfile(page);
   await page.locator('[name="a-cal"][value="lunar"]').check();
   await page.locator('#a-y').fill('2021');
   await page.locator('#a-m').selectOption('4');

@@ -1,4 +1,4 @@
-import { completeProfile } from './helpers/profile.js';
+import { completeProfile, editProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { findCompatMatches } from '../../src/domain/compat-matches.js';
 import { COMPAT_CATEGORIES } from '../../src/engine/compat.js';
@@ -105,6 +105,7 @@ test('추천 계산 실패는 재시도 가능하고 새 입력은 진행 중인
   await section.locator('[data-match-retry]').click();
   await expect(section.locator('.leader-button')).toHaveCount(5, { timeout: 20000 });
   await section.locator('[data-match-base="b"]').click();
+  await editProfile(page);
   await page.locator('#a-y').fill('2000');
   await page.locator('#a-notime').check();
   await completeProfile(page);

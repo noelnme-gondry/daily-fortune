@@ -7,7 +7,7 @@ import { tr, isEnglish } from '../i18n/runtime.js';
 import { term } from '../i18n/terms.js';
 import { languagePath } from '../site/locale.js';
 import { ILJU_TAG } from '../content/knowledge.js';
-import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine, listPeople, selectPerson, profileLabel } from './profile.js';
+import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine, listPeople, profileLabel } from './profile.js';
 import { showProfileGuide } from './profile-navigation.js';
 import { readingControls, applyReadingPreferences, wireReadingPreferences } from './reading-preferences.js';
 import { chartCard, dayView, weekView, monthView, yearView, manseOverview, manseView } from './views.js';
@@ -95,22 +95,21 @@ export async function mount(root) {
   let selectedDateButton;
   let submitting = false;
   let editing = false;
-  const narrowScreen = window.matchMedia('(max-width: 900px)');
   function syncFormVisibility() {
     if (!root.classList.contains('has-result')) return;
-    form.hidden = narrowScreen.matches && !editing;
+    form.hidden = !editing;
     root.querySelectorAll('[data-edit-profile]').forEach(button => button.setAttribute('aria-expanded', String(!form.hidden)));
   }
-  narrowScreen.addEventListener('change', syncFormVisibility);
 
   wireBirthForm(form, pair ? ['a', 'b'] : ['a']);
 
   function focusResult() {
-    const summary = $('#reading-summary', out);
+    const summary = $('#reading-summary', out) || out;
+    summary.tabIndex = -1;
     summary.focus({ preventScroll: true });
     // 페이지 이동 직후에는 스타일과 글꼴이 적용되면서 결과의 위치가 바뀐다.
     const scroll = () => document.fonts.ready.then(() => {
-      if (document.activeElement === summary) summary.scrollIntoView({ block: 'start' });
+      if (document.activeElement === summary) summary.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
     });
     if (document.readyState === 'complete') scroll();
     else window.addEventListener('load', scroll, { once: true });
@@ -169,7 +168,8 @@ export async function mount(root) {
       return false;
     }
     showError('');
-    let html = readingNavigation(tabMode, today) + readingControls() + `<button type="button" class="link-btn result-edit-top" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('출생 정보 수정', 'Edit birth details')}</button>`;
+    const details = p => `${p.name ? `${profileLabel(p)} · ` : ''}${p.calendar === 'lunar' ? tr('음력', 'Lunar') : tr('양력', 'Solar')}${p.leap ? tr(' 윤달', ' leap month') : ''} ${p.y}.${p.m}.${p.d} · ${p.gender === 'F' ? tr('여성', 'Female') : tr('남성', 'Male')} · ${p.noTime ? tr('시간 모름', 'Time unknown') : p.timeMode === 'branch' ? tr('시진 입력', 'Hour-period input') : p.time || tr('시간 모름', 'Time unknown')}`;
+    let html = `<section class="applied-profile" aria-label="${tr('이 풀이에 적용한 출생 정보', 'Birth details used for this reading')}"><div><strong>${tr('이 풀이의 출생 정보', 'Details used for this reading')}</strong><p>${esc(details(a))}${b ? `<br>${esc(details(b))}` : ''}</p></div><button type="button" class="sbtn result-edit-top" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('출생 정보 수정', 'Edit birth details')}</button></section>` + readingNavigation(tabMode, today) + readingControls();
     let res;
     let leaderRank;
     if (mode === 'today') { res = day(ca, today, 'today'); html += dayView(res, { scope: 'reading' }); }
@@ -213,9 +213,11 @@ export async function mount(root) {
     if (mode === 'rank') rankTool.mountRankLeaders($('.rank-leaders', out), leaderRank);
     if (pair) stopMatches = compatTool.mountCompatMatches($('.compat-matches', out), { a: toEngine(a), b: toEngine(b) }, { a: ca, b: cb }, today);
     root.classList.add('has-result');
-    // 좁은 화면에서는 결과 아래에 입력 폼을 반복하지 않는다. PC는 옆의 편집 폼을 유지한다.
+    // 계산에 적용한 정보만 요약하고, 편집은 모든 화면에서 명시적으로 연다.
     editing = false;
     syncFormVisibility();
+    const savedEntry = $('[data-saved-entry]', root);
+    if (savedEntry) savedEntry.hidden = true;
     if (share) wireShare($('.result-share', out), share);
     const ev = { tool: mode, calc_origin: source, entry_point: originEntry, reading_date: readingDate };
     track('calc_result', ev);
@@ -291,26 +293,37 @@ export async function mount(root) {
   function applyPerson(profile, slot) {
     if (slot === 'a') a0 = profile; else b0 = profile;
     fillForm(form, slot, profile); picker(slot).value = profile.profileId || '';
-    if (savedEntry) savedEntry.hidden = true;
-    form.hidden = false;
-    const a = readForm(form, 'a'), b = pair ? readForm(form, 'b') : null;
-    sessionSave(slot, profile);
-    if (!check(a) && (!pair || !check(b))) render(a, b, 'device_restore');
-    else { stopMatches?.(); clearResultWithPartnerAd(out); currentInputs = null; currentChart = null; root.classList.remove('has-result'); }
-    storageStatus.textContent = tr('저장한 사람을 불러왔습니다. 내용을 바꿔 계산·저장하면 새 항목으로 보관합니다. 기존 항목 수정은 목록 관리에서 할 수 있어요.', 'Loaded a saved person. Calculating and saving changed details creates a new entry. Edit an existing person in Manage people.');
+    showError('');
+    storageStatus.textContent = tr('저장한 사람을 입력창에 불러왔습니다. 아래 보기 버튼을 눌러야 새 정보가 운세에 반영됩니다.', 'Loaded this person into the form. Press the reading button to apply these details.');
   }
   for (const slot of slots) picker(slot).addEventListener('change', async event => {
     if (!event.target.value) {
       fillForm(form, slot, { gender: '', calendar: 'solar', y: 0, m: 0, d: 0 });
       $(`#${slot}-time`, form).value = '';
       if (slot === 'a') a0 = null; else b0 = null;
-      currentInputs = null; currentChart = null; stopMatches?.(); clearResultWithPartnerAd(out); root.classList.remove('has-result');
+      showError('');
+      storageStatus.textContent = tr('새 정보를 입력한 뒤 보기 버튼을 눌러 주세요. 기존 운세는 그대로 유지됩니다.', 'Enter new details and press the reading button. Your existing reading stays visible.');
       return;
     }
-    try { applyPerson(await selectPerson(event.target.value, slot), slot); track('profile_select', { tool: mode, selection_source: 'form' }); }
+    try {
+      const selected = event.target.value;
+      const person = (await listPeople()).find(person => person.id === selected);
+      if (picker(slot).value !== selected) return;
+      if (!person) throw new Error('Profile no longer exists');
+      applyPerson({ ...person.profile, profileId: person.id }, slot);
+      track('profile_select', { tool: mode, selection_source: 'form' });
+    }
     catch { storageStatus.textContent = tr('선택한 사람을 불러오지 못했습니다. 목록 관리에서 다시 확인해 주세요.', 'Could not load this person. Check Manage people and try again.'); }
   });
-  document.addEventListener('profile-selected', event => applyPerson(event.detail.profile, event.detail.slot));
+  document.addEventListener('profile-selected', event => {
+    if (!slots.includes(event.detail.slot)) return;
+    applyPerson(event.detail.profile, event.detail.slot);
+    editing = true;
+    form.hidden = false;
+    if (savedEntry) savedEntry.hidden = true;
+    syncFormVisibility();
+    $('#a-y', form).focus({ preventScroll: true });
+  });
   document.addEventListener('profiles-changed', event => { refreshPeople(event.detail).catch(() => {}); });
   try { await refreshPeople(); } catch { /* 계산은 저장소 없이도 동작한다. */ }
   await showProfileGuide();
@@ -329,6 +342,7 @@ export async function mount(root) {
     if (event.target.closest('[data-edit-profile]')) {
       editing = true;
       form.hidden = false;
+      if (savedEntry) savedEntry.hidden = true;
       root.querySelectorAll('[data-edit-profile]').forEach(button => button.setAttribute('aria-expanded', 'true'));
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
       $('#a-y', form).focus({ preventScroll: true });
@@ -401,7 +415,7 @@ export async function mount(root) {
     }
     if (render(a, b, 'form')) {
       await remember(a, b);
-      out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      focusResult();
     }
     } finally { submitting = false; }
   });
