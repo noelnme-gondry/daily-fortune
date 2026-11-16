@@ -123,7 +123,7 @@ test('연도별 만세력 Dataset 설명은 Google 길이 기준을 충족하고
 
 test('sitemap·robots·rss·llms.txt', () => {
   const sm = site.sitemap();
-  assert.equal((sm.match(/<loc>/g) || []).length, site.routes.length);
+  assert.equal((sm.match(/<loc>/g) || []).length, site.routes.filter(r => !/\/shop\/(orders|result)\//.test(r.path)).length);
   assert.ok(site.robots().includes(`Sitemap: ${SITE}/sitemap.xml`));
   for (const bot of ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended', 'Yeti']) assert.ok(site.robots().includes(bot));
   assert.ok(site.rss().includes('<rss version="2.0"'));
