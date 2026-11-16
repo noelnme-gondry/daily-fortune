@@ -25,19 +25,28 @@ export function nicepayConfig(env = process.env) {
   return { enabled, mode, origin, clientId, secretKey, methods, directory: databaseConfigured ? '' : directory, databaseUrl, base: mode === 'live' ? 'https://api.nicepay.co.kr' : 'https://sandbox-api.nicepay.co.kr' };
 }
 export function createNicepayGateway(config, fetcher = fetch) {
-  async function call(path, body) {
-    const response = await fetcher(`${config.base}/v1/payments${path}`, { method: body ? 'POST' : 'GET', headers: { Authorization: `Basic ${Buffer.from(`${config.clientId}:${config.secretKey}`).toString('base64')}`, 'Content-Type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(15000) });
-    const data = await response.json();
-    if (!response.ok || data.resultCode !== '0000') throw new PurchaseError('결제 상태를 확인하지 못했습니다. 구매 보관함에서 다시 확인해 주세요.', 502);
+  async function call(operation, path, body) {
+    const error = new PurchaseError('결제 상태를 확인하지 못했습니다. 구매 보관함에서 다시 확인해 주세요.', 502);
+    error.paymentOperation = operation;
+    let response, data;
+    try {
+      response = await fetcher(`${config.base}/v1/payments${path}`, { method: body ? 'POST' : 'GET', headers: { Authorization: `Basic ${Buffer.from(`${config.clientId}:${config.secretKey}`).toString('base64')}`, 'Content-Type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(15000) });
+      data = await response.json();
+    } catch { throw error; }
+    if (!response.ok || data?.resultCode !== '0000') {
+      error.httpStatus = response.status;
+      if (typeof data?.resultCode === 'string' && /^[A-Za-z0-9]{4}$/.test(data.resultCode)) error.resultCode = data.resultCode;
+      throw error;
+    }
     return data;
   }
   return {
-    approve: (tid, amount) => call(`/${encodeURIComponent(tid)}`, { amount }),
-    lookup: tid => call(`/${encodeURIComponent(tid)}`),
-    netCancel: orderId => call('/netcancel', { orderId }),
+    approve: (tid, amount) => call('approve', `/${encodeURIComponent(tid)}`, { amount }),
+    lookup: tid => call('lookup', `/${encodeURIComponent(tid)}`),
+    netCancel: orderId => call('netCancel', '/netcancel', { orderId }),
   };
 }
 export function verifyNicepayPayment(payment, order, config) {
-  if (payment.tid !== order.tid || payment.orderId !== order.id || payment.amount !== order.amount || payment.currency !== 'KRW' || !matchesSignature(payment.signature, sha256(`${payment.tid}${payment.amount}${payment.ediDate}${config.secretKey}`))) throw new PurchaseError('결제 정보가 주문과 일치하지 않습니다.', 409);
+  if (!payment || payment.tid !== order.tid || payment.orderId !== order.id || payment.amount !== order.amount || payment.currency !== 'KRW' || !matchesSignature(payment.signature, sha256(`${payment.tid}${payment.amount}${payment.ediDate}${config.secretKey}`))) throw new PurchaseError('결제 정보가 주문과 일치하지 않습니다.', 409);
   return payment.status === 'paid' && payment.balanceAmt === order.amount;
 }

@@ -77,12 +77,16 @@ export function createCommerceService({ config, store, gateway, now = Date.now }
         if (typeof body.tid !== 'string' || !/^[A-Za-z0-9_-]{1,100}$/.test(body.tid) || (o.tid && o.tid !== body.tid)) throw new PurchaseError('결제 거래번호를 확인해 주세요.', 409);
         if (o.status === 'CANCELLED') throw new PurchaseError('취소된 주문입니다. 상품을 다시 선택해 주세요.', 409);
         if (!o.tid && now() - o.createdAt > 24 * 60 * 60 * 1000) throw new PurchaseError('주문 시간이 지났습니다. 상품을 다시 선택해 주세요.', 409);
+        const resuming = !!o.tid;
         o.tid = body.tid;
         await db.put(o); // 승인 전에 거래번호를 보존: 응답 유실·재시작 시 조회로 복구한다.
-        let payment = await gateway.lookup(o.tid);
-        const alreadyPaid = verifyNicepayPayment(payment, o, config);
-        if (!alreadyPaid && payment.status !== 'ready') throw new PurchaseError('결제 가능한 상태가 아닙니다.', 409);
-        if (!alreadyPaid) {
+        let payment;
+        if (resuming) {
+          // 이미 승인 요청을 보냈을 수 있는 거래는 조회로만 복구하며 재청구하지 않는다.
+          payment = await gateway.lookup(o.tid);
+          if (!verifyNicepayPayment(payment, o, config)) throw new PurchaseError('결제 승인 여부를 확인해야 합니다. 주문 상태를 확인해 주세요.', 409);
+        } else {
+          // Server 승인 모델은 인증 검증 → 승인 순서다. 승인 전에는 조회할 거래가 없을 수 있다.
           try {
             payment = await gateway.approve(o.tid, o.amount);
             if (!verifyNicepayPayment(payment, o, config)) throw new PurchaseError('결제가 승인되지 않았습니다.', 409);
@@ -123,7 +127,7 @@ export function createCommerceService({ config, store, gateway, now = Date.now }
   };
 }
 
-export function createCommerceRouter({ config = nicepayConfig(), store, gateway } = {}) {
+export function createCommerceRouter({ config = nicepayConfig(), store, gateway, reportPaymentError = event => console.error('fortune_payment_failed', JSON.stringify(event)) } = {}) {
   // Express 앱은 Vite의 Connect에서도 요청·응답 API를 초기화한다.
   const router = express();
   router.disable('x-powered-by');
@@ -134,7 +138,15 @@ export function createCommerceRouter({ config = nicepayConfig(), store, gateway 
   // 외부 POST에는 Lax 쿠키가 없다. 주문 state와 서명으로 인증하며 구매자 쿠키를 바꾸지 않는다.
   router.post('/nicepay/return', express.urlencoded({ extended: false, limit: '16kb' }), async (req, res) => {
     try { const id = await service.callback(req.body, req.query.state); res.redirect(303, `/shop/result/?orderId=${encodeURIComponent(id)}`); }
-    catch { res.redirect(303, '/shop/orders/?payment=check'); }
+    catch (e) {
+      // 콜백 본문·인증 토큰·서명·상점 키·PG 원문은 로그에 남기지 않는다.
+      const event = { orderId: typeof req.body?.orderId === 'string' && idPattern.test(req.body.orderId) ? req.body.orderId : undefined, status: e instanceof PurchaseError ? e.status : 500 };
+      if (['approve', 'lookup', 'netCancel'].includes(e.paymentOperation)) event.operation = e.paymentOperation;
+      if (typeof e.resultCode === 'string' && /^[A-Za-z0-9]{4}$/.test(e.resultCode)) event.resultCode = e.resultCode;
+      if (Number.isInteger(e.httpStatus)) event.httpStatus = e.httpStatus;
+      reportPaymentError(event);
+      res.redirect(303, '/shop/orders/?payment=check');
+    }
   });
   router.use((req, res, next) => {
     const raw = /(?:^|;\s*)fortune_buyer=([a-f0-9]{64})(?:;|$)/.exec(req.headers.cookie || '')?.[1];
