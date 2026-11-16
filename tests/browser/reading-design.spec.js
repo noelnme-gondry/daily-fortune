@@ -37,8 +37,8 @@ for (const lang of ['ko', 'en']) test(`${lang}: 홈의 운세 예시는 실제 �
   }
 });
 
-test('풀이 목차는 스크롤 뒤에도 보이고 키보드·동작 줄이기 설정으로 즉시 입력을 연다', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+for (const width of [390, 1024]) test(`${width}px 풀이 목차는 본문을 가리지 않고 키보드·동작 줄이기 설정으로 즉시 입력을 연다`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 844 });
   await page.goto('/today/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#a-y').fill('1990');
@@ -54,13 +54,21 @@ test('풀이 목차는 스크롤 뒤에도 보이고 키보드·동작 줄이기
   await page.keyboard.press('Enter');
   await expect(page.locator(target)).toBeFocused();
   await expect(last).toHaveAttribute('aria-current', 'location');
-  await expect(nav).toBeInViewport({ ratio: 1 });
-  await expect.poll(() => nav.evaluate(el => {
-    const header = document.querySelector('.site-head');
-    const top = header.classList.contains('is-hidden') ? 0 : Math.max(0, header.getBoundingClientRect().bottom);
-    return Math.abs(el.getBoundingClientRect().top - top) < 2;
-  })).toBe(true);
-  await expect.poll(() => page.locator(target).evaluate(el => el.getBoundingClientRect().top >= document.querySelector('.reading-area-nav').getBoundingClientRect().bottom)).toBe(true);
+  if (width <= 760) {
+    // 펼쳐진 두 줄 메뉴가 작은 화면의 본문을 덮지 않도록 일반 흐름에 둔다.
+    await expect(nav).toHaveCSS('position', 'static');
+    expect(await nav.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+    await expect(page.locator(`${target} h3`)).toBeInViewport({ ratio: 1 });
+    await expect.poll(() => page.locator(target).evaluate(el => el.getBoundingClientRect().top >= Math.max(0, document.querySelector('.site-head').getBoundingClientRect().bottom))).toBe(true);
+  } else {
+    await expect(nav).toBeInViewport({ ratio: 1 });
+    await expect.poll(() => nav.evaluate(el => {
+      const header = document.querySelector('.site-head');
+      const top = header.classList.contains('is-hidden') ? 0 : Math.max(0, header.getBoundingClientRect().bottom);
+      return Math.abs(el.getBoundingClientRect().top - top) < 2;
+    })).toBe(true);
+    await expect.poll(() => page.locator(target).evaluate(el => el.getBoundingClientRect().top >= document.querySelector('.reading-area-nav').getBoundingClientRect().bottom)).toBe(true);
+  }
   await page.evaluate(() => {
     window.__readingScroll = [];
     const scroll = window.Element.prototype.scrollIntoView;
