@@ -105,6 +105,9 @@ const signature = p => {
   else value.timeBranch = null;
   return JSON.stringify(value);
 };
+// 편집한 입력을 원래 저장본으로 오인하지 않고, 같은 사람의 임시 결과만 삭제에 연결한다.
+export const withProfileReference = (input, selected) => selected?.profileId && signature(input) === signature(selected)
+  ? { ...input, profileId: selected.profileId } : input;
 const entry = (profile, id = globalThis.crypto.randomUUID()) => ({ id, profile: clean(profile), updatedAt: Date.now() });
 export const profileLabel = p => p.name || `${p.y}.${p.m}.${p.d}`;
 export function changed(detail = {}) { document.dispatchEvent(new globalThis.CustomEvent('profiles-changed', { detail })); }

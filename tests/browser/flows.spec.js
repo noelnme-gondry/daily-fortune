@@ -615,15 +615,15 @@ test('결과 이미지 저장에도 해 로고가 로드되고 PNG가 생성된�
   await expect(page.locator('#result')).toContainText('이미지 다운로드를 시작했습니다.');
 });
 
-test('홈의 재미 카드는 입력 옆에 있고 모바일에서는 입력 아래에 이어진다', async ({ page }) => {
+test('홈은 입력 옆의 실제 운세 예시와 그 아래의 캐릭터 소개로 구분한다', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await ready(page, '/');
-  const hero = await page.locator('.home-hero').boundingBox();
+  const preview = await page.locator('.home-reading').boundingBox();
   const features = await page.locator('.home-features').boundingBox();
   const form = await page.locator('#tool-form').boundingBox();
-  expect(hero.height).toBeLessThan(1100);
-  expect(features.x).toBeGreaterThan(form.x + form.width);
-  expect(features.y).toBeLessThan(form.y + form.height);
+  expect(preview.x).toBeGreaterThan(form.x + form.width);
+  expect(Math.abs(preview.y - form.y)).toBeLessThan(2);
+  expect(features.y).toBeGreaterThan(Math.max(preview.y + preview.height, form.y + form.height));
   await expect(page.locator('.home-feature')).toHaveCount(2);
   await expect(page.locator('.home-ilju-link')).toBeVisible();
   await expect(page.locator('#a-name')).toBeVisible();
@@ -633,7 +633,7 @@ test('홈의 재미 카드는 입력 옆에 있고 모바일에서는 입력 아
   expect((await page.locator('#a-y').boundingBox()).y).toBeLessThan(gender.y);
   for (const width of [320, 768, 1024]) {
     await page.setViewportSize({ width, height: 960 });
-    if (width <= 900) expect((await page.locator('.home-features').boundingBox()).y).toBeGreaterThan((await page.locator('#tool-form').boundingBox()).y);
+    if (width <= 900) expect((await page.locator('.home-reading').boundingBox()).y).toBeGreaterThan((await page.locator('#tool-form').boundingBox()).y);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   }
 });

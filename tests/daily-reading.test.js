@@ -52,7 +52,7 @@ for (const lang of ['ko', 'en']) {
   }));
 }
 
-test('일간 카드의 본문은 펼쳐지고 근거만 접히며 사용자 문자열을 이스케이프한다', () => {
+test('일간 카드의 본문·근거·전날 비교를 모두 펼치고 사용자 문자열을 이스케이프한다', () => {
   const r = day(buildChart(input), start);
   r.cats[0].name = '<img src=x>';
   r.cats[0].reading.outlook = '<script>alert(1)</script>';
@@ -60,7 +60,7 @@ test('일간 카드의 본문은 펼쳐지고 근거만 접히며 사용자 문�
   assert.equal((html.match(/class="daily-cat card"/g) || []).length, 7);
   assert.doesNotMatch(html, / hidden|<script>|<img src=x>/);
   assert.match(html, /&lt;script&gt;/);
-  assert.match(html, /<dialog class="explanation-dialog"/);
+  assert.doesNotMatch(html, /<dialog|<details/);
   const ids = [...(html + second).matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
   assert.equal(ids.length, new Set(ids).size, '주간·월간 상세를 함께 렌더해도 ID는 유일');
   for (const [, ref] of html.matchAll(/(?:href="#|aria-labelledby=")([^"]+)"/g)) assert.ok(ids.includes(ref), ref);

@@ -1,4 +1,3 @@
-import { detailDialog } from '../site/util.js';
 // 계산 결과를 HTML로 그리는 함수들 (브라우저 전용, 순수 문자열 생성)
 import {
   STEM_H, BR_H, EL_H, STEM_EL, BR_EL, TG, TG_SLUG, iljuSlug, pillarKo, pillarLabel, isoDate,
@@ -65,21 +64,21 @@ export function chartCard(c, profile, today) {
 export function reportHead(r, when) {
   const low = [...r.cats].sort((a, b) => a.score - b.score)[0];
   const lead = r.overall.outlook || low?.text?.split(/(?<=[.!?])\s+/)[0] || r.overall.text;
-  return `<section class="report-head card">${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2 data-result-heading>${esc(r.overall.headline)}</h2><p>${esc(lead)}</p>${detailDialog(`reading-overall-${++tipSeq}`, tr('이 흐름이 나온 이유', 'How this reading was calculated'), `<p>${esc(r.overall.text)}</p>`)}<p class="score-note">${tr('점수는 이 서비스의 계산 기준이며, 성공 확률을 뜻하지 않습니다.', 'Scores reflect this service’s calculation rules, not a probability of success.')}</p></div></section>`;
+  return `<section class="report-head card">${ring(r.overall.score)}<div class="report-text"><div class="when">${when}</div><h2 data-result-heading>${esc(r.overall.headline)}</h2><p>${esc(lead)}</p>${r.overall.text && r.overall.text !== lead ? `<section class="overall-basis"><h3>${tr('이 흐름이 나온 이유', 'How this reading was calculated')}</h3><p data-overall-basis>${esc(r.overall.text)}</p></section>` : ''}<p class="score-note">${tr('점수는 이 서비스의 계산 기준이며, 성공 확률을 뜻하지 않습니다.', 'Scores reflect this service’s calculation rules, not a probability of success.')}</p></div></section>`;
 }
 export function catList(cats, withText = true, scope = null) {
   return `<section class="cats">${cats.map((c) => `<article class="cat"${scope ? ` id="${scope}-${c.key}" tabindex="-1" aria-labelledby="${scope}-${c.key}-title"` : ''}><div class="cat-top"><h3${scope ? ` id="${scope}-${c.key}-title"` : ''}>${c.name}</h3>${band(c.score)}<div class="track"><i style="width:${c.score}%"></i></div><span class="num">${c.score}</span></div>${withText && c.text ? `<p>${esc(c.text)}</p>` : ''}</article>`).join('')}</section>`;
 }
 export function readingAreaLinks(cats, scope = 'reading') {
-  return `<nav class="daily-links area-switch" aria-label="${tr('분야별 운세 바로가기', 'Jump to a reading area')}">${scope === 'reading' ? `<a href="#reading-summary" data-reading-area>${tr('종합', 'Overview')}</a>` : ''}${cats.map(cat => `<a href="#${scope}-${cat.key}"${scope === 'reading' ? ' data-reading-area' : ''}>${esc(cat.name)}<b>${cat.score}${tr('점', ' pts')}</b></a>`).join('')}</nav>`;
+  return `<nav class="daily-links area-switch${scope === 'reading' ? ' reading-area-nav' : ''}" aria-label="${tr('분야별 운세 바로가기', 'Jump to a reading area')}">${scope === 'reading' ? `<a href="#reading-summary" data-reading-area>${tr('종합', 'Overview')}</a>` : ''}${cats.map(cat => `<a href="#${scope}-${cat.key}"${scope === 'reading' ? ' data-reading-area' : ''}>${esc(cat.name)}<b>${cat.score}${tr('점', ' pts')}</b></a>`).join('')}</nav>`;
 }
 function dailyCategories(cats, id) {
-  return `<section class="daily-cats" aria-labelledby="${id}-title"><div class="daily-intro"><h2 id="${id}-title">${tr('분야별로 읽는 오늘', 'Today, area by area')}</h2></div>
+  return `<section class="daily-cats" aria-labelledby="${id}-title"><div class="daily-intro"><h2 id="${id}-title">${tr('일곱 분야의 운세', 'Seven areas of your reading')}</h2></div>
     ${cats.map(cat => `<article class="daily-cat card" id="${id}-${cat.key}" tabindex="-1" aria-labelledby="${id}-${cat.key}-title"><header class="daily-cat-head"><h3 class="daily-cat-name" id="${id}-${cat.key}-title">${esc(cat.name)}</h3><b class="num">${cat.score}${tr('점', ' points')}</b>${band(cat.score)}</header>
-      <p class="daily-outlook" data-daily-outlook>${esc(cat.reading.outlook)}</p>
+      <div class="daily-reading-body"><p class="daily-outlook" data-daily-outlook${cat.reading.basis === cat.reading.outlook ? ' data-daily-basis' : ''}>${esc(cat.reading.outlook)}</p>
       <div class="daily-aspects"><section><h4>${tr('이렇게 드러날 수 있어요', 'How it may show up')}</h4><p data-daily-opportunity>${esc(cat.reading.opportunity)}</p></section><section><h4>${tr('치우치기 쉬운 쪽', 'When the balance tips')}</h4><p data-daily-caution>${esc(cat.reading.caution)}</p></section></div>
       <p class="daily-action" data-daily-action>${esc(cat.reading.action)}</p>
-      ${detailDialog(`${id}-${cat.key}-basis`, tr('내 사주와 만난 요소', 'The factors meeting your chart'), `${cat.reading.basis ? `<p data-daily-basis>${esc(cat.reading.basis)}</p>` : ''}<p data-daily-change>${esc(cat.reading.change)}</p>`, tr('해석 근거·전날과 비교', 'Basis & change from yesterday'))}
+      <section class="daily-context">${cat.reading.basis && cat.reading.basis !== cat.reading.outlook ? `<h4>${tr('내 사주와 만난 요소', 'The factors meeting your chart')}</h4><p data-daily-basis>${esc(cat.reading.basis)}</p>` : ''}<h4>${tr('전날과 비교하면', 'Compared with the previous day')}</h4><p data-daily-change>${esc(cat.reading.change)}</p></section></div>
     </article>`).join('')}</section>`;
 }
 export function luckyRow(l) {

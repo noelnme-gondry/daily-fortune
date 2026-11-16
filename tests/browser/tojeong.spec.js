@@ -72,6 +72,8 @@ test('토정비결 기기 저장·다른 탭 복원·삭제는 사주 저장본�
   await expect(next.locator('#tj-name')).toHaveValue('사주 보존');
   await expect(next.locator('#tj-save')).not.toBeChecked();
   await next.goto('/today/');
+  await expect(next.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await editProfile(next);
   await expect(next.locator('#a-name')).toHaveValue('사주 보존');
   await expect(next.locator('#a-y')).toHaveValue('1989');
   await expect(next.locator('#a-branch')).toHaveValue('3');

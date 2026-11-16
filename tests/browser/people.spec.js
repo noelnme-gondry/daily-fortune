@@ -80,6 +80,34 @@ test('관리 메뉴 선택·수정은 보기 버튼으로 적용하고 저장본
   await expect(page.locator('#a-y')).toHaveValue('');
 });
 
+test('다른 사람을 편집 중이어도 삭제한 사람의 적용 결과와 세션을 지운다', async ({ page }) => {
+  await ready(page); await fill(page, 'a', '적용한 사람', '1980'); await save(page);
+  const first = (await people(page))[0];
+  const second = await page.evaluate(async () => (await import('/src/client/profile.js')).savePerson({ name: '편집 중', gender: 'F', calendar: 'solar', y: 1995, m: 4, d: 3, noTime: true }));
+  await editProfile(page); await page.locator('#a-saved-person').selectOption(second.id);
+  await expect(page.locator('#a-y')).toHaveValue('1995');
+  await expect(page.locator('#result .applied-profile')).toContainText('적용한 사람');
+  await open(page); await page.locator(`[data-delete-person="${first.id}"]`).click();
+  await page.locator(`[data-confirm-delete="${first.id}"]`).click();
+  await expect(page.locator('#result .applied-profile')).toHaveCount(0);
+  expect(await page.evaluate(async () => (await import('/src/client/profile.js')).sessionLoad('a'))).toBeNull();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#a-y')).toHaveValue('1995');
+});
+
+test('저장본과 다른 생일로 제출한 임시 결과는 원래 사람을 삭제해도 보존한다', async ({ page }) => {
+  await ready(page); await fill(page, 'a', '원래 사람', '1980'); await save(page);
+  const first = (await people(page))[0];
+  await editProfile(page); await page.locator('#a-y').fill('1981'); await page.locator('#save-device').uncheck();
+  await page.locator('#tool-form [type=submit]').click();
+  await open(page); await page.locator(`[data-delete-person="${first.id}"]`).click();
+  await page.locator(`[data-confirm-delete="${first.id}"]`).click();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#result .applied-profile')).toContainText('1981.5.15');
+  await page.reload(); await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#a-y')).toHaveValue('1981');
+});
+
 test('기존 동의된 a/b는 목록으로 옮기고 토정비결과 미동의 세션을 구분한다', async ({ page }) => {
   await ready(page);
   await page.evaluate(async () => {
@@ -162,7 +190,7 @@ test('홈 첫 저장 후 이동한 결과에 안내가 한 번 나오고 선택�
   const id = (await people(page))[1].id;
   await ready(page, '/');
   await editProfile(page);
-  await page.locator('[data-edit-profile]').click(); await page.locator('#a-saved-person').selectOption(id);
+  await page.locator('#a-saved-person').selectOption(id);
   await expect(page.locator('#result .chart-head')).toHaveCount(0);
   await page.locator('#tool-form [type=submit]').click();
   await expect(page).toHaveURL(/\/today\/$/);

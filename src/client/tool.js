@@ -7,7 +7,7 @@ import { tr, isEnglish } from '../i18n/runtime.js';
 import { term } from '../i18n/terms.js';
 import { languagePath } from '../site/locale.js';
 import { ILJU_TAG } from '../content/knowledge.js';
-import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine, listPeople, profileLabel } from './profile.js';
+import { load, save, removeSaved, sessionLoad, sessionSave, takeLegacy, toEngine, listPeople, profileLabel, withProfileReference } from './profile.js';
 import { showProfileGuide } from './profile-navigation.js';
 import { readingControls, applyReadingPreferences, wireReadingPreferences } from './reading-preferences.js';
 import { chartCard, dayView, weekView, monthView, yearView, manseOverview, manseView } from './views.js';
@@ -23,6 +23,7 @@ import { refreshPeriodContext } from './period-context.js';
 import { wireReadingExplorer } from './reading-explorer.js';
 
 const $ = (s, el = document) => el.querySelector(s);
+const scrollBehavior = event => event.detail === 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
 const sexIdx = (p) => [...Array(60).keys()].find((n) => n % 10 === p.s && n % 12 === p.b);
 
 const who = (name) => cleanName(name) ? tr(`${cleanName(name)}님`, cleanName(name)) : tr('나', 'Me');
@@ -278,6 +279,8 @@ export async function mount(root) {
       select.value = people.some(person => person.id === selected) ? selected : '';
       if (selected && change.deleted === selected) {
         if (slot === 'a') a0 = null; else b0 = null;
+      }
+      if (change.deleted && currentInputs?.[slot]?.profileId === change.deleted) {
         currentInputs = null; currentChart = null; stopMatches?.();
         clearResultWithPartnerAd(out); root.classList.remove('has-result');
         if (savedEntry) savedEntry.hidden = true;
@@ -344,7 +347,7 @@ export async function mount(root) {
       form.hidden = false;
       if (savedEntry) savedEntry.hidden = true;
       root.querySelectorAll('[data-edit-profile]').forEach(button => button.setAttribute('aria-expanded', 'true'));
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      form.scrollIntoView({ behavior: scrollBehavior(event), block: 'start' });
       $('#a-y', form).focus({ preventScroll: true });
     }
     const dateButton = event.target.closest('[data-reading-date]');
@@ -356,7 +359,7 @@ export async function mount(root) {
       panel.innerHTML = `<button type="button" class="link-btn" data-close-day>${tr('날짜 상세 닫기', 'Close daily detail')}</button>${dayView(day(currentChart, { y, m, d }), { banner: false, scope: `detail-${isoDate({ y, m, d })}` })}`;
       panel.hidden = false;
       panel.focus({ preventScroll: true });
-      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      panel.scrollIntoView({ behavior: scrollBehavior(event), block: 'nearest' });
       track('calendar_day_open', { tool: mode });
     }
     if (event.target.closest('[data-close-day]')) {
@@ -385,6 +388,10 @@ export async function mount(root) {
     if (!persist.checked) { storageStatus.textContent = temporary ? tr("현재 탭에만 임시로 유지됩니다. 기존 기기 저장본은 삭제 버튼으로 지울 수 있습니다.", "Kept temporarily in this tab. Use Delete to remove any existing saved profiles.") : tr("이 브라우저는 저장을 제한하고 있습니다. 현재 화면에서만 결과를 볼 수 있습니다.", "This browser restricts storage. Results are available on this page only."); return temporary; }
     try {
       a0 = await save('a', a); if (b) b0 = await save('b', b);
+      if (currentInputs) {
+        currentInputs.a = withProfileReference(currentInputs.a, a0);
+        if (currentInputs.b) currentInputs.b = withProfileReference(currentInputs.b, b0);
+      }
       await refreshPeople();
       picker('a').value = a0.profileId; if (b) picker('b').value = b0.profileId;
       storageStatus.textContent = tr("이 기기에 저장했습니다.", "Saved on this device.");
@@ -397,8 +404,8 @@ export async function mount(root) {
     e.preventDefault();
     if (submitting) return;
     track('calc_attempt', { tool: mode, entry_point: originEntry });
-    const a = readForm(form, 'a');
-    const b = pair ? readForm(form, 'b') : null;
+    const a = withProfileReference(readForm(form, 'a'), a0);
+    const b = pair ? withProfileReference(readForm(form, 'b'), b0) : null;
     const errA = check(a), errB = b && check(b);
     if (errA || errB) { showError(errA || errB, errA ? 'a' : 'b'); return; }
     track('calc_submit', { tool: mode, entry_point: originEntry });

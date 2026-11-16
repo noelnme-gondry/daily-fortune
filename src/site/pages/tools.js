@@ -14,8 +14,8 @@ import { animalIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
 import { adSlot } from '../layout.js';
 import { birthTimeHint, displayNameField, personFields } from '../birth-form.js';
-import { dayExample, manseExample, yearExample, lifetimeExample, compatibilityExample } from '../public-examples.js';
-import { playExample } from '../play-examples.js';
+import { dayExample, manseExample, yearExample, lifetimeExample, compatibilityExample, homeReadingPreview } from '../public-examples.js';
+import { playExample, homeStoryPreview } from '../play-examples.js';
 import { yearGuide } from '../year-guide.js';
 import { nextTools } from '../tool-navigation.js';
 import { dayBox, weekBox, monthBox } from '../period-boxes.js';
@@ -187,14 +187,14 @@ export function home(ctx) {
     ['/saju-ranking/', siteText('내 사주 랭킹'), siteText('518,400가지 사주 중 내 사주는 몇 위?')],
     ['/saju/ilju-ranking/', siteText('60일주 랭킹'), siteText('평균 점수가 가장 높은 일주는?')],
   ];
-  const features = `<div class="home-features">${fun.slice(0, 2).map(([h, t, d], i) => `<a class="card home-feature" href="${h}"><span><small>${i === 0 ? tr('나의 아홉 장면', 'Nine chapters of your life') : tr('순위보다 흥미로운 이유', 'The reasons behind your rank')}</small><b>${siteValue(t)}</b><span>${d}</span><strong>${tr('살펴보기', 'Explore')} ↗</strong></span><img src="/characters/384/${i === 0 ? 'ranger' : 'stargazer'}.webp" width="160" height="160" alt=""></a>`).join('')}</div><a data-ga-cta="fun_card" class="home-ilju-link" href="/saju/ilju-ranking/">${tr('60일주끼리 비교한 랭킹도 있어요', 'Compare the 60 day pillars too')} ↗</a>`;
+  const features = `<div class="home-features">${fun.slice(0, 2).map(([h, t, d], i) => `<a class="card home-feature${i === 0 ? ' home-story-feature' : ''}" href="${h}"><span><small>${i === 0 ? tr('나의 아홉 장면', 'Nine chapters of your life') : tr('순위보다 흥미로운 이유', 'The reasons behind your rank')}</small><b>${siteValue(t)}</b><span>${d}</span><strong>${tr('살펴보기', 'Explore')} ↗</strong></span>${i === 0 ? `${homeStoryPreview(o)}<small class="home-story-note">${tr('위 가상 사례의 아홉 장면 중 세 장면입니다.', 'Three of nine chapters for the fictional chart above.')}</small>` : '<img src="/characters/384/stargazer.webp" width="160" height="160" loading="lazy" alt="">'}</a>`).join('')}</div><a data-ga-cta="fun_card" class="home-ilju-link" href="/saju/ilju-ranking/">${tr('60일주끼리 비교한 랭킹도 있어요', 'Compare the 60 day pillars too')} ↗</a>`;
   const body = `
     <section class="home-hero">
-      <div class="home-intro"><p class="eyebrow">${tr('나를 알아가며, 오늘을 만들어요', 'Know yourself. Make today your own.')}</p><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
+      <div class="home-intro"><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
       ${toolBlock('home', ctx)}
-      <div class="home-discovery"><h2 id="home-discovery-title">${siteText('재미로 보는 사주')}</h2>${features}<p class="note">${tr('사주는 전통 해석을 참고하는 도구입니다. 점수는 사건의 확률이나 사람의 가치를 뜻하지 않습니다.', 'Saju offers traditional interpretations for reflection. Scores are not event probabilities or a measure of anyone’s worth.')}</p>
-      </div>
+      ${homeReadingPreview(o)}
     </section>
+    <section class="home-discovery box-sec" aria-labelledby="home-discovery-title"><h2 id="home-discovery-title">${siteText('재미로 보는 사주')}</h2>${features}<p class="note">${tr('사주는 전통 해석을 참고하는 도구입니다. 점수는 사건의 확률이나 사람의 가치를 뜻하지 않습니다.', 'Saju offers traditional interpretations for reflection. Scores are not event probabilities or a measure of anyone’s worth.')}</p></section>
     ${ctx.lang === 'en' ? '<section class="box-sec home-purchases"><div class="sec-head"><h2>Premium fortune reports</h2><a href="/shop/">View all reports</a></div><p>Korean fortune reports: KRW 990 each as a one-time purchase, including a detailed reading and download.</p>' + productCards() + '</section>' : `<section class="box-sec home-purchases" aria-labelledby="home-purchases-title" lang="ko"><div class="sec-head"><h2 id="home-purchases-title">프리미엄 운세</h2><a href="/shop/">상품 전체 보기</a></div><p>토정비결·평생 사주·궁합. 일부 미리보기는 무료이며, 각각 990원 단건 결제 후 상세 풀이와 운세 다운로드를 제공합니다.</p>${productCards()}</section>`}
     <section class="box-sec home-services" aria-labelledby="home-services-title"><div class="sec-head"><h2 id="home-services-title">${tr('지금, 무엇이 궁금한가요?', 'What are you curious about?')}</h2></div><p class="note">${esc(FREE_ACCESS.description)}</p>${groupedLinks(o, '', 'purpose-groups home-purpose-groups')}</section>
     <nav class="reading-guides" aria-label="${tr('처음 읽는 분을 위한 안내', 'Guides for your first reading')}"><a href="/saju/guide/"><b>${tr('처음 보는 사주, 어디부터 읽을까요?', 'New to saju? Start here.')}</b><span>${tr('일간·오행·대운을 쉬운 말로 알아보세요.', 'Learn about Day Masters, elements and cycles.')}</span></a><a href="/about/"><b>${tr('결과는 어떻게 계산하나요?', 'How is a reading calculated?')}</b><span>${tr('계산 기준과 해석의 범위를 확인하세요.', 'Explore the method and its limits.')}</span></a></nav>

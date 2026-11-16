@@ -107,7 +107,8 @@ test('상단 저장·분야 펼침·섹션 도달은 개인 값을 보내지 않
   await expect(page.locator('[data-result-storage]')).toContainText('저장했습니다');
   await page.locator('[data-dismiss-profile-guide]').click();
   await page.locator('[data-reading-area][href="#reading-money"]').click();
-  await page.locator('#reading-money [data-dialog]').click();
+  await expect(page.locator('#reading-money [data-daily-basis]')).toBeVisible();
+  await page.locator('.chart-basis [data-dialog]').first().click();
   const events = await page.evaluate(() => window.critiqueEvents);
   for (const name of ['profile_save', 'reading_area_select', 'reading_detail_open', 'result_section_view']) expect(events.some(e => e[1] === name)).toBe(true);
   expect(JSON.stringify(events)).not.toMatch(/1990|1990-05-15|gender.*M|\bs=\d/);

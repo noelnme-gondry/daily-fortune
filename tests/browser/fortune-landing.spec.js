@@ -97,7 +97,7 @@ for (const lang of ['ko', 'en']) {
   });
 }
 
-test('홈의 저장 정보 버튼은 편집 중인 생일 대신 카드에 표시된 생일로 계산한다', async ({ page }) => {
+test('홈의 저장 정보를 수정하면 원래 카드가 접히고 제출한 생일로 계산한다', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await completeProfile(page);
@@ -110,8 +110,12 @@ test('홈의 저장 정보 버튼은 편집 중인 생일 대신 카드에 표�
   await saved.locator('[data-edit-profile]').click();
   await editProfile(page);
   await page.locator('#a-y').fill('1985');
-  await saved.locator('[data-saved-result]').click();
-  await expect(page.locator('.chart-disclosure .chart-card')).toBeVisible();
-  await expect(page.locator('#result .chart-head')).toContainText('1990.01.01');
+  await expect(saved).toBeHidden();
+  await expect(page.locator('#result .chart-card')).toHaveCount(0);
+  await page.locator('#tool-form [type=submit]').click();
+  await expect(page).toHaveURL(/\/today\/$/);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#result .chart-head')).toContainText('1985.01.01');
   await expect(page.locator('#a-y')).toHaveValue('1985');
+  expect(await page.evaluate(async () => (await import('/src/client/profile.js')).listPeople().then(people => people.map(person => person.profile.y)))).toEqual([1990, 1985]);
 });

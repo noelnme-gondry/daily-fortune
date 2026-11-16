@@ -20,7 +20,7 @@ async function fill(page) {
   await page.locator('[name="a-gender"][value="M"]').check();
   await page.locator('#a-time').fill('14:30');
 }
-const submit = page => page.locator('#tool-form [type="submit"]').click();
+const submit = async page => { await editProfile(page); await page.locator('#tool-form [type="submit"]').click(); };
 
 test('미입력 생일은 계산하지 않고 생일 필드와 오류를 연결한다', async ({ page }) => {
   await ready(page);
