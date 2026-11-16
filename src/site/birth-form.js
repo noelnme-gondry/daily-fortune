@@ -14,7 +14,7 @@ export function displayNameField(p) {
   return `<div class="field field-name"><label for="${p}-name">${label}</label>${input}${hint}</div>`;
 }
 
-export function personFields(p, legend, { deferDetails = false } = {}) {
+export function personFields(p, legend, { deferDetails = false, dateOnly = false } = {}) {
   const ms = [...Array(12).keys()].map((i) => `<option value="${i + 1}">${i + 1}${tr("월", "")}</option>`).join('');
   const ds = [...Array(31).keys()].map((i) => `<option value="${i + 1}">${i + 1}${tr("일", "")}</option>`).join('');
   return `<fieldset class="person" data-person="${p}">
@@ -25,7 +25,7 @@ export function personFields(p, legend, { deferDetails = false } = {}) {
       <div class="ymd"><input class="input" type="text" id="${p}-y" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="section-${p} bday-year" aria-label="${tr("태어난 해", "Birth year")}" placeholder="${tr('예시 1990', 'e.g. 1990')}" required><select class="input" id="${p}-m" aria-label="${tr("태어난 달", "Birth month")}" required><option value="">${tr('월', 'Month')}</option>${ms}</select><select class="input" id="${p}-d" aria-label="${tr("태어난 날", "Birth day")}" required><option value="">${tr('일', 'Day')}</option>${ds}</select></div>
       <label class="check"><input type="checkbox" id="${p}-leap" disabled>${tr(" 음력 윤달", " Lunar leap month")}</label>
     </fieldset>
-    <fieldset class="field field-gender"><legend>${tr("성별", "Gender")}</legend>
+    ${dateOnly ? '' : `<fieldset class="field field-gender"><legend>${tr("성별", "Gender")}</legend>
       <div class="seg"><label><input type="radio" name="${p}-gender" value="F" required><span>${tr("여성", "Female")}</span></label><label><input type="radio" name="${p}-gender" value="M" required><span>${tr("남성", "Male")}</span></label></div>
     </fieldset>
     <fieldset class="field field-time"><legend>${tr("태어난 시각 (선택)", "Birth time (optional)")}</legend>
@@ -35,6 +35,7 @@ export function personFields(p, legend, { deferDetails = false } = {}) {
       <label class="check"><input type="checkbox" id="${p}-notime">${tr(" 시간을 몰라요", " Time unknown")}</label>
       ${deferDetails ? '' : birthTimeHint(p)}
     </fieldset>
+    `}
     ${deferDetails ? '' : displayNameField(p)}
   </fieldset>`;
 }

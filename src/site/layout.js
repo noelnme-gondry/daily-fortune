@@ -191,7 +191,7 @@ ${partnerAdSlot(page)}
 <footer class="site-foot">
   <div class="wrap">
     <div class="foot-groups">${foot}</div>
-    <p class="foot-note">${tr(`${BRAND.name}는 생년월일시와 성별만으로 사주 원국을 세우고 운세를 계산합니다. 같은 입력이면 언제나 같은 결과가 나오며, 입력한 정보는 서버로 전송되지 않습니다. 운세는 참고용 콘텐츠입니다.`, `${BRAND.name} uses your birth date, time and gender to calculate a Korean saju reading in your browser. The same inputs produce the same results. Your birth details are not sent to our server. Readings are for reflection and entertainment.`)}</p>
+    <p class="foot-note">${tr(`${BRAND.name}는 생년월일시와 성별만으로 사주 원국을 세우고 운세를 계산합니다. 같은 입력이면 언제나 같은 결과가 나오며, 무료 계산기의 입력은 브라우저에서 처리합니다. 운세 상품의 미리보기·구매 정보는 서버에서 처리·보관합니다. 운세는 참고용 콘텐츠입니다.`, `${BRAND.name} uses your birth date, time and gender to calculate a Korean saju reading in your browser. The same inputs produce the same results. Free tools process birth details in your browser. Paid product previews and purchased reports are processed on our server. Readings are for reflection and entertainment.`)}</p>
     <p class="foot-note">${tr('운영', 'Operated by')} ${PUBLISHER.name} · <a href="mailto:${PUBLISHER.email}">${PUBLISHER.email}</a></p>
     <p class="foot-note">© ${ctx.today.y} ${BRAND.name}</p>
   </div>

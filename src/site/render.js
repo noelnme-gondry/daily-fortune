@@ -12,6 +12,7 @@ import * as saju from './pages/saju.js';
 import * as tti from './pages/tti.js';
 import * as manse from './pages/manse.js';
 import * as info from './pages/info.js';
+import { shopPage, productPage, ordersPage, resultPage } from './pages/shop.js';
 import { tojeongPage } from './pages/tojeong.js';
 import { sharePage } from './pages/share.js';
 import { config } from './config.js';
@@ -32,16 +33,21 @@ function routeTable(ctx) {
   const R = [];
   const add = (path, fn, o = {}) => R.push({ path, fn, priority: o.p ?? 0.6, changefreq: o.cf ?? 'monthly', daily: !!o.daily, feed: !!o.feed });
   add('/', tools.home, { p: 1, cf: 'daily', daily: true });
+  add('/shop/', shopPage, { p: 0.8 });
+  for (const id of ['tojeong', 'lifetime', 'compatibility']) add(`/shop/${id}/`, c => productPage(id, c), { p: 0.8 });
+  add('/shop/orders/', ordersPage, { p: 0 });
+  add('/shop/result/', resultPage, { p: 0 });
   add('/today/', tools.today, { p: 0.9, cf: 'daily', daily: true });
   add('/tomorrow/', tools.tomorrow, { p: 0.8, cf: 'daily', daily: true });
   add('/week/', tools.week, { p: 0.8, cf: 'weekly', daily: true });
   add('/month/', tools.month, { p: 0.8, cf: 'monthly', daily: true });
   add('/year/', tools.yearHub, { p: 0.7 });
   for (const yr of years) add(`/year/${yr}/`, (c) => tools.yearPage(yr, c), { p: 0.9 });
-  add('/tojeong/', tojeongPage, { p: 0.9 });
-  for (const yr of years.filter(yr => yr !== y)) add(`/tojeong/${yr}/`, (c) => tojeongPage(c, yr), { p: 0.8 });
-  add('/lifetime/', tools.lifetime, { p: 0.9 });
-  add('/compatibility/', tools.compatibility, { p: 0.9 });
+  const paidPage = (id, year) => c => ({ ...productPage(id, c, year), path: c.path });
+  add('/tojeong/', ctx.cfg.paidReadings ? paidPage('tojeong') : tojeongPage, { p: 0.9 });
+  for (const yr of years.filter(yr => yr !== y)) add(`/tojeong/${yr}/`, ctx.cfg.paidReadings && yr >= y ? paidPage('tojeong', yr) : (c) => tojeongPage(c, yr), { p: 0.8 });
+  add('/lifetime/', ctx.cfg.paidReadings ? paidPage('lifetime') : tools.lifetime, { p: 0.9 });
+  add('/compatibility/', ctx.cfg.paidReadings ? paidPage('compatibility') : tools.compatibility, { p: 0.9 });
   add('/life-story/', tools.story, { p: 0.9 });
   add('/saju-ranking/', tools.rank, { p: 0.9 });
   add('/manseryeok/', tools.manseryeok, { p: 0.8 });
@@ -140,7 +146,7 @@ export function createSite({ site, assets, now = Date.now() }) {
       return a ? `google.com, ${a.pub}, DIRECT, f08c47fec0942fa0\n` : '';
     },
     sitemap() {
-      const urls = routes.map((r) => `  <url><loc>${site}${r.path}</loc><lastmod>${lastmod(r)}</lastmod><changefreq>${r.changefreq}</changefreq><priority>${r.priority.toFixed(1)}</priority></url>`).join('\n');
+      const urls = routes.filter(r => !/\/shop\/(orders|result)\//.test(r.path)).map((r) => `  <url><loc>${site}${r.path}</loc><lastmod>${lastmod(r)}</lastmod><changefreq>${r.changefreq}</changefreq><priority>${r.priority.toFixed(1)}</priority></url>`).join('\n');
       return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
     },
     robots() {
@@ -174,7 +180,7 @@ ${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일�
 주요 사실:
 - 영어판 K-Fortune: ${site}/en/ — 동일한 기능·계산으로 영어 화면과 결과 해설을 제공합니다. 브라우저 기본 언어가 한국어가 아니면 영어판으로 연결되며, 직접 선택한 언어를 우선합니다.
 - 이용 요금: ${FREE_ACCESS.description}
-- 무료 토정비결은 음력 생년월일로 144괘를 구해 총운과 음력 12개월 한글 해설을 모두 제공합니다. 생시·성별을 사용하지 않으며 사주 신년운세와 별도 계산입니다. ${site}/tojeong/
+- 토정비결 상품은 990원 단건 결제로 총운·음력 12개월 상세 풀이와 다운로드를 제공합니다. 생시·성별을 사용하지 않으며 사주 신년운세와 별도 계산입니다. ${site}/shop/tojeong/
 - 년주는 입춘, 월주는 절기 절입 시각으로 바뀝니다. 시주는 동경 127.5° 평균태양시로 정하며, 현행 한국 표준시(UTC+9)·서머타임 미적용 기준으로 30분을 뺍니다. 이 기준에서 밤 11시 30분부터 다음 날 자시이며, 과거 표준시·서머타임 기간에는 경계가 달라집니다. 출생지별 진태양시는 계산하지 않습니다.
 - 시간 미상 처리와 한계: ${site}/about/#unknown-time . 시주를 제외하면 전체 오행·용신·운세 점수가 달라질 수 있으며 예측 정확도를 보장하지 않습니다.
 - 시진만 아는 경우 출생일의 표준시·서머타임에 맞춘 시계 기준 구간(평시 자시 23:30~01:30, 축시 01:30~03:30 …)에서 고르며, 구간 가운데 시각으로 같은 보정을 거쳐 계산합니다.
@@ -214,7 +220,7 @@ function llmsFull(ctx) {
   const out = [`# ${SITE.name} 전체 요약`, '', `> ${SITE.description}`, '', `출처: ${site}/ · 최종 업데이트 ${CONTENT_UPDATED}`, ''];
   out.push('## 계산 방법', '', ABOUT.lead, '');
   for (const s of ABOUT.sections) { out.push(`### ${s.h}`, ...s.items.map((i) => `- ${i}`), ''); }
-  out.push('## 무료 토정비결', '', TOJEONG.lead, TOJEONG.convention, TOJEONG.readingNote, TOJEONG.editionNote, `이용: ${site}/tojeong/`, `해설 출처 (MIT): ${TOJEONG.source}`, '');
+  out.push('## 토정비결 상품', '', '선택한 한 해·한 사람의 상세 풀이와 운세 다운로드를 990원 단건 결제로 제공합니다.', TOJEONG.convention, TOJEONG.readingNote, TOJEONG.editionNote, `이용: ${site}/shop/tojeong/`, `해설 출처 (MIT): ${TOJEONG.source}`, '');
   for (const f of TOJEONG.faq) out.push(`### ${f.q}`, f.a, '');
   out.push('## 사주 용어 사전', '');
   for (const g of GLOSSARY) out.push(`- **${g.term}(${g.hanja})**: ${g.def}`);
