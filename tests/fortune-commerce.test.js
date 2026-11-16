@@ -7,7 +7,7 @@ import { Duplex } from 'node:stream';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { createOrderStore, createCommerceService, createCommerceRouter } from '../src/server/fortune-commerce.js';
 import { createFortuneReport } from '../src/server/fortune-report.js';
-import { nicepayConfig, sha256, verifyNicepayPayment } from '../src/server/nicepay.js';
+import { nicepayConfig, createNicepayGateway, sha256, verifyNicepayPayment } from '../src/server/nicepay.js';
 import { FORTUNE_PRODUCTS } from '../src/domain/fortune-products.js';
 import { createSite } from '../src/site/render.js';
 
@@ -68,8 +68,34 @@ test('금액·서명·상점·state 위변조를 승인 전에 차단한다', as
   await assert.rejects(f.service.callback(f.auth, 'wrong-state'));
   assert.equal(f.approvals(), 0);
 });
-test('서명에 없는 주문번호까지 PG 거래 조회로 대조하여 다른 거래로 승인을 시도하지 않는다', async t => {
+test('최초 인증 콜백은 승인 전 거래 조회 없이 POST 승인하고 실제 다운로드까지 연결한다', async t => {
+  const f = await fixture(t), calls = [];
+  const config = { ...f.config, base: 'https://pg.example' };
+  const gateway = createNicepayGateway(config, async (url, options) => {
+    calls.push(options.method);
+    assert.equal(url, 'https://pg.example/v1/payments/TEST_TID');
+    if (options.method === 'GET' && !calls.includes('POST')) return { ok: true, status: 200, json: async () => ({ resultCode: 'A118', resultMsg: '조회 결과데이터 없음' }) };
+    if (options.method === 'POST') {
+      assert.deepEqual(JSON.parse(options.body), { amount: 990 });
+      assert.equal((await f.store.get(f.order.id)).tid, 'TEST_TID');
+    }
+    return { ok: true, status: 200, json: async () => f.payment(f.order, 'paid') };
+  });
+  const app = createCommerceRouter({ config, store: f.store, gateway });
+  const cookie = `fortune_buyer=${'a'.repeat(64)}`;
+  await f.store.put({ ...f.order, owner: sha256('a'.repeat(64)) });
+  const callback = await request(app, `/nicepay/return?state=${f.order.state}`, { method: 'POST', external: true, form: true, body: f.auth });
+  assert.equal(callback.headers.location, `/shop/result/?orderId=${f.order.id}`);
+  assert.deepEqual(calls, ['POST']);
+  assert.equal(callback.headers['set-cookie'], undefined);
+  const download = await request(app, `/orders/${f.order.id}/report?download=1`, { cookie });
+  assert.equal(download.status, 200);
+  assert.match(download.text, /<!doctype html>/);
+  assert.deepEqual(calls, ['POST', 'GET']);
+});
+test('기존 거래의 재전송은 PG 주문번호까지 대조하고 다른 거래를 재승인하지 않는다', async t => {
   const f = await fixture(t);
+  await f.store.put({ ...f.order, tid: 'TEST_TID' });
   const p = f.payment({ id: 'another-order' }); f.payments.set('TEST_TID', p);
   await assert.rejects(f.service.callback(f.auth, f.order.state));
   assert.equal(f.approvals(), 0);
@@ -79,6 +105,26 @@ test('정상 승인과 동시 콜백 재전송은 한 번만 청구하고 전체
   const ids = await Promise.all([f.service.callback(f.auth, f.order.state), f.service.callback(f.auth, f.order.state)]);
   assert.deepEqual(ids, [f.order.id, f.order.id]); assert.equal(f.approvals(), 1);
   assert.equal((await f.service.get(f.order.id, 'owner-a', true)).html, f.order.html);
+});
+test('재시작 후 승인 여부가 불확실한 기존 거래는 콜백으로 재청구하지 않는다', async t => {
+  const f = await fixture(t);
+  await f.store.put({ ...f.order, tid: 'TEST_TID' });
+  await assert.rejects(f.service.callback(f.auth, f.order.state), e => e.status === 409);
+  assert.equal(f.approvals(), 0);
+  await assert.rejects(f.service.get(f.order.id, 'owner-a', true), e => e.status === 402);
+  f.payments.set('TEST_TID', f.payment(f.order, 'paid'));
+  assert.equal(await f.service.callback(f.auth, f.order.state), f.order.id);
+  assert.equal(f.approvals(), 0);
+});
+test('최초 승인 응답의 다른 주문·금액·서명·통화는 다운로드 권한을 열지 않는다', async t => {
+  for (const changed of [{ orderId: 'another-order' }, { amount: 1 }, { signature: 'bad' }, { currency: 'USD' }]) {
+    const f = await fixture(t);
+    const invalid = { ...f.payment(f.order, 'paid'), ...changed };
+    const service = createCommerceService({ config: f.config, store: f.store, gateway: { approve: async () => invalid, lookup: async () => invalid, netCancel: async () => { throw new Error('unconfirmed cancellation'); } } });
+    await assert.rejects(service.callback(f.auth, f.order.state), e => e.status === 409);
+    assert.equal((await f.store.get(f.order.id)).status, 'REVIEW');
+    await assert.rejects(service.get(f.order.id, 'owner-a', true));
+  }
 });
 test('승인 응답 유실 뒤에는 PG 조회로 복구하고 취소·부분취소 후에는 다운로드를 차단한다', async t => {
   const f = await fixture(t);
@@ -192,6 +238,24 @@ test('DB 연결 실패 시 공개 설정도 결제를 닫고 접속 정보를 �
   const response = await request(app, '/config');
   assert.deepEqual(response.json(), { enabled: false, mode: 'sandbox', methods: ['card'] });
   assert.doesNotMatch(response.text, /secret|private-db/);
+});
+test('콜백 실패 로그에는 주문번호·작업·PG 코드만 남기고 토큰·키·PG 원문은 제외한다', async t => {
+  const f = await fixture(t), events = [];
+  const gateway = createNicepayGateway({ ...f.config, base: 'https://pg.example' }, async () => ({ ok: false, status: 401, json: async () => ({ resultCode: 'U100', resultMsg: 'private-provider-detail', authToken: f.auth.authToken, secretKey: f.config.secretKey }) }));
+  const app = createCommerceRouter({ config: f.config, store: f.store, gateway, reportPaymentError: e => events.push(e) });
+  const callback = await request(app, `/nicepay/return?state=${f.order.state}`, { method: 'POST', external: true, form: true, body: f.auth });
+  assert.equal(callback.headers.location, '/shop/orders/?payment=check');
+  assert.deepEqual(events, [{ orderId: f.order.id, status: 502, operation: 'approve', resultCode: 'U100', httpStatus: 401 }]);
+  const text = JSON.stringify(events);
+  for (const privateValue of [f.order.state, f.auth.authToken, f.auth.signature, f.config.clientId, f.config.secretKey, 'private-provider-detail']) assert.ok(!text.includes(privateValue));
+  assert.equal((await f.store.get(f.order.id)).status, 'REVIEW');
+});
+test('PG 네트워크·비 JSON 오류도 내부 응답을 노출하지 않는 작업별 오류로 변환한다', async t => {
+  const f = await fixture(t);
+  for (const fetcher of [async () => { throw new Error('private-network-url'); }, async () => ({ json: async () => { throw new Error('private-response'); } })]) {
+    const gateway = createNicepayGateway(f.config, fetcher);
+    await assert.rejects(gateway.approve('TEST_TID', 990), e => e.status === 502 && e.paymentOperation === 'approve' && !e.message.includes('private'));
+  }
 });
 
 test('결제수단 설정은 세 SDK 값을 보존하고 간편결제만 허용한 상점도 열며 잘못된 목록은 닫는다', () => {

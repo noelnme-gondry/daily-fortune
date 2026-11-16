@@ -45,7 +45,7 @@ test('Postgres 전환: 실제 SQL 엔진에서 주문·승인·권한·재시작
     const p = { resultCode: '0000', tid: 'PG_TEST_TID', orderId: order.id, amount: 990, balanceAmt: status === 'cancelled' ? 0 : 990, ediDate: '2026-11-16T12:00:00+09:00', currency: 'KRW', status };
     p.signature = sha256(`${p.tid}${p.amount}${p.ediDate}${config.secretKey}`); return p;
   }
-  const gateway = { lookup: async tid => payments.get(tid), approve: async tid => { approvals++; const p = { ...payments.get(tid), status: 'paid' }; payments.set(tid, p); return p; }, netCancel: async () => ({}) };
+  const gateway = { lookup: async tid => { if (!approvals) throw new PurchaseError('승인 전 조회 결과 없음', 502); return payments.get(tid); }, approve: async tid => { approvals++; const p = { ...payments.get(tid), status: 'paid' }; payments.set(tid, p); return p; }, netCancel: async () => ({}) };
   const one = createCommerceService({ config, store, gateway }), two = createCommerceService({ config, store: second, gateway });
   let order;
   await t.test('스키마 초기화 재시도에도 Library 데이터를 보존한다', async () => {
