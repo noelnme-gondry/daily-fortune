@@ -134,8 +134,11 @@ export function yearView(yr, months, today, { detailed = yr.year <= today.y, off
     `<section class="box card"><div class="box-head"><h3>${tr(`${yr.year}년 월별 흐름`, `Monthly scores for ${yr.year}`)}</h3><span class="muted">${tr("각 달 15일의 절기 월주 기준", "Based on the solar-term month pillar on the 15th")}</span></div>${ymChart(months, curM)}</section>` +
     `<div class="months">${months.map((m) => `<article class="mcard card${m.m === curM ? ' cur' : ''}"><div class="mcard-top"><h3>${tr(`${m.m}월`, `M${m.m}`)}<small>${hz(m.pillar)}</small></h3><span class="num">${m.score}</span></div><h4>${esc(m.headline)}</h4>${detailed ? `<p>${esc(m.text)}</p>` : ''}<div class="chips"><span class="chip"><em>${tr("강점", "Strength")}</em>${m.best.name} ${m.best.score}</span>${detailed && m.worst ? `<span class="chip"><em>${tr("주의", "Take care")}</em>${m.worst.name} ${m.worst.score}</span>` : ''}</div></article>`).join('')}</div>`;
   if (!detailed) return overview + calendar;
-  return `<section class="reading-chapter" id="reading-annual">${overview}</section>
-    <section class="reading-chapter" id="reading-months">${calendar}</section>` + annualPlan(yr, months);
+  const report = offline
+    ? `<section class="reading-chapter" id="reading-annual">${overview}</section>
+       <section class="reading-chapter" id="reading-months">${calendar}</section>`
+    : overview + calendar;
+  return report + annualPlan(yr, months);
 }
 
 /* ── 만세력 ───────────────────────────── */
