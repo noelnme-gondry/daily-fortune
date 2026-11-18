@@ -57,6 +57,26 @@ test('띠별 SPA 메뉴 이동에서도 추천 상품과 노출의 페이지 경
   await expect.poll(() => events(page, 'view_item_list')).toHaveLength(2);
   expect((await events(page, 'view_item_list'))[1].page_path).toBe(`/tti/${todayKST().y}/`);
 });
+test('모바일 상품 목록은 읽을 크기의 목차와 넓은 구매 버튼을 제공한다', async ({ page }) => {
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/shop/');
+    for (const card of await page.locator('.fortune-product').all()) {
+      const metrics = await card.evaluate(el => {
+        const button = el.querySelector('.btn'), s = window.getComputedStyle(el), b = button.getBoundingClientRect();
+        return { buttonWidth: b.width, buttonHeight: b.height, contentWidth: el.clientWidth - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight), size: parseFloat(window.getComputedStyle(el.querySelector('.reading-contents-cell strong')).fontSize) };
+      });
+      expect(metrics.buttonWidth).toBeCloseTo(metrics.contentWidth, 0);
+      expect(metrics.buttonHeight).toBeGreaterThanOrEqual(52);
+      expect(metrics.size).toBeGreaterThanOrEqual(16);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await preview(page);
+    const pay = page.locator('[data-purchase-pay]');
+    expect(await pay.evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(52);
+    expect(await pay.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+  }
+});
 test('개인 무료 결과를 계산한 뒤에만 프리미엄 박스를 제공한다', async ({ page }) => {
   await page.goto('/today/');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');

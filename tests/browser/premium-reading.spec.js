@@ -50,6 +50,24 @@ for (const productId of ids) for (const colorScheme of ['light', 'dark']) test(`
     await page.setViewportSize({ width, height: 900 });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
     expect(await frame.locator('html').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+    if (width === 320) {
+      expect(await frame.locator('.download-report').evaluate(el => parseFloat(window.getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(18);
+      for (const link of await frame.locator('.reading-toc a').all()) {
+        expect(await link.evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(48);
+        expect(await link.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      }
+      if (productId === 'compatibility') {
+        await frame.locator('#reading-years .reading-fold > summary').first().click();
+        const table = frame.locator('.reading-table-wrap[role="region"]');
+        await table.scrollIntoViewIfNeeded();
+        const firstColumn = table.locator('tbody th').first();
+        const beforeX = (await firstColumn.boundingBox()).x;
+        await table.focus();
+        await table.press('ArrowRight', { delay: 150 });
+        await expect.poll(() => table.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
+        expect(Math.abs((await firstColumn.boundingBox()).x - beforeX)).toBeLessThan(2);
+      }
+    }
   }
   const events = await page.evaluate(() => window.commerceEvents.filter(e => e[1] === 'purchase'));
   expect(events).toHaveLength(1);

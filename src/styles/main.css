@@ -1401,3 +1401,23 @@ body:has(dialog[open]) { overflow: hidden; }
   .rank-evidence { grid-template-columns: minmax(0, 1fr); }
   .site-menu { padding: 16px; }
 }
+
+/* 휴대폰에서는 풀이 본문을 먼저 읽고, 상품 선택은 넓은 버튼으로 이어간다. */
+@media (max-width: 760px) {
+  main { font-size: 17px; line-height: 1.85; }
+  .cat p, .daily-cat p, .tti-traits p, .tti-row p, .monthly-flow p, .life-event-body, .explanation-body p { font-size: 17px; line-height: 1.9; }
+  .reading-large :is(.cat p, .daily-reading-body p, .overall-basis p, .chart-basis p) { font-size: 19px; line-height: 1.95; }
+  .reading-controls { padding-inline: 0; }
+  .cats, .cats-static { padding-inline: 16px; }
+  .fortune-product { padding: 20px; }
+  .fortune-product-bottom { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .fortune-product-bottom .btn, .purchase-order .btn, .fortune-shop #purchase-form > .btn, .purchase-review .form-actions > button { width: 100%; min-height: 52px; padding: 12px 16px; font-size: 16px; white-space: normal; text-align: center; }
+  .purchase-review .form-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .purchase-order .hint, .purchase-details dd { overflow-wrap: anywhere; }
+  .reading-contents.is-compact .reading-contents-cell strong, .reading-contents-cell span { font-size: 16px; line-height: 1.7; }
+  .reading-contents-file, .premium-entry-action span { font-size: 15px; }
+}
+@media (max-width: 380px) {
+  .reading-contents, .reading-contents.is-compact { grid-template-columns: minmax(0, 1fr); }
+  .purchase-details div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+}
