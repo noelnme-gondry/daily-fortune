@@ -12,6 +12,7 @@ import * as saju from './pages/saju.js';
 import * as tti from './pages/tti.js';
 import * as manse from './pages/manse.js';
 import * as info from './pages/info.js';
+import { annualPath } from './product-path.js';
 import { shopPage, productPage, ordersPage, resultPage } from './pages/shop.js';
 import { tojeongPage, tojeongYearReference } from './pages/tojeong.js';
 import { lifetimeExample, compatibilityExample } from './public-examples.js';
@@ -37,6 +38,7 @@ function routeTable(ctx) {
   add('/', tools.home, { p: 1, cf: 'daily', daily: true });
   add('/shop/', shopPage, { p: 0.8 });
   for (const id of ['tojeong', 'lifetime', 'compatibility']) add(`/shop/${id}/`, c => productPage(id, c), { p: 0.8 });
+  add(annualPath(y + 1), c => productPage('annual', c, y + 1), { p: 0.9 });
   add('/shop/orders/', ordersPage, { p: 0 });
   add('/shop/result/', resultPage, { p: 0 });
   add('/today/', tools.today, { p: 0.9, cf: 'daily', daily: true });
@@ -133,6 +135,9 @@ export function createSite({ site, assets, now = Date.now() }) {
 
   // 같은 내용을 두 주소로 두지 않는다: 올해 연도의 토정비결 주소는 /tojeong/으로 보낸다.
   const redirects = new Map([[`/tojeong/${ctx.today.y}/`, '/tojeong/'], [`/en/tojeong/${ctx.today.y}/`, '/en/tojeong/']]);
+  for (const year of ctx.years.filter(y => y <= today.y)) {
+    for (const prefix of ['', '/en']) redirects.set(prefix + annualPath(year), `${prefix}/year/${year}/`);
+  }
   return {
     ctx, routes,
     has: (path) => byPath.has(path),

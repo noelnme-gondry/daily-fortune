@@ -33,8 +33,8 @@ async function fixture(t) {
   return { config, store, service, order, auth, payment, payments, approvals: () => approvals, cancellations: () => cancellations, fail: (cancel = false) => { failApproval = true; failCancel = cancel; } };
 }
 
-test('세 상품은 각각 990원 KRW 단건 구매 단위를 갖는다', () => {
-  assert.deepEqual(FORTUNE_PRODUCTS.map(p => [p.id, p.price, p.people]), [['tojeong', 990, 1], ['lifetime', 990, 1], ['compatibility', 990, 2]]);
+test('네 상품은 각각 990원 KRW 단건 구매 단위를 갖는다', () => {
+  assert.deepEqual(FORTUNE_PRODUCTS.map(p => [p.id, p.price, p.people]), [['tojeong', 990, 1], ['lifetime', 990, 1], ['compatibility', 990, 2], ['annual', 990, 1]]);
   for (const p of FORTUNE_PRODUCTS) assert.equal(p.currency, 'KRW');
 });
 for (const id of ['tojeong', 'lifetime', 'compatibility']) test(`${id}: 기존 엔진으로 상세 파일을 생성하고 모든 토정 월을 파일에 포함한다`, () => {
@@ -306,4 +306,35 @@ test('실제 API: 공개 수단 목록과 선택한 결제수단을 연결하고
   }
   assert.equal((await request(app, url, { method: 'POST', cookie, body: { method: 'vbank' } })).status, 400);
   assert.equal((await request(app, url, { method: 'POST', cookie, body: {} })).json().method, 'card');
+});
+
+test('한국 시간 새해에 상세판이 무료로 이동하고 지난 연도의 미결제 주문은 다시 결제할 수 없다', async t => {
+  let clock = Date.parse('2026-12-31T23:59:59+09:00');
+  const next = clock + 1000;
+  const siteAt = now => createSite({ site: 'https://example.org', assets: {}, now });
+  const before = siteAt(clock), after = siteAt(next);
+  for (const prefix of ['', '/en']) {
+    assert.ok(before.has(prefix + '/year/2027/premium/'));
+    assert.match(before.render(prefix + '/shop/'), /href="(?:\/en)?\/year\/2027\/premium\/"/);
+    assert.equal(after.redirect(prefix + '/year/2027/premium/'), prefix + '/year/2027/');
+    assert.match(before.render(prefix + '/year/2026/'), /data-annual-tier="full"/);
+    assert.match(before.render(prefix + '/year/2027/'), /data-annual-tier="preview"/);
+    assert.match(after.render(prefix + '/year/2027/'), /data-annual-tier="full"/);
+    assert.match(after.render(prefix + '/year/2028/'), /data-annual-tier="preview"/);
+    assert.ok(after.has(prefix + '/year/2028/premium/'));
+    assert.match(after.render(prefix + '/shop/'), /href="(?:\/en)?\/year\/2028\/premium\/"/);
+  }
+  const { config, store } = await fixture(t);
+  const service = createCommerceService({ config, store, now: () => clock });
+  const buy = { ...input('annual'), targetYear: 2027 };
+  const order = await service.create(buy, 'annual-buyer');
+  assert.match((await service.payment(order.id, 'annual-buyer')).goodsName, /2027년 프리미엄 운세/);
+  clock = next;
+  assert.equal((await service.list('annual-buyer'))[0].canPay, false);
+  await assert.rejects(service.create(buy, 'annual-buyer'), /연도/);
+  await assert.rejects(service.payment(order.id, 'annual-buyer'), /무료/);
+  const nextOrder = await service.create({ ...buy, targetYear: 2028 }, 'annual-buyer');
+  assert.match(nextOrder.title, /2028년/);
+  assert.notEqual(order.id, nextOrder.id);
+  assert.equal((await store.get(order.id)).html, order.html);
 });

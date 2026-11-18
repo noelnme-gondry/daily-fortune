@@ -1,9 +1,9 @@
 import { PUBLISHER } from '../publisher.js';
 import { PERIOD_SCORE_LIMITS } from '../../engine/fortune.js';
-const freeDescription = 'Basic fortunes and birth-chart tools are free without an account. Korean Tojeong, lifetime saju and compatibility products each cost KRW 990 as a one-time purchase, including the detailed report and an HTML download.';
+const freeDescription = 'Basic fortunes and birth-chart tools are free without an account. Korean annual, Tojeong, lifetime saju and compatibility products each cost KRW 990 as a one-time purchase, including the detailed report and an HTML download.';
 export const FREE_ACCESS = { summary: 'Daily fortunes and saju, no sign-up', description: freeDescription };
 export const FREE_FAQ = { q: 'Which readings are free, and which are paid?', a: freeDescription };
-export const SITE = { name: 'K-Fortune', alt: 'K-Fortune', searchName: 'K-Fortune | Korean Saju & Fortune', tagline: FREE_ACCESS.summary, description: 'Explore free daily fortunes and birth charts, plus Korean Tojeong, lifetime and compatibility reports at KRW 990 each with an HTML download.', publisher: PUBLISHER.name };
+export const SITE = { name: 'K-Fortune', alt: 'K-Fortune', searchName: 'K-Fortune | Korean Saju & Fortune', tagline: FREE_ACCESS.summary, description: 'Explore free daily fortunes and birth charts, plus Korean annual, Tojeong, lifetime and compatibility reports at KRW 990 each with an HTML download.', publisher: PUBLISHER.name };
 const unknownSummary = 'Choosing “Time unknown” excludes the hour pillar, its Ten Gods, hidden stems and life stage, and any relationships involving it. Element balance, strength, the useful element and fortune scores are recalculated from three pillars, so the overall reading may change.';
 const unknownBoundary = 'For unknown birth times, the calculation library uses a noon reference to determine the year, month and day pillars and decade cycles. This does not recover your actual birth time. Near solar-term or date boundaries, the chart and decade-cycle start may differ from a calculation using the actual time.';
 const common = [

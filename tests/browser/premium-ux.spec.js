@@ -110,7 +110,7 @@ for (const width of [390, 1440]) test(`${width}px: 상단 프리미엄 운세는
   await expect(page).toHaveURL(/\/shop\/$/);
   await expect(page.locator('h1')).toHaveText('나를 위한운세 한 권');
   await expect(premium).toHaveAttribute('aria-current', 'page');
-  await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(3);
+  await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(4);
   await expect(page.locator('#purchase-form')).toHaveCount(0);
   for (const [id, name] of [['tojeong', '토정비결'], ['lifetime', '평생 사주'], ['compatibility', '궁합']]) {
     await page.getByRole('link', { name: `${name} 선택`, exact: true }).click();
@@ -118,7 +118,7 @@ for (const width of [390, 1440]) test(`${width}px: 상단 프리미엄 운세는
     await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
     await premium.click();
     await expect(page).toHaveURL(/\/shop\/$/);
-    await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(3);
+    await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(4);
   }
 });
 test('영문 상단 프리미엄 메뉴도 상품 목록 안내를 거쳐 한국어 상품 선택으로 이어진다', async ({ page }) => {
@@ -131,7 +131,7 @@ test('영문 상단 프리미엄 메뉴도 상품 목록 안내를 거쳐 한국
   await expect(premium).toHaveAttribute('aria-current', 'page');
   await page.getByRole('link', { name: 'Continue in Korean', exact: true }).click();
   await expect(page).toHaveURL(/\/shop\/$/);
-  await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(3);
+  await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(4);
 });
 for (const path of ['/tojeong/', '/lifetime/', '/compatibility/']) test(`${path}: 기존 주소에서도 무료 전체 풀이 대신 990원 미리보기·구매 화면을 연다`, async ({ page }) => {
   await page.goto(path);

@@ -13,7 +13,7 @@ test.beforeEach(async ({ context, page }) => {
   await page.route('**/api/commerce/config', route => route.fulfill({ json: { enabled: true, mode: 'sandbox', methods: ['card'] } }));
 });
 async function preview(page, product = 'lifetime') {
-  await page.goto(`/${product}/`);
+  await page.goto(product === 'annual' ? `/year/${todayKST().y + 1}/premium/` : `/${product}/`);
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
   for (const who of product === 'compatibility' ? ['a', 'b'] : ['a']) {
     await page.locator(`#${who}-name`).fill('비공개테스트');
@@ -91,11 +91,12 @@ test('개인 무료 결과를 계산한 뒤에만 프리미엄 박스를 제공�
   await page.locator('.premium-entry [data-commerce-select]').scrollIntoViewIfNeeded();
   await expect.poll(() => events(page, 'view_item_list')).toHaveLength(1);
 });
-for (const product of ['tojeong', 'lifetime', 'compatibility']) test(`${product}: 미리보기·결제 시도·PG 전달·오류는 별개이고 매출을 만들지 않는다`, async ({ page }) => {
+for (const product of ['tojeong', 'lifetime', 'compatibility', 'annual']) test(`${product}: 미리보기·결제 시도·PG 전달·오류는 별개이고 매출을 만들지 않는다`, async ({ page }) => {
   await page.route('**/api/commerce/orders', route => route.fulfill({ json: { id: orderId, status: 'PENDING' } }));
   await page.route(`**/api/commerce/orders/${orderId}/payment`, route => route.fulfill({ json: { orderId, method: 'card', amount: 990 } }));
   await preview(page, product);
   expect(await events(page, 'view_item')).toHaveLength(1);
+  expect(await events(page, `view_${product}`)).toHaveLength(1);
   expect(await events(page, 'begin_checkout')).toHaveLength(1);
   expect(await events(page, 'payment_attempt')).toHaveLength(0);
   expect(await events(page, 'add_payment_info')).toHaveLength(0);
@@ -138,4 +139,16 @@ test('내부 계산 source를 획득 소스로 보내지 않고 정상 캠페인
   expect(result).toHaveLength(4);
   for (const params of result) { expect(params).not.toHaveProperty('source'); expect(params).toHaveProperty('calc_origin'); }
   expect(await events(page, 'test_campaign')).toMatchObject([{ source: 'newsletter' }]);
+});
+
+test('상점 조회와 내년 무료 운세의 유료 진입은 각 경로에서 한 번만 기록한다', async ({ page }) => {
+  const year = todayKST().y + 1;
+  await page.goto('/shop/');
+  await expect.poll(() => events(page, 'view_shop')).toHaveLength(1);
+  await page.goto(`/year/${year}/`);
+  expect(await events(page, 'view_annual')).toEqual([]);
+  await page.locator('.reading-entry a').filter({ hasText: '프리미엄' }).click();
+  await expect(page).toHaveURL(new RegExp(`/year/${year}/premium/$`));
+  await expect.poll(() => events(page, 'view_annual')).toMatchObject([{ reading_year: year }]);
+  expect(await events(page, 'view_shop')).toEqual([]);
 });

@@ -7,8 +7,8 @@ import { buildChart, lifetime } from '../../src/engine/index.js';
 
 const today = { y: 2026, m: 11, d: 16 };
 const person = { name: '구매 검증', calendar: 'solar', y: 1990, m: 5, d: 17, gender: 'M', noTime: true, timeMode: 'exact' };
-const ids = ['tojeong', 'lifetime', 'compatibility'];
-const report = id => createFortuneReport({ productId: id, people: id === 'compatibility' ? [person, { ...person, name: '두 번째', gender: 'F', y: 1991 }] : [person], targetYear: 2026, privacyConsent: true }, today);
+const ids = ['tojeong', 'lifetime', 'compatibility', 'annual'];
+const report = id => createFortuneReport({ productId: id, people: id === 'compatibility' ? [person, { ...person, name: '두 번째', gender: 'F', y: 1991 }] : [person], targetYear: id === 'annual' ? today.y + 1 : 2026, privacyConsent: true }, today);
 async function mockOrder(page, productId, { status = 'PAID', mode = 'live', reportStatus = 200, html } = {}) {
   const r = report(productId), id = `fortune_00000000-0000-4000-8000-00000000000${ids.indexOf(productId) + 1}`;
   const order = { id, productId, status, mode, amount: 990, title: r.title, canPay: false };
@@ -24,7 +24,7 @@ test.beforeEach(async ({ context }) => {
 for (const productId of ids) for (const colorScheme of ['light', 'dark']) test(`${productId} ${colorScheme}: 실제 구매 화면·박스 구성·목차·펼침·높이·오프라인·GA`, async ({ page, context }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ colorScheme });
-  await page.goto(`/shop/${productId}/`);
+  await page.goto(productId === 'annual' ? '/year/2027/premium/' : `/shop/${productId}/`);
   await expect(page.locator('.shop-contents .reading-contents-cell')).toHaveCount(READING_CHAPTERS[productId].length);
   await expect(page.locator('.shop-contents img')).toHaveCount(0);
   const orderId = await mockOrder(page, productId);
@@ -71,6 +71,9 @@ for (const productId of ids) for (const colorScheme of ['light', 'dark']) test(`
   }
   const events = await page.evaluate(() => window.commerceEvents.filter(e => e[1] === 'purchase'));
   expect(events).toHaveLength(1);
+  const specific = await page.evaluate(id => window.commerceEvents.filter(e => e[1] === `purchase_${id}`), productId);
+  expect(specific).toHaveLength(1);
+  expect(specific[0][2]).not.toHaveProperty('value');
   expect(events[0][2]).toMatchObject({ transaction_id: orderId, value: 990, currency: 'KRW', items: [{ item_id: productId, quantity: 1 }] });
   expect(JSON.stringify(events)).not.toContain(person.name);
   await page.reload();

@@ -1,3 +1,5 @@
+import { todayKST } from '../engine/core.js';
+import { fortuneProduct, productEdition } from '../domain/fortune-products.js';
 import express from 'express';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { mkdir, readFile, writeFile, rename, readdir } from 'node:fs/promises';
@@ -30,7 +32,8 @@ export function createOrderStore(directory) {
     },
   };
 }
-const publicOrder = o => ({ id: o.id, productId: o.productId, title: o.title, amount: o.amount, status: o.status, mode: o.mode, createdAt: o.createdAt, canPay: o.status === 'PENDING' && !o.tid && Date.now() - o.createdAt < 86400000 });
+const retiredAnnual = (o, now) => o.productId === 'annual' && o.targetYear <= todayKST(now).y;
+const publicOrder = (o, time = Date.now()) => ({ id: o.id, productId: o.productId, targetYear: o.targetYear, freeAnnual: retiredAnnual(o, time), title: o.title, amount: o.amount, status: o.status, mode: o.mode, createdAt: o.createdAt, canPay: !retiredAnnual(o, time) && o.status === 'PENDING' && !o.tid && time - o.createdAt < 86400000 });
 
 export function createCommerceService({ config, store, gateway, now = Date.now }) {
   const locks = new Map();
@@ -56,13 +59,13 @@ export function createCommerceService({ config, store, gateway, now = Date.now }
     async create(input, owner) {
       ready();
       if (input.purchaseConsent !== true) throw new PurchaseError('상품과 단건 결제 금액을 확인해 주세요.');
-      const report = createFortuneReport(input);
+      const report = createFortuneReport(input, todayKST(now()));
       const fingerprint = sha256(JSON.stringify(report.normalized));
       return lock(`owner:${owner}`, async db => {
         const existing = (await db.own(owner)).find(o => o.fingerprint === fingerprint && o.mode === config.mode && o.clientId === config.clientId && (o.status === 'PAID' || (o.status === 'PENDING' && now() - o.createdAt < 24 * 60 * 60 * 1000)));
         if (existing) return existing;
         const state = randomBytes(32).toString('hex');
-        const order = { id: `fortune_${randomUUID()}`, owner, productId: report.product.id, amount: report.product.price, title: report.title, html: report.html, fingerprint, state, status: 'PENDING', createdAt: now(), mode: config.mode, clientId: config.clientId, consentVersion: '2026-11-16' };
+        const order = { id: `fortune_${randomUUID()}`, owner, productId: report.product.id, targetYear: report.normalized.targetYear, amount: report.product.price, title: report.title, html: report.html, fingerprint, state, status: 'PENDING', createdAt: now(), mode: config.mode, clientId: config.clientId, consentVersion: '2026-11-16' };
         await db.put(order);
         return order;
       });
@@ -109,21 +112,22 @@ export function createCommerceService({ config, store, gateway, now = Date.now }
         return o.id;
       });
     },
-    async list(owner) { ready(); return (await store.own(owner)).map(publicOrder); },
+    async list(owner) { ready(); return (await store.own(owner)).map(o => publicOrder(o, now())); },
     async get(id, owner, full = false) {
       ready();
       return lock(id, async db => {
         const order = await refresh(await owned(id, owner, db), db);
         if (full && order.status !== 'PAID') throw new PurchaseError('결제 승인 후 상세 풀이와 다운로드를 이용할 수 있습니다.', 402);
-        return full ? order : publicOrder(order);
+        return full ? order : publicOrder(order, now());
       });
     },
     async payment(id, owner, method = 'card') {
       ready();
       if (typeof method !== 'string' || !(config.methods || ['card']).includes(method)) throw new PurchaseError('이용할 수 없는 결제수단입니다. 결제수단을 다시 선택해 주세요.');
       const o = await owned(id, owner, store); sameShop(o);
+      if (retiredAnnual(o, now())) throw new PurchaseError('해당 연도의 상세 운세는 이제 무료입니다.', 409);
       if (o.status !== 'PENDING' || o.tid || now() - o.createdAt > 24 * 60 * 60 * 1000) throw new PurchaseError('구매 보관함에서 주문 상태를 확인해 주세요.', 409);
-      return { clientId: config.clientId, method, orderId: o.id, amount: o.amount, goodsName: `운세 ${o.productId === 'lifetime' ? '평생 사주' : o.productId === 'tojeong' ? '토정비결' : '궁합'}`, returnUrl: `${config.origin}/api/commerce/nicepay/return?state=${o.state}` };
+      return { clientId: config.clientId, method, orderId: o.id, amount: o.amount, goodsName: `운세 ${productEdition(fortuneProduct(o.productId), o.targetYear).name}`, returnUrl: `${config.origin}/api/commerce/nicepay/return?state=${o.state}` };
     },
   };
 }

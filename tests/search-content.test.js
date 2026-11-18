@@ -16,8 +16,8 @@ const site = createSite({ site: origin, assets: { js: '/app.js', css: '/app.css'
 const core = ['/today/', '/manseryeok/', '/year/2027/', '/tojeong/2027/', '/about/'];
 
 test('핵심 5개는 초기 HTML·자기 canonical·색인 허용·사이트맵과 일관된 브랜드를 제공한다', () => {
-  assert.equal(site.routes.filter((r) => !r.lang).length, 211 + READING_GUIDES.length, '기존 한국어 경로와 가이드 목록의 모든 경로를 제공한다');
-  assert.equal(site.routes.filter((r) => r.lang === 'en').length, 211 + READING_GUIDES.length, '각 경로에 대응하는 영어판을 제공한다');
+  assert.equal(site.routes.filter((r) => !r.lang).length, 212 + READING_GUIDES.length, '기존 한국어 경로와 가이드 목록의 모든 경로를 제공한다');
+  assert.equal(site.routes.filter((r) => r.lang === 'en').length, 212 + READING_GUIDES.length, '각 경로에 대응하는 영어판을 제공한다');
   for (const path of core) {
     const html = site.render(path);
     assert.ok(html.includes(`<link rel="canonical" href="${origin}${path}">`));

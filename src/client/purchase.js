@@ -94,7 +94,7 @@ async function mountProduct(root) {
     error('');
     if (!$('#purchase-privacy').checked) { trackCheckoutError(id, 'preview', 'consent_required'); error('출생 정보 처리에 동의해 주세요.'); $('#purchase-privacy').focus(); return; }
     const read = who => dateOnly ? { name: $('#a-name').value.trim(), y: +$('#a-y').value, m: +$('#a-m').value, d: +$('#a-d').value, calendar: form.querySelector('[name="a-cal"]:checked').value, leap: !$('#a-leap').disabled && $('#a-leap').checked } : readForm(form, who);
-    input = { productId: id, people: [read('a'), ...(pair ? [read('b')] : [])], targetYear: dateOnly ? +$('#purchase-year').value : undefined, privacyConsent: true };
+    input = { productId: id, people: [read('a'), ...(pair ? [read('b')] : [])], targetYear: dateOnly ? +$('#purchase-year').value : Number(root.dataset.readingYear) || undefined, privacyConsent: true };
     busy = true; const submit = form.querySelector('[type="submit"]'); submit.disabled = true;
     try {
       const p = await api('/preview', input);
@@ -134,7 +134,12 @@ async function mountResult() {
   if (order.status !== 'PAID') {
     $('[data-purchase-result-status]').textContent = '결제가 완료되지 않았습니다.';
     $('[data-purchase-result-note]').textContent = order.status === 'CANCELLED' ? '취소된 주문입니다. 상품을 다시 선택해 주세요.' : '결제 상태 확인이 필요합니다. 잠시 후 페이지를 새로고침하거나 주문번호와 함께 운영자에게 문의해 주세요.';
-    if (order.canPay) {
+    if (order.freeAnnual && Number.isInteger(order.targetYear)) {
+      const link = document.createElement('a');
+      link.href = `/year/${order.targetYear}/`;
+      link.textContent = `${order.targetYear}년 무료 상세 운세 보기`;
+      $('[data-purchase-result-note]').replaceChildren(link);
+    } else if (order.canPay) {
       const config = await api('/config'), field = document.createElement('div'); field.className = 'field purchase-method';
       field.innerHTML = '<label for="purchase-method">결제수단</label><select class="input" id="purchase-method" disabled></select>';
       const method = field.querySelector('select'); fillPaymentMethods(method, config);

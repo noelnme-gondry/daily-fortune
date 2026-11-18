@@ -2,6 +2,7 @@
 // 언어판은 동일 편집에서 함께 갱신했으므로 경로의 /en 접두사를 제거한다.
 export const CONTENT_BASE_DATE = '2026-10-16';
 export const CONTENT_REVISIONS = Object.freeze([
+  { date: '2026-11-18', match: /^\/(?:$|shop\/|year\/|privacy\/)/ },
   { date: '2026-11-16', match: /^\/shop\// },
   { date: '2026-11-16', match: /^\/(?:$|(?:today|tomorrow|week|month|lifetime|manseryeok|compatibility|life-story|saju-ranking)\/$|year\/\d{4}\/|tti\/)/ },
   { date: '2026-11-14', match: /^\/(?:$|(?:today|tomorrow|week|month|lifetime|manseryeok|compatibility|life-story|saju-ranking)\/$|year\/\d{4}\/)/ },

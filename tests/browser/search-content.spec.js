@@ -143,7 +143,8 @@ test('KR/EN 월별 공개 해설은 직접 계산·재계산·저장 복원 결�
         await expect(example.locator('[data-month-best]')).toHaveText(`${m.best.name} ${m.best.score}${points}`);
         await expect(example.locator('[data-month-explanation]')).toHaveText(m.text);
         const result = page.locator('#result .mcard').nth(m.m - 1);
-        await expect(result.locator('p')).toHaveText(m.text);
+        if (y === 2026) await expect(result.locator('p')).toHaveText(m.text);
+        else await expect(result.locator('p')).toHaveCount(0);
         await expect(result.locator('.chip').first()).toContainText(`${m.best.name} ${m.best.score}`);
       }
     }

@@ -179,7 +179,7 @@ export async function mount(root) {
     else if (mode === 'tomorrow') { res = day(ca, addDays(today, 1), 'tomorrow'); html += dayView(res, { scope: 'reading' }); }
     else if (mode === 'week') { res = week(ca, today); html += weekView(res, today); }
     else if (mode === 'month') { res = month(ca, today.y, today.m); html += monthView(res, today); }
-    else if (mode === 'year') { res = year(ca, yr, yr === today.y + 1 ? 'next' : 'this'); html += yearView(res, yearMonths(ca, yr), today); }
+    else if (mode === 'year') { res = year(ca, yr); html += yearView(res, yearMonths(ca, yr), today, { detailed: root.dataset.annualTier === 'full' }); }
     else if (mode === 'lifetime') { res = lifeTool.lifetime(ca, today); html += lifeTool.lifeView(res, ca, today); }
     else if (mode === 'compatibility') { res = compatTool.compat(ca, cb, today); html += compatTool.compatView(res, ca, cb, today); }
     else if (mode === 'manseryeok') { html += manseOverview(ca, a, today) + manseView(ca); }
