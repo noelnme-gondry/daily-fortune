@@ -10,7 +10,7 @@ import { PERIOD_SCORE_LIMITS } from '../engine/fortune.js';
 // 무료 이용 범위는 첫 화면·FAQ·구조화 데이터·AI용 요약에서 함께 사용합니다.
 export const FREE_ACCESS = bilingual({
   summary: '오늘의 운세부터 내 사주까지',
-  description: '기본 운세와 만세력은 회원가입 없이 무료로 이용할 수 있습니다. 운세 상품의 상세 풀이와 다운로드는 토정비결·평생 사주·궁합 각각 990원 단건 결제로 제공합니다.',
+  description: '기본 운세와 만세력은 회원가입 없이 무료로 이용할 수 있습니다. 운세 상품의 상세 풀이와 다운로드는 내년 신년운세·토정비결·평생 사주·궁합 각각 990원 단건 결제로 제공합니다.',
   price: '0',
   currency: 'KRW',
 }, EN.FREE_ACCESS);
@@ -21,7 +21,7 @@ export const SITE = bilingual({
   alt: BRAND.alt,
   searchName: `${BRAND.descriptor} | ${BRAND.name}`,
   tagline: FREE_ACCESS.summary,
-  description: '무료 운세·만세력과 990원 단건 운세 상품을 제공합니다. 토정비결·평생 사주·궁합 상품에는 상세 풀이와 다운로드가 포함됩니다.',
+  description: '무료 운세·만세력과 990원 단건 운세 상품을 제공합니다. 내년 신년운세·토정비결·평생 사주·궁합 상품에는 상세 풀이와 다운로드가 포함됩니다.',
   publisher: PUBLISHER.name,
 }, EN.SITE);
 
@@ -158,7 +158,7 @@ export function yearTool(y, rel) {
 export const HOME = bilingual({
   title: `무료운세 | 오늘의 운세·사주·궁합 - ${BRAND.name}`,
   h1: '오늘의 운세, 내 사주로 읽어보세요',
-  description: '오늘의 운세와 만세력은 무료로, 토정비결·평생 사주·궁합 상품은 각각 990원에 만나보세요. 단건 결제와 운세 다운로드를 제공합니다.',
+  description: '오늘의 운세와 만세력은 무료로, 내년 운세·토정비결·평생 사주·궁합은 각 990원에 읽고 파일로 보관하세요.',
   lead: '종합 흐름과 일곱 분야의 풀이, 조심할 점과 해석 근거까지. 생년월일을 넣으면 내 사주에 맞춰 펼쳐집니다.',
   faq: [
     FREE_FAQ,

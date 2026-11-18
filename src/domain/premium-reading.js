@@ -1,6 +1,13 @@
 // 풀이의 해석과 생활 적용만 보강한다. 점수·사주·토정 괘는 기존 엔진의 값을 사용한다.
 const closingChapter = { id: 'closing', title: '풀이를 읽고 난 뒤', titleEn: 'Practical next steps', detail: '걱정될 때의 대처·실천·사주 읽기 도움말' };
 export const READING_CHAPTERS = Object.freeze({
+  annual: [
+    { id: 'annual', title: '한 해의 총운', titleEn: 'Your year ahead', detail: '세운과 대운으로 읽는 종합·일곱 분야 풀이' },
+    { id: 'months', title: '열두 달의 흐름', titleEn: 'Twelve monthly readings', detail: '월별 점수·강점과 주의할 분야' },
+    { id: 'quarters', title: '세 달씩 세우는 계획', detail: '분기별 점수 변화와 강점을 활용할 제안' },
+    { id: 'plan', title: '분야별 계획 달력', detail: '일·돈·관계 등 일곱 분야에서 힘을 쓸 달과 여유를 둘 달' },
+    closingChapter,
+  ],
   tojeong: [
     { id: 'annual', title: '한 해의 총운', titleEn: 'Your year ahead', detail: '내 괘의 전체 흐름과 읽는 법' },
     { id: 'themes', title: '생활 속 여섯 가지 이야기', titleEn: 'Six areas of everyday life', detail: '일·재물·관계·가정·변화·쉼' },

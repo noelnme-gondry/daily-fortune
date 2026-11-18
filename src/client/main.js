@@ -10,7 +10,7 @@ import { initAdExperiment } from './ad-experiment.js';
 import { initMobileHeader } from './mobile-header.js';
 import { initLanguage } from './language.js';
 import { initProfileNavigation } from './profile-navigation.js';
-import { initCommerceLists } from './purchase-analytics.js';
+import { initCommerceLists, trackShopPage } from './purchase-analytics.js';
 
 initLanguage();
 initProfileNavigation();
@@ -25,6 +25,7 @@ initTips();
 initPageShare();
 initAutoEvents();
 initCommerceLists();
+trackShopPage();
 initInteractions();
 initTtiNavigation();
 initPartnerAd();

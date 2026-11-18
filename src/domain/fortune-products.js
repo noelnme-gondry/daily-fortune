@@ -5,6 +5,11 @@ export const FORTUNE_PRODUCTS = Object.freeze([
     { id: 'tojeong', name: '토정비결', nameEn: 'Tojeong', people: 1, description: '한 해의 흐름을 읽고, 내 생활에 맞게 준비하는 시간' },
     { id: 'lifetime', name: '평생 사주', nameEn: 'Lifetime saju', people: 1, description: '타고난 성향을 이해하고, 앞으로의 흐름을 살펴보세요' },
     { id: 'compatibility', name: '궁합', nameEn: 'Compatibility', people: 2, description: '두 사람의 차이를 이해하고, 함께 지낼 방법을 찾아보세요' },
+    { id: 'annual', name: '프리미엄 신년운세', nameEn: 'Premium annual fortune', people: 1, description: '일곱 분야의 흐름을 열두 달에 펼쳐 보고, 나에게 맞는 한 해 계획을 세워 보세요.' },
   ].map(p => Object.freeze({ ...p, price: 990, currency: 'KRW', chapters: READING_CHAPTERS[p.id], includes: READING_CHAPTERS[p.id].map(c => c.title) })),
 ]);
+export function productEdition(product, targetYear) {
+  if (product.id !== 'annual') return product;
+  return { ...product, name: `${targetYear}년 프리미엄 운세`, nameEn: `${targetYear} premium fortune` };
+}
 export const fortuneProduct = id => FORTUNE_PRODUCTS.find(p => p.id === id) || null;

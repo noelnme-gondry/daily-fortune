@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
-import { buildChart, lifetime, compat, todayKST, isoDate } from '../engine/index.js';
+import { buildChart, year, yearMonths, lifetime, compat, todayKST, isoDate } from '../engine/index.js';
 import { calculateTojeong } from '../domain/tojeong.js';
+import { yearView } from '../client/views.js';
 import { birthDateError } from '../domain/birth-input.js';
 import { resolveBirthTime } from '../domain/birth-time.js';
 import { birthTimesFor } from '../engine/chart.js';
@@ -54,7 +55,14 @@ export function createFortuneReport(input, today = todayKST()) {
       body = tojeongPremium(r, reading);
     } else {
       const charts = people.map(p => buildChart(engineInput(p)));
-      if (product.id === 'lifetime') {
+      if (product.id === 'annual') {
+        targetYear = input.targetYear;
+        if (targetYear !== today.y + 1) throw new PurchaseError('구매 가능한 연도가 바뀌었습니다. 최신 운세 목록을 확인해 주세요.', 409);
+        const annual = year(charts[0], targetYear);
+        title = `${people[0].name || '나'}의 ${targetYear}년 신년운세`;
+        summary = annual.overall.headline;
+        body = yearView(annual, yearMonths(charts[0], targetYear), today, { detailed: true, offline: true });
+      } else if (product.id === 'lifetime') {
         const r = lifetime(charts[0], today);
         title = `${people[0].name || '나'}의 평생 사주`;
         summary = r.dayMaster.summary;

@@ -14,7 +14,7 @@ import { trackPurchase, trackCommerceStep } from '../src/client/purchase-analyti
 const today = { y: 2026, m: 11, d: 16 };
 const person = { name: '가나다', calendar: 'solar', y: 1990, m: 5, d: 17, gender: 'M', noTime: true, timeMode: 'exact' };
 const partner = { ...person, name: '라마바', gender: 'F', y: 1991 };
-const input = id => ({ productId: id, people: id === 'compatibility' ? [person, partner] : [person], targetYear: 2026, privacyConsent: true });
+const input = id => ({ productId: id, people: id === 'compatibility' ? [person, partner] : [person], targetYear: id === 'annual' ? 2027 : 2026, privacyConsent: true });
 const readings = JSON.parse(readFileSync(new URL('../src/content/tojeong-144.json', import.meta.url), 'utf8'));
 for (const id of Object.keys(READING_CHAPTERS)) test(`${id}: 판매 목차 모두 실제 해설로 제공하고 도움말·오프라인 펼침을 포함한다`, () => {
   const { html } = createFortuneReport(input(id), today);
@@ -49,7 +49,7 @@ test('토정비결 분야 해설은 실제 원문을 인용하고, 없는 주제
   assert.match(html, /기대하는 돈과 이미 확보한 돈을 구분/);
   for (let m = 1; m <= 12; m++) assert.ok(html.includes(`id="tj-month-${m}"`));
 });
-for (const id of Object.keys(READING_CHAPTERS)) test(`${id}: 기존 주문 원본을 보존하며 테마·숨겨진 설명·마무리 안내를 갱신한다`, () => {
+for (const id of ['tojeong', 'lifetime', 'compatibility']) test(`${id}: 기존 주문 원본을 보존하며 테마·숨겨진 설명·마무리 안내를 갱신한다`, () => {
   const a = buildChart(person), b = buildChart(partner), r = calculateTojeong(person, 2026);
   const body = id === 'tojeong' ? tojeongView(r, readings[r.code], person.name) : id === 'lifetime' ? lifeView(lifetime(a, today), a, today) : compatView(compat(a, b, today), a, b, today);
   const order = { productId: id, title: '기존 구매', html: `<!doctype html><html><style>:root{color-scheme:light}</style><main class="download-report"><header>풀이 기준일 2026-11-16</header>${body}<footer>기존 안내</footer></main></html>` };
@@ -75,7 +75,8 @@ test('GA 구매: 승인된 실결제만 금액·통화·상품으로 기록하�
   const order = { id: 'fortune_00000000-0000-4000-8000-000000000001', productId: 'lifetime', title: '개인 이름의 사주', mode: 'live', status: 'PAID', amount: 990 };
   for (const changed of [{ mode: 'sandbox' }, { status: 'PENDING' }, { status: 'REVIEW' }, { status: 'CANCELLED' }, { amount: 1 }, { id: '' }]) assert.equal(trackPurchase({ ...order, ...changed }), false);
   assert.equal(trackPurchase(order), true); assert.equal(trackPurchase(order), false);
-  assert.equal(events.length, 1);
+  assert.deepEqual(events.map(e => e[1]), ['purchase', 'purchase_lifetime']);
+  assert.equal(events[1][2].value, undefined);
   assert.equal(events[0][1], 'purchase'); assert.equal(events[0][2].value, 990); assert.equal(events[0][2].currency, 'KRW');
   assert.equal(events[0][2].items[0].item_name, '평생 사주');
   assert.ok(!JSON.stringify(events).includes('개인 이름'));

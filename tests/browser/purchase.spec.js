@@ -21,10 +21,10 @@ async function fillPerson(page, who, year = '1990') {
   const gender = page.locator(`[name="${who}-gender"][value="F"]`);
   if (await gender.count()) await gender.check();
 }
-test('홈 상품군은 세 개이고 각각 990원 단건 구매 경로로 연결된다', async ({ page }) => {
+test('홈 상품군은 네 개이고 각각 990원 단건 구매 경로로 연결된다', async ({ page }) => {
   await page.goto('/');
   const cards = page.locator('.home-purchases .fortune-product');
-  await expect(cards).toHaveCount(3);
+  await expect(cards).toHaveCount(4);
   for (const id of ['tojeong', 'lifetime', 'compatibility']) await expect(page.locator(`.home-purchases a[href="/shop/${id}/"]`)).toBeVisible();
   await page.locator('.home-purchases a[href="/shop/lifetime/"]').click();
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');

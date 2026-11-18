@@ -1,7 +1,7 @@
 import { completeProfile, editProfile } from './helpers/profile.js';
 import { test, expect } from '@playwright/test';
 import { EXAMPLE_INPUT, MANSE_BOUNDARIES } from '../../src/site/public-examples.js';
-import { buildChart, day, year, yearMonths, pillarH } from '../../src/engine/index.js';
+import { buildChart, day, year, yearMonths, pillarH, todayKST } from '../../src/engine/index.js';
 import { withLanguage } from '../../src/i18n/runtime.js';
 
 test.beforeEach(async ({ context, page }) => {
@@ -126,7 +126,8 @@ test('KR/EN 월별 비교는 JS 없이 모바일에서 읽고 실제 백과로 �
 });
 
 test('KR/EN 월별 공개 해설은 직접 계산·재계산·저장 복원 결과와 같다', async ({ page }) => {
-  for (const prefix of ['', '/en']) for (const y of [2026, 2027]) {
+  const currentYear = todayKST().y;
+  for (const prefix of ['', '/en']) for (const y of [currentYear, currentYear + 1]) {
     const lang = prefix ? 'en' : 'ko', points = prefix ? ' points' : '점';
     const months = withLanguage(lang, () => yearMonths(buildChart({ ...EXAMPLE_INPUT }), y));
     await page.goto(`${prefix}/year/${y}/`);
@@ -143,7 +144,8 @@ test('KR/EN 월별 공개 해설은 직접 계산·재계산·저장 복원 결�
         await expect(example.locator('[data-month-best]')).toHaveText(`${m.best.name} ${m.best.score}${points}`);
         await expect(example.locator('[data-month-explanation]')).toHaveText(m.text);
         const result = page.locator('#result .mcard').nth(m.m - 1);
-        await expect(result.locator('p')).toHaveText(m.text);
+        if (y === currentYear) await expect(result.locator('p')).toHaveText(m.text);
+        else await expect(result.locator('p')).toHaveCount(0);
         await expect(result.locator('.chip').first()).toContainText(`${m.best.name} ${m.best.score}`);
       }
     }

@@ -21,6 +21,18 @@
 `item_list_id`는 `home_reports`, `shop_catalog`, `reading_footer`다.
 `purchase`는 주문 ID를 `transaction_id`로 사용하며 기존 메모리·로컬 저장 중복 방지를 유지한다. 테스트 주문, 단순 클릭, 대기 주문은 매출로 보내지 않는다.
 
+## 지면별 조회와 구매
+
+| 지면 | 페이지 조회 | 상품별 구매 완료 |
+| --- | --- | --- |
+| 상품 목록 /shop/ | `view_shop` | — |
+| 토정비결 | `view_tojeong` | `purchase_tojeong` |
+| 궁합 | `view_compatibility` | `purchase_compatibility` |
+| 평생 사주 | `view_lifetime` | `purchase_lifetime` |
+| 내년 신년운세 /year/{연도}/premium/ | `view_annual` | `purchase_annual` |
+
+각 조회는 해당 문서 진입 시 전송한다. 연간 상품은 `reading_year`에 대상 연도를 담아 같은 이벤트 이름으로 매년 이어서 측정한다. 상품별 구매는 표준 `purchase`와 같은 승인·중복 방지 조건에서 한 번 전송한다. 매출 금액과 거래 ID는 표준 이벤트에만 담는다. 구매 전체 건수는 `purchase`, 개별 상품 건수는 위의 상품별 이벤트로 확인한다.
+
 ## 오류 진단
 
 `checkout_stage`: `configuration`, `preview`, `order_create`, `sdk_load`, `payment_prepare`, `payment_window`, `payment_return`, `report_load`.
