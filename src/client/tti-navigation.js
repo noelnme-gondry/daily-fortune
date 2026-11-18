@@ -1,6 +1,7 @@
 import { initPageShare } from './share.js';
 import { initAdSlotTracking } from './partner-ad.js';
 import { updateLanguageLinks } from './language.js';
+import { initCommerceLists } from './purchase-analytics.js';
 let pending;
 export function initTtiNavigation() {
   if (!document.querySelector('.tti-nav')) return;
@@ -38,6 +39,7 @@ export function initTtiNavigation() {
       if (push) history.pushState(null, '', url);
       updateLanguageLinks();
       initAdSlotTracking();
+      initCommerceLists();
       if (content.querySelector('[data-cohort]')) import('./tti-client.js').then((m) => m.mountTti()).catch(() => {});
       const h1 = content.querySelector('h1');
       if (h1) { h1.tabIndex = -1; h1.focus({ preventScroll: true }); }

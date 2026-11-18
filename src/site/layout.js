@@ -10,6 +10,7 @@ import { tr, withLanguage } from '../i18n/runtime.js';
 import { languagePath, localizedLinks, localizedHref } from './locale.js';
 import { allowsAds } from './ad-policy.js';
 import { PUBLISHER } from '../content/publisher.js';
+import { premiumEntry } from './premium-entry.js';
 
 const koreanBrand = withLanguage('ko', () => ({ name: BRAND.name, alt: BRAND.alt, description: SITE.description }));
 const englishBrand = withLanguage('en', () => ({ name: BRAND.name, alt: BRAND.alt }));
@@ -182,7 +183,7 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
 <aside class="profile-coach" data-profile-coach hidden role="status"><strong>${tr('저장한 사람은 여기서 관리하세요', 'Your people, all in one place')}</strong><p>${tr('위 메뉴의 ‘저장한 사람’에서 가족을 추가하고, 정보를 수정하거나 골라 볼 수 있어요.', 'Open People in the menu to add family, edit details, or choose whose reading to see.')}</p><div><button class="sbtn" type="button" data-manage-profiles aria-controls="profile-manager" aria-haspopup="dialog">${tr('저장한 사람 열기', 'Open People')}</button><button class="link-btn" type="button" data-dismiss-profile-guide>${tr('확인', 'Got it')}</button></div></aside>
 <main id="main" class="wrap">
 ${crumbsHtml(page.crumbs)}
-${page.section === '/tti/' ? `${ttiNav(ctx, page.path)}<div class="tti-content" data-tti-content>${page.body}</div>` : page.body}
+${page.section === '/tti/' ? `${ttiNav(ctx, page.path)}<div class="tti-content" data-tti-content>${page.body}${premiumEntry(page, ctx)}</div>` : `${page.body}${premiumEntry(page, ctx)}`}
 ${page.supplement ? `<section class="search-supplement" aria-label="${tr('계산 예시와 이용 안내', 'Calculation examples and guidance')}">${page.supplement}</section>` : ''}
 ${ads ? adSlot(ctx, 'bottom') : ''}
 ${page.share === false ? '' : shareBar(page, url)}

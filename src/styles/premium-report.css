@@ -28,6 +28,12 @@
 .report-embedded .download-report { padding:0 0 32px; }.report-embedded .reading-cover { display:none; }
 @media(max-width:600px) {
   .download-report { padding:24px 18px 48px; }.reading-duo { grid-template-columns:1fr;gap:24px; }.reading-chapter { padding-block:32px; }.reading-exercise { padding:18px; }.reading-score-list { grid-template-columns:1fr; }.reading-toc { gap:4px 18px;font-size:15px; }.reading-fold>summary { padding-inline:0; }.reading-fold-body { padding-inline:0; }
+  .download-report { font-size:18px;line-height:1.9; }.reading-exercise p { font-size:17px; }.reading-legacy p { font-size:18px;line-height:1.9; }
+  .reading-toc { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;font-size:16px; }
+  .reading-toc a { min-width:0;min-height:52px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);line-height:1.6;text-decoration:none; }
+  .reading-table-wrap { max-width:100%;overscroll-behavior-x:contain; }
+  .reading-table th:first-child { position:sticky;left:0;z-index:1;background:var(--bg);box-shadow:1px 0 var(--line); }
+  .reading-table thead th:first-child { background:var(--sunk); }
 }
 @media print {
   :root { color-scheme:light;--bg:#fff;--paper:#fff;--sunk:#f1e8e1;--ink:#352e2b;--ink-2:#685c55;--line:#ded0c5;--accent:#79513e;--accent-soft:#f3e5d9; }

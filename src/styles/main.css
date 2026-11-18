@@ -72,6 +72,12 @@
 .reading-contents.is-compact { grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;flex:1; }.is-compact .reading-contents-cell { padding:14px 10px; }.is-compact .reading-contents-cell:first-child { grid-column:1/-1; }.is-compact .reading-contents-cell strong { font-family:var(--f-body);font-size:15px; }.is-compact .reading-contents-closing { justify-content:flex-start; }.is-compact .reading-contents-file { flex-wrap:wrap;gap:4px 12px; }
 @media(max-width:760px) { .reading-contents { grid-template-columns:repeat(2,minmax(0,1fr)); }.reading-contents-cell { padding:18px 14px; }.reading-contents-cell strong { font-size:18px; }.reading-contents-closing { flex-direction:column;align-items:flex-start; } }
 .home-purchases { margin-block:48px; }.home-purchases>p { margin-top:12px; }
+.premium-entry { display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;margin-block:32px;padding:28px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r); }
+.premium-entry h2 { font-size:25px;margin-block:8px 12px; }.premium-entry h3 { font-size:23px;margin-bottom:12px; }
+.premium-entry-contents ul { list-style:none;padding:0;display:grid;gap:8px; }.premium-entry-contents li { padding:10px 14px;background:var(--accent-soft);border-radius:6px; }
+.premium-entry-action { grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;padding-top:18px;border-top:1px solid var(--line); }
+.premium-entry-action p { display:grid;gap:4px; }.premium-entry-action strong { font-size:26px; }.premium-entry-action span { color:var(--ink-2);font-size:14px; }
+@media(max-width:760px) { .premium-entry { grid-template-columns:minmax(0,1fr);padding:20px;gap:20px; }.premium-entry-action { display:grid;grid-template-columns:minmax(0,1fr); }.premium-entry-action .btn { width:100%;white-space:normal;text-align:center; } }
 @media(max-width:760px) {
   .shop-hero,.shop-purchase-grid { grid-template-columns:1fr;gap:24px; }.shop-hero { margin-bottom:28px; }
   .fortune-products { grid-template-columns:1fr; }.fortune-product { border:0;border-inline:1px solid var(--line);border-bottom:1px solid var(--line);padding:24px; }.fortune-product:last-child { border-bottom:0; }
@@ -204,6 +210,7 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: var(--sunk); white-space: nowrap; }
 .grid-table.small th, .grid-table.small td { padding: 7px 9px; font-size: 13px; text-align: center; white-space: nowrap; }
 .grid-table tr.is-today { background: var(--accent-soft); }
+.grid-table.manse tr.is-today .hz[class*="el-"] { color: color-mix(in srgb, var(--el) 85%, var(--ink)); }
 .grid-table.manse tr[data-sun] th { color: var(--seal); }
 .facts { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; border-collapse: separate; border-spacing: 0; }
 .facts th { width: 34%; color: var(--ink-2); font-weight: 500; background: var(--sunk); }
@@ -1393,4 +1400,24 @@ body:has(dialog[open]) { overflow: hidden; }
   .daily-aspects { grid-template-columns: minmax(0, 1fr); }
   .rank-evidence { grid-template-columns: minmax(0, 1fr); }
   .site-menu { padding: 16px; }
+}
+
+/* 휴대폰에서는 풀이 본문을 먼저 읽고, 상품 선택은 넓은 버튼으로 이어간다. */
+@media (max-width: 760px) {
+  main { font-size: 17px; line-height: 1.85; }
+  .cat p, .daily-cat p, .tti-traits p, .tti-row p, .monthly-flow p, .life-event-body, .explanation-body p { font-size: 17px; line-height: 1.9; }
+  .reading-large :is(.cat p, .daily-reading-body p, .overall-basis p, .chart-basis p) { font-size: 19px; line-height: 1.95; }
+  .reading-controls { padding-inline: 0; }
+  .cats, .cats-static { padding-inline: 16px; }
+  .fortune-product { padding: 20px; }
+  .fortune-product-bottom { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .fortune-product-bottom .btn, .purchase-order .btn, .fortune-shop #purchase-form > .btn, .purchase-review .form-actions > button { width: 100%; min-height: 52px; padding: 12px 16px; font-size: 16px; white-space: normal; text-align: center; }
+  .purchase-review .form-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .purchase-order .hint, .purchase-details dd { overflow-wrap: anywhere; }
+  .reading-contents.is-compact .reading-contents-cell strong, .reading-contents-cell span { font-size: 16px; line-height: 1.7; }
+  .reading-contents-file, .premium-entry-action span { font-size: 15px; }
+}
+@media (max-width: 380px) {
+  .reading-contents, .reading-contents.is-compact { grid-template-columns: minmax(0, 1fr); }
+  .purchase-details div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
 }

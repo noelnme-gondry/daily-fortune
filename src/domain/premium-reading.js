@@ -1,17 +1,17 @@
 // 풀이의 해석과 생활 적용만 보강한다. 점수·사주·토정 괘는 기존 엔진의 값을 사용한다.
-const closingChapter = { id: 'closing', title: '풀이를 읽고 난 뒤', detail: '걱정될 때의 대처·실천·사주 읽기 도움말' };
+const closingChapter = { id: 'closing', title: '풀이를 읽고 난 뒤', titleEn: 'Practical next steps', detail: '걱정될 때의 대처·실천·사주 읽기 도움말' };
 export const READING_CHAPTERS = Object.freeze({
   tojeong: [
-    { id: 'annual', title: '한 해의 총운', detail: '내 괘의 전체 흐름과 읽는 법' },
-    { id: 'themes', title: '생활 속 여섯 가지 이야기', detail: '일·재물·관계·가정·변화·쉼' },
+    { id: 'annual', title: '한 해의 총운', titleEn: 'Your year ahead', detail: '내 괘의 전체 흐름과 읽는 법' },
+    { id: 'themes', title: '생활 속 여섯 가지 이야기', titleEn: 'Six areas of everyday life', detail: '일·재물·관계·가정·변화·쉼' },
     { id: 'months', title: '음력 열두 달', detail: '월별 전문과 생활에 적용할 질문' },
     { id: 'plan', title: '나의 한 해 계획', detail: '시작할 일, 지킬 일, 돌아볼 일' },
     { id: 'basis', title: '내 괘가 나온 과정', detail: '음력 생일·기간·상중하괘 계산' },
     closingChapter,
   ],
   lifetime: [
-    { id: 'nature', title: '타고난 나의 모습', detail: '일간의 성향·강점·다듬을 점' },
-    { id: 'balance', title: '오행과 균형', detail: '오행 분포·강약·균형을 돕는 방식' },
+    { id: 'nature', title: '타고난 나의 모습', titleEn: 'Your natural tendencies', detail: '일간의 성향·강점·다듬을 점' },
+    { id: 'balance', title: '오행과 균형', titleEn: 'Elements and balance', detail: '오행 분포·강약·균형을 돕는 방식' },
     { id: 'living', title: '일과 돈, 관계와 생활', detail: '적성·재물·인연 해설과 실천 질문' },
     { id: 'cycles', title: '대운을 읽는 법', detail: '10년 단위 흐름과 시기별 활용법' },
     { id: 'years', title: '앞으로 15년의 주요 시기', detail: '선정 이유·분야별 점수·용어 설명' },
@@ -19,8 +19,8 @@ export const READING_CHAPTERS = Object.freeze({
     closingChapter,
   ],
   compatibility: [
-    { id: 'together', title: '두 사람이 만났을 때', detail: '전체 궁합과 서로의 기본 성향' },
-    { id: 'areas', title: '다섯 분야의 궁합', detail: '성격·애정·소통·경제·가정의 근거' },
+    { id: 'together', title: '두 사람이 만났을 때', titleEn: 'When two people meet', detail: '전체 궁합과 서로의 기본 성향' },
+    { id: 'areas', title: '다섯 분야의 궁합', titleEn: 'Five areas of compatibility', detail: '성격·애정·소통·경제·가정의 근거' },
     { id: 'balance', title: '서로 채워 주는 부분', detail: '두 사람의 오행 비교와 보완' },
     { id: 'practice', title: '오래 함께하는 방법', detail: '조심할 점·대화 질문·생활 약속' },
     { id: 'years', title: '함께 맞을 주요 시기', detail: '연도별 신호와 결혼 날짜 참고' },

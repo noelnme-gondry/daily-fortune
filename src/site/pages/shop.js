@@ -4,7 +4,7 @@ import { esc } from '../util.js';
 import { isEnglish } from '../../i18n/runtime.js';
 import { productPath } from '../product-path.js';
 
-const englishNames = { tojeong: 'Tojeong', lifetime: 'Lifetime saju', compatibility: 'Compatibility' };
+const englishNames = Object.fromEntries(FORTUNE_PRODUCTS.map(p => [p.id, p.nameEn]));
 function contentsBoard(product, compact = false) {
   return `<div class="reading-contents${compact ? ' is-compact' : ''}" aria-label="${product.name} 제공 내용">${product.chapters.map(c => `<div class="reading-contents-cell${c.id === 'closing' ? ' reading-contents-closing' : ''}"><strong>${c.title}</strong>${compact ? '' : `<span>${c.detail}</span>`}</div>`).join('')}<div class="reading-contents-file"><span>전체 상세 풀이</span><span>HTML 파일 보관</span></div></div>`;
 }
@@ -12,15 +12,15 @@ function englishShop(path, title, privatePage = false) {
   return { path, title, description: `${title}: Korean fortune reports at KRW 990 each, including a detailed reading and an HTML download.`, section: '/shop/', noAds: true, noindex: privatePage, crumbs: [['Fortune reports', '/shop/'], ...(path === '/shop/' ? [] : [[title, path]])], body: `<section class="shop-guide"><h1>${title}</h1><p class="lead">Fortune products are currently provided in Korean. Each report is a one-time purchase of KRW 990, with a detailed reading and an offline HTML download.</p><p>Payments are handled by NICEPAY. There is no subscription or automatic renewal.</p><p><a class="btn" data-set-language="ko" href="${path}">Continue in Korean</a></p><p>Purchased reports are linked to this browser. Save a copy before clearing cookies or changing devices.</p></section>` };
 }
 
-export function productCards(ctx) {
-  if (isEnglish()) return `<div class="fortune-products">${FORTUNE_PRODUCTS.map(p => `<article class="fortune-product"><h3>${englishNames[p.id]}</h3><p>Detailed Korean reading and an offline HTML report.</p><div class="fortune-product-bottom"><p><strong>KRW 990</strong><small>One-time payment</small></p><a class="btn" href="${productPath(p.id, ctx.cfg.paidReadings)}">View report</a></div></article>`).join('')}</div>`;
-  return `<div class="fortune-products">${FORTUNE_PRODUCTS.map(p => `<article class="fortune-product"><h3>${p.name}</h3><p>${p.description}</p>${contentsBoard(p, true)}<div class="fortune-product-bottom"><p><strong>990<span>원</span></strong><small>1회 결제</small></p><a class="btn" href="${productPath(p.id, ctx.cfg.paidReadings)}">${p.name} 선택</a></div></article>`).join('')}</div>`;
+export function productCards(ctx, listId = 'home_reports') {
+  if (isEnglish()) return `<div class="fortune-products">${FORTUNE_PRODUCTS.map(p => `<article class="fortune-product" data-commerce-list="${listId}" data-commerce-item="${p.id}"><h3>${englishNames[p.id]}</h3><p>Detailed Korean reading and an offline HTML report.</p><div class="fortune-product-bottom"><p><strong>KRW ${p.price}</strong><small>One-time payment</small></p><a class="btn" data-commerce-select href="${productPath(p.id, ctx.cfg.paidReadings)}">View report</a></div></article>`).join('')}</div>`;
+  return `<div class="fortune-products">${FORTUNE_PRODUCTS.map(p => `<article class="fortune-product" data-commerce-list="${listId}" data-commerce-item="${p.id}"><h3>${p.name}</h3><p>${p.description}</p>${contentsBoard(p, true)}<div class="fortune-product-bottom"><p><strong>${p.price}<span>원</span></strong><small>1회 결제</small></p><a class="btn" data-commerce-select href="${productPath(p.id, ctx.cfg.paidReadings)}">${p.name} 선택</a></div></article>`).join('')}</div>`;
 }
 const shell = (path, title, body, privatePage = false) => ({ path, title, description: `${title}. 상품별 990원 단건 결제로 상세 풀이와 HTML 운세 다운로드를 제공합니다.`, section: '/shop/', noAds: true, noindex: privatePage, crumbs: [['운세 상품', '/shop/'], ...(path === '/shop/' ? [] : [[title, path]])], body: `<div class="fortune-shop" lang="ko"><nav class="shop-nav" aria-label="운세 구매 메뉴"><a href="/shop/">운세 상품</a><a href="/shop/orders/">구매 보관함</a></nav>${body}</div>` });
 
 export function shopPage(ctx) {
   if (isEnglish()) return englishShop('/shop/', 'Your fortune report');
-  return shell('/shop/', '나를 위한 운세 한 권', `<header class="shop-hero"><h1>나를 위한<br>운세 한 권</h1><div><p class="lead">궁금한 이야기 하나를 골라보세요.<br>상세 풀이를 읽고, 내 운세를 파일로 간직하세요.</p><p class="shop-promise">상품별 990원 · 단건 결제 · 운세 다운로드 포함</p></div></header>${productCards(ctx)}<section class="shop-guide"><h2>구매는 이렇게 이어져요</h2><ol><li>운세 상품을 고르고 출생 정보를 입력해요.</li><li>미리보기와 구매 대상을 확인해요.</li><li>나이스페이에서 990원을 결제해요.</li><li>상세 풀이를 읽고 운세 파일을 다운로드해요.</li></ol><p>구독이나 자동 갱신은 없습니다. 토정비결은 선택한 한 해·한 사람, 평생 사주는 한 사람, 궁합은 두 사람 한 쌍의 풀이입니다.</p><p>운세 파일은 HTML 형식입니다. 저장한 파일을 브라우저에서 열거나 인쇄 메뉴에서 PDF로 보관할 수 있습니다.</p></section>`);
+  return shell('/shop/', '나를 위한 운세 한 권', `<header class="shop-hero"><h1>나를 위한<br>운세 한 권</h1><div><p class="lead">궁금한 이야기 하나를 골라보세요.<br>상세 풀이를 읽고, 내 운세를 파일로 간직하세요.</p><p class="shop-promise">상품별 990원 · 단건 결제 · 운세 다운로드 포함</p></div></header>${productCards(ctx, 'shop_catalog')}<section class="shop-guide"><h2>구매는 이렇게 이어져요</h2><ol><li>운세 상품을 고르고 출생 정보를 입력해요.</li><li>미리보기와 구매 대상을 확인해요.</li><li>나이스페이에서 990원을 결제해요.</li><li>상세 풀이를 읽고 운세 파일을 다운로드해요.</li></ol><p>구독이나 자동 갱신은 없습니다. 토정비결은 선택한 한 해·한 사람, 평생 사주는 한 사람, 궁합은 두 사람 한 쌍의 풀이입니다.</p><p>운세 파일은 HTML 형식입니다. 저장한 파일을 브라우저에서 열거나 인쇄 메뉴에서 PDF로 보관할 수 있습니다.</p></section>`);
 }
 export function productPage(id, ctx, year) {
   const p = fortuneProduct(id);

@@ -16,6 +16,24 @@ test.beforeEach(async ({ context, page }) => {
 });
 
 for (const prefix of ['', '/en']) {
+  test(`${prefix || 'ko'}: 모바일 본문과 큰 글자 설정은 읽을 크기를 유지한다`, async ({ page }) => {
+    for (const width of [320, 390, 760]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto(`${prefix}/year/2026/`);
+      await expect(page.locator('#reading-career p').first()).toBeVisible();
+      await page.locator('[data-reading-size]').selectOption('normal');
+      const text = page.locator('#reading-career p').first();
+      const normal = await text.evaluate(el => { const s = window.getComputedStyle(el); return { size: parseFloat(s.fontSize), line: parseFloat(s.lineHeight) }; });
+      expect(normal.size).toBeGreaterThanOrEqual(17);
+      expect(normal.line / normal.size).toBeGreaterThanOrEqual(1.8);
+      await page.locator('[data-reading-size]').selectOption('large');
+      expect(await text.evaluate(el => parseFloat(window.getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(19);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      await page.goto(`${prefix}/saju/ohaeng/wood/`);
+      expect(await page.locator('.prose p').first().evaluate(el => parseFloat(window.getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(17);
+    }
+  });
+
   test(`${prefix || 'ko'}: 개인 풀이에서는 저장된 궁합 상대를 표시하지 않고 궁합에서는 두 사람을 유지한다`, async ({ page }) => {
     for (const route of ['today', 'tomorrow', 'week', 'month', 'year/2026', 'year/2027', 'manseryeok', 'lifetime']) {
       await page.goto(`${prefix}/${route}/`);
