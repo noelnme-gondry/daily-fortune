@@ -4,6 +4,12 @@ import { todayKST, isoDate } from '../engine/core.js';
 
 export function track(name, params = {}) {
   try {
+    // 내부 계산 동작 이름이 GA 획득 source를 덮어쓰지 않게 한다.
+    const safeParams = { ...params };
+    if (['form', 'saved', 'sample', 'shared_result'].includes(safeParams.source)) {
+      safeParams.calc_origin ??= safeParams.source;
+      delete safeParams.source;
+    }
     let entrySource;
     if (name.startsWith('calc_')) {
       try {
@@ -13,7 +19,7 @@ export function track(name, params = {}) {
     }
     if (typeof window.gtag !== 'function') return false;
     window.gtag('event', name, {
-      ...adExperimentParams(), measurement_version: '3', usage_date: isoDate(todayKST()), ...params,
+      ...adExperimentParams(), measurement_version: '4', usage_date: isoDate(todayKST()), ...safeParams,
       ...(entrySource ? { entry_source: entrySource } : {}),
     });
     return true;

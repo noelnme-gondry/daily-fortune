@@ -33,7 +33,7 @@ test('궁합 맨 아래 추천: 분야별 실점수·상세·모바일·기준 �
   const expected = findCompatMatches(a, b.gender, today);
   await calculate(page);
   const section = page.locator('.compat-matches');
-  await expect(page.locator('#result > :last-child')).toHaveClass(/compat-matches/);
+  await expect(page.locator('#result > .compat-matches + .premium-entry:last-child')).toHaveCount(1);
   await expect(section.locator('[data-match-results]')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 });
   await expect(section.locator('[data-match-scope]')).toContainText('1983~2003년생 · 남성');
   const originalReport = await pairReport(page);

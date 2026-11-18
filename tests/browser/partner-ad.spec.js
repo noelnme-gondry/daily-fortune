@@ -540,7 +540,7 @@ test('발급 코드로 한 번만 초기화하고 절반 이상 노출 시 개�
   await expect.poll(async () => (await slotEvents(page)).length).toBe(1);
   const event = (await slotEvents(page))[0];
   expect(event.slice(0, 2)).toEqual(['event', 'ad_slot_view']);
-  expect(event[2]).toEqual({ measurement_version: '3', usage_date: isoDate(todayKST()), ad_measurement_version: '1', ad_provider: 'coupang', ad_slot: 'common', ad_context: 'content', page_path: '/tti/', page_location: 'http://127.0.0.1:4176/tti/', page_title: await page.title() });
+  expect(event[2]).toEqual({ measurement_version: '4', usage_date: isoDate(todayKST()), ad_measurement_version: '1', ad_provider: 'coupang', ad_slot: 'common', ad_context: 'content', page_path: '/tti/', page_location: 'http://127.0.0.1:4176/tti/', page_title: await page.title() });
   expect(JSON.stringify(event)).not.toContain('private');
   await showFraction(page, 0);
   await showFraction(page, 0.8);
@@ -637,7 +637,7 @@ for (const lang of ['', '/en']) for (const variant of ['A', 'B']) {
     for (const slot of ['common', 'lucky']) {
       expect((await slotEvents(page, slot))[0][2]).toEqual({
         ad_layout_version: AD_LAYOUT.id, ad_placement: AD_LAYOUT.placement, tool: 'today',
-        measurement_version: '3', usage_date: '2026-10-29', ad_measurement_version: '1',
+        measurement_version: '4', usage_date: '2026-10-29', ad_measurement_version: '1',
         ad_provider: 'coupang', ad_slot: slot, ad_context: slot === 'common' ? 'result_footer' : 'result', page_path: path,
         page_location: `http://127.0.0.1:4176${path}`, page_title: await page.title(),
       });

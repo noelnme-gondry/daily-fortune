@@ -1,7 +1,8 @@
 import { tr } from '../i18n/runtime.js';
 import { localizeClientLinks } from './language.js';
-import { track } from './analytics.js';
 import { adExperimentParams } from './ad-experiment.js';
+import { observeView } from './view-tracking.js';
+import { initCommerceLists } from './purchase-analytics.js';
 
 const selector = '[data-partner-ad-slot="common"]';
 const viewedPaths = new Set();
@@ -27,6 +28,7 @@ export function clearResultWithPartnerAd(out) {
   if (ad) document.querySelector('main').after(ad);
   ad?.removeAttribute('data-ad-context');
   out.replaceChildren();
+  initCommerceLists();
 }
 
 export function renderResultWithPartnerAd(out, html, resultParams = {}) {
@@ -42,10 +44,13 @@ export function renderResultWithPartnerAd(out, html, resultParams = {}) {
   const summary = next.querySelector(':scope > [data-result-summary], :scope > .report-head, :scope > .tojeong-summary, :scope > .chart-card, :scope > .life > .wide') || next.firstElementChild;
   const share = next.querySelector('.result-share + .hint');
   out.replaceChildren(...next.childNodes);
+  const premium = document.querySelector('template[data-premium-result]');
+  if (premium) out.append(premium.content.cloneNode(true));
   // 계산기 밖에 두어 고정 입력 폼이 배너를 가리지 않게 한다. 재계산에는 iframe을 이동하지 않는다.
   const tool = out.parentElement;
   if (ad && share && tool.nextElementSibling !== ad) tool.after(ad);
   localizeClientLinks(out);
+  initCommerceLists();
   if (ad) initPartnerAd();
   summary?.setAttribute('data-result-summary', '');
   const start = summary?.querySelector('[data-result-heading], h2, h3');
@@ -105,35 +110,4 @@ export function initAdSlotTracking() {
   if (luckySlot) stopLuckyTracking = observeView(luckySlot, 'ad_slot_view', luckyViewedPaths, {
     ...params, ad_slot: 'lucky',
   });
-}
-
-function observeView(target, eventName, seen, params = {}, viewKey = location.pathname) {
-  const path = location.pathname;
-  if (seen.has(viewKey) || !window.IntersectionObserver) return;
-  let visible = false;
-  let stopped = false;
-  const report = () => {
-    if (stopped || !visible || document.visibilityState !== 'visible' || seen.has(viewKey)) return;
-    if (!target.isConnected || target.closest('[hidden], [aria-hidden="true"]')) return;
-    const box = target.getBoundingClientRect();
-    if (box.width <= 0 || box.height <= 0 || window.getComputedStyle(target).visibility !== 'visible') return;
-    seen.add(viewKey);
-    track(eventName, {
-      ...params,
-      page_path: path, page_location: `${location.origin}${path}`, page_title: document.title,
-    });
-    stop();
-  };
-  const observer = new window.IntersectionObserver(([entry]) => {
-    visible = entry.isIntersecting && entry.intersectionRatio >= 0.5;
-    report();
-  }, { threshold: [0, 0.5] });
-  const stop = () => {
-    stopped = true;
-    observer.disconnect();
-    document.removeEventListener('visibilitychange', report);
-  };
-  document.addEventListener('visibilitychange', report);
-  observer.observe(target);
-  return stop;
 }
