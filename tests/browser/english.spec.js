@@ -153,3 +153,29 @@ test('English Tojeong fetches only its reading, shows all months and retains the
   await expect(page.locator('.tojeong-code')).toHaveText(code);
   expect(requests).toEqual([`/data/tojeong/en/${code}.json`, `/data/tojeong/${code}.json`]);
 });
+
+test('legacy language links canonicalize in one hop and keep campaign parameters', async ({ request }) => {
+  const response = await request.get('/en/tti/tomorrow/monkey/?lang=ko&utm_source=test', { maxRedirects: 0 });
+  expect(response.status()).toBe(301);
+  expect(response.headers().location).toBe('/tti/tomorrow/monkey/?utm_source=test');
+  expect(response.headers()['set-cookie']).toContain('fortune-language=ko');
+  const alias = await request.get(`/tojeong/${todayKST().y}/?lang=en`, { maxRedirects: 0 });
+  expect(alias.status()).toBe(301);
+  expect(alias.headers().location).toBe('/en/tojeong/');
+});
+
+test('tomorrow zodiac previews lead to the full reading and back in both languages', async ({ page, context }) => {
+  for (const [language, prefix] of [['ko', ''], ['en', '/en']]) {
+    await context.addCookies([{ name: 'fortune-language', value: language, url: 'http://127.0.0.1:4176' }]);
+    await page.goto(`${prefix}/tomorrow/`);
+    const detail = `${prefix}/tti/tomorrow/monkey/`;
+    await page.locator(`a[data-dialog][href="${detail}"]`).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.locator(`a[href="${prefix}/tomorrow/"]`)).toBeVisible();
+    await dialog.locator(`a[href="${detail}"]`).click();
+    await expect(page).toHaveURL(new RegExp(detail + '$'));
+    await expect(page.locator('main h1')).toContainText(language === 'ko' ? '원숭이띠' : 'Monkey');
+    await page.locator(`a[href="${prefix}/tomorrow/#zodiac-preview"]`).click();
+    await expect(page.locator('#zodiac-preview')).toBeInViewport();
+  }
+});
