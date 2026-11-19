@@ -37,3 +37,13 @@ test('판매 모드에서만 상품 중복 주소를 기존 운세 URL로 통합
     else process.env.FORTUNE_PAID_READINGS = previous;
   }
 });
+
+test('the sitemap lists canonical routes without generating article bodies', () => {
+  const site = createSite({ site: origin, assets: {}, now: Date.UTC(2026, 10, 19) });
+  for (const route of site.routes) route.fn = () => assert.fail(`Unexpected body render: ${route.path}`);
+  const xml = site.sitemap();
+  for (const prefix of ['', '/en']) {
+    assert.ok(xml.includes(`<loc>${origin}${prefix}/tti/tomorrow/monkey/</loc>`));
+    assert.ok(!xml.includes(`<loc>${origin}${prefix}/shop/result/</loc>`));
+  }
+});

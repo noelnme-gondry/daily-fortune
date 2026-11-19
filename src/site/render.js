@@ -12,7 +12,7 @@ import * as saju from './pages/saju.js';
 import * as tti from './pages/tti.js';
 import * as manse from './pages/manse.js';
 import * as info from './pages/info.js';
-import { annualPath } from './product-path.js';
+import { annualPath, productPath } from './product-path.js';
 import { shopPage, productPage, ordersPage, resultPage } from './pages/shop.js';
 import { tojeongPage, tojeongYearReference } from './pages/tojeong.js';
 import { lifetimeExample, compatibilityExample } from './public-examples.js';
@@ -34,13 +34,13 @@ function routeTable(ctx) {
   const y = ctx.today.y;
   const years = ctx.years;
   const R = [];
-  const add = (path, fn, o = {}) => R.push({ path, fn, priority: o.p ?? 0.6, changefreq: o.cf ?? 'monthly', daily: !!o.daily, feed: !!o.feed });
+  const add = (path, fn, o = {}) => R.push({ path, fn, priority: o.p ?? 0.6, changefreq: o.cf ?? 'monthly', daily: !!o.daily, feed: !!o.feed, canonicalPath: o.canonicalPath || path, noindex: !!o.noindex });
   add('/', tools.home, { p: 1, cf: 'daily', daily: true });
   add('/shop/', shopPage, { p: 0.8 });
-  for (const id of ['tojeong', 'lifetime', 'compatibility']) add(`/shop/${id}/`, c => productPage(id, c), { p: 0.8 });
+  for (const id of ['tojeong', 'lifetime', 'compatibility']) add(`/shop/${id}/`, c => productPage(id, c), { p: 0.8, canonicalPath: productPath(id, ctx.cfg.paidReadings) });
   add(annualPath(y + 1), c => productPage('annual', c, y + 1), { p: 0.9 });
-  add('/shop/orders/', ordersPage, { p: 0 });
-  add('/shop/result/', resultPage, { p: 0 });
+  add('/shop/orders/', ordersPage, { p: 0, noindex: true });
+  add('/shop/result/', resultPage, { p: 0, noindex: true });
   add('/today/', tools.today, { p: 0.9, cf: 'daily', daily: true });
   add('/tomorrow/', tools.tomorrow, { p: 0.8, cf: 'daily', daily: true });
   add('/week/', tools.week, { p: 0.8, cf: 'weekly', daily: true });
@@ -51,7 +51,7 @@ function routeTable(ctx) {
     const product = productPage(id, c, year);
     const name = { tojeong: tr(`${year}년 토정비결`, `${year} Tojeong`), lifetime: tr('평생 사주', 'Lifetime saju'), compatibility: tr('사주 궁합', 'Saju compatibility') }[id];
     return {
-      ...product, path: c.path, canonicalPath: c.path,
+      ...product, path: c.path,
       title: tr(`${name} 미리보기 · 상세 풀이 990원`, `${name} preview and premium report`),
       description: tr(`${name}의 일부 풀이를 미리 확인하세요. 개인별 상세 해설과 HTML 운세 파일은 990원 단건 결제로 제공합니다.`, `Preview your ${name} report. Detailed Korean readings and an HTML download cost KRW 990 as a one-time purchase.`),
       supplement: id === 'tojeong' ? yearGuide(year, c, c.path) : '',
@@ -126,6 +126,8 @@ export function createSite({ site, assets, now = Date.now() }) {
         }
         return result;
       });
+      p.canonicalPath = languagePath(r.canonicalPath, r.lang || 'ko');
+      p.noindex = r.noindex;
       p.modified = r.daily ? ctx.todayISO : contentModified(r.path);
       pageCache.set(path, p);
     }
@@ -163,10 +165,7 @@ export function createSite({ site, assets, now = Date.now() }) {
       return a ? `google.com, ${a.pub}, DIRECT, f08c47fec0942fa0\n` : '';
     },
     sitemap() {
-      const urls = routes.filter(r => {
-        const p = page(r.path);
-        return !p.noindex && languagePath(p.canonicalPath || p.path, r.lang || 'ko') === r.path;
-      }).map((r) => `  <url><loc>${site}${r.path}</loc><lastmod>${lastmod(r)}</lastmod><changefreq>${r.changefreq}</changefreq><priority>${r.priority.toFixed(1)}</priority></url>`).join('\n');
+      const urls = routes.filter(r => !r.noindex && languagePath(r.canonicalPath, r.lang || 'ko') === r.path).map((r) => `  <url><loc>${site}${r.path}</loc><lastmod>${lastmod(r)}</lastmod><changefreq>${r.changefreq}</changefreq><priority>${r.priority.toFixed(1)}</priority></url>`).join('\n');
       return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
     },
     robots() {

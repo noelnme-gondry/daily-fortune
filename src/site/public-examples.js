@@ -131,12 +131,22 @@ export function yearExample(y, ctx) {
   const which = y === ctx.today.y + 1 ? 'next' : 'this';
   const r = year(c, y, which), months = yearMonths(c, y);
   const unknown = year(buildChart({ ...EXAMPLE_INPUT, time: null }), y, which);
+  const adjacentYear = y === ctx.years[0] ? y + 1 : y - 1;
+  const adjacent = year(c, adjacentYear, adjacentYear === ctx.today.y + 1 ? 'next' : 'this');
+  const annualRows = [r, adjacent].map((reading, i) => {
+    const edition = i === 0 ? y : adjacentYear;
+    const label = edition === y ? edition : `<a href="/year/${edition}/#public-example">${edition}</a>`;
+    return `<tr><th scope="row">${label}</th><td>${pillarLabel(reading.pillar)}</td><td>${reading.overall.score}</td></tr>`;
+  }).join('');
   const comparison = months.filter((m) => [5, 11].includes(m.m));
   return `${start(`${y}${siteText("년 신년운세 계산 예시")}`)}
     <h3>${siteText("실제 계산 결과")}</h3><p>${siteText("대상 연도: ")}${y}${siteText("년 · 세운 ")}${pillarLabel(r.pillar)}${r.daeun ? `${siteText(" · 대운 ")}${pillarLabel(r.daeun)}` : ''}${siteText(". 종합 점수는 ")}<b data-example-overall>${r.overall.score}${siteText("점")}</b>${siteText("입니다.")}</p>
     <div class="table-wrap"><table class="grid-table"><caption>${siteText("가상 사례의 ")}${y}${siteText("년 분야별 점수")}</caption><thead><tr><th scope="col">${siteText("분야")}</th><th scope="col">${siteText("점수")}</th></tr></thead><tbody>${r.cats.map((cat) => `<tr><th scope="row">${cat.name}</th><td>${cat.score}${siteText("점")}</td></tr>`).join('')}</tbody></table></div>
     <p>${siteText("계산된 총운 해설: ")}${esc(r.overall.text)}</p>
     <div class="table-wrap" tabindex="0" role="region" aria-label="${tr('가상 사례의 월별 점수', 'Example monthly scores')}"><table class="grid-table"><caption>${siteText("가상 사례의 ")}${y}${siteText("년 월별 점수")}</caption><thead><tr><th scope="col">${siteText("월")}</th><th scope="col">${siteText("대표 월주")}</th><th scope="col">${siteText("점수")}</th></tr></thead><tbody>${months.map((m) => `<tr><th scope="row">${m.m}${siteText("월")}</th><td>${pillarLabel(m.pillar)}</td><td>${m.score}${siteText("점")}</td></tr>`).join('')}</tbody></table></div>
+    <h3>${tr('같은 생년월일로 두 해를 비교하면', 'Two years with the same birth chart')}</h3>
+    <p>${tr('위 사례에서 출생일과 시각을 고정하고 대상 연도만 바꿨습니다. 다른 연도를 누르면 그해의 분야별 풀이와 월별 흐름도 볼 수 있습니다.', 'Only the reading year changes in this example. Open the other year to explore its readings by area and month.')}</p>
+    <table class="grid-table"><caption>${tr('가상 사례의 연간 비교', 'Annual comparison for the fictional example')}</caption><thead><tr><th scope="col">${tr('대상 연도', 'Year')}</th><th scope="col">${tr('세운', 'Year pillar')}</th><th scope="col">${tr('종합 점수', 'Overall score')}</th></tr></thead><tbody>${annualRows}</tbody></table>
     <h3>${siteText("읽는 방법")}</h3><p>${siteText("이 사례의 연간 점수는 세운 68%와 대운 32%를 합친 뒤 환산한 값입니다. 월별 점수는 각 달 15일의 절기 월주 65%와 그날의 년주 35%로 별도 계산하므로, 열두 달 점수의 단순 평균이 연간 점수가 되지는 않습니다. 입춘 전인 1월에는 전년도 년주가 반영됩니다.")}</p>
     <h3>${tr('두 달의 점수와 해설을 함께 읽기', 'Read two months side by side')}</h3>
     <p>${tr('같은 가상 입력의 5월과 11월을 비교해 보세요. 설명을 위해 고른 두 달이며, 모든 사람의 최고·최저 월을 뜻하지 않습니다. 종합 점수와 그 달에서 상대적으로 높은 분야를 함께 읽으면 분야별 차이를 확인할 수 있습니다.', 'Compare May and November for the same fictional birth details. These months were chosen to illustrate the reading; they are not everyone’s best or worst months. Read the overall score alongside the highest-scoring area within each month to see how the areas differ.')}</p>

@@ -12,7 +12,6 @@ import { ttiDailyDetail } from '../tti-detail.js';
 import { ttiMonthCards } from '../tti-months.js';
 import { yearGuide } from '../year-guide.js';
 
-const yy = (y) => String(y).slice(2);
 const article = (ctx, page) => ({ '@type': 'Article', headline: page.h1 || page.title, description: page.description, inLanguage: siteText('ko-KR'), datePublished: ctx.published, dateModified: ctx.buildDate, author: { '@id': `${ctx.site}/#org` }, publisher: { '@id': `${ctx.site}/#org` }, mainEntityOfPage: { '@id': `${ctx.site}${page.path}#webpage` }, image: `${ctx.site}/og-default.png` });
 
 export function hub(ctx) {
@@ -70,6 +69,8 @@ export function animalYear(t, y, ctx) {
   for (let yr = y - 1; yr <= y + 12 && sjYears.length < 3; yr++) if (samjaeBranches(t).includes(yearPillar(yr).b) && yr >= y - 2) sjYears.push(yr);
   const name = tr(`${y}년 ${r.animal}띠 운세`, `${y} ${siteValue(r.animal)} Fortune`);
   const cohorts = r.cohorts.slice().reverse();
+  const exampleYears = cohorts.filter(c => c.age >= 18 && c.age <= 85).slice(0, 5).map(c => c.birthYear);
+  const cohortTable = `<details><summary>${tr('출생 연도별 점수 비교', 'Compare scores by birth year')}</summary><table class="grid-table"><caption>${tr(`${name} · 출생 연도별 비교`, `${name} by birth year`)}</caption><thead><tr><th scope="col">${siteText('출생 연도')}</th><th scope="col">${siteText('간지')}</th><th scope="col">${siteText('점수')}</th></tr></thead><tbody>${cohorts.map(c => `<tr><th scope="row">${c.birthYear}</th><td>${c.pillarText}</td><td>${c.score}</td></tr>`).join('')}</tbody></table></details>`;
   const faq = [
     { q: `${name}${siteText("는 어떤가요?")}`, a: r.summary },
     { q: `${y}${siteText("년 ")}${siteValue(r.animal)}${siteText("띠에게 좋은 달은?")}`, a: r.goodMonths.length ? `${r.goodMonths.map((x) => `${siteValue(x)}${siteText("월")}`).join(', ')}${siteText("은 월지가 ")}${siteValue(r.animal)}${siteText("띠와 합을 이루어 일이 잘 풀립니다.")}${r.cautionMonths.length ? ` ${r.cautionMonths.map((x) => `${siteValue(x)}${siteText("월")}`).join(', ')}${siteText("은 충·형·원진이 들어 조심하는 편이 좋습니다.")}` : ''}` : `${y}${siteText("년에는 특별히 합이 드는 달이 없어 꾸준함이 가장 큰 무기입니다.")}` },
@@ -79,7 +80,7 @@ export function animalYear(t, y, ctx) {
   const page = {
     path: `/tti/${y}/${ANIMAL_SLUG[t]}/`, h1: name, ogType: 'article', section: '/tti/',
     title: `${name}${siteText(" — 총운·재물·애정·건강과 출생 연도별 운세")}`,
-    description: `${y}${siteText("년 ")}${pillarLabel(r.pillar)}${siteText("년 ")}${siteValue(r.animal)}${siteText("띠 운세(")}${r.score}${siteText("점): ")}${r.headline}. ${cohorts.slice(-5).map((c) => `${yy(c.birthYear)}${siteText("년생")}`).join('·')}${siteText(" 출생 연도별 운세와 좋은 달, 삼재 여부, 행운의 색을 정리했습니다.")}`,
+    description: tr(`${name}는 ${r.score}점입니다. ${exampleYears.join('·')}년생의 점수와 풀이, 좋은 달과 조심할 달, 삼재 여부를 확인하세요.`, `${name} scores ${r.score} points. Compare readings for birth years including ${exampleYears.join(', ')} and see favorable months, months for caution and Samjae status.`),
     crumbs: [[siteText('띠별 운세'), '/tti/'], [`${y}${siteText("년")}`, `/tti/${y}/`], [`${siteValue(r.animal)}${siteText("띠")}`, `/tti/${y}/${ANIMAL_SLUG[t]}/`]],
   };
   page.ld = [article(ctx, page), faqLd(faq)];
@@ -89,7 +90,7 @@ export function animalYear(t, y, ctx) {
     <section class="tti-reading-basis"><h3>${tr('점수와 해석의 근거 보기', 'How the score and reading were derived')}</h3><p>${esc(r.basis)}</p>
     ${factTable([[siteText('해와의 관계'), `${branchName(r.pillar.b)}(${BR_H[r.pillar.b]}) ↔ ${branchName(t)}(${BR_H[t]}) · ${r.rel === '없음' ? siteText('특별한 합충 없음') : siteValue(r.rel)}`], [siteText('삼재'), r.samjae ? r.samjae.name : siteText('해당 없음')]])}
     </section>
-    <section class="cohort-picker box card"><h2>${siteText("내 출생 연도로 보기")}</h2><label for="tti-birth-year">${siteText("출생 연도")}<select class="input" id="tti-birth-year" data-cohort data-tti="${siteValue(t)}" data-year="${y}"><option value="">${siteValue(r.animal)}${siteText("띠 공통 운세")}</option>${cohorts.map((c) => `<option value="${c.birthYear}">${c.birthYear}${siteText("년생 · ")}${c.pillarText}</option>`).join('')}</select></label><p data-cohort-text aria-live="polite">${siteText("출생 연도를 선택하면 해당 연생의 해석과 월별 점수만 보여드립니다.")}</p><p class="hint">${siteText("위 총운·분야별 해석은 띠 공통입니다. 띠는 입춘 기준이므로 1월~2월 초 출생은 앞 띠일 수 있습니다. 개인 원국 전체를 반영한 결과는 사주 운세에서 확인하세요.")}</p></section>
+    <section class="cohort-picker box card"><h2>${siteText("내 출생 연도로 보기")}</h2>${cohortTable}<label for="tti-birth-year">${siteText("출생 연도")}<select class="input" id="tti-birth-year" data-cohort data-tti="${siteValue(t)}" data-year="${y}"><option value="">${siteValue(r.animal)}${siteText("띠 공통 운세")}</option>${cohorts.map((c) => `<option value="${c.birthYear}">${c.birthYear}${siteText("년생 · ")}${c.pillarText}</option>`).join('')}</select></label><p data-cohort-text aria-live="polite">${siteText("출생 연도를 선택하면 해당 연생의 해석과 월별 점수만 보여드립니다.")}</p><p class="hint">${siteText("위 총운·분야별 해석은 띠 공통입니다. 띠는 입춘 기준이므로 1월~2월 초 출생은 앞 띠일 수 있습니다. 개인 원국 전체를 반영한 결과는 사주 운세에서 확인하세요.")}</p></section>
     <section class="box-sec"><h2>${y}${siteText("년 1~12월 운세")}</h2><p class="hint">${siteText("각 달 15일의 월운 65% + 연간 점수 35%에 출생 연도의 천간 관계를 반영합니다. 월별 점수는 이 사이트의 해석 규칙이며 통계적 예측값이 아닙니다.")}</p><div class="monthly-flow" data-monthly-flow>${ttiMonthCards(ttiMonths(t, y))}</div>${cohortData(t, y, r)}</section>
     <p class="cta"><a class="btn" href="/year/${y}/">${siteText("내 사주로 ")}${y}${siteText("년 운세 보기")}</a></p>
     ${faqBlock(faq)}
@@ -171,7 +172,7 @@ export function animalDay(t, ctx, tomorrow = false) {
     description: `${fmtDate(date)} ${animal}${siteText("띠 ")}${word}${siteText("의 운세 ")}${r.score}${siteText("점. ")}${first}${siteText(" 12띠 중 ")}${rank}${siteText("위이며, 앞으로 7일 흐름과 행운의 색·숫자, 잘 맞는 띠를 함께 확인하세요.")}`,
     crumbs: [[siteText('띠별 운세'), '/tti/'], [`${animal}${siteText("띠 ")}${word}${siteText(" 운세")}`, `/tti/${period}/${slug}/`]],
     body: `${hero(dailyTitle, `${fmtDate(date)} ${animal}${siteText("띠는 12띠 가운데 ")}${rank}${siteText("위(")}${r.score}${siteText("점)입니다. ")}${top.score > r.score ? `${word}${siteText(" 가장 운이 좋은 띠는 ")}${siteValue(top.animal)}${siteText("띠(")}${top.score}${siteText("점)입니다.")}` : `${word}${siteText("은 ")}${animal}${siteText("띠가 가장 운이 좋은 띠입니다.")}`}`)}
-      <article class="box card">${ttiDailyDetail(t, date, word)}</article>
+      <article class="box card">${ttiDailyDetail(t, date, period)}</article>
       <section class="box card tti-week"><h2>${animal}${siteText("띠의 앞으로 7일")}</h2>
         <ol class="tti-week-list">${week.map((w, i) => `<li${i === 0 ? ' class="is-today"' : ''}><span>${weekdayName(dow(w.d))} ${fmtShort(w.d)}</span><i style="--s:${w.score}" aria-hidden="true"></i><b class="num">${w.score}</b>${bandChip(w.score)}</li>`).join('')}</ol>
         <p class="hint">${best.score >= r.score ? `${siteText("이번 7일 중에서는 ")}${best.d.m}${siteText("월 ")}${best.d.d}${siteText("일(")}${weekdayName(dow(best.d))}${siteText(")이 ")}${best.score}${siteText("점으로 가장 좋습니다.")}` : `${word}${siteText("이 이번 7일 중 가장 좋은 날입니다.")}`}</p>
@@ -183,6 +184,6 @@ export function animalDay(t, ctx, tomorrow = false) {
         [`${y}${siteText("년 · ")}${y + 1}${siteText("년 운세")}`, `<a href="/tti/${y}/${slug}/">${y}${siteText("년 ")}${animal}${siteText("띠 운세")}</a> · <a href="/tti/${y + 1}/${slug}/">${y + 1}${siteText("년 ")}${animal}${siteText("띠 운세")}</a>`],
       ], `${animal}${siteText("띠 한눈에 보기")}`)}
       <nav class="chips" aria-label="${siteText("다른 띠 ")}${word}${siteText(" 운세")}">${ANIMAL.map((n, i) => `<a class="chip${i === t ? ' on' : ''}" href="/tti/${period}/${ANIMAL_SLUG[i]}/">${animalIcon(i)}${siteValue(n)}${siteText("띠")}</a>`).join('')}</nav>
-      <a class="btn ghost" href="/tti/today/">${siteText("12띠 오늘의 운세로 돌아가기")}</a>`,
+      <a class="btn ghost" href="${tomorrow ? '/tomorrow/#zodiac-preview' : '/tti/today/'}">${tomorrow ? tr('내일의 12띠 운세로 돌아가기', 'Back to tomorrow’s twelve signs') : siteText("12띠 오늘의 운세로 돌아가기")}</a>`,
   };
 }
