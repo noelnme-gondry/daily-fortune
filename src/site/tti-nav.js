@@ -9,5 +9,11 @@ export function ttiNav(ctx, path) {
     ['/tti/samjae/', siteText('삼재 확인'), siteText('올해와 내년 삼재')],
     ['/tti/compatibility/', siteText('띠 궁합'), siteText('12띠 관계 살펴보기')],
   ];
-  return `<nav class="tti-nav" aria-label="${siteText("띠별 운세 메뉴")}">${items.map(([href, name, description]) => `<a class="card link-card" href="${href}"${path.startsWith(href) || (href === '/tti/today/' && path === '/tti/') ? ' aria-current="page"' : ''}>${uiIcon(href.includes('compatibility') ? 'help' : 'book')}<b>${name}</b><span>${description}</span></a>`).join('')}</nav>`;
+  const links = items.map(([href, name, description]) => {
+    let current = '';
+    if (path === href) current = ' aria-current="page"';
+    else if (path.startsWith(href)) current = ' aria-current="location"';
+    return `<a class="card link-card" href="${href}"${current}>${uiIcon(href.includes('compatibility') ? 'help' : 'book')}<b>${name}</b><span>${description}</span></a>`;
+  });
+  return `<nav class="tti-nav" aria-label="${siteText("띠별 운세 메뉴")}">${links.join('')}</nav>`;
 }

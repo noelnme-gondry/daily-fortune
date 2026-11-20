@@ -197,7 +197,7 @@ export function home(ctx) {
   const features = `<div class="home-features">${fun.slice(0, 2).map(([h, t, d], i) => `<a class="card home-feature${i === 0 ? ' home-story-feature' : ''}" href="${h}"><span><small>${i === 0 ? tr('나의 아홉 장면', 'Nine chapters of your life') : tr('순위보다 흥미로운 이유', 'The reasons behind your rank')}</small><b>${siteValue(t)}</b><span>${d}</span><strong>${tr('살펴보기', 'Explore')} ↗</strong></span>${i === 0 ? `${homeStoryPreview(o)}<small class="home-story-note">${tr('위 가상 사례의 아홉 장면 중 세 장면입니다.', 'Three of nine chapters for the fictional chart above.')}</small>` : '<img src="/characters/384/stargazer.webp" width="160" height="160" loading="lazy" alt="">'}</a>`).join('')}</div><a data-ga-cta="fun_card" class="home-ilju-link" href="/saju/ilju-ranking/">${tr('60일주끼리 비교한 랭킹도 있어요', 'Compare the 60 day pillars too')} ↗</a>`;
   const body = `
     <section class="home-hero">
-      <div class="home-intro"><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p></div>
+      <div class="home-intro"><h1>${esc(HOME.h1)}</h1><p class="lead">${esc(HOME.lead)}</p><a href="/tti/today/" data-ga-cta="home_zodiac_entry">${tr('생년월일 입력 없이 오늘의 띠별 운세 보기', 'Today by zodiac sign · No birth date needed')}</a></div>
       ${toolBlock('home', ctx)}
       ${homeReadingPreview(o)}
     </section>

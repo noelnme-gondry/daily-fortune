@@ -165,3 +165,34 @@ for (const product of ['tojeong', 'lifetime', 'compatibility']) test(`${product}
   await expect(page.locator('[data-purchase-details]')).toContainText(second.name);
   expect(previews).toBe(1);
 });
+
+test('평생·궁합 공개 예시에서 현재 언어의 상품 이용 단계로 돌아간다', async ({ page }) => {
+  for (const lang of ['', '/en']) {
+    for (const product of ['lifetime', 'compatibility']) {
+      await page.goto(`${lang}/${product}/`);
+      await page.locator('#public-example [data-ga-cta="public_example"]').click();
+      const target = page.locator(':target');
+      await expect(target).toBeInViewport();
+      await expect(target.locator(lang ? '[data-set-language="ko"]' : '#purchase-form')).toBeVisible();
+    }
+  }
+});
+
+test('띠별 안내에서 오늘 목록으로 이동하고 돌아오면 현재 페이지 표시도 따른다', async ({ page }) => {
+  for (const lang of ['', '/en']) {
+    await page.goto(`${lang}/tti/`);
+    const current = page.locator('.tti-nav [aria-current="page"]');
+    await expect(current).toHaveCount(0);
+    await page.locator(`.tti-nav a[href="${lang}/tti/today/"]`).click();
+    await expect(current).toHaveAttribute('href', `${lang}/tti/today/`);
+    await page.goBack();
+    await expect(current).toHaveCount(0);
+    await page.goto(`${lang}/tti/today/rat/`);
+    const section = page.locator('.tti-nav [aria-current="location"]');
+    await expect(section).toHaveAttribute('href', `${lang}/tti/today/`);
+    await page.locator(`.tti-nav a[href="${lang}/tti/samjae/"]`).click();
+    await expect(current).toHaveAttribute('href', `${lang}/tti/samjae/`);
+    await page.goBack();
+    await expect(section).toHaveAttribute('href', `${lang}/tti/today/`);
+  }
+});

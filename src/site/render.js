@@ -55,7 +55,7 @@ function routeTable(ctx) {
       title: tr(`${name} 미리보기 · 상세 풀이 990원`, `${name} preview and premium report`),
       description: tr(`${name}의 일부 풀이를 미리 확인하세요. 개인별 상세 해설과 HTML 운세 파일은 990원 단건 결제로 제공합니다.`, `Preview your ${name} report. Detailed Korean readings and an HTML download cost KRW 990 as a one-time purchase.`),
       supplement: id === 'tojeong' ? yearGuide(year, c, c.path) : '',
-      body: product.body + (id === 'lifetime' ? lifetimeExample(c.today) : id === 'compatibility' ? compatibilityExample(c.today) : tojeongYearReference(year)),
+      body: product.body + (id === 'lifetime' ? lifetimeExample(c.today, 'report-start') : id === 'compatibility' ? compatibilityExample(c.today, 'report-start') : tojeongYearReference(year)),
     };
   };
   add('/tojeong/', ctx.cfg.paidReadings ? paidPage('tojeong') : tojeongPage, { p: 0.9 });
