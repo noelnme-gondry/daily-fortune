@@ -44,29 +44,24 @@ T.groupCareer=[
 ];
 T.elementIndustry=['Education, publishing, design, fashion, landscaping and clothing','Broadcasting, media, IT services, advertising, beauty and energy','Property, construction, agriculture, brokerage, consulting and hospitality','Finance, machinery, automotive, law, medical devices and semiconductors','Trade, logistics, travel, food, fisheries and research'];
 T.wealth={
- none:'Wealth stars are not prominent in your chart. This reading favors building skills and reputation over chasing money directly, with a reliable system for managing finances.',
- weak:'Wealth energy is limited, favoring steady income over sudden windfalls. Regular saving suits this pattern better than trying to build a lump sum at once.',
- balanced:'Wealth energy is moderate, suggesting balance between earning and spending. Adjusting how much you expand or conserve can help maintain that balance.',
- strong:'Strong Wealth energy suggests an eye for opportunities. If the demands exceed what your Day Master can handle, keeping what you earn becomes just as important as earning it.',
- sikjae:'Expression and Wealth occur together, a traditional pattern called Expression generating Wealth. Skills, content and ideas are central to this interpretation of earning potential.',
- gunjeop:'Strong Companion energy with limited Wealth calls for care with partnerships, guarantees and lending. Keep clear boundaries between your money and other people’s.',
+ none:'Wealth symbols carry little weight in this chart. To reflect on your own habits, find one expense last month where the amount surprised you.',
+ weak:'Wealth symbols have a small share of this chart. Compare one monthly cost that stays fairly steady with one that varies.',
+ balanced:'Wealth symbols sit in the middle range. Put income and payment dates on the same calendar and see how far apart they fall.',
+ strong:'Wealth symbols carry considerable weight in this chart. If several expenses compete for attention, decide what to set aside, then compare what fits the remainder.',
+ sikjae:'Expression and Wealth occur together, traditionally called Expression generating Wealth. If someone has used something you made, ask which part they found useful.',
+ gunjeop:'Companion symbols carry more weight than Wealth. If you share a cost with someone, agree on your shares and a date to settle up.',
 };
-T.spouseStar={
- M:{none:'The Wealth stars traditionally associated with a wife or partner are not prominent. This reading suggests later connections or high personal standards, with patience favored over rushing.',one:'One clear Wealth star suggests a tendency to focus deeply on one person and stay committed.',many:'Multiple Wealth stars suggest frequent romantic opportunities. Thoughtful choices matter when several paths open.'},
- F:{none:'The Authority stars traditionally associated with a husband or partner are not prominent. Work and personal growth may take priority, with relationship themes becoming more noticeable in Authority periods.',one:'One clear Authority star suggests building a stable bond with a dependable partner.',many:'Multiple Authority stars suggest frequent connections and romantic attention. Clear preferences can make choosing easier.'},
-};
-T.mixedGwan='Direct Officer and Seven Killings both appear, a pattern traditionally called mixed Authority. You may feel drawn to both dependable and intense partners. Take time with romantic and marriage decisions.';
-T.spousePalace={
- '비견':'Peer in the spouse palace suggests a partner who feels like a friend. Equality and respect for each other’s space help the relationship last.',
- '겁재':'Rival in the spouse palace suggests passion, with possible struggles over control. Agree on rules for shared finances.',
- '식신':'Eating God in the spouse palace suggests a comfortable, affectionate home, with happiness in shared meals and everyday pleasures.',
- '상관':'Hurting Officer in the spouse palace suggests attraction to wit and charm. Careful wording helps protect the relationship.',
- '편재':'Indirect Wealth in the spouse palace suggests an active, sociable partner. Travel and new experiences can bring you closer.',
- '정재':'Direct Wealth in the spouse palace suggests a diligent, thrifty partner and a focus on building stable household finances.',
- '편관':'Seven Killings in the spouse palace suggests attraction to charisma, alongside tension. Respecting each other’s freedom brings ease.',
- '정관':'Direct Officer in the spouse palace suggests a principled, responsible partner who values trust and order at home.',
- '편인':'Indirect Resource in the spouse palace suggests a bond with an unusual or sensitive partner. Respect each other’s private time.',
- '정인':'Direct Resource in the spouse palace suggests a caring partner and emotional security in married life.',
+T.spousePalace = {
+  '비견': 'Peer represents equality in the day branch. For a shared decision, each suggest one option.',
+  '겁재': 'Rival brings up sharing. If a cost will be shared, agree on what each person feels comfortable paying.',
+  '식신': 'Eating God symbolizes everyday comfort. Notice what feels restful alone and in company.',
+  '상관': 'Hurting Officer brings direct expression into focus. Before a difficult conversation, ask if now is a good time.',
+  '편재': 'Indirect Wealth is associated with new experiences. If you want to try something together, extend a light invitation.',
+  '정재': 'Direct Wealth symbolizes steady care. Think of one small promise you would like to keep.',
+  '편관': 'Seven Killings brings boundaries into focus. Say which part of a request you feel comfortable accepting.',
+  '정관': 'Direct Officer symbolizes responsibility. Agree on what each person will take on before sharing a task.',
+  '편인': 'Indirect Resource brings private time and interests into focus. Let people know when you need room to concentrate.',
+  '정인': 'Direct Resource symbolizes support. Say whether you would welcome advice or simply some company.',
 };
 T.tgMeaning={'비견':'companionship and independence','겁재':'competition, winning, sharing and rivalry','식신':'ease, enjoyment and creative talent','상관':'unconventional expression and wit','편재':'active wealth, expansion and large transactions','정재':'steady wealth built through diligence','편관':'challenge, pressure and breaking through obstacles','정관':'reputation, order, position and responsibility','편인':'intuition, inspiration and unusual talent','정인':'learning, care, documents and support'};
 T.tgKeyword={'비견':'Independence','겁재':'Competition','식신':'Talent and ease','상관':'Change and expression','편재':'Expansion and business','정재':'Saving and stability','편관':'Challenge and breakthrough','정관':'Reputation and advancement','편인':'Expertise and inquiry','정인':'Learning and support'};
@@ -146,24 +141,24 @@ T.cat.money={
 T.cat.love={
  lead:{high:['{P}, a welcome message or another date may bring a sense of closeness.','{P}, there is room to look forward to a revealing conversation or a tender expression of affection.'],good:['{P}, a remembered promise or preference may make someone’s care feel tangible.','{P}, an easy conversation and a shared laugh offer room for affection to grow.'],mid:['{P}, focus on strengthening existing bonds rather than major progress.','{P}, feelings may be steady without much excitement.'],low:['{P}, a small remark may be easy to misunderstand.','{P}, heightened sensitivity may create distance in a relationship.']},
  factor:{
- '정재M':['Direct Wealth, the traditional partner star here, favors serious commitment.','Direct Wealth may bring requests for greater responsibility in a relationship.'],
- '편재M':['Indirect Wealth highlights new romantic encounters.','Indirect Wealth may scatter romantic attention and put trust under strain.'],
- '정관F':['Direct Officer, the traditional partner star here, highlights dependable connections.','Direct Officer may make meeting a partner’s expectations tiring.'],
- '편관F':['Seven Killings highlights intense romantic attraction.','Seven Killings may bring frustration with stubbornness or interference. Keep clear boundaries.'],
- '상관F':['Hurting Officer highlights charm and expressiveness that attract attention.','Hurting Officer conflicts with the traditional partner star, suggesting a greater need to manage arguments.'],
- '비견M':['Peer energy suggests that an easy friendship could develop into romance.','Peer energy competes with the traditional partner star, highlighting possible rivalry.'],
- '겁재M':['','Rival highlights jealousy or romantic rivalry. Be careful with triangles and assumptions.'],
- '상관':['Hurting Officer highlights charm and expressiveness that attract attention.','Hurting Officer may sharpen your tone. Choose your words with a partner carefully.'],
+ '정재M':["Direct Wealth points to steady care. If you would like to see someone again, a small invitation is a place to start.", "Direct Wealth brings responsibility into focus. Consider how much you feel comfortable offering."],
+ '편재M':["Indirect Wealth suggests openness to unfamiliar qualities.", "Indirect Wealth draws attention to different possibilities. You can take time to decide what you want."],
+ '정관F':["Direct Officer brings the qualities you find dependable into focus.", "If expectations feel heavy, Direct Officer invites you to distinguish what you want from what others expect."],
+ '편관F':["Seven Killings suggests feelings may build quickly. Take time to discover what draws you in.", "Seven Killings brings differences of pace into focus. Say what distance feels comfortable if you need to."],
+ '상관F':["Hurting Officer points to putting a feeling into words.", "With Hurting Officer, candour may sound sharper than intended. Start with what you mean to convey."],
+ '비견M':["Peer highlights the ease of meeting on equal terms.", "Peer brings comparison into focus. Affection does not need a scoreboard."],
+ '겁재M':["", "Rival brings comparison into focus. If a remark stays with you, listen a little longer before deciding what it means."],
+ '상관':["Hurting Officer highlights expressing a feeling you have kept to yourself.", "With Hurting Officer, expression may run ahead of intention. Consider how an important remark might land."],
  '식신':['Eating God favors simple pleasures such as a shared meal or relaxed date.','Eating God may bring complacency about keeping in touch.'],
  '비견':['Peer energy suggests that an easy friendship could develop into romance.','Peer energy may make both people reluctant to compromise.'],
  '겁재':['Rival supports a more active approach to expressing affection.','Rival may stir jealousy or competition within a relationship.'],
  '정인':['Direct Resource supports warm, considerate exchanges.','Strong Direct Resource may lead to overthinking and hesitation in romance.'],
  '편인':['Indirect Resource highlights connections built around unusual charm.','Indirect Resource may increase your need for solitude, which a partner could misunderstand.'],
- '도화':['Peach Blossom highlights charm and romantic attention.',''],
- '홍란':['Red Matchmaker and Heavenly Joy highlight happy relationship and marriage themes.',''],
- '일지합':['A combination with the spouse palace supports a deeper bond and commitment.',''],
+ '도화':["Peach Blossom draws attention to the way you express your charm.", ""],
+ '홍란':["Red Matchmaker and Heavenly Joy suggest openness to connection. If someone is on your mind, a light greeting may suit the day.", ""],
+ '일지합':["A day-branch combination suggests ease in connecting. Notice a moment when conversation feels natural.", ""],
  '일지삼합':['Three-harmony energy with the day branch favors enjoyable time together.',''],
- '일지충':['','A clash with the spouse palace highlights disagreements or time apart.'],
+ '일지충':["", "A day-branch clash suggests a difference in pace, even with someone close. If there is something to discuss, find a time that suits you both."],
  '일지형':['','A penalty relation with the day branch calls for care with words that may hurt.'],
  '일지원진':['','A friction relation with the day branch may let unspoken hurts build up. Put your feelings into words.'],
  '일지해':['','A harm relation with the day branch may make small matters emotionally sensitive.'],

@@ -1,3 +1,4 @@
+import { monthPractices } from '../domain/premium-reading.js';
 import { esc } from '../site/util.js';
 import { TOJEONG } from '../content/tojeong.js';
 import { tr } from '../i18n/runtime.js';
@@ -12,6 +13,7 @@ function paragraphs(text) {
 export function tojeongView(result, reading, name = '') {
   const r = result, v = r.values, l = r.birth.lunar;
   if (!reading?.chongun || !Array.from({ length: 12 }, (_, i) => reading.months?.[i + 1]).every(Boolean)) throw new Error(tr('토정비결 해설이 누락되었습니다.', 'The Tojeong reading is incomplete.'));
+  const practices = monthPractices(reading, r.code);
   const adjustments = [
     r.normalizedLeap ? tr('윤달 생일을 같은 월의 평달로 계산했습니다.', 'Your leap-month birthday was treated as the regular month with the same number.') : '',
     r.adjustedDay ? tr(`보는 해의 음력 ${l.m}월은 29일까지 있어 생일 ${l.d}일을 29일로 계산했습니다.`, `Lunar month ${l.m} has only 29 days in the target year, so birthday day ${l.d} was calculated as day 29.`) : '',
@@ -25,7 +27,7 @@ export function tojeongView(result, reading, name = '') {
   <section class="card box tojeong-reading"><h2>${tr('한 해의 총운', 'Your annual outlook')}</h2><p class="hint">${esc(TOJEONG.readingNote)}</p><div class="prose">${paragraphs(reading.chongun)}</div></section>
   <section class="card box"><div><h2>${tr('음력 열두 달의 흐름', 'The twelve lunar months')}</h2><p class="hint">${tr('달을 누르면 상세 풀이가 아래에 나타납니다. 윤달은 같은 월의 풀이를 읽습니다.', 'Select a month to read its interpretation below. A leap month uses the reading for the regular month with the same number.')}</p></div>
     <div class="tojeong-months" role="group" aria-label="${tr('음력 월 선택', 'Select a lunar month')}">${Array.from({ length: 12 }, (_, i) => `<button type="button" id="tj-month-button-${i + 1}" data-tojeong-month="${i + 1}" aria-controls="tj-month-${i + 1}" aria-pressed="${i === 0}"><span>${tr('음력', 'Lunar')}</span><b>${tr(`${i + 1}월`, `${i + 1}`)}</b></button>`).join('')}</div>
-    <div class="tojeong-month-detail">${Array.from({ length: 12 }, (_, i) => `<section id="tj-month-${i + 1}" role="region" aria-labelledby="tj-month-button-${i + 1}"${i ? ' hidden' : ''}><h3>${tr(`음력 ${i + 1}월 풀이`, `Lunar month ${i + 1}`)}</h3><div class="prose">${paragraphs(reading.months[i + 1])}</div></section>`).join('')}</div>
+    <div class="tojeong-month-detail">${Array.from({ length: 12 }, (_, i) => `<section id="tj-month-${i + 1}" role="region" aria-labelledby="tj-month-button-${i + 1}"${i ? ' hidden' : ''}><h3>${tr(`음력 ${i + 1}월 풀이`, `Lunar month ${i + 1}`)}</h3><div class="prose">${paragraphs(reading.months[i + 1])}</div>${practices[i] ? `<aside class="note"><b>${tr('생활에 비춰 보기', 'Try this in daily life')}</b><p>“${esc(practices[i].source)}” · ${esc(practices[i].action)}</p></aside>` : ''}</section>`).join('')}</div>
   </section>
   <section class="card box"><h2>${tr('내 괘가 나온 과정', 'How your reading was calculated')}</h2><dl class="tojeong-calculation">
     <div><dt>${tr(`상괘 ${r.upper}`, `Upper ${r.upper}`)}</dt><dd>${tr(`(세는나이 ${v.age} + 태세수 ${v.taese}) ÷ 8의 나머지`, `Remainder of (counting age ${v.age} + year value ${v.taese}) ÷ 8`)}</dd><dd>${tr(`${esc(r.ganji.year)}년 · 나머지 0이면 8`, `${esc(r.ganji.year)} year · A remainder of 0 becomes 8`)}</dd></div>

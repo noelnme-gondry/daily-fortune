@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "currentRelease": "6f4f36e36a122632b76ca17f063fe4c059c6cc2fbb9982b82f77071cfa345332",
+  "currentRelease": "8cc5bbafbfdf3276de7b0089e18175072778f90693d190bee7268c653a291e73",
   "activeRelease": null,
   "releases": [
     {
@@ -7135,6 +7135,317 @@
         "assets/tti-client-DqAeWXGd.js",
         "assets/util-Dj-icwve.js"
       ]
+    },
+    {
+      "id": "8cc5bbafbfdf3276de7b0089e18175072778f90693d190bee7268c653a291e73",
+      "preparedAt": "2026-11-20T17:19:57.282Z",
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z",
+      "retiredAt": null,
+      "sourceRevision": "80c80dbf1b40fddb5f4c1af81a0214074a5bdce6",
+      "provenance": "local release preparation",
+      "manifest": {
+        "_birth-form-DDLo-D4z.js": {
+          "file": "assets/birth-form-DDLo-D4z.js",
+          "name": "birth-form",
+          "imports": [
+            "src/client/main.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_terms-CY3aWw4-.js"
+          ]
+        },
+        "_birth-input-CSMfKQ-d.js": {
+          "file": "assets/birth-input-CSMfKQ-d.js",
+          "name": "birth-input",
+          "imports": [
+            "src/client/main.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js"
+          ]
+        },
+        "_korean-lunar-NK9q0LnC.js": {
+          "file": "assets/korean-lunar-NK9q0LnC.js",
+          "name": "korean-lunar"
+        },
+        "_lunar-Cyjw6xOv.js": {
+          "file": "assets/lunar-Cyjw6xOv.js",
+          "name": "lunar"
+        },
+        "_rank-CurPDWyq.js": {
+          "file": "assets/rank-CurPDWyq.js",
+          "name": "rank",
+          "imports": [
+            "src/client/main.js",
+            "_terms-CY3aWw4-.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_story-BYfHKVdC.js",
+            "_birth-form-DDLo-D4z.js"
+          ]
+        },
+        "_ranking-pagination-Cqih7sVH.js": {
+          "file": "assets/ranking-pagination-Cqih7sVH.js",
+          "name": "ranking-pagination",
+          "imports": [
+            "src/client/main.js",
+            "_util-DH8PuhQd.js"
+          ]
+        },
+        "_reading-preferences-DkFnTE1c.js": {
+          "file": "assets/reading-preferences-DkFnTE1c.js",
+          "name": "reading-preferences",
+          "imports": [
+            "src/client/main.js",
+            "_story-BYfHKVdC.js"
+          ]
+        },
+        "_story-BYfHKVdC.js": {
+          "file": "assets/story-BYfHKVdC.js",
+          "name": "story",
+          "imports": [
+            "src/client/main.js"
+          ]
+        },
+        "_terms-CY3aWw4-.js": {
+          "file": "assets/terms-CY3aWw4-.js",
+          "name": "terms",
+          "imports": [
+            "src/client/main.js"
+          ]
+        },
+        "_tool-BMPBhzVE.js": {
+          "file": "assets/tool-BMPBhzVE.js",
+          "name": "tool",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_birth-form-DDLo-D4z.js",
+            "_rank-CurPDWyq.js",
+            "_terms-CY3aWw4-.js",
+            "src/client/profile.js",
+            "_reading-preferences-DkFnTE1c.js",
+            "_util-DH8PuhQd.js"
+          ],
+          "dynamicImports": [
+            "src/client/rank-tool.js",
+            "src/client/story-tool.js",
+            "src/client/compat-tool.js",
+            "src/client/life-tool.js"
+          ]
+        },
+        "_util-DH8PuhQd.js": {
+          "file": "assets/util-DH8PuhQd.js",
+          "name": "util",
+          "imports": [
+            "src/client/main.js"
+          ]
+        },
+        "src/client/card.js": {
+          "file": "assets/card-C3DnZkAP.js",
+          "name": "card",
+          "src": "src/client/card.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js"
+          ]
+        },
+        "src/client/compat-tool.js": {
+          "file": "assets/compat-tool-Cwys82Qw.js",
+          "name": "compat-tool",
+          "src": "src/client/compat-tool.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_terms-CY3aWw4-.js",
+            "_tool-BMPBhzVE.js",
+            "_rank-CurPDWyq.js",
+            "_util-DH8PuhQd.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_ranking-pagination-Cqih7sVH.js",
+            "_birth-form-DDLo-D4z.js",
+            "src/client/profile.js",
+            "_reading-preferences-DkFnTE1c.js",
+            "_story-BYfHKVdC.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js"
+          ]
+        },
+        "src/client/life-tool.js": {
+          "file": "assets/life-tool-DnhRQ_Wg.js",
+          "name": "life-tool",
+          "src": "src/client/life-tool.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_tool-BMPBhzVE.js",
+            "_terms-CY3aWw4-.js",
+            "_rank-CurPDWyq.js",
+            "_util-DH8PuhQd.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js",
+            "_birth-form-DDLo-D4z.js",
+            "src/client/profile.js",
+            "_reading-preferences-DkFnTE1c.js",
+            "_story-BYfHKVdC.js"
+          ]
+        },
+        "src/client/main.js": {
+          "file": "assets/main-BXY2j2JC.js",
+          "name": "main",
+          "src": "src/client/main.js",
+          "isEntry": true,
+          "dynamicImports": [
+            "src/client/card.js",
+            "src/client/tti-client.js",
+            "src/client/profile.js",
+            "src/client/profile-manager.js",
+            "src/client/purchase.js",
+            "src/client/tti-client.js",
+            "src/client/tojeong-client.js",
+            "_tool-BMPBhzVE.js"
+          ]
+        },
+        "src/client/profile-manager.js": {
+          "file": "assets/profile-manager-Be1ryw5k.js",
+          "name": "profile-manager",
+          "src": "src/client/profile-manager.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_util-DH8PuhQd.js",
+            "_birth-form-DDLo-D4z.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_rank-CurPDWyq.js",
+            "src/client/profile.js",
+            "_terms-CY3aWw4-.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js",
+            "_story-BYfHKVdC.js"
+          ]
+        },
+        "src/client/profile.js": {
+          "file": "assets/profile-DlwODP45.js",
+          "name": "profile",
+          "src": "src/client/profile.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js"
+          ]
+        },
+        "src/client/purchase.js": {
+          "file": "assets/purchase-DOM5dX8U.js",
+          "name": "purchase",
+          "src": "src/client/purchase.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "_birth-form-DDLo-D4z.js",
+            "src/client/profile.js",
+            "_util-DH8PuhQd.js",
+            "src/client/main.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js",
+            "_terms-CY3aWw4-.js"
+          ]
+        },
+        "src/client/rank-tool.js": {
+          "file": "assets/rank-tool-BapDM_d7.js",
+          "name": "rank-tool",
+          "src": "src/client/rank-tool.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_tool-BMPBhzVE.js",
+            "_rank-CurPDWyq.js",
+            "_util-DH8PuhQd.js",
+            "_terms-CY3aWw4-.js",
+            "_birth-form-DDLo-D4z.js",
+            "_ranking-pagination-Cqih7sVH.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js",
+            "src/client/profile.js",
+            "_reading-preferences-DkFnTE1c.js",
+            "_story-BYfHKVdC.js"
+          ]
+        },
+        "src/client/story-tool.js": {
+          "file": "assets/story-tool-IlXuKLPQ.js",
+          "name": "story-tool",
+          "src": "src/client/story-tool.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_util-DH8PuhQd.js",
+            "_terms-CY3aWw4-.js",
+            "_story-BYfHKVdC.js",
+            "_rank-CurPDWyq.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_lunar-Cyjw6xOv.js",
+            "_korean-lunar-NK9q0LnC.js",
+            "_birth-form-DDLo-D4z.js"
+          ]
+        },
+        "src/client/tojeong-client.js": {
+          "file": "assets/tojeong-client-38bOOPWu.js",
+          "name": "tojeong-client",
+          "src": "src/client/tojeong-client.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "_korean-lunar-NK9q0LnC.js",
+            "src/client/main.js",
+            "_util-DH8PuhQd.js",
+            "_reading-preferences-DkFnTE1c.js",
+            "src/client/profile.js",
+            "_birth-input-CSMfKQ-d.js",
+            "_story-BYfHKVdC.js",
+            "_lunar-Cyjw6xOv.js"
+          ]
+        },
+        "src/client/tti-client.js": {
+          "file": "assets/tti-client-DA4XTiXk.js",
+          "name": "tti-client",
+          "src": "src/client/tti-client.js",
+          "isDynamicEntry": true,
+          "imports": [
+            "src/client/main.js",
+            "_util-DH8PuhQd.js",
+            "_terms-CY3aWw4-.js",
+            "src/client/profile.js"
+          ]
+        },
+        "src/styles/main.css": {
+          "file": "assets/style-Cj0r8Plp.css",
+          "src": "src/styles/main.css",
+          "isEntry": true
+        }
+      },
+      "files": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/card-C3DnZkAP.js",
+        "assets/compat-matches.worker-DWkhpKPd.js",
+        "assets/compat-tool-Cwys82Qw.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/life-tool-DnhRQ_Wg.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/profile-DlwODP45.js",
+        "assets/profile-manager-Be1ryw5k.js",
+        "assets/purchase-DOM5dX8U.js",
+        "assets/rank-CurPDWyq.js",
+        "assets/rank-tool-BapDM_d7.js",
+        "assets/ranking-pagination-Cqih7sVH.js",
+        "assets/reading-preferences-DkFnTE1c.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/story-tool-IlXuKLPQ.js",
+        "assets/style-Cj0r8Plp.css",
+        "assets/terms-CY3aWw4-.js",
+        "assets/tojeong-client-38bOOPWu.js",
+        "assets/tool-BMPBhzVE.js",
+        "assets/tti-client-DA4XTiXk.js",
+        "assets/util-DH8PuhQd.js"
+      ]
     }
   ],
   "assets": {
@@ -7190,7 +7501,7 @@
       "bytes": 18137,
       "mime": "text/javascript",
       "references": [],
-      "lastReferencedAt": "2026-11-20T14:22:58.805Z"
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
     },
     "assets/life-tool-LoEXFxTk.js": {
       "sha256": "1bfad007c17ef9c61459a07eef3556ce80b923badec7a56cffb6d18e7919a5b3",
@@ -7215,7 +7526,7 @@
       "bytes": 307789,
       "mime": "text/javascript",
       "references": [],
-      "lastReferencedAt": "2026-11-20T14:22:58.805Z"
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
     },
     "assets/main-DS2wYslW.js": {
       "sha256": "bb6716966c071e96b13c52661bfdb53ad65a71a760b00d6d34ff1ec22ccc8467",
@@ -12677,7 +12988,7 @@
       "bytes": 96933,
       "mime": "text/css",
       "references": [],
-      "lastReferencedAt": "2026-11-20T14:22:58.805Z"
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
     },
     "assets/terms-jIeT_A32.js": {
       "sha256": "65f982ec1d3bdc63858a84492a427af7421dbee37d6660c183f16f7d42184a5b",
@@ -13038,6 +13349,303 @@
         "assets/main-CCgMXx6r.js"
       ],
       "lastReferencedAt": "2026-11-20T14:22:58.805Z"
+    },
+    "assets/birth-form-DDLo-D4z.js": {
+      "sha256": "f138c768e639616a14527dd752fee43eea3dd77ef9b514b023c5d67b717ffabd",
+      "bytes": 9346,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/terms-CY3aWw4-.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/birth-input-CSMfKQ-d.js": {
+      "sha256": "b86f9f8a1f3ab79b62951af97814fd8be0b555a2002e0bb8dcbe0b9e190a266c",
+      "bytes": 4410,
+      "mime": "text/javascript",
+      "references": [
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/card-C3DnZkAP.js": {
+      "sha256": "48abce82a872524d82959e4045babc9290fec5623ca94d7253619da4e9211ae0",
+      "bytes": 2705,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-BXY2j2JC.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/compat-matches.worker-DWkhpKPd.js": {
+      "sha256": "f3c68a96c37e9506cbd9b8f413dbcbbd2a2f8d98437dd691c87fa57a131a6581",
+      "bytes": 495182,
+      "mime": "text/javascript",
+      "references": [],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/compat-tool-Cwys82Qw.js": {
+      "sha256": "746ebfc3fada1bdfe24174d90c2bef9002719fac228fd7fdd169292e03ede829",
+      "bytes": 13335,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/compat-matches.worker-DWkhpKPd.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/profile-DlwODP45.js",
+        "assets/rank-CurPDWyq.js",
+        "assets/ranking-pagination-Cqih7sVH.js",
+        "assets/reading-preferences-DkFnTE1c.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/terms-CY3aWw4-.js",
+        "assets/tool-BMPBhzVE.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/life-tool-DnhRQ_Wg.js": {
+      "sha256": "3a7c5d426cd4852e70a820258cad68de8e05d945e53e8b2bffe96e5608829087",
+      "bytes": 17472,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/profile-DlwODP45.js",
+        "assets/rank-CurPDWyq.js",
+        "assets/reading-preferences-DkFnTE1c.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/terms-CY3aWw4-.js",
+        "assets/tool-BMPBhzVE.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/main-BXY2j2JC.js": {
+      "sha256": "7ee0e0296ac64ac339bd2ebd9f4308763b2713a0fa7117ce45ce8e069ef864d3",
+      "bytes": 109419,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/card-C3DnZkAP.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/profile-DlwODP45.js",
+        "assets/profile-manager-Be1ryw5k.js",
+        "assets/purchase-DOM5dX8U.js",
+        "assets/rank-CurPDWyq.js",
+        "assets/reading-preferences-DkFnTE1c.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/terms-CY3aWw4-.js",
+        "assets/tojeong-client-38bOOPWu.js",
+        "assets/tool-BMPBhzVE.js",
+        "assets/tti-client-DA4XTiXk.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/profile-DlwODP45.js": {
+      "sha256": "8e510c9358b784fd844d8e227d3748f266894b3a1e4e65b4fba3787826acaa3a",
+      "bytes": 5740,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-BXY2j2JC.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/profile-manager-Be1ryw5k.js": {
+      "sha256": "455a95d8bd4373688940ca049add3d3ba5b4183c15fb41e1e3711ec4bfc7a543",
+      "bytes": 10995,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/profile-DlwODP45.js",
+        "assets/rank-CurPDWyq.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/terms-CY3aWw4-.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/purchase-DOM5dX8U.js": {
+      "sha256": "a6ed5368c2d4c0e045159d2dfa733896f217fb9fa813ac15f32b15efe72078d5",
+      "bytes": 11141,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/profile-DlwODP45.js",
+        "assets/terms-CY3aWw4-.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/rank-CurPDWyq.js": {
+      "sha256": "f574c0f1dc0871ff6b542adc3118c01c53c82a505c112dc033cbf570a295b215",
+      "bytes": 318694,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/terms-CY3aWw4-.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/rank-tool-BapDM_d7.js": {
+      "sha256": "2c9fc10469c7fbb90aded261fa5f8b3be9e2bb9b1c9fb97b3929963b1ff02a2d",
+      "bytes": 176074,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/profile-DlwODP45.js",
+        "assets/rank-CurPDWyq.js",
+        "assets/ranking-pagination-Cqih7sVH.js",
+        "assets/reading-preferences-DkFnTE1c.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/terms-CY3aWw4-.js",
+        "assets/tool-BMPBhzVE.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/ranking-pagination-Cqih7sVH.js": {
+      "sha256": "8a34f49851804193965577e72119193448e7444d060818e5c145e704a898e597",
+      "bytes": 1693,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-BXY2j2JC.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/reading-preferences-DkFnTE1c.js": {
+      "sha256": "45ee47b57da8e56ba9ba2b323257fe96359a7290e692e4df95f5979553434120",
+      "bytes": 3055,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-BXY2j2JC.js",
+        "assets/story-BYfHKVdC.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/story-BYfHKVdC.js": {
+      "sha256": "15488b708dfd10125501f9bc9268df99d6935196d441cec0c96c104266ae96b2",
+      "bytes": 18166,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-BXY2j2JC.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/story-tool-IlXuKLPQ.js": {
+      "sha256": "036cb3d810f4e7232bb597fd466a116e389aa1c0d80c281f7c6c176cac633a93",
+      "bytes": 10576,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/rank-CurPDWyq.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/terms-CY3aWw4-.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/terms-CY3aWw4-.js": {
+      "sha256": "d0a01c632b6c2039c220d9cf6e184b209cc3ba2f957d19cba9bfb416202ed84b",
+      "bytes": 3694,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-BXY2j2JC.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/tojeong-client-38bOOPWu.js": {
+      "sha256": "50d4571b297f8b7a7ab158c4a422c81acf890dcf28fa19e0a2d567f293fbfd43",
+      "bytes": 22202,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/profile-DlwODP45.js",
+        "assets/reading-preferences-DkFnTE1c.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/tool-BMPBhzVE.js": {
+      "sha256": "fab155a5b94437f261263e93d1ffcec39782c87593f3f3a248edbe69e8705bde",
+      "bytes": 273217,
+      "mime": "text/javascript",
+      "references": [
+        "assets/birth-form-DDLo-D4z.js",
+        "assets/birth-input-CSMfKQ-d.js",
+        "assets/compat-tool-Cwys82Qw.js",
+        "assets/korean-lunar-NK9q0LnC.js",
+        "assets/life-tool-DnhRQ_Wg.js",
+        "assets/lunar-Cyjw6xOv.js",
+        "assets/main-BXY2j2JC.js",
+        "assets/profile-DlwODP45.js",
+        "assets/rank-CurPDWyq.js",
+        "assets/rank-tool-BapDM_d7.js",
+        "assets/ranking-pagination-Cqih7sVH.js",
+        "assets/reading-preferences-DkFnTE1c.js",
+        "assets/story-BYfHKVdC.js",
+        "assets/story-tool-IlXuKLPQ.js",
+        "assets/terms-CY3aWw4-.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/tti-client-DA4XTiXk.js": {
+      "sha256": "20b0f128966e62bd3be296f54faf81ef91fcb2dbf8dc1b4d5ca9268f76e48d89",
+      "bytes": 1510,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-BXY2j2JC.js",
+        "assets/profile-DlwODP45.js",
+        "assets/terms-CY3aWw4-.js",
+        "assets/util-DH8PuhQd.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
+    },
+    "assets/util-DH8PuhQd.js": {
+      "sha256": "a96c02ceac99dcd893b398667a9be97b0ce678859a0d4aa2428542f5de02d809",
+      "bytes": 1423,
+      "mime": "text/javascript",
+      "references": [
+        "assets/main-BXY2j2JC.js"
+      ],
+      "lastReferencedAt": "2026-11-20T17:19:57.282Z"
     }
   }
 }

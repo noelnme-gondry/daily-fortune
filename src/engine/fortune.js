@@ -4,13 +4,15 @@ import { term, stemName, branchName, elementName, weekdayName } from '../i18n/te
 import T from '../content/text.js';
 import {
   STEM_H, BR_H, EL_H, STEM_EL, BR_EL, BR_MAIN, STAGES, STAGE_W,
-  pick, fill, josa, clamp, addDays, dow, daysIn, fmtDate, fmtShort,
+  fromUTC, DAY_MS, pick, fill, josa, clamp, addDays, dow, daysIn, fmtDate, fmtShort,
   tenGod, stageOf, branchRels, stemHe, stemChung, pillarLabel, brHours,
 } from './core.js';
 import { dayPillar, monthPillar, yearPillar, yearPillarOfDate, lunarText } from './calendar.js';
 import { daeunAt } from './chart.js';
 import { readingAction, readingCycle, readingHeadline, dayChangeText, weekRhythm } from '../domain/reading.js';
-import { dailyOverview, dailyReading } from '../domain/daily-reading.js';
+import { periodPractice } from '../domain/period-practice.js';
+import { practiceCalendar } from '../domain/practice-calendar.js';
+import { personalPractices, dailyOverview, dailyReading } from '../domain/daily-reading.js';
 
 export const CATS = ['career', 'money', 'love', 'move', 'health', 'social', 'study'];
 const CAT_W = [1, 1, 1, 0.6, 0.9, 0.8, 0.6];
@@ -135,7 +137,9 @@ export function catText(c, cat, m, score, P, key, used) {
     if (main) parts.push(factorText(c, cat, main[0], -1));
     if (pos && pos[1] > 0.6 && fresh(pos)) parts.push(tr('그래도 ', 'Even so, ') + factorText(c, cat, pos[0], 1));
   }
-  let adv = pick(C.advice[band], key + cat + 'A');
+  const factor = leadingFactor({ pos, posG, neg, negG }, score)?.[0];
+  const topic = readingAction(cat, score, { factor, identity: key }).id;
+  let adv = periodPractice(topic, key);
   if (cat === 'health' && (band === 'low' || band === 'mid')) adv += tr(' 이 점수로 건강 상태나 질환을 판단할 수는 없습니다.', ' This score does not assess health or illness.');
   parts.push(adv);
   return parts.join(' ');
@@ -167,6 +171,25 @@ function lucky(c, key) {
   const b = pick(LUCKY_BR[el], key + 'lt');
   return { el, color: pick(E.color, key + 'lc'), number: pick(E.number, key + 'ln'), dir: E.dir, time: tr(`${branchName(b)}시 ${brHours(b)}`, `${branchName(b)} hour ${brHours(b)}`) };
 }
+function leadingFactor(factors, score) {
+  const { pos, neg, posG, negG } = factors;
+  return score >= 60 ? pos || posG || neg || negG : neg || negG || pos || posG;
+}
+
+const chartCalendars = new WeakMap();
+function dailyPractices(chart, date) {
+  if (!chartCalendars.has(chart)) chartCalendars.set(chart, practiceCalendar(cycle => {
+    const { dEv, comb } = dayComb(chart, fromUTC(cycle * DAY_MS));
+    const scores = scoresOf(comb, 'day');
+    return CATS.map((cat, i) => {
+      const factor = leadingFactor(topFactors(chart, cat, dEv.acc[i]), scores.cats[i])?.[0];
+      const topic = readingAction(cat, scores.cats[i], { factor, cycle, identity: chart.key }).id;
+      return personalPractices(cat, factor, topic, cycle, chart.key);
+    });
+  }));
+  return chartCalendars.get(chart)(readingCycle(date));
+}
+
 function buildReport(c, comb, kind, ctx) {
   const sc = scoresOf(comb, kind);
   const key = c.key + '|' + ctx.key;
@@ -176,11 +199,11 @@ function buildReport(c, comb, kind, ctx) {
     const base = { key: cat, name: T.catName[cat], score: sc.cats[i] };
     if (!shortPeriod) return { ...base, text: catText(c, cat, comb.acc[i], sc.cats[i], ctx.P, key, used) };
     // 일간 해설은 매일 달라지는 일진의 요인을 먼저 읽는다. 월·년 배경에 가려지지 않게 한다.
-    const { pos, neg, posG, negG } = topFactors(c, cat, ctx.dayFactors?.[i] || comb.acc[i]);
-    const positive = sc.cats[i] >= 60;
-    // 요약 점수대에 해당하는 요인이 없더라도 실제 존재하는 반대 요인을 설명한다.
-    const main = positive ? pos || posG || neg || negG : neg || negG || pos || posG;
-    const action = readingAction(cat, sc.cats[i], { factor: main?.[0], cycle: ctx.cycle, identity: c.key });
+    const factors = topFactors(c, cat, ctx.dayFactors?.[i] || comb.acc[i]);
+    const { pos, neg } = factors;
+    const main = leadingFactor(factors, sc.cats[i]);
+    const practice = ctx.practices?.[i];
+    const action = readingAction(cat, sc.cats[i], { factor: main?.[0], cycle: ctx.cycle, identity: c.key, topic: practice?.[3] });
     const basis = [];
     if (main) basis.push((ctx.dayFactors ? tr('일진 해석에서 ', 'In the day pillar: ') : '') + factorText(c, cat, main[0], main[1]));
     const counter = main?.[1] > 0 ? neg : pos;
@@ -190,11 +213,12 @@ function buildReport(c, comb, kind, ctx) {
     }
     if (kind === 'day') {
       const reading = dailyReading(cat, bandOf(sc.cats[i]), {
-        action: action.text, basis: basis.join(' '), change: dayChangeText(sc.cats[i], ctx.previous.cats[i]),
+        action: tr(practice[0], practice[1]), basis: basis.join(' '),
+        cycle: ctx.cycle, identity: c.key, change: dayChangeText(sc.cats[i], ctx.previous.cats[i]),
       });
-      return { ...base, focus: action.headline, actionId: action.id, reading, text: reading.text };
+      return { ...base, focus: action.headline, actionId: action.id, reading: { ...reading, behavior: practice[2] }, text: reading.text };
     }
-    const parts = [weekRhythm(ctx.days, i).text, action.text, ...basis];
+    const parts = [weekRhythm(ctx.days, i).text, periodPractice(action.id, key), ...basis];
     return { ...base, focus: action.headline, actionId: action.id, text: parts.join(' ') };
   });
   const ranked = cats.slice().sort((a, b) => b.score - a.score);
@@ -245,7 +269,7 @@ export function day(c, o, which = 'today') {
   const word = which === 'tomorrow' ? tr('내일', 'Tomorrow') : tr('오늘', 'Today');
   const r = buildReport(c, comb, 'day', {
     key: `d${o.y}-${o.m}-${o.d}`, P: tr(`${word}은`, word), unit: tr('날', 'Day'), label: fmtDate(o),
-    cycle: readingCycle(o), dayFactors: dEv.acc, previous,
+    cycle: readingCycle(o), practices: dailyPractices(c, o), dayFactors: dEv.acc, previous,
     intro: introFor(c, dEv, tr(`${word}은 ${pillarLabel(dEv.p)}일입니다.`, `${word} is a ${pillarLabel(dEv.p)} day.`)),
   });
   r.date = o; r.pillar = dEv.p; r.pillarText = tr(`${pillarLabel(dEv.p)}일`, `${pillarLabel(dEv.p)} day`); r.lunar = lunarText(o);

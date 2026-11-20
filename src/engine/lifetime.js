@@ -59,11 +59,21 @@ export function lifetime(c, today) {
   if (bi >= 3 && jae < 1.2) wealth.push(T.wealth.gunjeop);
 
   const spouseCount = SPOUSE[c.gender].reduce((n, t) => n + (c.tenGodCount[t] || 0), 0);
-  const love = [T.spouseStar[c.gender][spouseCount === 0 ? 'none' : spouseCount === 1 ? 'one' : 'many']];
-  if (c.gender === 'F' && c.tenGodCount['정관'] && c.tenGodCount['편관']) love.push(T.mixedGwan);
+  const symbols = SPOUSE[c.gender].map(t => term(t)).join(tr('·', ' / '));
+  const love = [tr(
+    `이 전통 풀이가 관계의 상징으로 삼는 ${symbols}은 원국에서 ${spouseCount}개입니다. 이 수는 상대의 수나 만남 시기를 뜻하지 않습니다.`,
+    `This reading counts ${spouseCount} occurrences of ${symbols} as relationship symbols. The count does not tell us how many partners someone has or when they will meet.`,
+  )];
+  if (c.gender === 'F' && c.tenGodCount['정관'] && c.tenGodCount['편관']) love.push(tr(
+    '정관과 편관이 함께 보여 전통적으로 관살혼잡이라 부릅니다. 가까운 사이에서 안정감을 주는 약속과 혼자 정하고 싶은 일을 따로 떠올려 보세요.',
+    'Direct Officer and Seven Killings occur together. To reflect on this combination, distinguish an agreement that feels reassuring from a choice you want to make independently.',
+  ));
   love.push(T.spousePalace[tenGod(c.dm, BR_MAIN[c.pillars.day.b])]);
-  if (branchRels(c.pillars.day.b, c.pillars.month.b).includes('충')) love.push(tr('일지와 월지가 충하여 결혼 후 생활 환경이나 가족 관계에 큰 변화가 생기기 쉽습니다. 독립된 생활 공간을 확보하는 것이 좋습니다.', 'A clash between the day and month branches highlights changes in home or family relationships after marriage. Having your own living space may help.'));
-  if (c.natalSS.some(([n]) => n === '도화살')) love.push(tr('원국에 도화가 있어 타고난 매력으로 이성의 관심을 받기 쉽습니다.', 'Peach Blossom in the natal chart traditionally highlights natural charm and romantic attention.'));
+  if (branchRels(c.pillars.day.b, c.pillars.month.b).includes('충')) love.push(tr(
+    '일지와 월지의 충은 서로 다른 생활 리듬으로 읽습니다. 함께 지내는 사람이 있다면 같이 보내고 싶은 시간과 각자 쉴 시간을 맞춰 보세요.',
+    'The day and month branches clash, a symbol of different rhythms. If you share a space, compare when you want company and when each person wants quiet.',
+  ));
+  if (c.natalSS.some(([n]) => n === '도화살')) love.push(tr('도화는 관심과 표현을 읽는 상징입니다. 마음을 전하고 싶다면 상대가 편하게 답할 수 있는 방식부터 골라 보세요.', 'Peach Blossom is a symbol of attention and expression. If you want to share a feeling, leave the other person room to respond.'));
 
   const byWeight = [0, 1, 2, 3, 4].sort((a, b) => c.weights[a] - c.weights[b]);
   const weakEl = byWeight[0], strongEl = byWeight[4];

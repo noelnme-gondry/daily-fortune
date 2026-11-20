@@ -1,3 +1,4 @@
+import { periodPractice } from './period-practice.js';
 // 풀이의 해석과 생활 적용만 보강한다. 점수·사주·토정 괘는 기존 엔진의 값을 사용한다.
 const closingChapter = { id: 'closing', title: '풀이를 읽고 난 뒤', titleEn: 'Practical next steps', detail: '걱정될 때의 대처·실천·사주 읽기 도움말' };
 export const READING_CHAPTERS = Object.freeze({
@@ -36,6 +37,16 @@ export const READING_CHAPTERS = Object.freeze({
   ],
 });
 
+// English matches refer to words in the translated source, not a new forecast.
+const monthlyThemes = {
+  work: [/\b(work|business|career|achievement)\b/i, ['career-priority', 'career-scope', 'career-record']],
+  money: [/\b(money|wealth|income|expenses?|property)\b/i, ['money-budget', 'money-value', 'money-comparison']],
+  people: [/\b(friend|friends|conversation|people|gossip)\b/i, ['social-reply', 'social-request', 'social-boundary']],
+  home: [/\b(family|household|children)\b/i, ['social-roles', 'love-thanks', 'love-listening']],
+  change: [/\b(travel|journey|change|abroad)\b/i, ['move-route', 'move-buffer', 'move-visit']],
+  rest: [/\b(rest|peace|worry|health|tired|busy)\b/i, ['health-pace', 'health-rest', 'health-unwind']],
+};
+
 export const READING_TOPICS = [
   { id: 'work', name: '일과 성취', pattern: /경영|사업|공명|관록|성취|하는 일|새 일|직업|공로/, meaning: '일의 성취를 말하는 대목은 목표와 진행 방식을 돌아보는 소재입니다. 좋은 표현이 있어도 준비와 실행이 생략되는 것은 아니며, 막힌다는 표현은 중간 점검의 계기로 읽어 보세요.', action: '지금 하는 일에서 끝냈다고 말할 수 있는 기준을 한 문장으로 정하고, 가장 작은 다음 단계부터 실행해 보세요.', question: '이번 달에 끝낼 일 하나와 도움을 요청할 사람은 누구인가요?' },
   { id: 'money', name: '재물과 생활', pattern: /재물|손재|이득|소득|가산|금전|재산|소모|재수/, meaning: '재물의 들어옴과 나감은 수입뿐 아니라 지출·보관·약속을 함께 살피라는 상징으로 읽을 수 있습니다. 원문의 재물운은 실제 수익이나 손실을 계산한 값이 아닙니다.', action: '기대하는 돈과 이미 확보한 돈을 구분해 적고, 반복해서 나가는 지출과 함께 쓰는 비용의 약속부터 확인해 보세요.', question: '이번 달에 지키고 싶은 지출 기준과 미리 확인할 약속은 무엇인가요?' },
@@ -47,11 +58,26 @@ export const READING_TOPICS = [
 export const readingSentences = text => text.split(/(?<=[.!?。])\s+/).filter(Boolean);
 
 // 주제에 해당하는 실제 원문만 연결한다. 일치하지 않으면 근거가 없음을 그대로 반환한다.
-export function topicEvidence(reading, topic) {
+export function topicEvidence(reading, topic, limit = 2) {
   const sources = [{ label: '한 해의 총운', anchor: 'reading-annual', text: reading.chongun }, ...Object.entries(reading.months).map(([month, text]) => ({ label: `음력 ${month}월`, anchor: `tj-month-${month}`, text }))];
-  return sources.flatMap(source => readingSentences(source.text).filter(s => topic.pattern.test(s)).map(text => ({ ...source, text }))).slice(0, 2);
+  return sources.flatMap(source => readingSentences(source.text).filter(s => topic.pattern.test(s)).map(text => ({ ...source, text }))).slice(0, limit);
 }
-export function monthTopics(text) { return READING_TOPICS.filter(topic => topic.pattern.test(text)).slice(0, 2); }
+export function monthPractices(reading, code) {
+  const used = new Set(), frequency = new Map();
+  return Array.from({ length: 12 }, (_, i) => {
+    const text = reading.months[i + 1];
+    const matches = READING_TOPICS.flatMap(topic => {
+      const [english, practice] = monthlyThemes[topic.id];
+      const match = text.match(topic.pattern) || text.match(english);
+      return match ? [{ topic, practice, source: match[0], index: match.index }] : [];
+    });
+    matches.sort((a, b) => (frequency.get(a.practice) || 0) - (frequency.get(b.practice) || 0) || a.index - b.index);
+    if (!matches.length) return null;
+    const { topic, practice, source } = matches[0];
+    frequency.set(practice, (frequency.get(practice) || 0) + 1);
+    return { source, name: topic.name, action: periodPractice(practice, code + '|' + i, used) };
+  });
+}
 
 export const ELEMENT_PRACTICE = [
   { name: '목', focus: '방향을 정하고 차근차근 키우기', text: '배우고 싶은 일이나 새로운 계획을 작은 단계로 나눠 보세요. 시작한 일을 계속 키울 수 있도록 다음 행동과 점검 날짜를 함께 정하는 방식입니다.', question: '지금 시작한 일 중 꾸준히 키워 보고 싶은 것은 무엇인가요?' },

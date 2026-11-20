@@ -3,6 +3,7 @@ import { tr } from '../i18n/runtime.js';
 import { READING_ACTIONS, SHORT_READING_LABELS, ZODIAC_RELATION, ELEMENT_THEME } from '../content/reading-actions.js';
 import { READING_HEADLINES } from '../content/reading-headlines.js';
 import { LEGACY_READING_LABELS, LEGACY_READING_HEADLINES } from '../content/reading-share-legacy.js';
+import { periodPractice } from './period-practice.js';
 import { zodiacOutlook } from './zodiac-outlook.js';
 import { ZODIAC_DAY_SCENES, ZODIAC_DAY_TOPICS } from '../content/zodiac-day-scenes.js';
 
@@ -44,7 +45,7 @@ export function readingHeadlines(kind) {
 
 // 날짜·주차의 순번으로 후보를 순환한다. 조회 이력이나 난수에 의존하지 않는다.
 // 한국어·영어는 같은 id를 선택하며, 문구 선택이 점수 계산에 들어가지 않는다.
-export function readingAction(cat, score, { factor, cycle = 0, identity = '', offset = 0, headlineOffset = 0 } = {}) {
+export function readingAction(cat, score, { factor, cycle = 0, identity = '', offset = 0, headlineOffset = 0, topic } = {}) {
   const all = READING_ACTIONS[cat];
   const theme = factorTheme(factor);
   const matching = theme ? all.filter((row) => row[1].includes(theme)) : all;
@@ -53,7 +54,8 @@ export function readingAction(cat, score, { factor, cycle = 0, identity = '', of
   const rotation = cycle + Math.floor(cycle / 12);
   const position = hash(`${identity}|${cat}|${factor || ''}`) + rotation + offset;
   const index = ((position % candidates.length) + candidates.length) % candidates.length;
-  const [id, , title, active, careful] = candidates[index];
+  const row = topic ? all.find(item => cat + '-' + item[0] === topic) : null;
+  const [id, , title, active, careful] = row || candidates[index];
   const actionId = `${cat}-${id}`;
   const titles = READING_HEADLINES[actionId][score >= 60 ? 0 : 1];
   // 주제가 한 바퀴 돈 다음 제목의 상황을 바꿔, 같은 나머지 연산에 고정되지 않게 한다.
@@ -101,16 +103,20 @@ export function zodiacElementText(e, es) {
     : tr(`지지의 오행은 ${branch}, 천간의 오행은 ${josa(stem, "을/를")} 함께 살피게 합니다.`, `The branch element emphasizes ${branch}, alongside ${stem} from the stem element.`);
 }
 
-export function zodiacDayReading(focus, score, cycle, offset) {
+export function zodiacDayScene(focus, cycle, offset) {
   const scenes = ZODIAC_DAY_SCENES[focus];
   // 같은 일진이 60일 뒤 돌아올 때에도 같은 장면으로 돌아가지 않게 한 칸 더 옮긴다.
   const position = cycle + Math.floor(cycle / 60) + offset;
   const scene = scenes[((position % scenes.length) + scenes.length) % scenes.length];
-  const [headlines, favorable, careful, action, watch] = scene;
-  const turn = Math.floor(position / scenes.length);
+  return { scene, position, count: scenes.length };
+}
+
+export function zodiacDayReading(focus, score, { scene, position, count }, practice) {
+  const [headlines, favorable, careful, , watch] = scene;
+  const turn = Math.floor(position / count);
   const headline = localized(headlines[((turn % headlines.length) + headlines.length) % headlines.length]);
   const outlook = `${localized(ZODIAC_DAY_TOPICS[focus])} · ${localized(score >= 60 ? favorable : careful)}`;
-  const advice = localized(action), caution = localized(watch);
+  const advice = localized(practice), caution = localized(watch);
   return { headline, outlook, advice, caution, text: `${outlook} ${advice} ${caution}` };
 }
 
@@ -118,5 +124,6 @@ export function zodiacReading({ rel, e, es, score, cycle, offset = 0, headlineOf
   const focus = zodiacFocus(rel, e, es);
   const action = readingAction(focus, score, { cycle, offset, headlineOffset, identity });
   const { outlook, caution } = zodiacOutlook({ rel, e, es, score });
-  return { ...action, outlook, advice: action.text, caution, text: `${outlook} ${action.text} ${caution}` };
+  const advice = periodPractice(action.id, identity + '|' + cycle + '|' + offset);
+  return { ...action, outlook, advice, caution, text: `${outlook} ${advice} ${caution}` };
 }

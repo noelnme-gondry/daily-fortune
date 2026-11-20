@@ -1,5 +1,6 @@
+import { periodPractice } from '../domain/period-practice.js';
 import { readFileSync } from 'node:fs';
-import { READING_CHAPTERS, READING_TOPICS, topicEvidence, monthTopics, readingSentences, ELEMENT_PRACTICE, TEN_GOD_PRACTICE, COMPAT_PRACTICE } from '../domain/premium-reading.js';
+import { READING_CHAPTERS, READING_TOPICS, topicEvidence, monthPractices, readingSentences, ELEMENT_PRACTICE, TEN_GOD_PRACTICE, COMPAT_PRACTICE } from '../domain/premium-reading.js';
 import { lifeEventDetails } from '../domain/life-event-detail.js';
 import { chartCard } from '../client/views.js';
 import { STEM_EL, pillarLabel } from '../engine/core.js';
@@ -48,21 +49,22 @@ export function closingView(productId, points = []) {
 
 function tojeongCautions(reading) {
   return READING_TOPICS.map(topic => {
-    const source = topicEvidence(reading, topic).find(s => /손재|구설|실패|욕심|경솔|분주|불리|조심|근심|신중/.test(s.text));
+    const source = topicEvidence(reading, topic, Infinity).find(s => /손재|구설|실패|욕심|경솔|분주|불리|조심|근심|신중/.test(s.text));
     return source ? { basis: `${source.label}의 ${topic.name} 관련 표현이 마음에 걸린다면`, action: topic.action } : null;
   }).filter(Boolean).slice(0, 3);
 }
 export function tojeongPremium(r, reading) {
   const l = r.birth.lunar, v = r.values;
   const cautions = tojeongCautions(reading);
+  const practices = monthPractices(reading, r.code);
   const months = Array.from({ length: 12 }, (_, i) => {
-    const text = reading.months[i + 1], topics = monthTopics(text);
-    return fold(`음력 ${i + 1}월 풀이`, topics.map(t => t.name).join(' · '), prose(text) + `<div class="reading-month-help"><h4>이 달을 내 생활에 비춰 보기</h4>${topics.length ? topics.map(t => p(t.question)).join('') : p('이 달에 이어갈 일과 새로 조정할 일을 하나씩 골라 보세요.')}<p class="hint">원문에서 다루는 주제에 연결한 질문입니다. 별도의 월별 점수나 사건 예측을 덧붙인 것은 아닙니다.</p></div>`, i === 0, `tj-month-${i + 1}`);
+    const text = reading.months[i + 1], practice = practices[i];
+    return fold(`음력 ${i + 1}월 풀이`, practice?.name || '월별 원문', prose(text) + (practice ? `<div class="reading-month-help"><h4>이 달을 내 생활에 비춰 보기</h4>${p('원문의 ‘' + practice.source + '’에서 골라 본 행동입니다.')}${p(practice.action)}</div>` : ''), i === 0, `tj-month-${i + 1}`);
   }).join('');
   return chapter('tojeong', 'annual', `<p class="reading-intro">나의 괘 <b class="tojeong-code">${r.code}</b> · ${r.targetYear}년</p><p class="hint">${esc(TOJEONG.readingNote)}</p><div class="reading-prose">${prose(reading.chongun)}</div>${exercise('총운에서 내 상황과 닮은 대목 하나와 아직 맞지 않는 대목 하나를 골라 보세요. 어떤 조건이 달라지면 생각이 바뀔지도 함께 적으면 한 해를 돌아볼 기준이 됩니다.', '올해 가장 신경 쓰이는 일은 무엇이고, 그중 내가 바꿀 수 있는 것은 무엇인가요?')}`)
     + chapter('tojeong', 'themes', p('같은 괘의 총운과 월별 원문을 여섯 주제로 모았습니다. 인용된 대목과 생활 질문을 함께 읽어 보세요. 원문에 없는 분야의 운을 새로 만들어 판단하지 않습니다.') + topicsView(reading))
-    + chapter('tojeong', 'months', p('달을 펼치면 원문 전체와 그 달에 돌아볼 질문을 읽을 수 있습니다. 월별 풀이는 음력 기준이며, 윤달은 같은 월의 풀이를 읽습니다.') + months)
-    + chapter('tojeong', 'plan', `<div class="reading-plan"><article><h3>시작하기 전</h3>${p('총운에서 고른 주제를 지금의 일정에 대입해 보세요. 이루고 싶은 결과와 이미 갖춘 준비를 구분하면 막연한 기대나 걱정을 줄이는 데 도움이 됩니다.')}</article><article><h3>달이 바뀔 때</h3>${p('월별 질문 중 필요한 것 하나만 골라 답해 보세요. 일이 잘 풀리면 도움이 된 행동을 남기고, 어렵다면 상황과 방법 중 무엇을 조정할 수 있는지 살펴보세요.')}</article><article><h3>한 해를 돌아볼 때</h3>${p('운세가 맞았는지뿐 아니라 실제로 어떤 선택을 했는지 돌아보세요. 계속할 습관, 그만둘 부담, 도움을 받은 사람을 남기면 다음 계획에 쓸 수 있습니다.')}</article></div>`)
+    + chapter('tojeong', 'months', p('달을 펼치면 원문 전체와 원문 주제에 맞는 생활 예시를 읽을 수 있습니다. 월별 풀이는 음력 기준이며, 윤달은 같은 월의 풀이를 읽습니다.') + months)
+    + chapter('tojeong', 'plan', `<div class="reading-plan"><article><h3>시작하기 전</h3>${p('총운에서 고른 주제를 지금의 일정에 대입해 보세요. 이루고 싶은 결과와 이미 갖춘 준비를 구분하면 막연한 기대나 걱정을 줄이는 데 도움이 됩니다.')}</article><article><h3>달이 바뀔 때</h3>${p('그달의 풀이에서 내게 필요한 행동을 하나 골라 해보세요. 일이 잘 풀리면 도움이 된 행동을 남기고, 어렵다면 상황과 방법 중 무엇을 조정할 수 있는지 살펴보세요.')}</article><article><h3>한 해를 돌아볼 때</h3>${p('운세가 맞았는지뿐 아니라 실제로 어떤 선택을 했는지 돌아보세요. 계속할 습관, 그만둘 부담, 도움을 받은 사람을 남기면 다음 계획에 쓸 수 있습니다.')}</article></div>`)
     + chapter('tojeong', 'basis', `<dl class="reading-facts"><div><dt>풀이 기간</dt><dd>${r.period.start.y}.${r.period.start.m}.${r.period.start.d} ~ ${r.period.end.y}.${r.period.end.m}.${r.period.end.d} (양력)</dd></div><div><dt>음력 생일</dt><dd>${l.y}년 ${l.leap ? '윤' : ''}${l.m}월 ${l.d}일 · 세는나이 ${v.age}세</dd></div><div><dt>상괘 ${r.upper}</dt><dd>(세는나이 ${v.age} + 태세수 ${v.taese}) ÷ 8의 나머지 · ${esc(r.ganji.year)}년</dd></div><div><dt>중괘 ${r.middle}</dt><dd>(음력 생월 날수 ${v.monthDays} + 월건수 ${v.wolgeon}) ÷ 6의 나머지 · ${esc(r.ganji.month)}월</dd></div><div><dt>하괘 ${r.lower}</dt><dd>(음력 생일 ${v.birthDay} + 일진수 ${v.iljin}) ÷ 3의 나머지 · ${esc(r.ganji.day)}일</dd></div></dl>${p('나머지가 0이면 각각 8·6·3을 사용합니다. 음력 월의 간지를 사용하며 사주의 절기 월주와 다릅니다.')}${r.normalizedLeap ? p('윤달 생일을 같은 월의 평달로 계산했습니다.') : ''}${r.adjustedDay ? p('보는 해의 생일 달이 29일까지 있어 생일을 29일로 조정했습니다.') : ''}<p class="hint">해설: <a href="${TOJEONG.source}">molpass/mcp-tojeong</a> · © 2026 Lee, JungHoon · <a href="https://makeyourownday-fortune.com/licenses/mcp-tojeong.txt">MIT 라이선스</a></p>`)
     + closingView('tojeong', cautions);
 }
@@ -89,7 +91,7 @@ export function lifetimePremium(r, c, person, today) {
     + chapter('lifetime', 'cycles', p('대운은 10년 단위로 읽는 흐름입니다. 나이는 대운 시작 나이이며 계산 기준과 원국은 마지막 장에서 확인할 수 있습니다. 각 시기를 펼치면 십신의 뜻과 생활에 적용할 방법을 볼 수 있습니다.') + cycles)
     + chapter('lifetime', 'years', fold('15년 전체 흐름 비교', '선정된 해뿐 아니라 모든 해의 종합·금전·애정 점수', annualTable([c], [person.name || '나'], today, 15)) + events)
     + chapter('lifetime', 'basis', p(timeNote(c)) + chartCard(c, person, today))
-    + closingView('lifetime', [{ basis: `내 성향에서 다듬을 점: ${dm.weaknesses.join(', ')}`, action: dm.advice }, { basis: `균형을 살펴볼 주제: ${balance.focus}`, action: balance.text }]);
+    + closingView('lifetime', [{ basis: `내 성향에서 다듬을 점: ${dm.weaknesses.join(', ')}`, action: dm.advice }, { basis: `균형을 살펴볼 주제: ${balance.focus}`, action: periodPractice(['study-routine', 'study-explain', 'career-priority', 'career-scope', 'love-listening'][r.roles.yong], c.dm) }]);
 }
 
 export function compatibilityPremium(r, a, b, people, today) {
@@ -101,14 +103,19 @@ export function compatibilityPremium(r, a, b, people, today) {
   const marriage = positives(r.events.marriageYears), child = positives(r.events.childYears);
   const eventList = items => items.length ? items.map(item => `<div class="reading-year"><h4>${item.y}년 · ${pillarLabel(item.pillar)}</h4>${p(item.why)}</div>`).join('') : p('비교 기간에 선정 기준을 넘는 신호가 없습니다. 실제 결혼·출산의 가능성이나 결과를 뜻하지 않습니다.');
   const dates = marriage.some(v => v.y === r.events.bestYear) ? (r.events.weddingDates.length ? list(r.events.weddingDates.map(d => `${d.label} · ${pillarLabel(d.pillar)}일 · ${d.lunar}`)) : p('해당 연도에 남아 있는 추천 날짜가 없습니다.')) : p('결혼 신호가 선정 기준을 넘지 않아 날짜를 추천하지 않습니다.');
-  const lowest = [...r.cats].sort((x, y) => x.score - y.score)[0];
+  const minimum = Math.min(...r.cats.map(cat => cat.score));
+  const topics = { love: 'love-plans', talk: 'social-reply', personality: 'social-boundary', money: 'money-shared', family: 'social-roles' };
+  const lowest = r.cats.filter(cat => cat.score === minimum).map(cat => ({
+    basis: `${cat.name} ${cat.score}점 · 다섯 분야 중 가장 낮은 점수`,
+    action: periodPractice(topics[cat.key], [a.dm, b.dm, cat.key].join('|')),
+  }));
   return chapter('compatibility', 'together', `<div class="reading-score-head"><p class="reading-intro">${esc(r.headline)}</p><p><strong>${r.total}</strong>점</p></div>${r.lines.map(p).join('')}<div class="reading-duo">${[a, b].map((c, i) => `<article><h3>${esc(people[i].name || (i ? '상대' : '나'))}의 기본 성향</h3>${p(T.dayMaster[c.dm].summary)}${p(T.dayMaster[c.dm].advice)}</article>`).join('')}</div><p class="hint">종합과 분야별 점수는 원국 관계를 해석한 값이며 관계 만족도나 결혼 성공 확률이 아닙니다.</p>`)
     + chapter('compatibility', 'areas', areas)
     + chapter('compatibility', 'balance', elementTable([a, b], [r.nameA, r.nameB]) + r.complement.map(p).join('') + `<div class="reading-duo">${[a, b].map((c, i) => { const e = ELEMENT_PRACTICE[c.roles.yong]; return `<article><h3>${esc(i ? r.nameB : r.nameA)}에게 필요한 균형</h3>${p(`${e.name} · ${e.focus}`)}${p(e.text)}</article>`; }).join('')}</div>` + p('한쪽이 다른 쪽에게 필요한 오행을 갖고 있다는 해석과 실제로 상대를 돌볼 책임은 별개입니다. 각자의 생활을 지키면서 서로 원하는 도움을 확인해 보세요.'))
     + chapter('compatibility', 'practice', r.cautions.map(item => `<article class="reading-topic"><h3>${esc(item.title)}</h3>${p(item.text)}</article>`).join('') + exercise('의견이 갈리는 일 하나를 정해 각자의 이유를 먼저 말해 보세요. 바로 합의하기 어렵다면 지금 동의할 수 있는 작은 약속부터 정하고, 다시 이야기할 시간을 남겨 두세요.', '이번 주에 서로에게 덜 부담스럽게 바꿀 수 있는 약속은 무엇인가요?'))
     + chapter('compatibility', 'years', p(`결혼·재물은 ${today.y}–${today.y + 9}년, 자녀는 ${r.events.bestYear}–${r.events.bestYear + 10}년의 11개 연도를 비교했습니다. 신호는 전통 해석의 비교값이며 실제 사건의 예측이 아닙니다.`) + fold('두 사람의 10년 흐름 비교', '각자의 종합·금전·애정 점수를 나란히 보기', annualTable([a, b], [r.nameA, r.nameB], today, 10)) + `<article class="reading-event-group"><h3>결혼·인연의 신호</h3>${eventList(marriage)}${p('두 사람 중 한쪽에만 두드러지는 신호가 있을 수도 있습니다. 일정과 의사를 함께 확인하는 참고로 읽어 주세요.')}</article><article class="reading-event-group"><h3>자녀·돌봄의 신호</h3>${eventList(child)}${p('자녀에 관한 신호는 임신 가능성을 나타내는 점수가 아닙니다. 실제 계획은 두 사람의 의사와 생활 여건을 먼저 살펴보세요.')}</article><article class="reading-event-group"><h3>금전 점수가 상대적으로 높은 해</h3>${eventList(r.events.moneyYears)}${p('비교 기간 안에서 상대적으로 높다는 뜻이며 실제 수익을 보장하지 않습니다.')}</article>` + fold(`${r.events.bestYear}년 결혼 날짜 참고`, '두 사람의 일지·띠와 충돌 없는 주말 비교', dates + p('날짜의 전통적 조건만 비교한 값입니다. 실제 일정과 두 사람의 선택을 우선하며 결혼 결과를 보장하지 않습니다.')))
     + chapter('compatibility', 'basis', [a, b].map((c, i) => p(`${people[i].name || (i ? '상대' : '나')}: ${timeNote(c)}`) + chartCard(c, people[i], today)).join(''))
-    + closingView('compatibility', [{ basis: `두 사람의 다섯 분야 중 상대적으로 낮은 항목은 ${lowest.name} ${lowest.score}점입니다. 낮은 순위라는 뜻이며 무조건 나쁜 범위라는 의미는 아닙니다.`, action: COMPAT_PRACTICE[lowest.key].agreement }, ...r.cautions.slice(0, 1).map(c => ({ basis: c.title, action: c.text }))]);
+    + closingView('compatibility', [...lowest, ...r.cautions.slice(0, 1).map(c => ({ basis: c.title, action: c.text }))]);
 }
 
 export function reportDocument(title, body, date, productId) {

@@ -29,7 +29,9 @@ function rowsHtml(result, category, side, page) {
   if (!rows.length) return `<p>${tr('이 범위에서 출생일이 확인되는 추천 사주를 찾지 못했습니다.', 'No matching charts with verified birth dates were found in this range.')}</p>`;
   return `<ol class="leader-list" id="compat-match-list" start="${page.start + 1}">${rows.map((r, i) => {
     const id = `compat-match-${side}-${category}-${page.start + i}`;
-    const weakest = COMPAT_CATEGORIES.filter(([k]) => k !== 'total').slice().sort(([a], [b]) => r.scores[a] - r.scores[b])[0];
+    const areas = COMPAT_CATEGORIES.filter(([k]) => k !== 'total');
+    const low = Math.min(...areas.map(([k]) => r.scores[k]));
+    const weakest = areas.filter(([k]) => r.scores[k] === low).map(([, label]) => label).join(tr('·', ', '));
     return `<li><button type="button" class="leader-button" data-dialog="${id}" aria-haspopup="dialog" aria-controls="${id}">
       <b class="leader-place">${tr(`${r.rank}위`, `#${r.rank}`)}</b><span class="leader-summary"><b>${tr(`${r.input.y}년생 · 만 ${r.age}세`, `Born ${r.input.y} · age ${r.age}`)}</b><span class="leader-date">${tr("양력", "Solar date")} ${dateText(r.input)}</span><small>${tr(`${pillarKo(r.pillars.day)}일주`, `${pillarLabel(r.pillars.day)} day pillar`)} · ${esc(r.timeLabel)}</small></span>
       <strong class="leader-score">${r.score}<small>${tr("점", "pts")}</small></strong>
@@ -39,7 +41,7 @@ function rowsHtml(result, category, side, page) {
       <dl class="leader-pillars">${[['year', '년주'], ['month', '월주'], ['day', '일주'], ['hour', '시주']].map(([k, n]) => `<div><dt>${term(n)}</dt><dd>${pillarH(r.pillars[k])}<small>${tr(pillarKo(r.pillars[k]), pillarLabel(r.pillars[k]))}</small></dd></div>`).join('')}</dl>
       <dl class="leader-categories compat-match-scores">${COMPAT_CATEGORIES.map(([k, n]) => `<div><dt>${term(n)}</dt><dd data-match-score="${k}">${r.scores[k]}${tr("점", " pts")}</dd></div>`).join('')}</dl>
       <section><h3>${tr("이 분야에서 잘 맞는 이유", "Why this category matches")}</h3><ul class="compat-match-detail-reasons">${r.reasons[category].map((t) => `<li>${esc(t)}</li>`).join('')}</ul></section>
-      <p class="hint">${tr(`상대적으로 낮은 분야: ${weakest[1]} ${r.scores[weakest[0]]}점. 종합과 분야별 궁합은 각각의 기준으로 계산합니다.`, `Lower-scoring area: ${weakest[1]} ${r.scores[weakest[0]]} pts. Overall and category compatibility use separate criteria.`)}</p></div></dialog></li>`;
+      <p class="hint">${tr(`상대적으로 낮은 분야: ${weakest} ${low}점. 종합과 분야별 궁합은 각각의 기준으로 계산합니다.`, `Lower-scoring area: ${weakest} ${low} pts. Overall and category compatibility use separate criteria.`)}</p></div></dialog></li>`;
   }).join('')}</ol>`;
 }
 

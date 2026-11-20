@@ -190,7 +190,7 @@ export function rankFromTable(score, table) {
     for (let i = score.cats[k] + 1; i < h.length; i++) above += h[i];
     return { key: k, name, score: score.cats[k], pct: Math.max(1, Math.round(((above + 1) / table.n) * 100)) };
   });
-  return { rank, of: table.n, pct, tier: { code: tier[1], name: tier[2], text: tier[3] }, cats };
+  return { rank, tied: table.total[idx], of: table.n, pct, tier: { code: tier[1], name: tier[2], text: tier[3] }, cats };
 }
 
 export function sajuRank(chart, tables) {

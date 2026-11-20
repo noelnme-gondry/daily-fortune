@@ -47,7 +47,7 @@ export function rankRevealView(r, name, histogram) {
       <div class="rank-identity-text">
         <p class="rank-tier"><b>${tr(`${r.tier.code} 등급`, `Tier ${r.tier.code}`)}</b><span>${tr(`상위 ${r.pct}%`, `Top ${r.pct}%`)}</span></p>
         <h3 class="rank-num num" tabindex="-1">${tr(`${rank}위`, `#${rank}`)}</h3>
-        <p class="rank-pool">${tr(`이론상 ${of}가지 사주 조합 중`, `Out of ${of} theoretical chart combinations`)} ${tip(TIPS.rankPct, tr('순위 계산 설명', 'Ranking method'))}</p>
+        <p class="rank-pool">${tr(`이론상 ${of}가지 사주 조합 중`, `Out of ${of} theoretical chart combinations`)} ${r.tied > 1 ? tr(` · 같은 점수 ${r.tied.toLocaleString(locale)}개 조합이 공동 ${rank}위`, ` · ${r.tied.toLocaleString(locale)} combinations share rank ${rank}`) : ''} ${tip(TIPS.rankPct, tr('순위 계산 설명', 'Ranking method'))}</p>
         <p class="rank-character">${esc(job.name)}</p>
         <p class="rank-specialty">${tr('내 특기', 'My specialty')} <b>${esc(specialty.name)} · ${tr(`상위 ${specialty.pct}%`, `Top ${specialty.pct}%`)}</b></p>
       </div>
