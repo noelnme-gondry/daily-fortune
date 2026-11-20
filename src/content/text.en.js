@@ -44,12 +44,12 @@ T.groupCareer=[
 ];
 T.elementIndustry=['Education, publishing, design, fashion, landscaping and clothing','Broadcasting, media, IT services, advertising, beauty and energy','Property, construction, agriculture, brokerage, consulting and hospitality','Finance, machinery, automotive, law, medical devices and semiconductors','Trade, logistics, travel, food, fisheries and research'];
 T.wealth={
- none:'Wealth stars are not prominent in your chart. This reading favors building skills and reputation over chasing money directly, with a reliable system for managing finances.',
- weak:'Wealth energy is limited, favoring steady income over sudden windfalls. Regular saving suits this pattern better than trying to build a lump sum at once.',
- balanced:'Wealth energy is moderate, suggesting balance between earning and spending. Adjusting how much you expand or conserve can help maintain that balance.',
- strong:'Strong Wealth energy suggests an eye for opportunities. If the demands exceed what your Day Master can handle, keeping what you earn becomes just as important as earning it.',
- sikjae:'Expression and Wealth occur together, a traditional pattern called Expression generating Wealth. Skills, content and ideas are central to this interpretation of earning potential.',
- gunjeop:'Strong Companion energy with limited Wealth calls for care with partnerships, guarantees and lending. Keep clear boundaries between your money and other people’s.',
+ none:'Wealth symbols carry little weight in this chart. To reflect on your own habits, find one expense last month where the amount surprised you.',
+ weak:'Wealth symbols have a small share of this chart. Compare one monthly cost that stays fairly steady with one that varies.',
+ balanced:'Wealth symbols sit in the middle range. Put income and payment dates on the same calendar and see how far apart they fall.',
+ strong:'Wealth symbols carry considerable weight in this chart. If several expenses compete for attention, decide what to set aside, then compare what fits the remainder.',
+ sikjae:'Expression and Wealth occur together, traditionally called Expression generating Wealth. If someone has used something you made, ask which part they found useful.',
+ gunjeop:'Companion symbols carry more weight than Wealth. If you share a cost with someone, agree on your shares and a date to settle up.',
 };
 T.spousePalace = {
   '비견': 'Peer represents equality in the day branch. For a shared decision, each suggest one option.',
