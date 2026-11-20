@@ -203,31 +203,37 @@ export const DAILY_ACTION_ALTERNATIVES = {
     ['낯선 곳으로 간다면 돌아올 때 눈에 띌 표지 하나를 기억해 두세요.', 'On an unfamiliar route, note one landmark you will recognise on the way back.', 'note-return-landmark'],
     ['평소와 다른 길이 궁금한 날에는 시간에 쫓기지 않는 구간 하나만 바꿔 보세요.', 'If a different route appeals, try it on the one stretch where you have time to spare.', 'try-alternate-route'],
     ['길을 설명할 때 방향만 말하기 어렵다면 도착하면 보이는 것을 알려 주세요.', 'When directions are hard to describe, tell the person what they should see on arrival.', 'describe-arrival-landmark'],
+    ['낯선 길에서 인터넷이 끊길까 걱정된다면 필요한 구간의 지도를 미리 저장해 두세요.', 'If reception may be patchy on an unfamiliar route, save that section of the map offline.', 'download-offline-map'],
   ],
   'move-booking': [
     ['예약한 것이 있다면 바꿀 수 있는 마지막 시점을 한 번 확인해 보세요.', 'If you have a booking, check when you can still change it.', 'check-change-deadline'],
     ['예매를 고민 중이라면 출발 시각과 실제 집에서 나설 시각을 나란히 적어 보세요.', 'Before booking, compare the departure time with the time you would need to leave home.', 'plan-departure'],
     ['같이 쓸 예약이라면 확인 문자를 누가 가지고 있는지 서로 알아두세요.', 'If a booking is shared, make sure everyone knows who has the confirmation.', 'share-booking-details'],
+    ['일정을 짜기 전에 가려는 곳의 쉬는 날부터 확인해 보세요. 문이 닫힌 뒤에 도착하는 일을 피할 수 있어요.', 'Before setting a date, check the closing days of the place you want to visit.', 'check-opening-hours'],
   ],
   'move-buffer': [
     ['약속이 이어지는 날엔 먼저 끝난 곳에서 다음 장소까지 걷는 시간도 넣어 보세요.', 'If plans run back to back, count the walk to the next place too.', 'budget-transfer-time'],
     ['늦을 것 같다면 서두르는 동안 기다리게 하기보다 예상 도착 시각을 한 번 알려 주세요.', 'If you are running late, give the person waiting a realistic arrival time.', 'send-arrival-update'],
     ['조금 일찍 닿으면 어디서 편하게 기다릴 수 있을지 한 곳만 정해 두세요.', 'If you might arrive early, pick a comfortable place to wait.', 'choose-waiting-place'],
+    ['걷는 구간이 부담스럽다면 중간에 앉아서 쉴 수 있는 곳을 찾아 두세요.', 'If a walk feels long, look for a place to sit partway along it.', 'locate-rest-stop'],
   ],
   'move-meeting': [
     ['사람이 많은 곳에서 만난다면 서로 반대쪽에 설 수 없는 한 지점을 골라 보세요.', 'If you are meeting in a crowd, pick a spot with only one obvious side to stand on.', 'choose-meeting-landmark'],
     ['장소 이름이 비슷하다면 주소나 지도 표시 한 개를 보내 두세요.', 'If two places have similar names, send the address or a map pin.', 'share-map-pin'],
     ['밖에서 누군가를 기다린다면 자리를 옮길 때 새 위치를 한 번 알려 주세요.', 'When waiting for someone outside, let them know if you move from the agreed spot.', 'send-location-update'],
+    ['만나기로 한 곳에 계단이 있다면 함께 가는 사람이 편하게 쓸 수 있는 입구가 있는지 물어보세요.', 'If the meeting place has steps, ask about an entrance everyone in your group can use.', 'check-step-free-access'],
   ],
   'move-packing': [
     ['나서기 전에 도착해서 가장 먼저 쓸 물건을 손이 닿는 곳에 챙겨 보세요.', 'Put the first thing you will need on arrival somewhere easy to reach.', 'pack-first-use-on-top'],
     ['가방이 무겁다면 없을 때 잠깐 빌릴 수 있는 물건부터 하나 빼 보세요.', 'If your bag feels heavy, leave out something you could borrow for a moment if needed.', 'borrow-instead-of-carrying'],
     ['다녀온 뒤에는 안 쓴 물건 하나를 기억해 두세요. 다음번 짐이 가벼워져요.', 'When you get back, note one thing you never used. It can stay home next time.', 'note-unused-item'],
+    ['짐 때문에 둘러보기 어렵다면 가방을 맡길 수 있는 곳이 동선에 있는지 보세요.', 'If a bag would make it hard to explore, look for a luggage locker on your route.', 'locate-luggage-storage'],
   ],
   'move-visit': [
     ['찾아갈 곳이 있다면 가장 보고 싶은 한 곳에 머물 시간을 먼저 남겨 보세요.', 'If you are planning a visit, save time for the one place you most want to linger.', 'reserve-time-for-priority'],
     ['예전에 좋았던 곳에 다시 간다면 지난번에 못 본 한 가지를 찾아보세요.', 'On a return visit, look for one thing you missed the first time.', 'revisit-missed-stop'],
     ['여럿이 움직인다면 각자 꼭 들르고 싶은 곳을 한 군데씩 골라 보세요.', 'For a group outing, let each person pick one place they care about visiting.', 'exchange-preferences'],
+    ['둘러본 곳에서 기억하고 싶은 게 있다면 작은 소리나 눈에 띈 풍경을 하나 기록해 두세요.', 'Keep a note of one sound or sight you want to remember from a visit.', 'record-impression-of-place'],
   ],
   'health-rest': [
     ['잠깐 쉴 틈이 나면 하던 일을 어디서 멈췄는지 표시해 두세요. 쉬는 동안 기억하고 있지 않아도 돼요.', 'Before a break, mark where you stopped so you do not have to hold it in mind.', 'leave-restart-note'],

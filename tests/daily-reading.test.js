@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildChart, day, week, bandOf, addDays, CATS, ttiDay } from '../src/engine/index.js';
+import { practiceFamily } from '../src/domain/practice-calendar.js';
 import { animalDay } from '../src/site/pages/tti.js';
 import { dayView } from '../src/client/views.js';
 import { DAILY_OUTLOOK, DAILY_OVERVIEW } from '../src/content/daily-outlook.js';
@@ -164,14 +165,14 @@ test('2026년 동일 표본에서 개인 일곱 분야와 각 띠의 직전 14�
     for (const chart of charts) {
       const days = dates.map(date => day(chart, date).cats);
       counts.forEach((count, i) => {
-        const rows = days.map(cats => cats[i].reading);
+        const rows = days.map(cats => cats[i].reading).map(r => ({ ...r, behavior: practiceFamily(r.behavior) }));
         assert.ok(rows.every(r => r.behavior && r.action));
         countRepeats(rows, ['action', 'behavior'], count, 14);
       });
     }
     counts.forEach((count, i) => Object.values(count).forEach(n => assertRate(n, charts.length * 351, CATS[i])));
     for (let sign = 0; sign < 12; sign++) {
-      const rows = dates.map(date => ttiDay(sign, date)), counts = { advice: 0, behavior: 0 };
+      const rows = dates.map(date => ttiDay(sign, date)).map(r => ({ ...r, behavior: practiceFamily(r.behavior) })), counts = { advice: 0, behavior: 0 };
       assert.ok(rows.every(r => r.behavior && r.advice));
       countRepeats(rows, ['advice', 'behavior'], counts, 14);
       Object.values(counts).forEach(n => assertRate(n, 351, sign));
