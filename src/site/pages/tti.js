@@ -173,6 +173,9 @@ export function animalDay(t, ctx, tomorrow = false) {
     crumbs: [[siteText('띠별 운세'), '/tti/'], [`${animal}${siteText("띠 ")}${word}${siteText(" 운세")}`, `/tti/${period}/${slug}/`]],
     body: `${hero(dailyTitle, `${fmtDate(date)} ${animal}${siteText("띠는 12띠 가운데 ")}${rank}${siteText("위(")}${r.score}${siteText("점)입니다. ")}${top.score > r.score ? `${word}${siteText(" 가장 운이 좋은 띠는 ")}${siteValue(top.animal)}${siteText("띠(")}${top.score}${siteText("점)입니다.")}` : `${word}${siteText("은 ")}${animal}${siteText("띠가 가장 운이 좋은 띠입니다.")}`}`)}
       <article class="box card">${ttiDailyDetail(t, date, period)}</article>
+      <p class="cta"><a class="btn ghost" data-ga-cta="zodiac_other_day" href="/tti/${tomorrow ? 'today' : 'tomorrow'}/${slug}/">${tomorrow
+        ? tr(`${animal}띠의 오늘 풀이 보기`, `Read today’s ${animal} outlook`)
+        : tr(`${animal}띠의 내일 풀이 보기`, `Read tomorrow’s ${animal} outlook`)}</a></p>
       <section class="box card tti-week"><h2>${animal}${siteText("띠의 앞으로 7일")}</h2>
         <ol class="tti-week-list">${week.map((w, i) => `<li${i === 0 ? ' class="is-today"' : ''}><span>${weekdayName(dow(w.d))} ${fmtShort(w.d)}</span><i style="--s:${w.score}" aria-hidden="true"></i><b class="num">${w.score}</b>${bandChip(w.score)}</li>`).join('')}</ol>
         <p class="hint">${best.score >= r.score ? `${siteText("이번 7일 중에서는 ")}${best.d.m}${siteText("월 ")}${best.d.d}${siteText("일(")}${weekdayName(dow(best.d))}${siteText(")이 ")}${best.score}${siteText("점으로 가장 좋습니다.")}` : `${word}${siteText("이 이번 7일 중 가장 좋은 날입니다.")}`}</p>

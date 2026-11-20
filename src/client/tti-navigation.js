@@ -29,11 +29,12 @@ export function initTtiNavigation() {
         old.forEach((n) => n.remove()); replacement.forEach((n) => document.head.append(n));
       }
       const nav = document.querySelector('.tti-nav'), newNav = next.querySelector('.tti-nav');
-      const activeHref = newNav.querySelector('[aria-current]')?.getAttribute('href');
+      const active = newNav.querySelector('[aria-current]');
+      const activeHref = active?.getAttribute('href');
       if ([...nav.querySelectorAll('a')].map((a) => a.getAttribute('href')).join() !== [...newNav.querySelectorAll('a')].map((a) => a.getAttribute('href')).join()) nav.replaceChildren(...newNav.childNodes);
       document.querySelectorAll('.tti-nav a').forEach((a) => {
         const chosen = a.getAttribute('href') === activeHref;
-        if (chosen) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+        if (chosen) a.setAttribute('aria-current', active.getAttribute('aria-current')); else a.removeAttribute('aria-current');
       });
       document.body.dataset.page = new URL(url, location.origin).pathname;
       if (push) history.pushState(null, '', url);

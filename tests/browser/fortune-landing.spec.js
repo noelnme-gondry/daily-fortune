@@ -7,6 +7,27 @@ test.beforeEach(async ({ context }) => { await context.route('https://**/*', rou
 
 for (const lang of ['ko', 'en']) {
   const prefix = lang === 'en' ? '/en' : '';
+  test(`${lang}: 홈에서 출생 정보 없이 내 띠의 오늘 풀이를 연다`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${prefix}/`);
+    const entry = page.locator('.home-intro [data-ga-cta="home_zodiac_entry"]');
+    await expect(entry).toBeInViewport();
+    await entry.click();
+    await expect(page).toHaveURL(new RegExp(`${prefix}/tti/today/$`));
+    const signs = page.locator('main .tti-row');
+    await expect(signs).toHaveCount(12);
+    await signs.first().getByRole('link').click();
+    const reading = page.getByRole('dialog');
+    await expect(reading).toBeVisible();
+    await reading.locator('a.btn.ghost').click();
+    await expect(page).toHaveURL(new RegExp(`${prefix}/tti/today/[^/]+/$`));
+    await expect(page.locator('h1')).toBeVisible();
+    const todayUrl = page.url();
+    await page.locator('[data-ga-cta="zodiac_other_day"]').click();
+    await expect(page).toHaveURL(todayUrl.replace('/today/', '/tomorrow/'));
+    await page.locator('[data-ga-cta="zodiac_other_day"]').click();
+    await expect(page).toHaveURL(todayUrl);
+  });
   test(`${lang}: 무료운세 홈의 서비스 탐색·오늘 입력·저장 복원·띠별 선택을 유지한다`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${prefix}/`);
