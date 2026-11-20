@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createFortuneReport } from '../src/server/fortune-report.js';
 import { presentStoredReport, tojeongPremium } from '../src/server/premium-report.js';
-import { READING_CHAPTERS, READING_TOPICS, topicEvidence } from '../src/domain/premium-reading.js';
+import { READING_CHAPTERS, READING_TOPICS, topicEvidence, monthPractices } from '../src/domain/premium-reading.js';
 import { calculateTojeong } from '../src/domain/tojeong.js';
 import { buildChart, lifetime, compat } from '../src/engine/index.js';
 import { lifeView } from '../src/client/life-tool.js';
@@ -88,4 +88,18 @@ test('GA 구매: 승인된 실결제만 금액·통화·상품으로 기록하�
   assert.equal(trackPurchase(next), true); assert.equal(trackPurchase(next), false);
   trackCommerceStep('view_item', 'tojeong'); trackCommerceStep('begin_checkout', 'compatibility');
   assert.deepEqual(events.slice(-2).map(e => e[1]), ['view_item', 'begin_checkout']);
+});
+
+
+test('토정 144괘의 월별 행동은 해당 달 원문의 표현에만 연결된다', () => {
+  for (const [code, reading] of Object.entries(readings)) {
+    const practices = monthPractices(reading, code);
+    practices.forEach((choice, i) => {
+      if (choice) assert.ok(choice.action && reading.months[i + 1].includes(choice.source));
+    });
+  }
+  const sample = { months: Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i + 1, i < 3 ? '재물을 살핀다.' : '푸른 하늘.'])) };
+  const choices = monthPractices(sample, '111');
+  assert.equal(new Set(choices.slice(0, 3).map(choice => choice.action)).size, 3);
+  assert.ok(choices.slice(3).every(choice => choice === null));
 });

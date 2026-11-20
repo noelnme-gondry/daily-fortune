@@ -87,7 +87,7 @@ export function lifeStory(c, today) {
       const y = c.birth.y + a0 + i;
       const report = year(c, y);
       const sorted = report.cats.slice().sort((a, b) => b.score - a.score);
-      return { y, age: a0 + i, score: report.overall.score, headline: report.overall.headline, strong: sorted[0].name, careful: sorted.at(-1).name };
+      return { y, age: a0 + i, score: report.overall.score, headline: report.overall.headline, strong: sorted.filter(c => c.score === sorted[0].score).map(c => c.name).join(tr('·', ', ')), careful: sorted.filter(c => c.score === sorted.at(-1).score).map(c => c.name).join(tr('·', ', ')) };
     });
     // 그 시기의 주요 해 (과거는 "있었을", 미래는 "다가올")
     const ev = [];
@@ -95,8 +95,8 @@ export function lifeStory(c, today) {
       const y = c.birth.y + age;
       if (y < 1900 || y > 2100) continue;
       const s = yearSignals(c, y);
-      if (s.marriage >= 4) ev.push({ y, age, kind: '결혼·인연', w: s.marriage });
-      if (s.child >= 3.5) ev.push({ y, age, kind: '자녀', w: s.child });
+      if (age >= 18 && s.marriage >= 4) ev.push({ y, age, kind: '결혼·인연', w: s.marriage });
+      if (age >= 18 && s.child >= 3.5) ev.push({ y, age, kind: '자녀', w: s.child });
       if (s.move >= 4.5) ev.push({ y, age, kind: '이동·변화', w: s.move });
     }
     const events = ['결혼·인연', '자녀', '이동·변화'].map((k) => ev.filter((e) => e.kind === k).sort((x, y) => y.w - x.w || x.y - y.y)[0]).filter(Boolean)

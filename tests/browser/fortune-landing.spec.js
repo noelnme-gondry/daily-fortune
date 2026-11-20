@@ -14,6 +14,9 @@ for (const lang of ['ko', 'en']) {
     await expect(entry).toBeInViewport();
     await entry.click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/tti/today/$`));
+    // The server also provides a working detail link before the dialog module loads.
+    // This scenario exercises the enhanced dialog, so wait for the destination document.
+    await page.waitForLoadState('load');
     const signs = page.locator('main .tti-row');
     await expect(signs).toHaveCount(12);
     await signs.first().getByRole('link').click();
@@ -139,4 +142,19 @@ test('홈의 저장 정보를 수정하면 원래 카드가 접히고 제출한 
   await expect(page.locator('#result .chart-head')).toContainText('1985.01.01');
   await expect(page.locator('#a-y')).toHaveValue('1985');
   expect(await page.evaluate(async () => (await import('/src/client/profile.js')).listPeople().then(people => people.map(person => person.profile.y)))).toEqual([1990, 1985]);
+});
+
+test('the zodiac link reaches the reading when JavaScript is unavailable', async ({ browser }) => {
+  const page = await browser.newPage({ javaScriptEnabled: false });
+  try {
+    await page.route('https://**/*', route => route.abort());
+    for (const prefix of ['', '/en']) {
+      await page.goto(`${prefix}/tti/today/`);
+      await page.locator('main .tti-row a.tti-name').first().click();
+      await expect(page).toHaveURL(new RegExp(`${prefix}/tti/today/rat/$`));
+      await expect(page.locator('main h1')).toBeVisible();
+    }
+  } finally {
+    await page.close();
+  }
 });

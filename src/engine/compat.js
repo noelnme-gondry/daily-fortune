@@ -109,7 +109,7 @@ export function compat(a, b, today) {
   const elName = (e) => `${elementName(e)}(${EL_H[e]})`;
   const compLine = (X, Y, cX, sY) => {
     const need = cX.roles.yong;
-    if (sY[need] >= 0.24) return tr(`${Y}의 사주에는 ${X}에게 필요한 ${elName(need)} 기운이 넉넉해, 함께 있으면 ${X}의 마음과 운이 안정됩니다.`, `${Y} has plenty of ${elName(need)}, the element useful to ${X}. Traditionally, this is read as a supportive, stabilizing pairing.`);
+    if (sY[need] >= 0.24) return tr(`${Y}의 사주에는 ${X}에게 필요한 ${elName(need)} 기운이 넉넉해, 두 원국을 비교하면 이 오행이 보완되는 쪽으로 읽습니다.`, `${Y} has plenty of ${elName(need)}, the element useful to ${X}. Traditionally, this is read as a supportive, stabilizing pairing.`);
     if (sY[need] <= 0.08) return tr(`${Y}의 사주에는 ${X}의 용신인 ${elName(need)} 기운이 적어, 기대기보다 각자의 영역을 지켜 주는 관계가 잘 맞습니다.`, `${Y} has little ${elName(need)}, the useful element of ${X}. Respecting each other’s space may suit this pattern better than relying heavily on one another.`);
     return tr(`${josa(Y, '은/는')} ${X}에게 필요한 ${elName(need)} 기운을 적당히 갖고 있어 무리 없이 보완이 됩니다.`, `${Y} has a moderate amount of ${elName(need)}, the element useful to ${X}, suggesting a comfortable level of support.`);
   };
@@ -136,7 +136,6 @@ export function compat(a, b, today) {
     if (sA[e] < 0.07 && sB[e] < 0.07) { const E = T.element[e]; pushC('부족', { el: E.name, elh: E.hanja, nature: E.nature, color: E.color[0], season: E.season }); break; }
   }
   if (cautions.length < 3 && eA !== eB) pushC('기본', { X: nameA, Y: nameB, xe: elName(eA), ye: elName(eB) });
-  if (cautions.length < 3) cautions.push({ title: tr('익숙함 속의 소홀함', 'Taking familiarity for granted'), text: tr('관계가 편안해질수록 감사와 칭찬을 말로 표현하는 습관이 궁합을 지켜 줍니다.', 'As the relationship becomes comfortable, keep expressing appreciation and encouragement.') });
 
   // 결혼·자녀·재물 시기
   const years = [];

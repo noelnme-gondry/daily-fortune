@@ -161,7 +161,8 @@ export function animalDay(t, ctx, tomorrow = false) {
   const rank = 1 + all.filter((x) => x.score > r.score).length;
   const top = all.filter((x) => x.tti !== t).sort((a, b) => b.score - a.score)[0];
   const week = [...Array(7).keys()].map((i) => { const d = addDays(date, i); return { d, score: ttiDay(t, d).score }; });
-  const best = week.slice(1).sort((a, b) => b.score - a.score)[0];
+  const high = Math.max(...week.map(w => w.score));
+  const best = week.filter(w => w.score === high).map(w => fmtShort(w.d) + ' (' + weekdayName(dow(w.d)) + ')').join(tr(' · ', ', '));
   const m = ttiMatches(t);
   const y = ctx.today.y;
   const births = ttiYear(t, y).cohorts.filter((c) => c.age >= 6 && c.age <= 90).map((c) => c.birthYear);
@@ -178,7 +179,7 @@ export function animalDay(t, ctx, tomorrow = false) {
         : tr(`${animal}띠의 내일 풀이 보기`, `Read tomorrow’s ${animal} outlook`)}</a></p>
       <section class="box card tti-week"><h2>${animal}${siteText("띠의 앞으로 7일")}</h2>
         <ol class="tti-week-list">${week.map((w, i) => `<li${i === 0 ? ' class="is-today"' : ''}><span>${weekdayName(dow(w.d))} ${fmtShort(w.d)}</span><i style="--s:${w.score}" aria-hidden="true"></i><b class="num">${w.score}</b>${bandChip(w.score)}</li>`).join('')}</ol>
-        <p class="hint">${best.score >= r.score ? `${siteText("이번 7일 중에서는 ")}${best.d.m}${siteText("월 ")}${best.d.d}${siteText("일(")}${weekdayName(dow(best.d))}${siteText(")이 ")}${best.score}${siteText("점으로 가장 좋습니다.")}` : `${word}${siteText("이 이번 7일 중 가장 좋은 날입니다.")}`}</p>
+        <p class="hint">${tr(`이번 7일의 최고점은 ${high}점입니다. 해당 날짜는 ${best}입니다.`, `The highest score in these seven days is ${high}. Dates at that score: ${best}.`)}</p>
       </section>
       ${factTable([
         [siteText('출생 연도'), `${births.map((b) => `${b}`).join(' · ')}${siteText("년생 ")}<small>${siteText("(1월~2월 초 출생은 입춘 전이라 앞 띠일 수 있습니다)")}</small>`],

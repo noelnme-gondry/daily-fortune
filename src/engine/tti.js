@@ -4,11 +4,13 @@ import { term, animalName } from '../i18n/terms.js';
 import T from '../content/text.js';
 import TT from '../content/tti.js';
 import {
-  BR_EL, STEM_EL, DOHWA, YEOKMA, fill, pick, clamp, elRel, tenGod, relKey, pillarLabel, samjaeBranches, hongran, cheonhui,
+  fromUTC, DAY_MS, BR_EL, STEM_EL, DOHWA, YEOKMA, fill, pick, clamp, elRel, tenGod, relKey, pillarLabel, samjaeBranches, hongran, cheonhui,
 } from './core.js';
 import { yearPillar, monthPillar, dayPillar } from './calendar.js';
 import { bandOf } from './fortune.js';
-import { readingAction, readingCycle, zodiacReading, zodiacDayReading, zodiacFocus, zodiacRelationText, zodiacElementText } from '../domain/reading.js';
+import { readingAction, readingCycle, zodiacReading, zodiacDayReading, zodiacDayScene, zodiacFocus, zodiacRelationText, zodiacElementText } from '../domain/reading.js';
+import { periodPractice } from '../domain/period-practice.js';
+import { practiceCalendar } from '../domain/practice-calendar.js';
 import { zodiacCategoryOutlook, zodiacYearSummary } from '../domain/zodiac-outlook.js';
 
 const REL_W = { '합': 14, '삼합': 10, '같음': -3, '없음': 0, '충': -14, '형': -8, '원진': -8, '해': -5, '파': -4 };
@@ -61,7 +63,7 @@ export function ttiYear(tti, y) {
     const factor = cat === 'love' && (dohwa || hong) ? '도화' : cat === 'move' && yeokma ? '역마'
       : rel === '없음' || rel === '같음' ? ['비견', '식신', '정재', '정관', '정인'][e] : rel;
     const action = readingAction(cat, s, { ...context, factor });
-    return { key: cat, name: T.catName[cat], score: s, text: `${zodiacCategoryOutlook(cat, s)} ${action.text}` };
+    return { key: cat, name: T.catName[cat], score: s, text: `${zodiacCategoryOutlook(cat, s)} ${periodPractice(action.id, tti + '|' + y)}` };
   });
   const a = animalName(tti);
   const basis = [zodiacRelationText(rel), zodiacElementText(e, es)];
@@ -84,7 +86,8 @@ export function ttiYear(tti, y) {
     if (bp.b !== tti) continue;
     const tg = tenGod(bp.s, yp.s);
     const age = y - by;
-    const focus = TT.ageFocus.find(([max]) => age <= max)[1];
+    const topic = readingAction(zodiacFocus(rel, e, es), score, { factor: tg, cycle: y, identity: String(by) });
+    const focus = periodPractice(topic.id, by + '|' + y);
     cohorts.push({ birthYear: by, pillar: bp, pillarText: pillarLabel(bp), age, tg, score: clamp(Math.round(base + COHORT_W[tg]), 25, 96), text: `${TT.cohort[tg]} ${focus}` });
   }
   const focus = zodiacReading({ rel, e, es, score, ...context });
@@ -105,23 +108,32 @@ function ttiDayState(tti, dp, mp) {
   return { rel, e, es, score };
 }
 
+function dailySignScenes(dp, mp, cycle) {
+  const counts = new Map();
+  return Array.from({ length: 12 }, (_, sign) => {
+    const state = ttiDayState(sign, dp, mp);
+    const focus = zodiacFocus(state.rel, state.e, state.es);
+    const offset = counts.get(focus) || 0;
+    counts.set(focus, offset + 1);
+    return { ...state, focus, selection: zodiacDayScene(focus, cycle, offset) };
+  });
+}
+
+const signPractices = practiceCalendar(cycle => {
+  const date = fromUTC(cycle * DAY_MS);
+  return dailySignScenes(dayPillar(date), monthPillar(date), cycle).map(({ selection }) => selection.scene[3]);
+});
+
 export function ttiDay(tti, o) {
-  const dp = dayPillar(o), mp = monthPillar(o), cycle = readingCycle(o);
-  const state = ttiDayState(tti, dp, mp);
-  const { rel, e, es, score } = state;
-  const focus = zodiacFocus(rel, e, es);
-  // 같은 날짜·분야는 띠 순서대로 다른 장면을 배정한다. 조회 순서나 표시 언어와 무관하다.
-  let offset = 0;
-  for (let t = 0; t < tti; t++) {
-    const other = ttiDayState(t, dp, mp);
-    if (zodiacFocus(other.rel, other.e, other.es) === focus) offset++;
-  }
+  const cycle = readingCycle(o);
+  const { rel, score, focus, selection } = dailySignScenes(dayPillar(o), monthPillar(o), cycle)[tti];
+  const practice = signPractices(cycle)[tti];
   const key = `ttid${tti}|${o.y}-${o.m}-${o.d}`;
   const a = animalName(tti);
   const band = bandOf(score);
-  const { text, headline, outlook, advice, caution } = zodiacDayReading(focus, score, cycle, offset);
+  const { text, headline, outlook, advice, caution } = zodiacDayReading(focus, score, selection, practice);
   const E = T.element[(BR_EL[tti] + 4) % 5];
-  return { tti, animal: a, score, band, rel, headline, outlook, advice, caution, text, color: pick(E.color, key + 'c'), number: pick(E.number, key + 'n') };
+  return { tti, animal: a, score, band, rel, headline, outlook, advice, behavior: practice[2], caution, text, color: pick(E.color, key + 'c'), number: pick(E.number, key + 'n') };
 }
 
 // 일별 총점과 같은 요인을 상세 화면에 그대로 공개한다.
@@ -160,7 +172,9 @@ export function ttiCompat(a, b) {
   const e = elRel(BR_EL[a], BR_EL[b]);
   const base = { '합': 90, '삼합': 86, '같음': 70, '없음': 72, '충': 46, '원진': 48, '형': 53, '해': 58, '파': 60 }[rel];
   const adj = [0, 3, -2, -2, 3][e];
-  return { a, b, rel, score: clamp(base + adj, 30, 97), text: fill(TT.compat[rel], { a: animalName(a), b: animalName(b) }) };
+  const topic = { '충': 'social-agreement', '형': 'social-roles', '원진': 'social-reply', '해': 'social-boundary', '파': 'social-request' }[rel] || 'social-credit';
+  const practice = periodPractice(topic, [Math.min(a, b), Math.max(a, b), rel].join('|'));
+  return { a, b, rel, score: clamp(base + adj, 30, 97), text: fill(TT.compat[rel], { a: animalName(a), b: animalName(b) }) + ' ' + practice };
 }
 // 띠별로 잘 맞는 띠(육합·삼합)와 조심할 띠(충·원진·형)
 export function ttiMatches(tti) {
