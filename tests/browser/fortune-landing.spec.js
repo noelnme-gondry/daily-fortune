@@ -8,6 +8,14 @@ test.beforeEach(async ({ context }) => { await context.route('https://**/*', rou
 for (const lang of ['ko', 'en']) {
   const prefix = lang === 'en' ? '/en' : '';
   test(`${lang}: 홈에서 출생 정보 없이 내 띠의 오늘 풀이를 연다`, async ({ page }) => {
+    await page.addInitScript(() => {
+      window.gtag = (command, name, params) => {
+        if (command !== 'event') return;
+        const events = JSON.parse(sessionStorage.getItem('zodiac-test-events') || '[]');
+        sessionStorage.setItem('zodiac-test-events', JSON.stringify([...events, { name, params }]));
+      };
+    });
+    const events = () => page.evaluate(() => JSON.parse(sessionStorage.getItem('zodiac-test-events') || '[]'));
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${prefix}/`);
     const entry = page.locator('.home-intro [data-ga-cta="home_zodiac_entry"]');
@@ -19,12 +27,15 @@ for (const lang of ['ko', 'en']) {
     await page.waitForLoadState('load');
     const signs = page.locator('main .tti-row');
     await expect(signs).toHaveCount(12);
-    await signs.first().getByRole('link').click();
+    expect((await events()).filter(e => e.name === 'zodiac_quick_view')).toHaveLength(0);
+    await signs.first().getByRole('link').press('Enter');
     const reading = page.getByRole('dialog');
     await expect(reading).toBeVisible();
+    expect((await events()).filter(e => e.name === 'zodiac_quick_view')).toMatchObject([{ params: { tool: 'zodiac', entry_point: 'zodiac_today' } }]);
     await reading.locator('a.btn.ghost').click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/tti/today/[^/]+/$`));
     await expect(page.locator('h1')).toBeVisible();
+    expect((await events()).filter(e => e.name === 'select_content' && e.params.content_type === 'zodiac_week_detail')).toHaveLength(1);
     const todayUrl = page.url();
     await page.locator('[data-ga-cta="zodiac_other_day"]').click();
     await expect(page).toHaveURL(todayUrl.replace('/today/', '/tomorrow/'));

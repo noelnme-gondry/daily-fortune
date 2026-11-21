@@ -25,7 +25,16 @@ export function initInteractions() {
     const trigger = event.target.closest('[data-dialog]');
     if (trigger) {
       const dialog = document.getElementById(trigger.dataset.dialog);
-      if (dialog) { event.preventDefault(); openers.set(dialog, trigger); dialog.showModal(); if (dialog.matches('.explanation-dialog') && trigger.closest('#result')) track('reading_detail_open', { tool: trigger.closest('[data-tool]')?.dataset.tool || 'content', detail_type: trigger.closest('.daily-cat') ? 'area_detail' : trigger.closest('.chart-basis') ? 'chart_detail' : 'basis' }); }
+      if (dialog && !dialog.open) {
+        event.preventDefault();
+        openers.set(dialog, trigger);
+        dialog.showModal();
+        if (dialog.dataset.zodiacPeriod) {
+          track('zodiac_quick_view', { tool: 'zodiac', entry_point: `zodiac_${dialog.dataset.zodiacPeriod}` });
+        } else if (dialog.matches('.explanation-dialog') && trigger.closest('#result')) {
+          track('reading_detail_open', { tool: trigger.closest('[data-tool]')?.dataset.tool || 'content', detail_type: trigger.closest('.daily-cat') ? 'area_detail' : trigger.closest('.chart-basis') ? 'chart_detail' : 'basis' });
+        }
+      }
     }
     const close = event.target.closest('[data-close-dialog]');
     if (close) closeDialog(close.closest('dialog'));
