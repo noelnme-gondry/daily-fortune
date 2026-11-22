@@ -1,9 +1,9 @@
-import { DAILY_OUTLOOK, DAILY_OVERVIEW } from '../content/daily-outlook.js';
+import { DAILY_OUTLOOK, DAILY_OVERVIEW, DAILY_FACTOR_OUTLOOK, CAREER_FOLLOW_THROUGH } from '../content/daily-outlook.js';
 import { DAILY_ACTION_ALTERNATIVES, DAILY_SCENES } from '../content/daily-scenes.js';
 import { READING_ACTIONS } from '../content/reading-actions.js';
 import { factorTheme } from './reading.js';
 import { hash } from '../engine/core.js';
-import { tr } from '../i18n/runtime.js';
+import { isEnglish, tr } from '../i18n/runtime.js';
 
 export const dailyOverview = (band) => tr(...DAILY_OVERVIEW[band]);
 
@@ -33,7 +33,7 @@ export function personalPractices(cat, factor, topic, cycle, identity) {
 }
 
 // 해석과 활용 예시를 구분한다. 요인·전날 대비는 엔진이 계산한 값을 그대로 받는다.
-export function dailyReading(cat, band, { action, basis, change, cycle, identity }) {
+export function dailyReading(cat, band, { action, basis, change, cycle, identity, main, counter }) {
   const [outlook, bandOpportunity, bandCaution] = DAILY_OUTLOOK[cat][band].map(pair => tr(...pair));
   // Every fourth date uses the actual score band. Only the other dates
   // advance the scene sequence, including across month and year boundaries.
@@ -46,7 +46,15 @@ export function dailyReading(cat, band, { action, basis, change, cycle, identity
     ? scenes[((sceneIndex % scenes.length) + scenes.length) % scenes.length] : null;
   const opportunity = scene ? tr(scene[0], scene[1]) : bandOpportunity;
   const caution = scene ? tr(scene[2], scene[3]) : bandCaution;
-  const reading = { outlook: basis || outlook, opportunity, caution, action,
+  const phrase = factor => factor && DAILY_FACTOR_OUTLOOK[cat]?.[factorTheme(factor[0])]?.[factor[1] > 0 ? 0 : 1];
+  const first = phrase(main), other = phrase(counter);
+  let personal = first;
+  if (first && other && first !== other) {
+    personal += (counter[1] < 0 ? ' 다만 ' : ' 그래도 ') + other;
+  } else if (first && cat === 'career') {
+    personal += ' ' + CAREER_FOLLOW_THROUGH[factorTheme(main[0])][main[1] > 0 ? 0 : 1];
+  }
+  const reading = { outlook: isEnglish() ? basis || outlook : personal || outlook, opportunity, caution, action,
     basis: basis || tr('이 분야의 개별 일진 요인 해설은 제공되지 않습니다. 점수는 일진·월운·세운을 함께 반영한 값입니다.', 'No individual day-pillar factor explanation is available for this area. The score combines the day, month and year cycles.'),
     change,
   };

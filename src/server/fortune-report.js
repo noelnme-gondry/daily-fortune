@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { READINGS as readings } from '../content/tojeong-readings.js';
 import { buildChart, year, yearMonths, lifetime, compat, todayKST, isoDate } from '../engine/index.js';
 import { calculateTojeong } from '../domain/tojeong.js';
 import { yearView } from '../client/views.js';
@@ -9,7 +9,6 @@ import { fortuneProduct } from '../domain/fortune-products.js';
 import { tojeongPremium, lifetimePremium, compatibilityPremium, reportDocument } from './premium-report.js';
 import { withLanguage } from '../i18n/runtime.js';
 
-const readings = JSON.parse(readFileSync(new URL('../content/tojeong-144.json', import.meta.url), 'utf8'));
 export class PurchaseError extends Error {
   constructor(message, status = 400) { super(message); this.status = status; }
 }
@@ -51,7 +50,7 @@ export function createFortuneReport(input, today = todayKST()) {
       if (![today.y, today.y + 1].includes(targetYear)) throw new PurchaseError('올해 또는 내년을 선택해 주세요.');
       const r = calculateTojeong(people[0], targetYear), reading = readings[r.code];
       title = `${people[0].name || '나'}의 ${targetYear}년 토정비결`;
-      summary = reading.chongun.split(/(?<=[.!?])\s+/)[0];
+      summary = reading.interpretation || reading.chongun.split(/(?<=[.!?])\s+/)[0];
       body = tojeongPremium(r, reading);
     } else {
       const charts = people.map(p => buildChart(engineInput(p)));

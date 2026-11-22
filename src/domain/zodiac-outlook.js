@@ -1,4 +1,5 @@
-import { tr } from '../i18n/runtime.js';
+import { annualThemes } from '../content/period-outlook.js';
+import { isEnglish, tr } from '../i18n/runtime.js';
 import { ZODIAC_OPPORTUNITY, ZODIAC_CAREFUL_OPPORTUNITY, ZODIAC_CAUTION, ZODIAC_ELEMENT_CAUTION, ZODIAC_CATEGORY_OUTLOOK } from '../content/zodiac-outlook.js';
 
 const localized = (pair) => tr(...pair);
@@ -40,5 +41,9 @@ export function zodiacYearSummary(cats) {
   const contrast = low < 60
     ? tr(`${names(bottom)}(${low}점)은 주의해서 살필 부분입니다.`, `${names(bottom)} (${low}) needs care.`)
     : tr(`${names(bottom)}도 ${low}점으로, 낮은 점수대는 아닙니다.`, `${names(bottom)} still scores ${low}, outside the cautious range.`);
+  if (!isEnglish()) {
+    const story = [high >= 60 && annualThemes[top[0].key][0], low < 60 && annualThemes[bottom[0].key][1]].filter(Boolean).join(' ');
+    return `${story} ${lead} ${contrast}`;
+  }
   return `${lead} ${zodiacCategoryOutlook(top[0].key, high)} ${contrast} ${low < 60 ? zodiacCategoryOutlook(bottom[0].key, low) : ''}`.trim();
 }

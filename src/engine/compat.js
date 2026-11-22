@@ -22,6 +22,30 @@ const CAT_NAMES = bilingual(CAT_NAMES_KO, CAT_NAMES_EN);
 export const COMPAT_CATEGORIES = bilingual([['total', '종합'], ...Object.entries(CAT_NAMES_KO)], [['total', 'Overall'], ...Object.entries(CAT_NAMES_EN)]);
 export const COMPAT_HEADLINES = bilingual(['천생연분에 가까운 인연', '서로를 키워 주는 좋은 인연', '노력할수록 깊어지는 인연', '차이를 이해해야 하는 인연', '서로를 배워 가야 하는 인연'], ['A naturally close connection', 'A connection that helps you both grow', 'A bond that deepens with effort', 'A connection that calls for understanding differences', 'A connection built by learning about each other']);
 
+const compatibilityCopy = {
+  personality: ['서로의 평소 리듬을 편안하게 느끼기 쉬운 두 사람이에요.', '같은 상황에서 반응하는 속도가 다를 때는 서로 생각할 틈을 주세요.'],
+  love: ['호감을 표현하고 받아들이는 방식이 자연스럽게 맞닿는 편이에요.', '마음이 같아도 표현을 기다리는 쪽과 먼저 말을 건네는 쪽이 다를 수 있어요.'],
+  talk: ['두 사람은 이야기를 나누면서 마음을 맞추기가 비교적 수월해요.', '말뜻이 엇갈릴 때는 상대가 어떤 뜻으로 들었는지부터 물어보세요.'],
+  money: ['돈을 어디에 쓰고 무엇을 아낄지 뜻을 모으기 좋은 편이에요.', '함께 돈을 쓸 때는 각자가 편하게 여기는 선이 다를 수 있어요.'],
+  family: ['함께 보내는 일상의 리듬을 맞추는 데 힘이 실리는 관계예요.', '함께할 일과 각자 하고 싶은 일의 경계는 두 사람이 다르게 느낄 수 있어요.'],
+};
+const relationshipTitles = {
+  personality: [['서로의 리듬이 편안한 사이', 'Comfort in each other’s rhythms'], ['속도가 다를 때 마음을 맞추는 법', 'Making room for different rhythms']],
+  love: [['마음을 주고받기 편안한 사이', 'At ease exchanging affection'], ['마음을 표현하는 속도가 다를 때', 'Different paces of affection']],
+  talk: [['이야기를 나눌수록 가까워지는 사이', 'Growing closer through conversation'], ['같은 말이 다르게 들릴 때', 'When the same words land differently']],
+  money: [['쓰고 아끼는 기준이 통하는 사이', 'Finding common ground on spending'], ['돈을 대하는 기준을 알아가는 사이', 'Getting to know each other’s spending habits']],
+  family: [['함께하는 일상이 편안한 사이', 'At ease in everyday life together'], ['둘이 편안한 생활을 찾아가는 사이', 'Finding a shared everyday rhythm']],
+};
+const evenTitle = ['여러 면에서 비슷한 호흡', 'A similar rhythm across the areas'];
+export function compatibilityShareTitles() {
+  return [...COMPAT_HEADLINES, tr(...evenTitle), ...Object.values(relationshipTitles).flat().map(pair => tr(...pair))];
+}
+
+function relationshipOutlook(top, low) {
+  if (top.score === low.score) return '어느 한 분야만 두드러지지 않고 여러 면이 비슷한 두 사람이에요. 평소 무엇을 편안하게 느끼는지부터 이야기해 보세요.';
+  return [top.score >= 60 && compatibilityCopy[top.key][0], low.score < 60 && compatibilityCopy[low.key][1]].filter(Boolean).join(' ');
+}
+
 function compatBasis(a, b) {
   const eA = STEM_EL[a.dm], eB = STEM_EL[b.dm];
   let dmKey, dmW;
@@ -185,7 +209,14 @@ export function compat(a, b, today) {
     .sort((x, y) => toUTC(x.date) - toUTC(y.date))
     .map((d) => ({ date: d.date, label: fmtDate(d.date), pillar: d.p, pillarText: pillarLabel(d.p), lunar: lunarText(d.date) }));
 
-  const headline = COMPAT_HEADLINES[total >= 85 ? 0 : total >= 75 ? 1 : total >= 62 ? 2 : total >= 50 ? 3 : 4];
+  let headline = COMPAT_HEADLINES[total >= 85 ? 0 : total >= 75 ? 1 : total >= 62 ? 2 : total >= 50 ? 3 : 4];
+  if (!isEnglish()) {
+    const ranked = [...cats].sort((a, b) => b.score - a.score);
+    const top = ranked[0], low = ranked.at(-1);
+    const titles = top.score >= 60 ? relationshipTitles[top.key][0] : relationshipTitles[low.key][1];
+    headline = tr(...(top.score === low.score ? evenTitle : titles));
+    lines.unshift(relationshipOutlook(top, low));
+  }
   return {
     nameA, nameB, total, headline, cats, lines, complement, cautions,
     keys: { dm: dmKey, day: dayKey, year: yearKey, month: monthKey },

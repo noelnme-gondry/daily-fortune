@@ -1,3 +1,4 @@
+import { READINGS } from './src/content/tojeong-readings.js';
 import fs from 'node:fs';
 import { defineConfig } from 'vite';
 import { handleLanguage } from './src/site/language-middleware.js';
@@ -64,7 +65,8 @@ function sitePages() {
 // 토정비결 해설: 브라우저는 144괘 전체 대신 자기 괘 하나(/data/tojeong/{괘}.json)만 받는다.
 // 원본은 src/content/tojeong-144.json 하나로 두고, 개발 서버는 즉석 응답·빌드는 괘별 파일로 내보낸다.
 function tojeongData() {
-  const read = (language = 'ko') => JSON.parse(fs.readFileSync(new URL(`./src/content/tojeong-144${language === 'en' ? '.en' : ''}.json`, import.meta.url), 'utf8'));
+  const read = (language = 'ko') => language === 'ko' ? READINGS
+    : JSON.parse(fs.readFileSync(new URL('./src/content/tojeong-144.en.json', import.meta.url), 'utf8'));
   return {
     name: 'ohaeng-tojeong-data',
     configureServer(server) {

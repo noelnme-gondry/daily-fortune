@@ -752,7 +752,7 @@ export const READING_HEADLINES = {
       ['자료가 많다면 이해 쉬운 것 하나부터', 'When resources pile up, start with one clear source'],
       ['찾는 시간을 줄이고 읽어 볼 때', 'Spend less time searching and begin reading'],
       ['모든 설명을 다 보지 않아도 됩니다', 'You do not need to read every explanation'],
-      ['어디서 시작할지 막막하면 한 권만', 'When starting feels hard, choose one book'],
+      ['마음이 자꾸 다른 곳으로 향하는 날', 'When distractions keep pulling you away'],
       ['내가 따라갈 수 있는 자료를 기준으로', 'Choose material you can follow'],
       ['공부할 것을 늘리기보다 한 번 끝까지', 'Follow one resource through before adding more'],
     ],

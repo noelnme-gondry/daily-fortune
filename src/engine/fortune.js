@@ -1,3 +1,5 @@
+import { TOMORROW_CONTEXT } from '../content/daily-outlook.js';
+import { periodOutlook } from '../content/period-outlook.js';
 import { isEnglish, tr } from '../i18n/runtime.js';
 import { term, stemName, branchName, elementName, weekdayName } from '../i18n/terms.js';
 // 기간 운세: 기간의 간지(일진·월운·세운·대운)가 원국과 맺는 관계를 7개 분야 점수와 해설로 바꾼다.
@@ -213,7 +215,7 @@ function buildReport(c, comb, kind, ctx) {
     }
     if (kind === 'day') {
       const reading = dailyReading(cat, bandOf(sc.cats[i]), {
-        action: tr(practice[0], practice[1]), basis: basis.join(' '),
+        main, counter: basis.length > 1 ? counter : null, action: tr(practice[0], practice[1]), basis: basis.join(' '),
         cycle: ctx.cycle, identity: c.key, change: dayChangeText(sc.cats[i], ctx.previous.cats[i]),
       });
       return { ...base, focus: action.headline, actionId: action.id, reading: { ...reading, behavior: practice[2] }, text: reading.text };
@@ -235,11 +237,24 @@ function buildReport(c, comb, kind, ctx) {
   const title = shortPeriod
     ? ctx.days ? readingHeadline(focus.focus, weekRhythm(ctx.days).kind) : focus.focus
     : headline(sc, ctx.unit);
+  const overall = { score: sc.overall, headline: title, text: lines.join(' ') };
+  if (!isEnglish() && kind === 'day') {
+    overall.outlook = focus.reading.outlook;
+    if (ctx.which === 'tomorrow') {
+      const previous = ctx.previous.cats[CATS.indexOf(focus.key)];
+      const difference = focus.score - previous;
+      const direction = difference >= 8 ? '오늘보다 한결 여유가 생기는 흐름이에요.'
+        : difference <= -8 ? '오늘보다 조금 더 마음을 쓰게 될 수 있어요.' : '';
+      const context = TOMORROW_CONTEXT[focus.key][focus.score >= 60 ? 0 : 1];
+      const opening = direction && `내일 ${josa(focus.name, '은/는')} ${direction}`;
+      overall.outlook = [opening, focus.reading.outlook, context].filter(Boolean).join(' ');
+    }
+  }
+  else if (!isEnglish()) overall.outlook = periodOutlook(kind, ranked, ctx.days && weekRhythm(ctx.days).kind, ctx.label);
+  else if (kind === 'day') overall.outlook = `${dailyOverview(bandOf(sc.overall))} ${lines.at(-1)}`;
   return {
     kind, key: ctx.key, label: ctx.label,
-    overall: { score: sc.overall, headline: title, text: lines.join(' '),
-      ...(kind === 'day' ? { outlook: `${dailyOverview(bandOf(sc.overall))} ${lines.at(-1)}` } : {}),
-    },
+    overall,
     cats, lucky: lucky(c, key),
   };
 }
@@ -269,7 +284,7 @@ export function day(c, o, which = 'today') {
   const word = which === 'tomorrow' ? tr('내일', 'Tomorrow') : tr('오늘', 'Today');
   const r = buildReport(c, comb, 'day', {
     key: `d${o.y}-${o.m}-${o.d}`, P: tr(`${word}은`, word), unit: tr('날', 'Day'), label: fmtDate(o),
-    cycle: readingCycle(o), practices: dailyPractices(c, o), dayFactors: dEv.acc, previous,
+    which, cycle: readingCycle(o), practices: dailyPractices(c, o), dayFactors: dEv.acc, previous,
     intro: introFor(c, dEv, tr(`${word}은 ${pillarLabel(dEv.p)}일입니다.`, `${word} is a ${pillarLabel(dEv.p)} day.`)),
   });
   r.date = o; r.pillar = dEv.p; r.pillarText = tr(`${pillarLabel(dEv.p)}일`, `${pillarLabel(dEv.p)} day`); r.lunar = lunarText(o);

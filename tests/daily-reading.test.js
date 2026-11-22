@@ -24,7 +24,7 @@ test('기존 일곱 운과 모든 점수대에 흐름·기회·주의점의 한�
         assert.doesNotMatch(reading[field], /undefined|NaN|\[object Object\]/);
         if (lang === 'en') assert.doesNotMatch(reading[field], /[가-힣]/);
       }
-      assert.equal(reading.text, [reading.outlook, reading.opportunity, reading.caution, 'action', 'change'].join(' '));
+      assert.equal(reading.text, [...new Set([reading.outlook, reading.opportunity, reading.caution, 'action', reading.basis, 'change'])].join(' '));
       assert.equal(dailyOverview(band), DAILY_OVERVIEW[band][lang === 'ko' ? 0 : 1]);
     });
   }
@@ -39,10 +39,12 @@ for (const lang of ['ko', 'en']) {
       const chart = buildChart({ ...input, time });
       for (let d = 0; d < 30; d++) {
         const date = addDays(start, d), r = day(chart, date), previous = day(chart, addDays(date, -1));
-        assert.ok(r.overall.outlook.startsWith(dailyOverview(bandOf(r.overall.score))));
+        if (lang === 'en') assert.ok(r.overall.outlook.startsWith(dailyOverview(bandOf(r.overall.score))));
+        else assert.ok(r.overall.outlook.length > 15);
         for (let i = 0; i < r.cats.length; i++) {
           const cat = r.cats[i], band = bandOf(cat.score);
-          assert.ok(cat.reading.outlook === cat.reading.basis || cat.reading.outlook === DAILY_OUTLOOK[cat.key][band][0][lang === 'ko' ? 0 : 1]);
+          if (lang === 'ko') assert.notEqual(cat.reading.outlook, cat.reading.basis);
+          else assert.ok(cat.reading.outlook === cat.reading.basis || cat.reading.outlook === DAILY_OUTLOOK[cat.key][band][0][lang === 'ko' ? 0 : 1]);
           assert.ok(DAILY_OUTLOOK[cat.key][band]);
           const diff = cat.score - previous.cats[i].score;
           assert.match(cat.reading.change, new RegExp(diff === 0 ? String(cat.score) : String(Math.abs(diff))));

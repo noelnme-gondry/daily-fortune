@@ -12,7 +12,7 @@ const similarActions = [
   ['send-location-update', 'send-arrival-update', 'share-map-pin'],
   ['choose-meeting-landmark', 'describe-arrival-landmark', 'note-return-landmark'],
   ['schedule-restart', 'prepare-next-session', 'leave-restart-note'],
-  ['assign-cleanup', 'divide-start-and-finish'],
+  ['assign-cleanup', 'divide-start-and-finish', 'split-by-strength'],
   ['locate-sticking-point', 'select-blocking-question'],
   ['introduce-two-people', 'offer-introduction'],
   ['open-with-shared-memory', 'share-memory-object'],
