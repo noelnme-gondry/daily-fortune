@@ -65,7 +65,7 @@ export function createCommerceService({ config, store, gateway, now = Date.now }
         const existing = (await db.own(owner)).find(o => o.fingerprint === fingerprint && o.mode === config.mode && o.clientId === config.clientId && (o.status === 'PAID' || (o.status === 'PENDING' && now() - o.createdAt < 24 * 60 * 60 * 1000)));
         if (existing) return existing;
         const state = randomBytes(32).toString('hex');
-        const order = { id: `fortune_${randomUUID()}`, owner, productId: report.product.id, targetYear: report.normalized.targetYear, amount: report.product.price, title: report.title, html: report.html, fingerprint, state, status: 'PENDING', createdAt: now(), mode: config.mode, clientId: config.clientId, consentVersion: '2026-11-16' };
+        const order = { id: `fortune_${randomUUID()}`, owner, productId: report.product.id, targetYear: report.normalized.targetYear, amount: report.product.price, title: report.title, html: report.html, fingerprint, state, status: 'PENDING', createdAt: now(), mode: config.mode, clientId: config.clientId, consentVersion: input.consentVersion === '2026-11-23' ? '2026-11-23' : '2026-11-16' };
         await db.put(order);
         return order;
       });

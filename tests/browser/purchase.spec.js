@@ -36,26 +36,25 @@ for (const product of ['tojeong', 'lifetime', 'compatibility']) test(`${product}
   await fillPerson(page, 'a');
   if (product === 'compatibility') await fillPerson(page, 'b', '1991');
   if (product === 'tojeong') { await expect(page.locator('.field-gender')).toHaveCount(0); await expect(page.locator('.field-time')).toHaveCount(0); }
-  await page.locator('#purchase-privacy').check();
-  await page.getByRole('button', { name: '무료 미리보기', exact: true }).click();
+  await page.getByRole('button', { name: '운세보기', exact: true }).click();
   await expect(page.locator('[data-purchase-review]')).toBeVisible();
+  await page.locator('[data-preview-options] summary').click();
+  await page.locator('[data-preview-request]').click();
   await expect(page.locator('[data-preview-summary]')).not.toBeEmpty();
-  await expect(page.locator('#purchase-form')).toBeVisible();
+  await expect(page.locator('#purchase-form')).toBeHidden();
   await expect(page.locator('[data-purchase-download]')).toHaveCount(0);
-  await page.locator('#purchase-confirm').check();
   await expect(page.locator('[data-purchase-pay]')).toBeDisabled();
-  await page.getByRole('button', { name: '입력 정보 수정' }).click();
+  await page.getByRole('button', { name: '대상 수정' }).click();
   await expect(page.locator('#a-y')).toHaveValue('1990');
-  await expect(page.locator('#a-y')).toBeFocused();
+  await expect(page.locator('[data-purchase-person="a"] summary').first()).toBeFocused();
 });
-test('개인정보 동의와 존재하지 않는 날짜는 미리보기 전에 안내한다', async ({ page }) => {
+test('누락·존재하지 않는 날짜는 대상 확정 전에 안내한다', async ({ page }) => {
   await page.goto('/shop/lifetime/');
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
-  await page.getByRole('button', { name: '무료 미리보기', exact: true }).click();
-  await expect(page.locator('[data-purchase-error]')).toContainText('동의');
+  await page.getByRole('button', { name: '운세보기', exact: true }).click();
+  await expect(page.locator('[data-purchase-error]')).toContainText('생년월일');
   await fillPerson(page, 'a'); await page.locator('#a-m').selectOption('2'); await page.locator('#a-d').selectOption('31');
-  await page.locator('#purchase-privacy').check();
-  await page.getByRole('button', { name: '무료 미리보기', exact: true }).click();
+  await page.getByRole('button', { name: '운세보기', exact: true }).click();
   await expect(page.locator('[data-purchase-error]')).toContainText('없습니다');
   await expect(page.locator('[data-purchase-review]')).toBeHidden();
 });
@@ -88,12 +87,11 @@ for (const method of methods) test(`${method}: 선택한 결제수단이 서버 
   await mockCheckout(page);
   await page.goto('/shop/lifetime/');
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
-  await fillPerson(page, 'a'); await page.locator('#purchase-privacy').check();
-  await page.getByRole('button', { name: '무료 미리보기', exact: true }).click();
+  await fillPerson(page, 'a');
+  await page.getByRole('button', { name: '운세보기', exact: true }).click();
   await expect(page.getByLabel('결제수단', { exact: true }).locator('option')).toHaveCount(3);
   await page.getByLabel('결제수단', { exact: true }).selectOption(method);
-  await page.locator('#purchase-confirm').check();
-  const button = page.getByRole('button', { name: '990원 결제하기', exact: true });
+  const button = page.getByRole('button', { name: '동의하고 990원 결제하기', exact: true });
   await expect(button).toBeEnabled();
   const requested = page.waitForRequest(r => r.url().endsWith(`/orders/${orderId}/payment`));
   await button.click();
