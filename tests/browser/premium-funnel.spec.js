@@ -23,7 +23,7 @@ async function preview(page, product = 'lifetime') {
     if (product !== 'tojeong') await page.locator(`[name="${who}-gender"][value="F"]`).check();
   }
   await page.locator('#purchase-privacy').check();
-  await page.getByRole('button', { name: '미리보기·주문 확인', exact: true }).click();
+  await page.getByRole('button', { name: '무료 미리보기', exact: true }).click();
   await expect(page.locator('[data-purchase-review]')).toBeVisible();
 }
 for (const width of [320, 390, 768, 1440]) test(`${width}px: 콘텐츠의 목차 박스는 관련 상품으로 연결되고 노출·선택을 구분한다`, async ({ page }) => {
@@ -151,4 +151,74 @@ test('상점 조회와 내년 무료 운세의 유료 진입은 각 경로에서
   await expect(page).toHaveURL(new RegExp(`/year/${year}/premium/$`));
   await expect.poll(() => events(page, 'view_annual')).toMatchObject([{ reading_year: year }]);
   expect(await events(page, 'view_shop')).toEqual([]);
+});
+
+for (const [width, product, saved] of [[375, 'tojeong', false], [1280, 'lifetime', true], [375, 'compatibility', true], [1280, 'compatibility', false]]) {
+  test(`${width}px ${product} ${saved ? '저장' : '신규'}: 메뉴에서 미리보기 없이 정확한 대상으로 결제`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    let previewRequests = 0;
+    page.on('request', request => { if (request.url().endsWith('/api/commerce/preview')) previewRequests++; });
+    await page.goto('/');
+    if (saved) {
+      await page.evaluate(async () => {
+        const { savePerson } = await import('/src/client/profile.js');
+        for (const y of [1990, 1991]) await savePerson({ name: String(y), gender: 'F', calendar: 'solar', y, m: 5, d: 17, noTime: true });
+      });
+    }
+    await page.locator('[data-premium-menu]').click();
+    await page.locator(`[data-commerce-item="${product}"] [data-commerce-select]`).click();
+    await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
+    const slots = product === 'compatibility' ? ['a', 'b'] : ['a'];
+    for (const [i, who] of slots.entries()) {
+      if (saved) {
+        const option = page.locator(`#${who}-saved-person option`).filter({ hasText: String(1990 + i) });
+        await page.locator(`#${who}-saved-person`).selectOption(await option.getAttribute('value'));
+      } else {
+        await page.locator(`#${who}-y`).fill(String(1990 + i));
+        await page.locator(`#${who}-m`).selectOption('5');
+        await page.locator(`#${who}-d`).selectOption('17');
+        if (product !== 'tojeong') await page.locator(`[name="${who}-gender"][value="F"]`).check();
+      }
+      await expect(page.locator(`#${who}-y`)).toHaveValue(String(1990 + i));
+    }
+    await page.locator('#purchase-privacy').check();
+    await expect(page.locator('[data-purchase-pay]')).toBeDisabled();
+    await page.locator('#purchase-confirm').check();
+    await page.route('**/api/commerce/orders', route => {
+      const order = route.request().postDataJSON();
+      expect(order.people.map(person => person.y)).toEqual(slots.map((_, i) => 1990 + i));
+      expect(order).toMatchObject({ productId: product, purchaseConsent: true, privacyConsent: true });
+      return route.fulfill({ json: { id: orderId, status: 'PENDING' } });
+    });
+    await page.route(`**/orders/${orderId}/payment`, route => route.fulfill({ json: { orderId, method: 'card', amount: 990 } }));
+    await page.locator('[data-purchase-pay]').click();
+    await expect.poll(() => events(page, 'add_payment_info')).toHaveLength(1);
+    expect(await events(page, 'checkout_input_start')).toHaveLength(1);
+    expect(await events(page, 'payment_attempt')).toHaveLength(1);
+    expect(await events(page, 'begin_checkout')).toHaveLength(0);
+    expect(previewRequests).toBe(0);
+  });
+}
+
+test('입력을 고치면 이전 미리보기와 구매 확인을 지우고 잘못된 대상은 주문하지 않는다', async ({ page }) => {
+  await preview(page);
+  await page.locator('#purchase-confirm').check();
+  await page.locator('#a-y').fill('');
+  await expect(page.locator('[data-purchase-review]')).toBeHidden();
+  await expect(page.locator('#purchase-confirm')).not.toBeChecked();
+  let orders = 0;
+  page.on('request', request => { if (request.url().endsWith('/api/commerce/orders')) orders++; });
+  await page.locator('#purchase-confirm').check();
+  await page.locator('[data-purchase-pay]').click();
+  await expect(page.locator('[data-purchase-error]')).toContainText('생년월일');
+  expect(await events(page, 'purchase_error')).toMatchObject([{ checkout_stage: 'input', error_code: 'invalid_input' }]);
+  expect(orders).toBe(0);
+});
+
+test('상단 메뉴 클릭만 상품 목록 진입 이벤트로 구분한다', async ({ page }) => {
+  await page.goto('/');
+  const menu = page.locator('[data-premium-menu]');
+  await menu.evaluate(el => el.addEventListener('click', event => event.preventDefault(), { once: true }));
+  await menu.click();
+  expect(await events(page, 'premium_menu_click')).toMatchObject([{ commerce_version: '3' }]);
 });
