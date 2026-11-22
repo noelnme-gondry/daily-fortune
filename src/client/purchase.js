@@ -1,4 +1,5 @@
-import { readForm, fillForm, wireBirthForm, syncTime } from './birth-form.js';
+import { birthDateError } from '../domain/birth-input.js';
+import { readForm, fillForm, wireBirthForm, syncTime, check } from './birth-form.js';
 import { listPeople, profileLabel } from './profile.js';
 import { esc } from '../site/util.js';
 import { NICEPAY_PAYMENT_METHODS } from '../domain/payment-methods.js';
@@ -49,10 +50,21 @@ async function mountProduct(root) {
   const id = root.dataset.fortuneProduct, pair = id === 'compatibility', dateOnly = id === 'tojeong';
   trackCommerceStep('view_item', id);
   const form = $('#purchase-form'), review = $('[data-purchase-review]'), button = $('[data-purchase-pay]'), confirm = $('#purchase-confirm'), method = $('#purchase-method');
-  let config = { enabled: false }, input, busy = false;
+  let config = { enabled: false }, busy = false;
+  let started = false;
+  const privacy = $('#purchase-privacy');
+  function changed(event) {
+    if (!started && event?.target !== privacy) {
+      trackCommerceStep('checkout_input_start', id);
+      started = true;
+    }
+    review.hidden = true;
+    confirm.checked = false;
+    update();
+  }
   const slots = pair ? ['a', 'b'] : ['a'];
   const picker = who => form.querySelector(`[data-profile-picker="${who}"]`);
-  const populate = (profile, who) => { fillForm(form, who, profile); picker(who).value = profile.profileId || ''; };
+  const populate = (profile, who) => { fillForm(form, who, profile); picker(who).value = profile.profileId || ''; changed(); };
   async function refreshPeople() {
     const people = await listPeople();
     for (const who of slots) {
@@ -74,8 +86,7 @@ async function mountProduct(root) {
   document.addEventListener('profile-selected', event => {
     const { profile, slot } = event.detail;
     if (busy || !slots.includes(slot)) return;
-    if (!form.hidden) populate(profile, slot);
-    else { $('[data-purchase-edit]').click(); populate(profile, slot); }
+    populate(profile, slot);
   });
   try { await refreshPeople(); } catch { /* 저장소 없이 직접 입력할 수 있다. */ }
   if (!dateOnly) { wireBirthForm(form, pair ? ['a', 'b'] : ['a']); for (const who of pair ? ['a', 'b'] : ['a']) syncTime(form, who); }
@@ -86,29 +97,53 @@ async function mountProduct(root) {
     $('[data-purchase-status]').textContent = !config.enabled ? '결제 준비 중입니다. 미리보기는 이용할 수 있습니다.' : config.mode === 'sandbox' ? '나이스페이 테스트 결제 환경입니다. 실제로 청구되지 않습니다.' : '나이스페이에서 결제합니다.';
   } catch (e) { trackCheckoutError(id, 'configuration', errorCode(e)); $('[data-purchase-status]').textContent = '결제 연결을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.'; }
   root.dataset.ready = 'true';
-  const update = () => { method.disabled = !config.enabled || !config.methods?.length || busy; button.disabled = method.disabled || !method.value || !confirm.checked || busy; };
+  function update() {
+    form.inert = busy;
+    method.disabled = !config.enabled || !config.methods?.length || busy;
+    confirm.disabled = busy;
+    button.disabled = method.disabled || !method.value || !confirm.checked || !privacy.checked;
+  }
+  form.addEventListener('input', changed);
+  form.addEventListener('change', changed);
   confirm.addEventListener('change', update);
   method.addEventListener('change', update);
+  update();
+
+  function readInput() {
+    const read = who => dateOnly ? { name: $('#a-name').value.trim(), y: +$('#a-y').value, m: +$('#a-m').value, d: +$('#a-d').value, calendar: form.querySelector('[name="a-cal"]:checked').value, leap: !$('#a-leap').disabled && $('#a-leap').checked } : readForm(form, who);
+    return { productId: id, people: slots.map(read), targetYear: dateOnly ? +$('#purchase-year').value : Number(root.dataset.readingYear) || undefined, privacyConsent: privacy.checked };
+  }
+
   form.addEventListener('submit', async e => {
     e.preventDefault(); if (busy) return;
     error('');
-    if (!$('#purchase-privacy').checked) { trackCheckoutError(id, 'preview', 'consent_required'); error('출생 정보 처리에 동의해 주세요.'); $('#purchase-privacy').focus(); return; }
-    const read = who => dateOnly ? { name: $('#a-name').value.trim(), y: +$('#a-y').value, m: +$('#a-m').value, d: +$('#a-d').value, calendar: form.querySelector('[name="a-cal"]:checked').value, leap: !$('#a-leap').disabled && $('#a-leap').checked } : readForm(form, who);
-    input = { productId: id, people: [read('a'), ...(pair ? [read('b')] : [])], targetYear: dateOnly ? +$('#purchase-year').value : Number(root.dataset.readingYear) || undefined, privacyConsent: true };
-    busy = true; const submit = form.querySelector('[type="submit"]'); submit.disabled = true;
+    if (!privacy.checked) { trackCheckoutError(id, 'preview', 'consent_required'); error('출생 정보 처리에 동의해 주세요.'); privacy.focus(); return; }
+    const input = readInput();
+    busy = true;
+    update();
     try {
       const p = await api('/preview', input);
       trackCommerceStep('begin_checkout', id);
       $('[data-preview-title]').textContent = p.title; $('[data-preview-summary]').textContent = p.summary;
       $('[data-purchase-details]').innerHTML = `<div><dt>상품</dt><dd>${esc(p.title)}</dd></div>${p.people.map((v, i) => `<div><dt>${pair ? (i ? '상대' : '나') : '구매 대상'}</dt><dd>${esc(v.name || (i ? '상대' : '나'))} · ${v.calendar === 'lunar' ? '음력' : '양력'} ${v.leap ? '윤달 ' : ''}${v.y}.${v.m}.${v.d}${dateOnly ? '' : ` · ${v.gender === 'M' ? '남성' : '여성'} · ${v.noTime ? '시간 모름' : esc(v.timeMode === 'branch' ? `시진 ${v.timeBranch}` : v.time)}`}</dd></div>`).join('')}${p.targetYear ? `<div><dt>풀이 연도</dt><dd>${p.targetYear}년</dd></div>` : ''}<div><dt>제공 내용</dt><dd>전체 상세 풀이 + HTML 운세 파일</dd></div>`;
-      form.hidden = true; review.hidden = false; confirm.checked = false;
-      $('[data-purchase-step="input"]').removeAttribute('aria-current'); $('[data-purchase-step="review"]').setAttribute('aria-current', 'step');
+      review.hidden = false;
       review.focus(); review.scrollIntoView({ block: 'start' });
-    } catch (e) { trackCheckoutError(id, 'preview', errorCode(e)); error(e.message); } finally { busy = false; submit.disabled = false; update(); }
+    } catch (e) { trackCheckoutError(id, 'preview', errorCode(e)); error(e.message); } finally { busy = false; update(); }
   });
-  $('[data-purchase-edit]').addEventListener('click', () => { if (busy) return; review.hidden = true; form.hidden = false; input = null; error(''); $('[data-purchase-step="review"]').removeAttribute('aria-current'); $('[data-purchase-step="input"]').setAttribute('aria-current', 'step'); $('#a-y').focus(); });
+  $('[data-purchase-edit]').addEventListener('click', () => { if (!busy) $('#a-y').focus(); });
   button.addEventListener('click', async () => {
-    if (busy || !input || !confirm.checked || !config.enabled || !method.value) return;
+    if (busy || !privacy.checked || !confirm.checked || !config.enabled || !method.value) return;
+    const input = readInput();
+    for (const [index, person] of input.people.entries()) {
+      const issue = dateOnly ? birthDateError(person) : check(person);
+      if (issue) {
+        error(pair ? `${index ? '상대' : '나'} · ${issue}` : issue);
+        trackCheckoutError(id, 'input', 'invalid_input');
+        const field = birthDateError(person) ? '#' + slots[index] + '-y' : 'input[name="' + slots[index] + '-gender"]';
+        form.querySelector(field)?.focus();
+        return;
+      }
+    }
     busy = true; update(); error('');
     trackCommerceStep('payment_attempt', id, method.value);
     let orderCreated = false;

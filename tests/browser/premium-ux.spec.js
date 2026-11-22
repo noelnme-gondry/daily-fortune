@@ -146,7 +146,7 @@ for (const path of ['/tojeong/', '/lifetime/', '/compatibility/']) test(`${path}
   }
   await page.locator('#purchase-privacy').check(); await page.locator('#purchase-form [type=submit]').click();
   await expect(page.locator('[data-purchase-review]')).toBeVisible();
-  await expect(page.locator('#purchase-form')).toBeHidden();
+  await expect(page.locator('#purchase-form')).toBeVisible();
   await expect(page.locator('[data-purchase-review]')).toContainText('전체 풀이와 운세 파일은 결제 후 제공됩니다.');
 });
 for (const product of ['tojeong', 'lifetime', 'compatibility']) test(`${product}: 저장한 사람을 선택해도 제출 전에는 서버 미리보기를 요청하지 않는다`, async ({ page }) => {
