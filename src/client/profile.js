@@ -83,7 +83,16 @@ export function sessionLoad(who) {
   return takeLegacy(who);
 }
 export function sessionSave(who, p) {
-  try { sessionStorage.setItem(KEY[who], JSON.stringify(p)); return true; } catch { return false; }
+  try {
+    sessionStorage.setItem(KEY[who], JSON.stringify(p));
+    if (who === 'a' || who === 'tojeong') sessionStorage.setItem('ohaeng:last-birth-slot', who);
+    return true;
+  } catch { return false; }
+}
+// 날짜만 쓰는 상품은 현재 탭에서 마지막으로 사용한 나/토정 슬롯을 먼저 읽는다.
+export function dateProfileSlots() {
+  try { if (sessionStorage.getItem('ohaeng:last-birth-slot') === 'a') return ['a', 'tojeong']; } catch { /* 저장 제한 */ }
+  return ['tojeong', 'a'];
 }
 export const toEngine = (p) => ({
   name: p.name, gender: p.gender, calendar: p.calendar, leap: p.leap, y: p.y, m: p.m, d: p.d,

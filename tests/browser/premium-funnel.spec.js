@@ -16,14 +16,18 @@ async function preview(page, product = 'lifetime') {
   await page.goto(product === 'annual' ? `/year/${todayKST().y + 1}/premium/` : `/${product}/`);
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
   for (const who of product === 'compatibility' ? ['a', 'b'] : ['a']) {
+    const panel = page.locator(`[data-purchase-person="${who}"]`);
+    if (await panel.getAttribute('open') === null) await panel.locator('summary').first().click();
     await page.locator(`#${who}-name`).fill('비공개테스트');
     await page.locator(`#${who}-y`).fill('1990');
     await page.locator(`#${who}-m`).selectOption('5');
     await page.locator(`#${who}-d`).selectOption('17');
     if (product !== 'tojeong') await page.locator(`[name="${who}-gender"][value="F"]`).check();
   }
-  await page.locator('#purchase-privacy').check();
-  await page.getByRole('button', { name: '무료 미리보기', exact: true }).click();
+  await page.getByRole('button', { name: '운세보기', exact: true }).click();
+  await page.locator('[data-preview-options] summary').click();
+  await page.locator('[data-preview-request]').click();
+  await expect(page.locator('[data-preview-summary]')).not.toBeEmpty();
   await expect(page.locator('[data-purchase-review]')).toBeVisible();
 }
 for (const width of [320, 390, 768, 1440]) test(`${width}px: 콘텐츠의 목차 박스는 관련 상품으로 연결되고 노출·선택을 구분한다`, async ({ page }) => {
@@ -100,7 +104,6 @@ for (const product of ['tojeong', 'lifetime', 'compatibility', 'annual']) test(`
   expect(await events(page, 'begin_checkout')).toHaveLength(1);
   expect(await events(page, 'payment_attempt')).toHaveLength(0);
   expect(await events(page, 'add_payment_info')).toHaveLength(0);
-  await page.locator('#purchase-confirm').check();
   await page.locator('[data-purchase-pay]').click();
   await expect(page.locator('[data-purchase-error]')).toBeVisible();
   expect(await events(page, 'payment_attempt')).toMatchObject([{ payment_type: 'card', items: [{ item_id: product }] }]);
@@ -113,7 +116,6 @@ for (const stage of ['order_create', 'payment_prepare']) test(`${stage}: HTTP �
   await page.route('**/api/commerce/orders', route => route.fulfill(stage === 'order_create' ? { status: 503, json: { message: 'private order failure' } } : { json: { id: orderId, status: 'PENDING' } }));
   await page.route(`**/api/commerce/orders/${orderId}/payment`, route => route.fulfill({ status: 409, json: { message: 'private payment failure' } }));
   await preview(page);
-  await page.locator('#purchase-confirm').check();
   await page.locator('[data-purchase-pay]').click();
   await expect(page.locator('[data-purchase-error]')).toBeVisible();
   expect(await events(page, 'purchase_error')).toMatchObject([{ checkout_stage: stage, error_code: stage === 'order_create' ? 'http_5xx' : 'http_4xx' }]);
@@ -161,8 +163,8 @@ for (const [width, product, saved] of [[375, 'tojeong', false], [1280, 'lifetime
     await page.goto('/');
     if (saved) {
       await page.evaluate(async () => {
-        const { savePerson } = await import('/src/client/profile.js');
-        for (const y of [1990, 1991]) await savePerson({ name: String(y), gender: 'F', calendar: 'solar', y, m: 5, d: 17, noTime: true });
+        const { save } = await import('/src/client/profile.js');
+        for (const y of [1990, 1991]) await save(y === 1990 ? 'a' : 'b', { name: String(y), gender: 'F', calendar: 'solar', y, m: 5, d: 17, noTime: true });
       });
     }
     await page.locator('[data-premium-menu]').click();
@@ -171,8 +173,7 @@ for (const [width, product, saved] of [[375, 'tojeong', false], [1280, 'lifetime
     const slots = product === 'compatibility' ? ['a', 'b'] : ['a'];
     for (const [i, who] of slots.entries()) {
       if (saved) {
-        const option = page.locator(`#${who}-saved-person option`).filter({ hasText: String(1990 + i) });
-        await page.locator(`#${who}-saved-person`).selectOption(await option.getAttribute('value'));
+        await expect(page.locator(`[data-purchase-person="${who}"] > summary`)).toContainText(String(1990 + i));
       } else {
         await page.locator(`#${who}-y`).fill(String(1990 + i));
         await page.locator(`#${who}-m`).selectOption('5');
@@ -181,19 +182,22 @@ for (const [width, product, saved] of [[375, 'tojeong', false], [1280, 'lifetime
       }
       await expect(page.locator(`#${who}-y`)).toHaveValue(String(1990 + i));
     }
-    await page.locator('#purchase-privacy').check();
-    await expect(page.locator('[data-purchase-pay]')).toBeDisabled();
-    await page.locator('#purchase-confirm').check();
+    await expect(page.locator('[data-purchase-pay]')).toBeHidden();
+    await page.getByRole('button', { name: '운세보기', exact: true }).click();
+    await expect(page.locator('[data-purchase-details] dd').first()).toContainText('1990');
+    if (slots.length === 2) await expect(page.locator('[data-purchase-details] dd').nth(1)).toContainText('1991');
     await page.route('**/api/commerce/orders', route => {
       const order = route.request().postDataJSON();
       expect(order.people.map(person => person.y)).toEqual(slots.map((_, i) => 1990 + i));
+      if (saved) expect(order.people.map(person => person.name)).toEqual(slots.map((_, i) => String(1990 + i)));
       expect(order).toMatchObject({ productId: product, purchaseConsent: true, privacyConsent: true });
       return route.fulfill({ json: { id: orderId, status: 'PENDING' } });
     });
     await page.route(`**/orders/${orderId}/payment`, route => route.fulfill({ json: { orderId, method: 'card', amount: 990 } }));
     await page.locator('[data-purchase-pay]').click();
     await expect.poll(() => events(page, 'add_payment_info')).toHaveLength(1);
-    expect(await events(page, 'checkout_input_start')).toHaveLength(1);
+    expect(await events(page, 'checkout_input_start')).toHaveLength(saved ? 0 : 1);
+    expect(await events(page, 'checkout_subject_confirm')).toHaveLength(1);
     expect(await events(page, 'payment_attempt')).toHaveLength(1);
     expect(await events(page, 'begin_checkout')).toHaveLength(0);
     expect(previewRequests).toBe(0);
@@ -202,14 +206,13 @@ for (const [width, product, saved] of [[375, 'tojeong', false], [1280, 'lifetime
 
 test('입력을 고치면 이전 미리보기와 구매 확인을 지우고 잘못된 대상은 주문하지 않는다', async ({ page }) => {
   await preview(page);
-  await page.locator('#purchase-confirm').check();
+  await page.locator('[data-purchase-edit]').click();
   await page.locator('#a-y').fill('');
   await expect(page.locator('[data-purchase-review]')).toBeHidden();
-  await expect(page.locator('#purchase-confirm')).not.toBeChecked();
+  await expect(page.locator('[data-purchase-pay]')).toBeHidden();
   let orders = 0;
   page.on('request', request => { if (request.url().endsWith('/api/commerce/orders')) orders++; });
-  await page.locator('#purchase-confirm').check();
-  await page.locator('[data-purchase-pay]').click();
+  await page.getByRole('button', { name: '운세보기' }).click();
   await expect(page.locator('[data-purchase-error]')).toContainText('생년월일');
   expect(await events(page, 'purchase_error')).toMatchObject([{ checkout_stage: 'input', error_code: 'invalid_input' }]);
   expect(orders).toBe(0);
@@ -220,5 +223,32 @@ test('상단 메뉴 클릭만 상품 목록 진입 이벤트로 구분한다', a
   const menu = page.locator('[data-premium-menu]');
   await menu.evaluate(el => el.addEventListener('click', event => event.preventDefault(), { once: true }));
   await menu.click();
-  expect(await events(page, 'premium_menu_click')).toMatchObject([{ commerce_version: '3' }]);
+  expect(await events(page, 'premium_menu_click')).toMatchObject([{ commerce_version: '4' }]);
+});
+
+test('토정비결은 최근 사람·확정한 연도를 표시하고 수정 후 동의한 값만 주문한다', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const { sessionSave } = await import('/src/client/profile.js');
+    sessionSave('tojeong', { name: '이전', calendar: 'solar', y: 1987, m: 1, d: 12 });
+    sessionSave('a', { name: '최근', calendar: 'solar', y: 1992, m: 3, d: 17, noTime: true, gender: 'M' });
+  });
+  const calls = [];
+  page.on('request', request => { if (request.method() === 'POST' && request.url().includes('/api/commerce/')) calls.push(request); });
+  await page.goto('/tojeong/');
+  await expect(page.locator('[data-purchase-person="a"] > summary')).toContainText('최근');
+  await page.getByRole('button', { name: '운세보기', exact: true }).click();
+  await expect(page.locator('[data-purchase-details]')).toContainText('1992.3.17');
+  await page.getByRole('button', { name: '대상 수정' }).click();
+  const year = todayKST().y + 1;
+  await page.locator('#purchase-year').selectOption(String(year));
+  await page.getByRole('button', { name: '운세보기', exact: true }).click();
+  await expect(page.locator('[data-purchase-details]')).toContainText(year + '년');
+  expect(calls).toHaveLength(0);
+  await page.route('**/api/commerce/orders', route => route.fulfill({status: 503, json: {message: '모의 중단'}}));
+  await page.getByRole('button', { name: '동의하고 990원 결제하기' }).click();
+  await expect(page.locator('[data-purchase-error]')).toBeVisible();
+  expect(calls).toHaveLength(1);
+  expect(calls[0].postDataJSON()).toMatchObject({ targetYear: year, people: [{ name: '최근', y: 1992 }], privacyConsent: true, purchaseConsent: true });
 });

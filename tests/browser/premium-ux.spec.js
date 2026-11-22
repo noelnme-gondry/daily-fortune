@@ -144,10 +144,10 @@ for (const path of ['/tojeong/', '/lifetime/', '/compatibility/']) test(`${path}
     await page.locator('#b-y').fill('1991'); await page.locator('#b-m').selectOption('8'); await page.locator('#b-d').selectOption('2');
     await page.locator('[name="b-gender"][value="M"]').check();
   }
-  await page.locator('#purchase-privacy').check(); await page.locator('#purchase-form [type=submit]').click();
+  await page.locator('#purchase-form [type=submit]').click();
   await expect(page.locator('[data-purchase-review]')).toBeVisible();
-  await expect(page.locator('#purchase-form')).toBeVisible();
-  await expect(page.locator('[data-purchase-review]')).toContainText('전체 풀이와 운세 파일은 결제 후 제공됩니다.');
+  await expect(page.locator('#purchase-form')).toBeHidden();
+  await expect(page.locator('[data-purchase-review]')).toContainText('1회 결제');
 });
 for (const product of ['tojeong', 'lifetime', 'compatibility']) test(`${product}: 저장한 사람을 선택해도 제출 전에는 서버 미리보기를 요청하지 않는다`, async ({ page }) => {
   const [, id] = await seed(page);
@@ -155,15 +155,17 @@ for (const product of ['tojeong', 'lifetime', 'compatibility']) test(`${product}
   page.on('request', request => { if (new URL(request.url()).pathname === '/api/commerce/preview') previews++; });
   await page.goto(`/shop/${product}/`);
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
+  const personPanel = page.locator('[data-purchase-person="a"]');
+  if (await personPanel.getAttribute('open') === null) await personPanel.locator('summary').first().click();
   await page.locator('#a-saved-person').selectOption(id);
   await expect(page.locator('#a-y')).toHaveValue(String(second.y));
   expect(previews).toBe(0);
   await expect(page.locator('[data-purchase-review]')).toBeHidden();
   if (product === 'compatibility') { await page.locator('#b-saved-person').selectOption(id); await expect(page.locator('#b-y')).toHaveValue(String(second.y)); }
-  await page.locator('#purchase-privacy').check(); await page.locator('#purchase-form [type=submit]').click();
+  await page.locator('#purchase-form [type=submit]').click();
   await expect(page.locator('[data-purchase-review]')).toBeVisible();
   await expect(page.locator('[data-purchase-details]')).toContainText(second.name);
-  expect(previews).toBe(1);
+  expect(previews).toBe(0);
 });
 
 test('평생·궁합 공개 예시에서 현재 언어의 상품 이용 단계로 돌아간다', async ({ page }) => {

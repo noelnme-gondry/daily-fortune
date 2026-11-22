@@ -1,6 +1,6 @@
 import { birthDateError } from '../domain/birth-input.js';
 import { readForm, fillForm, wireBirthForm, syncTime, check } from './birth-form.js';
-import { listPeople, profileLabel } from './profile.js';
+import { listPeople, profileLabel, sessionLoad, sessionSave, load, dateProfileSlots, withProfileReference } from './profile.js';
 import { esc } from '../site/util.js';
 import { NICEPAY_PAYMENT_METHODS } from '../domain/payment-methods.js';
 import { trackCommerceStep, trackPurchase, trackCheckoutError } from './purchase-analytics.js';
@@ -47,113 +47,157 @@ async function payOrder(id, method, productId) {
   }
 }
 async function mountProduct(root) {
-  const id = root.dataset.fortuneProduct, pair = id === 'compatibility', dateOnly = id === 'tojeong';
+  const id = root.dataset.fortuneProduct;
+  const pair = id === 'compatibility', dateOnly = id === 'tojeong';
+  const slots = pair ? ['a', 'b'] : ['a'];
+  const form = $('#purchase-form'), review = $('[data-purchase-review]');
+  const pay = $('[data-purchase-pay]'), preview = $('[data-preview-request]'), summary = $('[data-preview-summary]');
+  const method = $('#purchase-method');
+  let people = [], confirmed = null, busy = false, started = false;
+  let config = { enabled: false };
+  const picker = slot => form.querySelector(`[data-profile-picker="${slot}"]`);
+  const panel = slot => form.querySelector(`[data-purchase-person="${slot}"]`);
+  const slotName = slot => pair ? (slot === 'a' ? '나' : '상대') : '구매 대상';
   trackCommerceStep('view_item', id);
-  const form = $('#purchase-form'), review = $('[data-purchase-review]'), button = $('[data-purchase-pay]'), confirm = $('#purchase-confirm'), method = $('#purchase-method');
-  let config = { enabled: false }, busy = false;
-  let started = false;
-  const privacy = $('#purchase-privacy');
-  function changed(event) {
-    if (!started && event?.target !== privacy) {
-      trackCommerceStep('checkout_input_start', id);
-      started = true;
+
+  function describe(p) {
+    const parts = [p.name, p.calendar === 'lunar' ? (p.leap ? '음력 윤달' : '음력') : '양력', `${p.y}.${p.m}.${p.d}`];
+    if (!dateOnly) parts.push(p.gender === 'M' ? '남성' : '여성', p.noTime ? '시간 모름' : p.timeMode === 'branch' ? `시진 ${p.timeBranch}` : p.time);
+    return parts.filter(Boolean).join(' · ');
+  }
+  function populate(slot, p, collapse) {
+    fillForm(form, slot, p);
+    picker(slot).value = p.profileId || '';
+    panel(slot).querySelector('[data-person-caption]').textContent = collapse ? describe(p) : '';
+    panel(slot).open = !collapse;
+  }
+  async function refreshPeople() {
+    people = await listPeople();
+    for (const slot of slots) {
+      const select = picker(slot), selected = select.value;
+      select.closest('.profile-picker').hidden = people.length === 0;
+      select.replaceChildren(new window.Option('직접 입력 · 새 사람', ''), ...people.map(person => new window.Option(person.profile.name ? profileLabel(person.profile) + ' · ' + [person.profile.y, person.profile.m, person.profile.d].join('.') : profileLabel(person.profile), person.id)));
+      select.value = selected;
     }
-    review.hidden = true;
-    confirm.checked = false;
+  }
+  function edit() {
+    if (busy) return;
+    confirmed = null;
+    form.hidden = false; review.hidden = true;
+    summary.hidden = true; summary.textContent = '';
+    $('[data-preview-options]').open = false;
+    error('');
     update();
   }
-  const slots = pair ? ['a', 'b'] : ['a'];
-  const picker = who => form.querySelector(`[data-profile-picker="${who}"]`);
-  const populate = (profile, who) => { fillForm(form, who, profile); picker(who).value = profile.profileId || ''; changed(); };
-  async function refreshPeople() {
-    const people = await listPeople();
-    for (const who of slots) {
-      const select = picker(who), selected = select.value;
-      select.closest('.profile-picker').hidden = people.length === 0;
-      select.innerHTML = '<option value="">직접 입력 · 새 사람</option>' + people.map(p => `<option value="${esc(p.id)}">${esc(profileLabel(p.profile))} · ${p.profile.y}.${p.profile.m}.${p.profile.d}</option>`).join('');
-      select.value = people.some(p => p.id === selected) ? selected : '';
-    }
+  function update() {
+    pay.disabled = !confirmed || !config.enabled || !method.value || busy;
+    method.disabled = !config.enabled || !config.methods?.length || busy;
+    preview.disabled = busy;
+    $('[data-purchase-edit]').disabled = busy;
   }
-  for (const who of slots) picker(who).addEventListener('change', async event => {
-    const selected = event.target.value;
-    if (!selected) { populate({ calendar: 'solar', gender: '', y: 0, m: 0, d: 0 }, who); return; }
-    try {
-      const person = (await listPeople()).find(p => p.id === selected);
-      if (person && picker(who).value === selected && !busy) populate({ ...person.profile, profileId: person.id }, who);
-    } catch { error('저장한 사람을 불러오지 못했습니다. 직접 입력하거나 다시 선택해 주세요.'); }
+  function inputStarted() {
+    if (!started) trackCommerceStep('checkout_input_start', id);
+    started = true;
+  }
+  if (!dateOnly) wireBirthForm(form, slots);
+  else form.addEventListener('change', e => {
+    if (e.target.name !== 'a-cal') return;
+    $('#a-leap').disabled = e.target.value !== 'lunar';
+    if ($('#a-leap').disabled) $('#a-leap').checked = false;
   });
+  for (const slot of slots) {
+    picker(slot).addEventListener('change', () => {
+      const person = people.find(p => p.id === picker(slot).value);
+      populate(slot, person ? { ...person.profile, profileId: person.id } : { calendar: 'solar' }, false);
+      inputStarted();
+    });
+    panel(slot).addEventListener('input', () => {
+      panel(slot).querySelector('[data-person-caption]').textContent = '';
+      inputStarted();
+    });
+  }
   document.addEventListener('profiles-changed', () => { refreshPeople().catch(() => {}); });
   document.addEventListener('profile-selected', event => {
     const { profile, slot } = event.detail;
     if (busy || !slots.includes(slot)) return;
-    populate(profile, slot);
+    edit(); populate(slot, profile, true); inputStarted();
   });
-  try { await refreshPeople(); } catch { /* 저장소 없이 직접 입력할 수 있다. */ }
-  if (!dateOnly) { wireBirthForm(form, pair ? ['a', 'b'] : ['a']); for (const who of pair ? ['a', 'b'] : ['a']) syncTime(form, who); }
-  else form.addEventListener('change', e => { if (e.target.name === 'a-cal') { $('#a-leap').disabled = e.target.value !== 'lunar'; if ($('#a-leap').disabled) $('#a-leap').checked = false; } });
-  try {
-    config = await api('/config');
-    fillPaymentMethods(method, config);
-    $('[data-purchase-status]').textContent = !config.enabled ? '결제 준비 중입니다. 미리보기는 이용할 수 있습니다.' : config.mode === 'sandbox' ? '나이스페이 테스트 결제 환경입니다. 실제로 청구되지 않습니다.' : '나이스페이에서 결제합니다.';
-  } catch (e) { trackCheckoutError(id, 'configuration', errorCode(e)); $('[data-purchase-status]').textContent = '결제 연결을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.'; }
-  root.dataset.ready = 'true';
-  function update() {
-    form.inert = busy;
-    method.disabled = !config.enabled || !config.methods?.length || busy;
-    confirm.disabled = busy;
-    button.disabled = method.disabled || !method.value || !confirm.checked || !privacy.checked;
-  }
-  form.addEventListener('input', changed);
-  form.addEventListener('change', changed);
-  confirm.addEventListener('change', update);
+  $('[data-purchase-edit]').addEventListener('click', () => {
+    edit(); panel('a').querySelector('summary').focus();
+  });
   method.addEventListener('change', update);
-  update();
-
-  function readInput() {
-    const read = who => dateOnly ? { name: $('#a-name').value.trim(), y: +$('#a-y').value, m: +$('#a-m').value, d: +$('#a-d').value, calendar: form.querySelector('[name="a-cal"]:checked').value, leap: !$('#a-leap').disabled && $('#a-leap').checked } : readForm(form, who);
-    return { productId: id, people: slots.map(read), targetYear: dateOnly ? +$('#purchase-year').value : Number(root.dataset.readingYear) || undefined, privacyConsent: privacy.checked };
-  }
-
-  form.addEventListener('submit', async e => {
-    e.preventDefault(); if (busy) return;
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (busy || confirmed) return;
     error('');
-    if (!privacy.checked) { trackCheckoutError(id, 'preview', 'consent_required'); error('출생 정보 처리에 동의해 주세요.'); privacy.focus(); return; }
-    const input = readInput();
-    busy = true;
-    update();
-    try {
-      const p = await api('/preview', input);
-      trackCommerceStep('begin_checkout', id);
-      $('[data-preview-title]').textContent = p.title; $('[data-preview-summary]').textContent = p.summary;
-      $('[data-purchase-details]').innerHTML = `<div><dt>상품</dt><dd>${esc(p.title)}</dd></div>${p.people.map((v, i) => `<div><dt>${pair ? (i ? '상대' : '나') : '구매 대상'}</dt><dd>${esc(v.name || (i ? '상대' : '나'))} · ${v.calendar === 'lunar' ? '음력' : '양력'} ${v.leap ? '윤달 ' : ''}${v.y}.${v.m}.${v.d}${dateOnly ? '' : ` · ${v.gender === 'M' ? '남성' : '여성'} · ${v.noTime ? '시간 모름' : esc(v.timeMode === 'branch' ? `시진 ${v.timeBranch}` : v.time)}`}</dd></div>`).join('')}${p.targetYear ? `<div><dt>풀이 연도</dt><dd>${p.targetYear}년</dd></div>` : ''}<div><dt>제공 내용</dt><dd>전체 상세 풀이 + HTML 운세 파일</dd></div>`;
-      review.hidden = false;
-      review.focus(); review.scrollIntoView({ block: 'start' });
-    } catch (e) { trackCheckoutError(id, 'preview', errorCode(e)); error(e.message); } finally { busy = false; update(); }
-  });
-  $('[data-purchase-edit]').addEventListener('click', () => { if (!busy) $('#a-y').focus(); });
-  button.addEventListener('click', async () => {
-    if (busy || !privacy.checked || !confirm.checked || !config.enabled || !method.value) return;
-    const input = readInput();
-    for (const [index, person] of input.people.entries()) {
-      const issue = dateOnly ? birthDateError(person) : check(person);
+    const subjects = [];
+    for (const slot of slots) {
+      const p = dateOnly ? { name: $('#a-name').value.trim(), y: +$('#a-y').value, m: +$('#a-m').value, d: +$('#a-d').value, calendar: form.querySelector('[name="a-cal"]:checked').value, leap: !$('#a-leap').disabled && $('#a-leap').checked } : readForm(form, slot);
+      const issue = dateOnly ? birthDateError(p) : check(p);
       if (issue) {
-        error(pair ? `${index ? '상대' : '나'} · ${issue}` : issue);
+        error(pair ? slotName(slot) + ' · ' + issue : issue);
         trackCheckoutError(id, 'input', 'invalid_input');
-        const field = birthDateError(person) ? '#' + slots[index] + '-y' : 'input[name="' + slots[index] + '-gender"]';
-        form.querySelector(field)?.focus();
+        panel(slot).open = true;
+        (birthDateError(p) ? $('#' + slot + '-y') : form.querySelector(`[name="${slot}-gender"]`)).focus();
         return;
       }
+      subjects.push(p);
     }
+    const targetYear = dateOnly ? +$('#purchase-year').value : Number(root.dataset.readingYear) || undefined;
+    confirmed = { productId: id, people: subjects, targetYear };
+    subjects.forEach((p, i) => {
+      const selected = people.find(person => person.id === picker(slots[i]).value);
+      const ref = selected && { ...selected.profile, profileId: selected.id };
+      const matchesDate = ref && ['name', 'calendar', 'y', 'm', 'd'].every(key => ref[key] === p[key]) && !!ref.leap === !!p.leap;
+      const recent = dateOnly && matchesDate ? { ...p, profileId: ref.profileId } : withProfileReference(p, ref);
+      sessionSave(dateOnly ? 'tojeong' : slots[i], recent);
+    });
+    const rows = subjects.map((p, i) => [slotName(slots[i]), describe(p)]);
+    if (targetYear) rows.push(['풀이 연도', targetYear + '년']);
+    $('[data-purchase-details]').innerHTML = rows.map(([label, value]) => `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('');
+    form.hidden = true; review.hidden = false;
+    trackCommerceStep('checkout_subject_confirm', id);
+    update(); review.focus(); review.scrollIntoView({ block: 'start' });
+  });
+  preview.addEventListener('click', async () => {
+    if (!confirmed || busy) return;
+    busy = true; update(); error('');
+    try {
+      const p = await api('/preview', { ...confirmed, privacyConsent: true });
+      summary.hidden = false; summary.textContent = p.summary;
+      trackCommerceStep('begin_checkout', id);
+    } catch (e) { trackCheckoutError(id, 'preview', errorCode(e)); error(e.message); }
+    finally { busy = false; update(); }
+  });
+  pay.addEventListener('click', async () => {
+    if (!confirmed || pay.disabled || busy) return;
     busy = true; update(); error('');
     trackCommerceStep('payment_attempt', id, method.value);
     let orderCreated = false;
     try {
-      const order = await api('/orders', { ...input, purchaseConsent: true });
+      const order = await api('/orders', { ...confirmed, privacyConsent: true, purchaseConsent: true, consentVersion: '2026-11-23' });
       orderCreated = true;
       if (order.status === 'PAID') { location.assign(`/shop/result/?orderId=${encodeURIComponent(order.id)}`); return; }
       await payOrder(order.id, method.value, id);
-    } catch (e) { if (!orderCreated) trackCheckoutError(id, 'order_create', errorCode(e)); error(e.message); } finally { busy = false; update(); }
+    } catch (e) { if (!orderCreated) trackCheckoutError(id, 'order_create', errorCode(e)); error(e.message); }
+    finally { busy = false; update(); }
   });
+  try { await refreshPeople(); } catch { /* 세션 입력은 저장소 없이도 사용할 수 있다. */ }
+  for (const slot of slots) {
+    const keys = dateOnly ? dateProfileSlots() : [slot];
+    const usable = p => p && !(dateOnly ? birthDateError(p) : check(p));
+    const recent = keys.map(sessionLoad).find(usable)
+      || (await Promise.all(keys.map(key => load(key).catch(() => null)))).find(usable);
+    if (recent) populate(slot, recent, true);
+    else if (!dateOnly) syncTime(form, slot);
+  }
+  form.inert = false;
+  try {
+    config = await api('/config');
+    fillPaymentMethods(method, config);
+    $('[data-purchase-status]').textContent = !config.enabled ? '결제 준비 중입니다. 미리보기는 이용할 수 있습니다.' : config.mode === 'sandbox' ? '나이스페이 테스트 결제 환경입니다. 실제로 청구되지 않습니다.' : '';
+  } catch (e) { trackCheckoutError(id, 'configuration', errorCode(e)); $('[data-purchase-status]').textContent = '결제 연결을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.'; }
+  update(); root.dataset.ready = 'true';
 }
 async function mountOrders(root) {
   if (new URLSearchParams(location.search).get('payment') === 'check') trackCheckoutError(null, 'payment_return', 'provider_check_required');
