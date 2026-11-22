@@ -1,3 +1,4 @@
+import { ZODIAC_MONTH } from '../content/zodiac-outlook.js';
 import { tr, isEnglish } from '../i18n/runtime.js';
 import { term, animalName } from '../i18n/terms.js';
 // 띠별 운세: 해·날의 간지와 띠(년지)의 관계만으로 계산하는 대중용 운세. 개인 사주보다 단순하지만 같은 규칙으로 결정론적이다.
@@ -158,13 +159,23 @@ export function ttiMonths(tti, y, birthYear = null) {
   const cohort = birthYear === null ? null : annual.cohorts.find((c) => c.birthYear === birthYear);
   if (birthYear !== null && !cohort) throw new RangeError(tr('해당 띠의 출생 연도를 선택해 주세요.', 'Select a birth year that belongs to this zodiac sign.'));
   const adjustment = cohort ? COHORT_W[cohort.tg] : 0;
-  return Array.from({ length: 12 }, (_, i) => {
+  const months = Array.from({ length: 12 }, (_, i) => {
     const m = i + 1, mp = monthPillar({ y, m, d: 15 });
     const rel = relKey(mp.b, tti), e = elRel(BR_EL[tti], BR_EL[mp.b]);
     const score = clamp(Math.round(annual.score * 0.35 + (60 + REL_W[rel] + ELEM_W[e]) * 0.65 + adjustment), 22, 97);
-    const reading = zodiacReading({ rel, e, score, cycle: y * 12 + m, offset: sceneOffset(tti, mp), identity: `zodiac-month|${birthYear ?? 'all'}` });
-    return { m, score, pillarText: pillarLabel(mp), rel, text: reading.text };
+    const text = isEnglish()
+      ? zodiacReading({ rel, e, score, cycle: y * 12 + m, offset: sceneOffset(tti, mp), identity: `zodiac-month|${birthYear ?? 'all'}` }).text
+      : ZODIAC_MONTH[zodiacFocus(rel, e)][score >= 60 ? 0 : 1];
+    return { m, score, pillarText: pillarLabel(mp), rel, text };
   });
+  if (!isEnglish()) {
+    for (let i = 1; i < months.length; i++) {
+      const change = months[i].score - months[i - 1].score;
+      if (change >= 8) months[i].text += ` ${i}월보다 움직이기 한결 수월한 흐름입니다.`;
+      if (change <= -8) months[i].text += ` ${i}월과 같은 속도를 내려고 애쓰지 않아도 괜찮아요.`;
+    }
+  }
+  return months;
 }
 
 export function ttiCompat(a, b) {
@@ -174,7 +185,7 @@ export function ttiCompat(a, b) {
   const adj = [0, 3, -2, -2, 3][e];
   const topic = { '충': 'social-agreement', '형': 'social-roles', '원진': 'social-reply', '해': 'social-boundary', '파': 'social-request' }[rel] || 'social-credit';
   const practice = periodPractice(topic, [Math.min(a, b), Math.max(a, b), rel].join('|'));
-  return { a, b, rel, score: clamp(base + adj, 30, 97), text: fill(TT.compat[rel], { a: animalName(a), b: animalName(b) }) + ' ' + practice };
+  return { a, b, rel, score: clamp(base + adj, 30, 97), text: fill(TT.compat[rel], { a: animalName(a), b: animalName(b) }) + (isEnglish() ? ' ' + practice : '') };
 }
 // 띠별로 잘 맞는 띠(육합·삼합)와 조심할 띠(충·원진·형)
 export function ttiMatches(tti) {

@@ -1,3 +1,4 @@
+import { READINGS as readings } from '../content/tojeong-readings.js';
 import { periodPractice } from '../domain/period-practice.js';
 import { readFileSync } from 'node:fs';
 import { READING_CHAPTERS, READING_TOPICS, topicEvidence, monthPractices, readingSentences, ELEMENT_PRACTICE, TEN_GOD_PRACTICE, COMPAT_PRACTICE } from '../domain/premium-reading.js';
@@ -12,7 +13,6 @@ import { TOJEONG } from '../content/tojeong.js';
 
 const stylesheet = readFileSync(new URL('../styles/main.css', import.meta.url), 'utf8');
 const reportStyle = readFileSync(new URL('../styles/premium-report.css', import.meta.url), 'utf8');
-const readings = JSON.parse(readFileSync(new URL('../content/tojeong-144.json', import.meta.url), 'utf8'));
 const fonts = 'https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap';
 export const REPORT_CSP = "default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; base-uri 'none'; form-action 'none'";
 const p = text => `<p>${esc(text)}</p>`;
@@ -61,7 +61,7 @@ export function tojeongPremium(r, reading) {
     const text = reading.months[i + 1], practice = practices[i];
     return fold(`음력 ${i + 1}월 풀이`, practice?.name || '월별 원문', prose(text) + (practice ? `<div class="reading-month-help"><h4>이 달을 내 생활에 비춰 보기</h4>${p('원문의 ‘' + practice.source + '’에서 골라 본 행동입니다.')}${p(practice.action)}</div>` : ''), i === 0, `tj-month-${i + 1}`);
   }).join('');
-  return chapter('tojeong', 'annual', `<p class="reading-intro">나의 괘 <b class="tojeong-code">${r.code}</b> · ${r.targetYear}년</p><p class="hint">${esc(TOJEONG.readingNote)}</p><div class="reading-prose">${prose(reading.chongun)}</div>${exercise('총운에서 내 상황과 닮은 대목 하나와 아직 맞지 않는 대목 하나를 골라 보세요. 어떤 조건이 달라지면 생각이 바뀔지도 함께 적으면 한 해를 돌아볼 기준이 됩니다.', '올해 가장 신경 쓰이는 일은 무엇이고, 그중 내가 바꿀 수 있는 것은 무엇인가요?')}`)
+  return chapter('tojeong', 'annual', `<p class="reading-intro">나의 괘 <b class="tojeong-code">${r.code}</b> · ${r.targetYear}년</p><p class="hint">${esc(TOJEONG.readingNote)}</p>${reading.interpretation ? p(reading.interpretation) + '<h3>원문</h3>' : ''}<div class="reading-prose">${prose(reading.chongun)}</div>${exercise('총운에서 내 상황과 닮은 대목 하나와 아직 맞지 않는 대목 하나를 골라 보세요. 어떤 조건이 달라지면 생각이 바뀔지도 함께 적으면 한 해를 돌아볼 기준이 됩니다.', '올해 가장 신경 쓰이는 일은 무엇이고, 그중 내가 바꿀 수 있는 것은 무엇인가요?')}`)
     + chapter('tojeong', 'themes', p('같은 괘의 총운과 월별 원문을 여섯 주제로 모았습니다. 인용된 대목과 생활 질문을 함께 읽어 보세요. 원문에 없는 분야의 운을 새로 만들어 판단하지 않습니다.') + topicsView(reading))
     + chapter('tojeong', 'months', p('달을 펼치면 원문 전체와 원문 주제에 맞는 생활 예시를 읽을 수 있습니다. 월별 풀이는 음력 기준이며, 윤달은 같은 월의 풀이를 읽습니다.') + months)
     + chapter('tojeong', 'plan', `<div class="reading-plan"><article><h3>시작하기 전</h3>${p('총운에서 고른 주제를 지금의 일정에 대입해 보세요. 이루고 싶은 결과와 이미 갖춘 준비를 구분하면 막연한 기대나 걱정을 줄이는 데 도움이 됩니다.')}</article><article><h3>달이 바뀔 때</h3>${p('그달의 풀이에서 내게 필요한 행동을 하나 골라 해보세요. 일이 잘 풀리면 도움이 된 행동을 남기고, 어렵다면 상황과 방법 중 무엇을 조정할 수 있는지 살펴보세요.')}</article><article><h3>한 해를 돌아볼 때</h3>${p('운세가 맞았는지뿐 아니라 실제로 어떤 선택을 했는지 돌아보세요. 계속할 습관, 그만둘 부담, 도움을 받은 사람을 남기면 다음 계획에 쓸 수 있습니다.')}</article></div>`)

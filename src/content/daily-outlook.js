@@ -11,22 +11,22 @@ export const DAILY_OVERVIEW = {
 export const DAILY_OUTLOOK = {
   career: {
     high: [
-      ['준비해 온 실력을 보여 주고 좋은 평가를 기대해 볼 만한 날입니다. 회의에서 내 의견이 받아들여지거나, 해 온 일을 보고 새로운 역할을 제안하는 사람이 있을 수 있습니다.', 'Your preparation has room to shine, with a chance of encouraging feedback. An idea may find support in a meeting, or someone may suggest a new role after seeing your work.'],
+      ['준비해 온 실력을 보여 주고 좋은 평가를 기대해 볼 만한 날입니다. 회의에서 내 의견이 받아들여지거나, 해 온 일을 보고 새로운 역할을 제안하는 사람이 있을 수 있습니다. 그럴 때에는 무엇을 해냈는지와 함께 어떤 판단이 가장 어려웠는지도 들려주세요. 결과만 볼 때는 몰랐던 내 수고가 그 이야기에서 드러날 수 있어요.', 'Your preparation has room to shine, with a chance of encouraging feedback. An idea may find support in a meeting, or someone may suggest a new role after seeing your work.'],
       ['미뤄 둔 지원이나 제안이 있다면 자신 있는 경험을 앞세워 보세요. 이미 해낸 일을 말로 꺼내는 것이 나를 알아봐 줄 사람과 만나는 계기가 될 수 있습니다.', 'For an application or proposal you have put off, lead with an experience you feel good about. Talking about completed work may help the right person notice you.'],
       ['적극성이 강해질수록 혼자 결론을 내리거나 다른 사람의 몫까지 떠안기 쉽습니다. 의견을 내는 것과 책임을 확정하는 것은 구분하고, 마감과 담당 범위를 맞춰 보세요.', 'Initiative can turn into deciding alone or taking on someone else’s share. Separate a suggestion from a commitment, and agree on deadlines and responsibilities.'],
     ],
     good: [
-      ['작은 성과를 알아봐 주는 말 한마디가 힘이 될 수 있는 날입니다. 막혀 있던 일이 동료의 도움으로 풀리거나, 함께 일하자는 반가운 이야기가 오갈 수 있습니다.', 'A word of recognition for a small achievement may lift your spirits. A colleague could help with a stuck task, or a welcome conversation about working together may begin.'],
+      ['작은 성과를 알아봐 주는 말 한마디가 힘이 될 수 있는 날입니다. 막혀 있던 일이 동료의 도움으로 풀리거나, 함께 일하자는 반가운 이야기가 오갈 수 있습니다. 반가운 제안이 오면 혼자 잘할 수 있는지부터 따지기보다 서로 어느 부분을 맡으면 좋을지 얘기해 보세요. 그 대화 속에서 막연했던 기대가 한결 또렷해질 수 있어요.', 'A word of recognition for a small achievement may lift your spirits. A colleague could help with a stuck task, or a welcome conversation about working together may begin.'],
       ['혼자 잘 끝내야 한다는 부담을 조금 덜어 보세요. 중간 결과를 보여 주거나 궁금한 것을 물으면 다음 단계로 나아갈 힌트를 얻을 수 있습니다.', 'Ease the pressure to finish perfectly on your own. Showing progress or asking a question may give you a useful clue for the next step.'],
       ['무난하게 진행된다는 이유로 확인 절차를 건너뛰지 마세요. 특히 구두로 바뀐 요청은 기존에 합의한 내용과 다른 부분이 없는지 짚어 두는 편이 좋습니다.', 'Keep the usual checks even when work feels straightforward. For a changed verbal request, check how it differs from the original agreement.'],
     ],
     mid: [
-      ['크게 주목받는 일보다 한 가지를 끝냈다는 만족이 남을 수 있는 날입니다. 반응이 늦은 일도 있으니, 지금 손에 잡히는 진척부터 보며 자신감을 이어 가세요.', 'The satisfaction of finishing one thing may matter more than a big moment in the spotlight. Some responses may take time, so let tangible progress support your confidence.'],
+      ['크게 주목받는 일보다 한 가지를 끝냈다는 만족이 남을 수 있는 날입니다. 반응이 늦은 일도 있으니, 지금 손에 잡히는 진척부터 보며 자신감을 이어 가세요. 누군가의 답을 기다리는 동안에도 내 손으로 마칠 수 있는 부분은 있을 거예요. 그걸 마무리해 두면 나중에 다시 이어 갈 때 마음이 한결 가볍습니다.', 'The satisfaction of finishing one thing may matter more than a big moment in the spotlight. Some responses may take time, so let tangible progress support your confidence.'],
       ['수정할 부분이 분명한 일부터 손대면 시작하기가 한결 편합니다. 새 아이디어는 가까운 동료에게 먼저 이야기하며 부담 없이 반응을 살펴보세요.', 'A task with a clear revision can be easier to begin. Try a new idea with a trusted colleague and explore the response without pressure.'],
       ['업무 속도나 표현 방식이 다르다고 의도를 단정하면 협의가 더 어려워질 수 있습니다. 답이 늦은 일은 재촉하기 전에 상대가 필요한 정보부터 확인해 보세요.', 'Avoid treating a different pace or style as evidence of someone’s intentions. Before pressing for an answer, check what information the other person needs.'],
     ],
     low: [
-      ['애쓴 만큼 반응이 돌아오지 않아 서운할 수 있는 날입니다. 일이 더디다고 내 실력이 부족한 것은 아니니, 결과 하나로 나를 평가하지 않았으면 합니다.', 'It may feel disappointing if the response does not match your effort. Slow progress does not mean a lack of ability; one result need not define your work.'],
+      ['애쓴 만큼 반응이 돌아오지 않아 서운할 수 있는 날입니다. 일이 더디다고 내 실력이 부족한 것은 아니니, 결과 하나로 나를 평가하지 않았으면 합니다. 답을 기다리는 일과 아직 손볼 수 있는 일을 나눠 보세요. 어느 쪽에 힘을 쓸지 정해지면 막연히 기다릴 때보다 마음이 덜 무거울 거예요.', 'It may feel disappointing if the response does not match your effort. Slow progress does not mean a lack of ability; one result need not define your work.'],
       ['모호한 요청을 다시 묻거나 도움을 청하는 일부터 해도 괜찮습니다. 혼자 해결하려던 부담을 나누고, 끝낼 수 있는 일 하나에서 작은 안도감을 찾아보세요.', 'It is fine to start by clarifying a vague request or asking for help. Share a burden you were carrying alone and find some relief in one manageable finish.'],
       ['부담을 느낀 상태에서 약속을 늘리거나 감정적으로 답하지 않도록 여유를 두세요. 처리할 수 있는 양을 먼저 밝히고, 일정 조율이 필요한 일은 미리 이야기하는 편이 좋습니다.', 'Leave room before adding commitments or replying under pressure. State your capacity and raise scheduling needs early.'],
     ],
@@ -163,4 +163,59 @@ export const DAILY_OUTLOOK = {
       ['이 점수로 시험 결과나 문서 승인을 단정하지 마세요. 마감이 있는 일은 운세 때문에 미루지 말고, 실제 요구 사항과 남은 시간을 기준으로 준비하세요.', 'This score cannot determine an exam result or document approval. Prepare for deadlines using actual requirements and available time.'],
     ],
   },
+};
+
+// 각 분야에서 실제로 두드러진 일진 요인. 왼쪽은 가점, 오른쪽은 감점일 때의 풀이.
+export const DAILY_FACTOR_OUTLOOK = {
+  career: {
+    peer: ['혼자 붙들고 있던 일에 다른 사람의 손이 보태지면 길이 열릴 만해요. 내게는 막다른 길처럼 보였던 대목도 그 일을 처음 듣는 사람에게는 좋은 질문거리가 되거든요.', '서로 비슷한 일을 해 봤다는 게 오히려 걸림돌이 될 수 있어요. 나는 당연히 이 순서라고 생각했는데 상대도 자기 방식이 당연하다고 여기는 식이에요.'],
+    expression: ['속으로 여러 번 고쳐 본 생각을 말로 꺼내기 좋은 날이에요. 매끄러운 제안이 아니어도 어디서 불편함을 느꼈는지 들려주면 듣는 사람이 뜻을 헤아리기 쉽겠어요.', '고칠 점부터 이야기하면 보태려던 말이 지적으로 들릴 수 있어요. 함께 풀고 싶다면 “왜 이렇게 했어요?”보다 “저는 여기서 막혔는데, 어떻게 보셨어요?”라는 말이 대화를 이어 주겠어요.'],
+    duty: ['어디까지가 내 몫인지 분명해지면서 일에 힘이 붙는 날이에요. 해야 할 일 가운데 내 답을 기다리는 것이 보인다면, 그것부터 마치는 편이 함께 일하는 사람에게도 도움이 되겠어요.', '기대를 저버리고 싶지 않아 선뜻 맡은 일이 뒤늦게 무겁게 느껴질 수 있어요. 부탁받는 순간 내키는지보다, 이미 맡은 일과 같이 해낼 여유가 있는지가 더 중요한 날이에요.'],
+    wealth: ['지금 들이는 수고가 어디에 쓰일지 보이면 일할 맛이 나겠어요. 오래 붙들고 있던 일이 있다면 누가 그 결과를 기다리는지 떠올려 보세요. 손볼 곳과 이쯤에서 마칠 곳이 갈릴 수 있어요.', '빨리 성과가 날 것 같은 일에 눈이 가면서 먼저 맡은 일의 끝이 흐려지기 쉬워요. 새 제안이 반갑더라도 지금 하던 일을 어떻게 마칠지 생각할 틈은 남겨 두세요.'],
+    learning: ['전에 익힌 것이 뜻밖의 곳에서 쓰일 수 있어요. 막힌 문제와 닮은 경험이 떠오른다면 그때의 답보다 무엇 때문에 그렇게 판단했는지 되짚어 보세요.', '더 알아보고 싶은 마음 때문에 첫걸음이 늦어지기 쉬워요. 답이 없어도 시작할 수 있는 부분과 꼭 누군가에게 물어야 하는 부분을 가르면 일이 한결 가벼워지겠어요.'],
+    change: ['익숙한 방식이 통하지 않던 일에 다른 길이 보일 만해요. 바꾸고 싶었던 것이 있다면 되돌리기 쉬운 한 부분부터 시도해 보세요. 내게 맞는 방식인지 감을 잡을 수 있어요.', '하려던 순서가 달라지면 이미 들인 수고까지 헛된 것처럼 느껴지기 쉬워요. 조건이 달라져도 그대로 쓸 수 있는 부분부터 찾아보면 처음부터 다시 시작할 부담은 덜어질 거예요.'],
+  },
+  money: {
+    wealth: ['눈여겨보던 기회가 내 형편에도 맞는지 가늠하기 좋은 날이에요.', '매력적으로 보이는 선택일수록 실제로 내게 남는 몫을 놓치기 쉬워요.'],
+    peer: ['혼자 셈을 할 때보다 함께 비용 이야기를 꺼낼 때 실마리가 보이겠어요.', '사람들과 보조를 맞추려다 내게 편한 금액을 넘어서기 쉬운 날이에요.'],
+  },
+  love: {
+    expression: ['마음에 품었던 말을 평소보다 자연스럽게 건넬 수 있겠어요.', '솔직해지고 싶은 마음이 앞서서 말이 조금 세게 나가기 쉬운 날이에요.'],
+    peer: ['함께 웃었던 일을 떠올리는 것만으로도 사이가 편해질 수 있어요.', '가까워지고 싶은 마음이 클수록 작은 반응에도 신경이 쓰일 수 있어요.'],
+  },
+  move: {
+    change: ['늘 가던 자리를 잠시 벗어나면 반가운 변화가 생길 만해요.', '움직일 일이 겹치면 한 번의 변경이 다음 약속까지 흔들 수 있어요.'],
+  },
+  health: {
+    duty: ['하던 일과 쉬는 시간 사이에 나만의 리듬을 찾기 수월해요.', '마쳐야 할 일이 마음에 걸려 쉬는 동안에도 긴장이 이어지기 쉬워요.'],
+  },
+  social: {
+    peer: ['먼저 건넨 말 한마디에서 생각보다 긴 대화가 이어질 만해요.', '내가 당연하게 여긴 호의가 상대에게는 다르게 느껴질 수 있어요.'],
+    expression: ['나답게 꺼낸 이야기가 어색하던 사이를 편하게 해 주겠어요.', '별뜻 없이 꺼낸 말도 상대가 다르게 들을 수 있는 날이에요.'],
+  },
+  study: {
+    learning: ['전에 어렵게 느껴졌던 대목이 다른 설명을 만나면 풀릴 만해요.', '자꾸 더 알아보려는 마음에 처음 품었던 질문이 흐려질 수 있어요.'],
+    wealth: ['배운 것을 어디에 써 볼지 떠올리면 이해가 한결 빨라지겠어요.', '눈길을 끄는 일이 많아 하던 공부에 마음을 붙이기 어려울 수 있어요.'],
+  },
+};
+
+// 내일 총운은 같은 날짜의 분야별 첫 풀이를 바탕으로, 그 흐름이 어떤 선택으로 이어지는지 설명한다.
+export const TOMORROW_CONTEXT = {
+  career: ['애써 온 일을 알아줬으면 하는 마음이 있었다면, 어디까지 왔는지 누군가에게 들려줘도 좋겠어요. 뜻밖에 다음 걸음을 함께 고민해 줄 사람을 만날 수 있어요.', '일이 마음에 걸리는 날일수록 부탁을 받자마자 답하기 쉬워요. 답을 조금 늦추더라도 어디까지 할 수 있는지 내 쪽 사정을 먼저 헤아려 보세요.'],
+  money: ['무엇이 싼지보다 무엇에 쓰면 아깝지 않을지가 눈에 들어오겠어요. 망설이던 선택 앞에서는 쓰고 난 뒤에도 누릴 즐거움이 떠오르는지 보세요.', '그 자리에서 결정해야 아낄 수 있다는 말에 마음이 급해질 수 있어요. 그 조건이 사라져도 내가 원할 선택인지 생각해 보면 판단이 한결 편해지겠어요.'],
+  love: ['좋은 말을 찾느라 머뭇거렸다면 둘 사이에 실제로 있었던 즐거운 순간 하나를 꺼내 보세요. 상대에게는 멋진 표현보다 내가 그 일을 기억하고 있다는 사실이 더 반가울 수 있어요.', '마음이 쓰이는 말은 짧아도 여운이 길지요. 그 한마디로 둘 사이를 판단하기 전에 내가 기대했던 대답이 무엇이었는지 돌아보면, 무엇을 물어보고 싶은지도 또렷해져요.'],
+  move: ['늘 가는 곳이어도 누구를 만나러 가는지, 무엇을 보고 싶은지에 따라 발걸음이 달라지지요. 오래 마음에 남았던 곳이 있다면 이번 움직임의 중심에 놓아도 좋겠어요.', '계획이 바뀌면 놓친 일정부터 만회하고 싶어지기 쉬워요. 그래도 꼭 가고 싶은 곳 하나를 남겨 두면 나머지 시간을 조정할 여지가 생깁니다.'],
+  health: ['의욕이 생길 때 그 힘을 전부 써야 하는 건 아니에요. 하고 나서도 편안함이 남는 속도라면 그 리듬을 다음 날까지 이어 가기 좋겠어요.', '쉬는 중에도 다음 할 일이 떠오르면 몸을 멈추고도 쉰 기분이 들지 않을 수 있어요. 끝까지 해낼 일 하나를 더 찾기보다 어디서 멈추면 마음이 편할지 정해 보세요.'],
+  social: ['문득 생각나는 사람이 있다면 지난번 들었던 이야기의 뒷소식을 물어보세요. 할 말이 많아야 좋은 만남이 되는 건 아니잖아요. 상대에게는 그 일을 아직 기억해 준다는 사실이 더 반가울 수 있어요.', '어색함을 빨리 풀고 싶을수록 혼자 말을 채우기 쉬워요. 상대가 이야기를 끝낼 때까지 조금 기다려 보면 처음 들었을 때와는 다른 뜻이 보일 수 있어요.'],
+  study: ['오래 풀리지 않던 질문을 다시 만나면 예전에는 모르고 지나친 부분이 눈에 띌 만해요. 정답을 봤을 때보다 왜 그런 답인지 내 말로 풀어낼 때 배운 것이 오래 남겠습니다.', '한 번 읽고 이해되지 않으면 괜히 나만 뒤처진 듯 느낄 수 있어요. 앞에서부터 전부 되짚기보다 정확히 어느 대목에서 납득이 안 됐는지 찾아보면 물어볼 말도 생깁니다.'],
+};
+
+// 직장운에서 맞서는 요인이 없을 때는 한 가지 흐름을 끝까지 풀어 준다.
+export const CAREER_FOLLOW_THROUGH = {
+  peer: ['어디에서 막혔는지 솔직히 털어놓아도 괜찮아요. 답을 받아내려 애쓰지 않아도 말하는 사이에 내가 놓친 부분이 보일 수 있어요.', '일을 바로 나누기 전에 서로 어디까지 와 있다고 생각하는지 들어보세요. 출발점을 맞추고 나면 괜한 재촉도 줄어들겠어요.'],
+  expression: ['먼저 꺼낸 생각이 그대로 채택돼야만 좋은 대화는 아니에요. 그 말을 듣고 누군가 자기 경험을 보탠다면 그것도 의미 있는 진전이에요.', '먼저 이유를 들으면 그대로 살려야 할 대목도 보이겠어요. 그 뒤에 건넨 의견은 상대에게도 받아들이기가 한결 편합니다.'],
+  duty: ['다른 사람이 다음 단계로 넘어가는 모습을 보면, 내 일이 어디에 보탬이 됐는지도 느낄 수 있겠어요.', '전부 맡겠다는 말보다 언제 어떤 부분을 도울 수 있는지 알려주는 대답이 상대에게는 오히려 든든할 수 있어요.'],
+  wealth: ['모두 다 잘하려 애쓰기보다 누군가 실제로 쓸 부분에 힘을 주면 내가 들인 시간의 보람도 더 선명해지겠어요.', '어떤 기회인지 조금 더 듣는 것과 바로 책임을 맡는 것은 다른 일이에요. 마음에 드는 제안일수록 생각할 시간을 둬도 괜찮습니다.'],
+  learning: ['두 상황이 꼭 같지 않아도 괜찮아요. 전에 통했던 방법 중 지금도 살려 쓸 수 있는 한 가지가 보인다면 다음 걸음은 한결 가벼워지겠어요.', '모든 걸 파악한 뒤에야 도움을 청할 필요는 없어요. 모르는 부분을 짚어서 묻는 편이 상대도 자기 경험을 보태기 좋습니다.'],
+  change: ['작게 바꿔 본 뒤 손이 더 편해졌는지 살펴보세요. 그 차이를 알아야 다른 일에도 같은 방식을 써 볼지 정하기 쉬워요.', '다른 사람이 기다리는 일이 있다면 달라진 부분만 짧게 나눠도 좋겠어요. 그 사람도 자기 순서를 조정할 여유를 얻을 수 있어요.'],
 };

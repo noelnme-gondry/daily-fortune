@@ -12,6 +12,7 @@ export const ZODIAC_DAY_SCENES = {
         ['글보다 목소리가 편한 사이라면 통화할 수 있는 시간을 하나 제안해 보세요.', 'If you both prefer talking, offer a time for a call.', 'offer-call-time'],
       ],
       ['답장이 늦어도 같은 메시지를 거듭 보내지는 마세요.', 'Give a slow reply time before sending the same message again.'],
+      ['한동안 떠올리기만 했던 사람에게 말을 걸기 편한 날이에요.', '오랜만에 연락하려니 반가운 마음보다 어색함이 먼저 올라올 수 있어요.'],
     ],
     [
       [['손이 필요한 자리', 'A place for an extra hand'], ['혼자 하던 일에 손을 빌릴 때', 'A moment to ask for another pair of hands'], ['도움을 청할 한 가지', 'One specific thing to ask for']],
@@ -23,6 +24,7 @@ export const ZODIAC_DAY_SCENES = {
         ['서로 어려워하는 일이 다르다면 한 가지씩 바꿔 맡아 보세요.', 'If different tasks come easily to each of you, try swapping one small task.', 'trade-small-tasks'],
       ],
       ['도움을 청하기 전에 언제까지 답이 필요한지 생각해 두세요.', 'Work out when you need a reply before asking for help.'],
+      ['혼자 궁리하던 일도 사정을 털어놓으면 길이 보이겠어요.', '도움이 필요한데도 먼저 말하기는 쉽지 않은 날이에요.'],
     ],
     [
       [['한 테이블에 앉는 날', 'Around the same table'], ['식탁에서 듣는 새 이야기', 'A new story at the table'], ['짧은 모임에서 건질 대화', 'A worthwhile conversation at a brief gathering']],
@@ -34,6 +36,7 @@ export const ZODIAC_DAY_SCENES = {
         ['말이 겹치면 내가 하려던 얘기를 잠시 멈추고 먼저 시작한 사람이 마저 말하게 해 주세요.', 'If voices overlap, pause and let the person who started speaking finish.', 'leave-room-to-speak'],
       ],
       ['사적인 질문은 상대가 먼저 말을 꺼낼 때까지 기다리세요.', 'Wait for the other person to bring up more personal topics.'],
+      ['가벼운 대화 속에서 의외로 마음이 맞는 사람을 발견할 만해요.', '대화가 빠르게 흘러 내 이야기가 묻힐 수 있겠어요.'],
     ],
     [
       [['돌아오는 작은 호의', 'A small kindness returned'], ['누군가 기억한 내 수고', 'Someone remembers what you did'], ['고마움을 건넬 차례', 'A chance to say thanks']],
@@ -45,6 +48,7 @@ export const ZODIAC_DAY_SCENES = {
         ['받은 도움이 유용했다면 같은 일에 막힌 사람에게 그 방법을 알려 주세요.', 'If a tip helped you, pass the method along to someone facing the same problem.', 'pass-help-forward'],
       ],
       ['가벼운 호의를 무거운 빚처럼 받아들이지 않아도 됩니다.', 'A small favor need not feel like a large debt.'],
+      ['무심코 베푼 친절이 누군가에게 오래 남았다는 걸 느낄 수 있어요.', '마음을 써 준 만큼 돌아오지 않아 조금 서운할 수 있겠어요.'],
     ],
     [
       [['말뜻을 다시 맞추는 날', 'Checking what was meant'], ['한 줄만으로 알 수 없는 마음', 'What one line cannot tell you'], ['짐작보다 직접 묻는 편이 빠른 날', 'Ask before guessing']],
@@ -56,6 +60,7 @@ export const ZODIAC_DAY_SCENES = {
         ['마음에 걸린 말은 실제로 들은 부분과 내가 덧붙인 짐작을 따로 적어 보세요.', 'Write down the words you heard separately from what you inferred.', 'separate-quote-from-inference'],
       ],
       ['지난 일까지 한꺼번에 꺼내면 오늘 풀려던 이야기에서 멀어집니다.', 'Bringing up every past issue can distract from what you meant to resolve today.'],
+      ['어색하게 남은 한마디도 다시 이야기를 나누면 달리 들리겠어요.', '짧은 대답 하나가 유난히 차갑게 느껴질 수 있는 날이에요.'],
     ],
     [
       [['역할을 나누면 가벼워지는 일', 'A lighter load when roles are shared'], ['빈자리를 먼저 찾는 협업', 'Look for what nobody has covered'], ['누가 끝까지 챙길지 정하는 날', 'Agree on who sees it through']],
@@ -67,6 +72,7 @@ export const ZODIAC_DAY_SCENES = {
         ['다음 사람이 이어받을 작업물이나 물건을 어디에 둘지 한 곳을 정해 보세요.', 'Agree on one place to leave what the next person needs.', 'set-handoff-location'],
       ],
       ['상대의 여유를 확인한 뒤에 일을 더 나누세요.', 'Check the other person’s availability before handing over more work.'],
+      ['힘을 나누기 좋은 날이에요. 내가 어려워하는 일을 누군가는 수월하게 여길 수 있거든요.', '서로 상대가 알아서 하려니 생각하면 엇갈리기 쉬워요.'],
     ],
     [
       [['다음 약속으로 이어지는 대화', 'A conversation worth continuing'], ['공통 관심사에서 찾는 약속', 'A shared interest becomes a plan'], ['한 번 더 만나고 싶은 이유', 'A reason to meet again']],
@@ -78,6 +84,7 @@ export const ZODIAC_DAY_SCENES = {
         ['대화에서 서로 궁금해한 것이 있다면 나중에 찾아볼 자료 하나를 건네 보세요.', 'Send one useful reference about something you were both curious about.', 'share-useful-reference'],
       ],
       ['일정을 확정하기 전에 비용이나 이동 거리가 부담스럽지 않은지 확인하세요.', 'Before committing, make sure the cost and travel distance are manageable.'],
+      ['같은 것을 좋아한다는 발견이 인연을 조금 더 가깝게 해 줄 수 있어요.', '반가운 마음이 같아도 다시 만날 여유까지 꼭 같지는 않겠어요.'],
     ],
     [
       [['조용히 건네는 환영', 'A quiet welcome'], ['처음 온 사람 곁의 한 자리', 'Room for a newcomer'], ['낯선 자리에서 통하는 한마디', 'A word that helps someone settle in']],
@@ -89,6 +96,7 @@ export const ZODIAC_DAY_SCENES = {
         ['낯선 사람이 적응하고 싶어 한다면 얘기가 통할 만한 한 사람에게 소개해 주세요.', 'If a newcomer wants to meet someone, offer an introduction to one person with a shared interest.', 'offer-introduction'],
       ],
       ['소개하고 싶은 이야기가 있어도 당사자가 직접 꺼낼 몫을 남겨 두세요.', 'Leave room for a newcomer to decide what to share about themselves.'],
+      ['먼저 건네는 인사 한마디가 낯선 사이를 한결 편하게 해 주겠어요.', '반겨 주고 싶은 마음도 한꺼번에 몰리면 상대는 쑥스러울 수 있어요.'],
     ],
     [
       [['뜸했던 대화에 이어지는 뒷이야기', 'The rest of an old story'], ['지난번 얘기를 기억해 주는 마음', 'Remembering what mattered'], ['결과가 궁금했던 그 일', 'Wondering how it worked out']],
@@ -100,6 +108,7 @@ export const ZODIAC_DAY_SCENES = {
         ['나중에 소식을 전하고 싶다고 하면 그 사람이 말한 때를 기억해 두세요.', 'If they would like to share news later, make a note of the time they suggested.', 'remember-next-checkpoint'],
       ],
       ['상대가 더 말하고 싶어 하는지 보기 전에 해결책부터 꺼내지 마세요.', 'Wait to see whether they want to say more before offering a solution.'],
+      ['전에 들은 이야기를 기억해 주는 것만으로도 반가움을 전하기 좋은 날이에요.', '궁금해서 꺼낸 말이 답을 재촉하는 것처럼 들리기 쉬워요.'],
     ],
   ],
   career: [
@@ -113,6 +122,7 @@ export const ZODIAC_DAY_SCENES = {
         ['말이 너무 길어지면 실제 예 하나를 골라 보여 주세요.', 'When an explanation grows long, show a single worked example.', 'show-example'],
       ],
       ['배경 설명은 상대가 물어볼 때 꺼낼 수 있게 따로 남겨 두세요.', 'Keep the background handy for when someone asks.'],
+      ['내 뜻을 짧게 꺼내도 상대가 귀를 기울여 줄 만한 날이에요.', '하고 싶은 말이 많아 정작 부탁하고 싶은 게 뒤로 밀리겠어요.'],
     ],
     [
       [['마감 앞에서 고를 일', 'Choosing what makes the deadline'], ['끝낼 일과 미룰 일', 'What to finish and what can wait'], ['오래 붙든 일을 마무리할 때', 'Time to wrap up a lingering task']],
@@ -124,6 +134,7 @@ export const ZODIAC_DAY_SCENES = {
         ['시간이 모자라면 없어도 쓸 수 있는 부분 하나를 이번 범위에서 빼 보세요.', 'If time is short, leave out one part the result can work without.', 'drop-optional-task'],
       ],
       ['보낼 것이 있다면 파일이나 준비물만 마지막으로 한 번 살펴보세요.', 'If you have something to send or take along, give the file or item one last look.'],
+      ['오래 끌어온 일에 마침표를 찍을 만한 날이에요.', '거의 다 왔는데 작은 아쉬움이 자꾸 눈에 밟힐 수 있어요.'],
     ],
     [
       [['초안이 먼저 할 일', 'What a first draft can do'], ['다듬기 전에 보여 줄 한 장', 'One page to show before polishing'], ['아이디어를 시험하는 첫 화면', 'A first screen that tests an idea']],
@@ -135,6 +146,7 @@ export const ZODIAC_DAY_SCENES = {
         ['초안 두 개가 있다면 달라진 부분만 나란히 놓고 읽어 보세요.', 'Place two drafts side by side and read only the part that changed.', 'compare-before-after'],
       ],
       ['처음 나온 의견을 모두 반영하기 전에 가장 중요한 목적을 다시 보세요.', 'Revisit the main purpose before acting on every first reaction.'],
+      ['아직 다듬지 않은 생각에서도 가능성을 알아보는 사람이 있겠어요.', '혼자 오래 고민할수록 처음 좋았던 생각까지 흐려지기 쉬워요.'],
     ],
     [
       [['기록이 남기는 신뢰', 'Trust built by a clear record'], ['왜 바꿨는지 남겨 두는 날', 'Leave a record of why it changed'], ['나중에 읽힐 작업 메모', 'A work note for later']],
@@ -146,6 +158,7 @@ export const ZODIAC_DAY_SCENES = {
         ['여럿이 낸 생각이라면 누가 어떤 부분을 냈는지 결과물에 함께 남겨 보세요.', 'For a shared idea, credit who contributed which part in the result.', 'credit-contribution'],
       ],
       ['최종본과 검토본은 이름을 달리해 두어 혼선을 줄이세요.', 'Give final and review copies distinct names to avoid a mix-up.'],
+      ['남들이 모르고 지나갔던 수고에 빛이 드는 날이에요.', '여럿이 힘쓴 일에서는 누가 어떤 몫을 했는지 흐릿해지기 쉬워요.'],
     ],
     [
       [['일을 넘기기 전 한 번', 'Before handing a task over'], ['다음 사람이 바로 시작할 수 있게', 'Help the next person get started'], ['말로 넘긴 일을 글로 정리할 때', 'Put a spoken handover in writing']],
@@ -157,6 +170,7 @@ export const ZODIAC_DAY_SCENES = {
         ['누군가 이어받을 자료가 있다면 그 사람도 열어 볼 수 있는지 확인해 주세요.', 'If someone will need a resource, check whether they can actually open it.', 'verify-access'],
       ],
       ['말로만 합의한 마감은 받은 사람이 확인할 수 있게 남기세요.', 'Write down any deadline that was agreed only in conversation.'],
+      ['다른 사람이 내 일을 새 눈으로 보며 의외의 길을 찾아줄 수 있어요.', '나는 익숙해서 지나친 대목에서 다른 사람은 막힐 수 있겠어요.'],
     ],
     [
       [['새 요청에 답하는 순서', 'How to answer a new request'], ['수락하기 전에 물어볼 것', 'What to ask before saying yes'], ['새 부탁의 조건부터', 'Start with the terms of a new request']],
@@ -168,17 +182,19 @@ export const ZODIAC_DAY_SCENES = {
         ['전부 맡기 어렵다면 오늘 해줄 수 있는 작은 부분만 제안해도 좋아요.', 'If you cannot take on the whole request, offer one piece you can do today.', 'offer-smaller-role'],
       ],
       ['할 수 있는 범위를 정하기 전에는 완료일을 약속하지 마세요.', 'Avoid promising a finish date before settling what you can take on.'],
+      ['내 경험이 누군가에게 든든한 힘이 될 수 있는 날이에요.', '기대에 부응하고 싶어 무심코 내 몫보다 많이 맡기 쉬워요.'],
     ],
     [
-      [['누구나 찾을 수 있는 자리', 'A place anyone can find'], ['다음 사람이 덜 헤매는 준비', 'Helping the next person find their way'], ['작은 정리가 살리는 시간', 'A little order saves time']],
-      ['찾는 데 시간을 쓰던 것을 눈에 잘 띄게 두면 다음 일이 수월해질 수 있어요.', 'Putting something frequently sought in plain sight can make the next task easier.'],
-      ['내 눈에 반듯해 보여도 남이 쓰는 순서와 다를 수 있어요.', 'A tidy arrangement may not follow the order someone else uses.'],
+      [['손발이 맞기 시작할 때', 'Finding a shared rhythm'], ['같은 일도 다르게 보는 날', 'Two ways to see the same task'], ['서로의 방식을 알아가는 날', 'Learning how each other works']],
+      ['함께할 사람의 방식에 좋은 점이 보이고, 내 방식도 기꺼이 나눌 수 있는 날이에요.', 'It may be easier to appreciate what someone else brings to shared work.'],
+      ['혼자서는 익숙한 일도 둘이 하면 손발이 잘 맞지 않을 수 있어요.', 'A familiar task can feel different when two people approach it together.'],
       [
-        ['함께 쓰는 것이 있다면 자주 찾는 하나의 자리를 정하고 쓰는 사람에게 알려 보세요.', 'For something you share, agree on a home for one frequently needed item.', 'agree-storage-location'],
-        ['이름이 비슷한 물건은 겉에서 구분할 수 있는 표시를 하나 붙여 보세요.', 'Mark similar items so someone can tell them apart without opening them.', 'label-shared-item'],
-        ['같은 자료가 여러 군데 있다면 현재 쓰는 판본을 골라 오래된 것과 구분해 두세요.', 'If several copies are in circulation, distinguish the current version from the old ones.', 'remove-obsolete-copy'],
+        ['손발이 안 맞는다면 각자 어떤 순서로 하려 했는지 이야기해 보세요.', 'If you get out of step, compare the order each person had in mind.', 'compare-work-sequences'],
+        ['상대 방식이 낯설다면 한 번은 그 흐름에 맞춰 보세요. 편한 점과 불편한 점을 직접 느낄 수 있어요.', 'Try their approach once and see what feels easier or harder.', 'try-partner-method'],
+        ['각자 편한 부분을 하나씩 맡아 보면 잘 맞는 호흡을 찾을 수 있어요.', 'Each take a part you feel comfortable doing and see how the partnership works.', 'split-by-strength'],
       ],
-      ['누군가 쓰고 있는 것을 묻지 않고 옮기면 한 번 더 찾게 될 수 있어요.', 'Check before moving something another person is using.'],
+      ['방법이 다르다고 해서 함께하려는 뜻까지 다른 건 아니에요.', 'Different methods need not mean different intentions.'],
+      ['혼자 애쓸 때보다 서로의 방식을 맞출 때 일이 가볍게 풀리겠어요.', '혼자 할 때는 편했던 방식이 함께 일할 때는 어긋나기 쉬운 날이에요.'],
     ],
   ],
   money: [
@@ -192,6 +208,7 @@ export const ZODIAC_DAY_SCENES = {
         ['자주 쓸지 모르는 물건은 직접 써볼 기회가 있는지 알아보세요.', 'For something you may seldom use, ask whether you can try it first.', 'try-before-buying'],
       ],
       ['할인 기간이 짧다는 이유만으로 예정에 없던 물건을 담지 마세요.', 'A short sale is no reason to add an unplanned item.'],
+      ['마음에 들면서도 내 형편에 맞는 선택을 찾기 수월한 날이에요.', '값이 싸졌다는 생각에 정작 나에게 필요한지는 놓치기 쉬워요.'],
     ],
     [
       [['정산을 챙기는 날', 'Time to settle the bill'], ['미뤄 둔 비용 이야기를 꺼낼 때', 'Bring up an expense you put off'], ['영수증으로 맞추는 정산', 'Use the receipt to settle up']],
@@ -203,6 +220,7 @@ export const ZODIAC_DAY_SCENES = {
         ['서로 기억하는 금액이 다르면 차이가 나는 항목 하나만 골라 확인해 보세요.', 'If the amounts you remember differ, check the one item that explains the gap.', 'query-discrepancy'],
       ],
       ['입금이 확인되기 전에는 그 돈을 다음 지출에 미리 보태지 마세요.', 'Wait for the payment to arrive before counting it toward another expense.'],
+      ['미뤄 둔 돈 이야기를 꺼내도 서로 이해할 여지가 있는 날이에요.', '돈 문제에선 작은 기억 차이도 서운함으로 번질 수 있어요.'],
     ],
     [
       [['작은 보답이 반가운 때', 'A small reward is welcome'], ['수고의 값을 말할 자리', 'A chance to name the value of your work'], ['일거리 제안에 답하기 전', 'Before answering an offer of work']],
@@ -214,17 +232,19 @@ export const ZODIAC_DAY_SCENES = {
         ['대가를 나중에 받기로 했다면 언제 다시 확인할지 정해 보세요.', 'If payment is due later, choose when to follow up.', 'schedule-followup'],
       ],
       ['구두로 정한 금액은 시작하기 전에 글로 한 번 확인하세요.', 'Confirm a verbally agreed amount in writing before you start.'],
+      ['그동안 들인 수고의 값을 인정받는 일이 반갑게 느껴질 수 있어요.', '수고에 비해 돌아오는 것이 적게 느껴져 망설여질 수 있어요.'],
     ],
     [
-      [['오래 쓴 물건의 다음 쓰임', 'Another use for an old favourite'], ['사기 전에 들여다볼 서랍', 'The drawer worth checking first'], ['손에 익은 것의 값어치', 'The value of the familiar']],
-      ['이미 가진 것에서 바라던 쓰임을 찾으면 사야 할 목록이 가벼워질 수 있어요.', 'Finding a new use for something you own can shorten a shopping list.'],
-      ['예전에 아꼈다는 이유만으로 불편한 물건을 계속 쓸 필요는 없어요.', 'An old favourite need not stay in use if it no longer works for you.'],
+      [['돈을 쓰고 싶은 이유', 'What makes spending tempting'], ['지금 마음에 맞는 선택', 'A choice that fits now'], ['만족이 오래가는 쪽', 'What will still matter later']],
+      ['지금 내게 값어치 있는 것이 또렷하게 보이는 날이에요.', 'It may be easier to recognize what you genuinely value.'],
+      ['답답한 기분을 바꾸고 싶어서 평소보다 지갑을 쉽게 열 수 있어요.', 'Wanting a change of mood can make spending feel unusually tempting.'],
       [
-        ['교체하고 싶은 물건이 있다면 고치고 싶은 점 하나를 적고, 지금 가진 것으로 해결할 수 있는지 보세요.', 'For an item you want to replace, name the one thing you would change and see whether it can be adjusted.', 'adjust-before-replacing'],
-        ['당장 필요하지만 오래 쓸지 모르겠다면 잠깐 빌릴 곳을 찾아보세요.', 'If you need it briefly but long-term use is uncertain, see whether you could borrow one.', 'borrow-before-replacing'],
-        ['아끼던 물건이 고장 났다면 같은 것을 사기 전에 수리가 가능한지 물어보세요.', 'For a broken item you value, ask whether it can be repaired before replacing it.', 'find-repair-option'],
+        ['기꺼이 돈을 쓰고 싶은 한 가지를 골라 보세요. 나머지를 지나치기가 한결 쉬워져요.', 'Choose the one thing worth paying for and let the rest pass.', 'choose-spending-priority'],
+        ['기분 때문에 끌렸다면 마음이 가라앉은 뒤에도 여전히 원하는지 보세요.', 'Let the feeling settle and see whether you still want to spend.', 'delay-spending'],
+        ['무엇을 살지보다 어떤 시간을 보내고 싶은지 떠올려 보면 뜻밖에 다른 선택이 보이겠어요.', 'Think about the experience you want and consider another way to enjoy it.', 'substitute-experience'],
       ],
-      ['바꾸기로 했다면 새 물건을 둘 자리도 한 번 살펴보세요.', 'If you decide to replace it, check where the new item will go.'],
+      ['남들이 만족했다는 이야기가 내 취향까지 대신 정해 주지는 않아요.', 'Another person’s enthusiasm need not decide your preferences.'],
+      ['돈을 아끼고 싶은 마음과 즐겁게 쓰고 싶은 마음 사이에 나만의 기준이 설 만한 날이에요.', '지금의 기분과 오래 남을 만족을 구분하기가 조금 어려운 날이에요.'],
     ],
   ],
   move: [
@@ -238,17 +258,19 @@ export const ZODIAC_DAY_SCENES = {
         ['일찍 도착할 수 있다면 편하게 기다릴 곳 하나를 미리 골라 보세요.', 'If you may arrive early, choose a comfortable place to wait.', 'choose-waiting-place'],
       ],
       ['같은 이름의 장소가 여러 곳이면 주소와 지점을 대조하세요.', 'If places share a name, check the address and branch.'],
+      ['밖에서 움직일 일이 여럿이라도 시간이 모처럼 잘 맞을 만해요.', '하나가 늦어지면 다음 약속까지 마음이 바빠지는 날이에요.'],
     ],
     [
-      [['다른 길이 보이는 때', 'A different route comes into view'], ['평소 길이 막혔을 때', 'When the usual route is blocked'], ['지도에 남겨 둘 두 번째 길', 'A second route to save']],
-      ['낯선 길로 돌아가다 반가운 곳을 하나 발견할 수 있습니다.', 'Taking an unfamiliar route may lead to a welcome discovery.'],
-      ['평소 쓰던 길이나 교통편이 여의치 않아 계획을 바꿀 수 있습니다.', 'A familiar route or service may be unavailable, calling for a change of plan.'],
+      [['예정이 달라질 때', 'When your plans change'], ['한 번 돌아가는 여유', 'A little room for a detour'], ['방향을 다시 잡는 날', 'Finding your bearings again']],
+      ['처음 생각한 길을 벗어나면 오히려 반가운 일을 만날 여지가 있어요.', 'An unexpected change of route can leave room for a welcome discovery.'],
+      ['움직일 일이 있다면 마음에 여유가 조금 더 필요한 날이에요.', 'Leave yourself a little breathing room if you are on the move.'],
       [
-        ['출발 전에 대체 경로 하나를 지도에 저장해 두면 마음이 놓입니다.', 'Save one alternate route on your map before setting off.', 'save-alternative-route'],
-        ['여럿이 다른 길로 간다면 다시 만날 지점 하나를 지도에 표시해 나누세요.', 'If you take different routes, share a map pin for where you will meet again.', 'share-map-pin'],
-        ['낯선 길에 들어설 때 돌아오는 쪽에서도 보일 표지를 하나 기억해 두세요.', 'On an unfamiliar route, pick a landmark you will recognise coming back.', 'note-return-landmark'],
+        ['가장 기다려지는 일정 하나를 기준으로 나머지는 느슨하게 잡아도 좋겠어요.', 'Anchor your plans around the one occasion that matters most.', 'reserve-time-for-priority'],
+        ['무리해서 가려던 곳이 있다면 편하게 갈 수 있는 다른 날로 옮겨 보세요.', 'Move a difficult trip to a day when you can enjoy it comfortably.', 'reschedule-difficult-trip'],
+        ['계획이 틀어진 틈에 그동안 지나치기만 했던 곳에 잠시 머물러도 좋겠습니다.', 'If your plan changes, linger somewhere you usually pass by.', 'explore-nearby-place'],
       ],
-      ['시간이 부족할 때는 확인하지 않은 지름길로 서두르지 마세요.', 'When time is short, avoid rushing down a shortcut you have not checked.'],
+      ['늦어진 시간을 만회하려고 서두를수록 마음만 더 급해질 수 있어요.', 'Rushing to make up lost time can make the day feel more pressured.'],
+      ['예정과 다른 움직임이 오히려 숨을 돌릴 계기가 될 수 있어요.', '일정이 어긋나면 한 번에 만회하려는 마음이 앞서기 쉬워요.'],
     ],
   ],
   study: [
@@ -262,6 +284,7 @@ export const ZODIAC_DAY_SCENES = {
         ['도움을 구할 수 있다면 풀이 전체 대신 막힌 한 단계만 직접 보여 달라고 해보세요.', 'If help is available, ask for a demonstration of the single step that stopped you.', 'ask-for-demonstration'],
       ],
       ['풀이를 읽은 뒤에는 책을 덮고 그 단계만 다시 설명해 보세요.', 'After reading the solution, close the book and explain just that step.'],
+      ['어렵게 여긴 대목도 한 번 묻고 나면 의외로 맥이 잡힐 만해요.', '무엇을 모르는지 말로 꺼내기까지 시간이 조금 걸리는 날이에요.'],
     ],
     [
       [['찾아 둔 자료를 쓰는 날', 'Using a reference you saved'], ['오래된 메모의 새 쓰임', 'A new use for an old note'], ['답에 가까운 자료부터', 'Start with the source closest to an answer']],
@@ -273,6 +296,7 @@ export const ZODIAC_DAY_SCENES = {
         ['다시 쓸 문장이 있다면 어디서 봤는지 출처와 함께 남겨 두세요.', 'Save a useful passage with its source so you can return to it.', 'save-source-and-quote'],
       ],
       ['인용하려는 내용은 요약본만 보고 옮기지 말고 원문을 확인하세요.', 'Check the original before quoting a point you found in a summary.'],
+      ['전에 읽었던 내용이 오늘 고민과 맞닿아 새롭게 보이겠어요.', '서로 다른 설명이 모두 그럴듯해 어느 쪽을 믿을지 망설여지겠어요.'],
     ],
     [
       [['배운 것을 내 말로', 'What you learned in your own words'], ['설명해 보면 드러나는 빈틈', 'Explaining reveals what is missing'], ['개념 하나를 예로 풀어 보는 날', 'Give one concept an example']],
@@ -284,6 +308,7 @@ export const ZODIAC_DAY_SCENES = {
         ['설명이 어디까지 맞는지 보려면 들어맞지 않는 예를 하나 만들어 보세요.', 'To test the limits of an explanation, construct an example where it fails.', 'find-counterexample'],
       ],
       ['정의와 예시가 서로 맞는지 확인한 뒤 메모를 공유하세요.', 'Check that the definition fits the example before sharing your note.'],
+      ['배운 이야기를 다른 사람에게 들려주는 동안 생각이 더 또렷해지겠어요.', '안다고 느꼈던 것도 내 말로 풀어내려니 잠시 막힐 수 있어요.'],
     ],
     [
       [['기억을 불러오는 작은 단서', 'A small cue that brings an idea back'], ['책을 덮고 떠올리는 한 가지', 'One thing to recall with the book closed'], ['낯익음과 기억 사이', 'Between recognition and recall']],
@@ -295,6 +320,7 @@ export const ZODIAC_DAY_SCENES = {
         ['기억한 예제의 조건 하나를 바꾸고 답도 달라지는지 확인해 보세요.', 'Change one condition in the example you remember and see whether the answer changes.', 'vary-one-condition'],
       ],
       ['잊힌 부분을 찾았을 때 처음부터 전부 다시 볼 필요는 없어요.', 'One missing detail need not send you back to the beginning.'],
+      ['한 번 익힌 것이 작은 실마리를 만나 되살아나기 쉬운 날이에요.', '낯익다는 느낌과 제대로 떠올릴 수 있는 것 사이에 차이가 있겠어요.'],
     ],
   ],
 };

@@ -1,5 +1,5 @@
 import { hash, toUTC, DAY_MS, josa } from '../engine/core.js';
-import { tr } from '../i18n/runtime.js';
+import { isEnglish, tr } from '../i18n/runtime.js';
 import { READING_ACTIONS, SHORT_READING_LABELS, ZODIAC_RELATION, ELEMENT_THEME } from '../content/reading-actions.js';
 import { READING_HEADLINES } from '../content/reading-headlines.js';
 import { LEGACY_READING_LABELS, LEGACY_READING_HEADLINES } from '../content/reading-share-legacy.js';
@@ -112,10 +112,11 @@ export function zodiacDayScene(focus, cycle, offset) {
 }
 
 export function zodiacDayReading(focus, score, { scene, position, count }, practice) {
-  const [headlines, favorable, careful, , watch] = scene;
+  const [headlines, favorable, careful, , watch, alternate] = scene;
   const turn = Math.floor(position / count);
   const headline = localized(headlines[((turn % headlines.length) + headlines.length) % headlines.length]);
-  const outlook = `${localized(ZODIAC_DAY_TOPICS[focus])} · ${localized(score >= 60 ? favorable : careful)}`;
+  const beat = !isEnglish() && turn % 2 !== 0 ? alternate[score >= 60 ? 0 : 1] : localized(score >= 60 ? favorable : careful);
+  const outlook = `${localized(ZODIAC_DAY_TOPICS[focus])} · ${beat}`;
   const advice = localized(practice), caution = localized(watch);
   return { headline, outlook, advice, caution, text: `${outlook} ${advice} ${caution}` };
 }

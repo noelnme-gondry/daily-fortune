@@ -21,7 +21,7 @@ test('띠 일간·월간은 생활 속 운과 행동을 먼저 설명하고 전�
     }
     for (const m of ttiMonths(t, 2026)) {
       assert.doesNotMatch(m.text, JARGON);
-      assert.match(m.text, /대인운|협업운|재물운|업무운|학업/);
+      assert.match(m.text, /대인운|협업운|재물운|업무운|이동운|학업/);
     }
   }
 });

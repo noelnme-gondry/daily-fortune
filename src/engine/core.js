@@ -57,6 +57,7 @@ export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // 받침에 따라 조사 선택: josa('편관', '은/는') → '편관은'
 export function josa(word, pair) {
+  if (word === '나' && pair === '이/가') return '내가';
   const [withJong, noJong] = pair.split('/');
   const m = String(word).replace(/[^가-힣0-9]+$/, '');
   const last = m.charAt(m.length - 1);

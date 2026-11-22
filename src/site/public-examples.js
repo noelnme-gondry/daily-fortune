@@ -1,5 +1,5 @@
 import { elementName, term } from '../i18n/terms.js';
-import { tr } from '../i18n/runtime.js';
+import { isEnglish, tr } from '../i18n/runtime.js';
 import { siteText, siteValue } from './copy.js';
 // 공개 설명에만 쓰는 가상 입력. 개인 저장소·요청 매개변수를 읽지 않는다.
 // 결과를 전사하지 않고 실제 계산기와 같은 엔진으로 HTML을 생성한다.
@@ -77,7 +77,7 @@ export function dayExample(date, which) {
     const before = previousScores.get(cat.key), delta = cat.score - before;
     return `<tr data-day-area="${cat.key}"><th scope="row">${esc(cat.name)}</th><td>${before}${points}</td><td>${cat.score}${points}</td><td>${delta > 0 ? '+' : ''}${delta}${points}</td></tr>`;
   }).join('')}</tbody></table></div>
-    <p>${siteText('계산된 총운 해설: ')}${esc(r.overall.text)}</p>
+    ${!isEnglish() ? `<p>${esc(r.overall.outlook)}</p>` : ''}<p>${siteText('계산된 총운 해설: ')}${esc(r.overall.text)}</p>
     <h3>${tr('분야별 계산 근거와 활용 예시', 'Calculation basis and practical examples by area')}</h3>
     ${r.cats.map(cat => `<section data-day-reading="${cat.key}"><h4>${esc(cat.name)}</h4><p>${esc(cat.reading.basis)}</p><p>${esc(cat.reading.change)}</p><p>${tr('활용 예시: ', 'Practical example: ')}${esc(cat.reading.action)}</p></section>`).join('')}
     <p>${tr('이 변화는 위 가상 인물의 사례입니다. 모든 사람에게 같은 분야의 점수가 오르거나 내린다는 뜻은 아닙니다.', 'These changes describe the fictional person above. They do not mean that the same areas rise or fall for everyone.')}</p>
@@ -142,7 +142,7 @@ export function yearExample(y, ctx) {
   return `${start(`${y}${siteText("년 신년운세 계산 예시")}`)}
     <h3>${siteText("실제 계산 결과")}</h3><p>${siteText("대상 연도: ")}${y}${siteText("년 · 세운 ")}${pillarLabel(r.pillar)}${r.daeun ? `${siteText(" · 대운 ")}${pillarLabel(r.daeun)}` : ''}${siteText(". 종합 점수는 ")}<b data-example-overall>${r.overall.score}${siteText("점")}</b>${siteText("입니다.")}</p>
     <div class="table-wrap"><table class="grid-table"><caption>${siteText("가상 사례의 ")}${y}${siteText("년 분야별 점수")}</caption><thead><tr><th scope="col">${siteText("분야")}</th><th scope="col">${siteText("점수")}</th></tr></thead><tbody>${r.cats.map((cat) => `<tr><th scope="row">${cat.name}</th><td>${cat.score}${siteText("점")}</td></tr>`).join('')}</tbody></table></div>
-    <p>${siteText("계산된 총운 해설: ")}${esc(r.overall.text)}</p>
+    ${!isEnglish() ? `<p>${esc(r.overall.outlook)}</p>` : ''}<p>${siteText("계산된 총운 해설: ")}${esc(r.overall.text)}</p>
     <div class="table-wrap" tabindex="0" role="region" aria-label="${tr('가상 사례의 월별 점수', 'Example monthly scores')}"><table class="grid-table"><caption>${siteText("가상 사례의 ")}${y}${siteText("년 월별 점수")}</caption><thead><tr><th scope="col">${siteText("월")}</th><th scope="col">${siteText("대표 월주")}</th><th scope="col">${siteText("점수")}</th></tr></thead><tbody>${months.map((m) => `<tr><th scope="row">${m.m}${siteText("월")}</th><td>${pillarLabel(m.pillar)}</td><td>${m.score}${siteText("점")}</td></tr>`).join('')}</tbody></table></div>
     <h3>${tr('같은 생년월일로 두 해를 비교하면', 'Two years with the same birth chart')}</h3>
     <p>${tr('위 사례에서 출생일과 시각을 고정하고 대상 연도만 바꿨습니다. 다른 연도를 누르면 그해의 분야별 풀이와 월별 흐름도 볼 수 있습니다.', 'Only the reading year changes in this example. Open the other year to explore its readings by area and month.')}</p>

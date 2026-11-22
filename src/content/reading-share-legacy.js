@@ -171,6 +171,7 @@ export const LEGACY_READING_LABELS = [
   ]
 ];
 export const LEGACY_READING_HEADLINES = [
+  ['어디서 시작할지 막막하면 한 권만', 'When starting feels hard, choose one book'],
   [
     "보고의 첫 줄에 결론을",
     "Put the conclusion on the first line"

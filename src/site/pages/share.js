@@ -13,8 +13,9 @@ import { tojeongHeadline } from '../../content/tojeong.js';
 import { TOJEONG_RANGE } from '../../domain/tojeong.js';
 import { TOOLS } from '../../content/pages.js';
 import { TOJEONG } from '../../content/tojeong.js';
+import { compatibilityShareTitles } from '../../engine/compat.js';
 import { readingHeadlines } from '../../domain/reading.js';
-import { TG, sexagenary, iljuSlug, pillarH, COMPAT_HEADLINES, TIERS, parseISO } from '../../engine/index.js';
+import { TG, sexagenary, iljuSlug, pillarH, TIERS, parseISO } from '../../engine/index.js';
 import { SHARE_KINDS, cleanName, ADJ_FLAT } from '../share-codec.js';
 import { esc } from '../util.js';
 
@@ -67,7 +68,7 @@ export function parseShare(q) {
     card.more = [`/saju/ilju/${iljuSlug(il.p)}/`, `${displayPillar(il.p)}${siteText("일주 풀이 보기")}`];
   } else if (k === 'compat') {
     const s = int(q.get('s'), 0, 100), h = q.get('h'), n2 = cleanName(q.get('n2'));
-    const headline = localizedHeadline(h, (lang) => withLanguage(lang, () => [...COMPAT_HEADLINES]));
+    const headline = localizedHeadline(h, (lang) => withLanguage(lang, compatibilityShareTitles));
     if (s === null || headline === null) return null;
     card.kicker = `${name || siteText('나')} × ${n2 || siteText('상대')}${siteText(" 궁합")}`; card.big = `${s}${siteText("점")}`; card.title = headline;
   } else if (k === 'story') {
