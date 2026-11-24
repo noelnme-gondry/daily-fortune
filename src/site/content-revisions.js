@@ -1,7 +1,8 @@
 // 본문 변경 이력. 빌드 날짜로 모든 페이지의 수정일을 덮지 않는다.
-// 언어판은 동일 편집에서 함께 갱신했으므로 경로의 /en 접두사를 제거한다.
+// 두 언어에 공통인 편집은 같은 경로로 조회하고 언어별 편집은 따로 기록한다.
 export const CONTENT_BASE_DATE = '2026-10-16';
 export const CONTENT_REVISIONS = Object.freeze([
+  { date: '2026-11-24', lang: 'ko', match: /^\/(?:$|saju\/sipsin\/pyeonjae\/$|tti\/samjae\/$)/ },
   { date: '2026-11-19', match: /^\/(?:year\/\d{4}\/|tti\/\d{4}\/[^/]+\/)$/ },
   { date: '2026-11-18', match: /^\/(?:$|shop\/|year\/|privacy\/)/ },
   { date: '2026-11-16', match: /^\/shop\// },
@@ -17,7 +18,8 @@ export const CONTENT_REVISIONS = Object.freeze([
 ]);
 export function contentModified(path) {
   const base = path.replace(/^\/en(?=\/)/, '');
-  return CONTENT_REVISIONS.find(r => r.match.test(base))?.date || CONTENT_BASE_DATE;
+  const lang = path === base ? 'ko' : 'en';
+  return CONTENT_REVISIONS.find(r => (!r.lang || r.lang === lang) && r.match.test(base))?.date || CONTENT_BASE_DATE;
 }
 export const LATEST_CONTENT_DATE = CONTENT_REVISIONS.reduce((date, r) => r.date > date ? r.date : date, CONTENT_BASE_DATE);
 
