@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { completeProfile, editProfile } from './helpers/profile.js';
-import { FREE_ACCESS } from '../../src/content/pages.js';
+import { HOME_ACCESS } from '../../src/content/pages.js';
 import { withLanguage } from '../../src/i18n/runtime.js';
 
 test.beforeEach(async ({ context }) => { await context.route('https://**/*', route => route.abort()); });
@@ -46,7 +46,7 @@ for (const lang of ['ko', 'en']) {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${prefix}/`);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
-    await expect(page.locator('.home-services')).toContainText(withLanguage(lang, () => FREE_ACCESS.description));
+    await expect(page.locator('.home-services')).toContainText(withLanguage(lang, () => HOME_ACCESS.a));
     const order = await page.evaluate(() => ['.home-services', '.reading-guides', '.reading-guide-links'].map(s => document.querySelector(s).getBoundingClientRect().top));
     expect(order.slice(1).every(top => top > order[0])).toBe(true);
     expect(await page.locator('.home-features').evaluate(el => el.getBoundingClientRect().top)).toBeLessThan(order[0]);

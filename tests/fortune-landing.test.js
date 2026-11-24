@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSite } from '../src/site/render.js';
-import { HOME, TOOLS, FREE_ACCESS } from '../src/content/pages.js';
+import { HOME, HOME_ACCESS, TOOLS } from '../src/content/pages.js';
 import { BRAND } from '../src/content/brand.js';
 import { READING_GUIDES } from '../src/content/reading-guides.js';
 import { contentModified } from '../src/site/content-revisions.js';
@@ -17,10 +17,10 @@ for (const lang of ['ko', 'en']) {
   test(`${lang}: 홈은 전용 무료운세 메타와 기존 서비스 목록을 가이드보다 앞에 제공한다`, () => withLanguage(lang, () => {
     const html = site.render(`${prefix}/`), body = main(html);
     assert.ok(html.includes(`<title>${esc(HOME.title)}</title>`));
-    assert.ok(html.includes(`<meta name="description" content="${esc(HOME.description)}">`));
+    assert.ok(html.includes(`<meta name="description" content="${esc(HOME.description.replace('{year}', 2027))}">`));
     assert.ok(body.includes(`<h1>${esc(HOME.h1)}</h1>`));
     assert.ok(body.includes(`<p class="lead">${esc(HOME.lead)}</p>`));
-    assert.ok(body.includes(FREE_ACCESS.description));
+    assert.ok(body.includes(HOME_ACCESS.a));
     const services = body.indexOf('class="box-sec home-services"');
     assert.ok(body.indexOf('id="tool"') < services);
     for (const marker of ['class="reading-guides"', 'class="box-sec reading-guide-links"']) assert.ok(services < body.indexOf(marker));
@@ -42,10 +42,10 @@ for (const lang of ['ko', 'en']) {
     for (const attribute of ['name="description"', 'property="og:description"', 'name="twitter:description"']) {
       const tags = [...html.matchAll(new RegExp(`<meta ${attribute} content="([^"]+)">`, 'g'))];
       assert.equal(tags.length, 1, attribute);
-      assert.equal(tags[0][1], esc(HOME.description), attribute);
+      assert.equal(tags[0][1], esc(HOME.description.replace('{year}', 2027)), attribute);
     }
     const graph = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1])['@graph'];
-    assert.equal(graph.find(node => node['@type'] === 'WebPage').description, HOME.description);
+    assert.equal(graph.find(node => node['@type'] === 'WebPage').description, description);
     if (lang === 'en') assert.doesNotMatch(description, /[가-힣]/);
   }));
 
@@ -101,3 +101,26 @@ for (const lang of ['ko', 'en']) {
     for (const g of READING_GUIDES.filter(g => g.linkSection !== undefined)) assert.ok(g.linkSection >= 0 && g.linkSection < g.copy.sections.length);
   });
 }
+
+test('한국어 홈과 삼재 검색 문구는 KST 연도가 바뀔 때 실제 도착 페이지와 표를 따른다', () => {
+  for (const [instant, nextYear, expectedTitle] of [
+    ['2026-12-31T23:59:00+09:00', 2027, '2026·2027년 삼재띠 | 토끼띠·양띠·돼지띠는 언제 끝날까?'],
+    ['2027-01-01T00:01:00+09:00', 2028, '2027년 삼재띠 토끼띠·양띠·돼지띠 | 2028년 호랑이띠·말띠·개띠'],
+  ]) {
+    const current = createSite({ site: origin, assets: {}, now: Date.parse(instant) });
+    const home = current.render('/');
+    assert.ok(home.includes(`${nextYear}년 신년운세의 총운과 월별 점수는 무료`));
+    assert.ok(home.includes(`href="/year/${nextYear}/">${nextYear}년 총운과 월별 점수`));
+    assert.ok(current.has(`/year/${nextYear}/`));
+    assert.ok(current.render('/tti/samjae/').includes(`<title>${expectedTitle}</title>`));
+    assert.equal(current.page('/en/tti/samjae/').title, 'Samjae — The Three-Year Zodiac Caution Cycle');
+  }
+});
+
+test('편재 검색 제목은 일간별 표를 안내하고 다른 십신과 영어 제목은 유지한다', () => {
+  const page = site.render('/saju/sipsin/pyeonjae/');
+  assert.ok(page.includes('<title>사주 편재 뜻과 찾는 법 | 내 일간으로 보는 편재표</title>'));
+  assert.ok(page.includes('<h2>일간별 편재 찾기</h2>'));
+  assert.equal(site.page('/saju/sipsin/jeongjae/').title, '정재 뜻 — 많을 때·없을 때·운에서 올 때');
+  assert.match(site.page('/en/saju/sipsin/pyeonjae/').title, /Meaning, Prominence, Absence & Timing/);
+});

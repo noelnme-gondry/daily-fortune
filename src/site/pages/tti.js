@@ -101,15 +101,24 @@ export function animalYear(t, y, ctx) {
 
 export function samjae(ctx) {
   const c = TTI_COPY.samjae;
+  const year = ctx.today.y;
+  const thisY = samjaeYear(year), nextY = samjaeYear(year + 1);
+  let title = c.title;
+  if (ctx.lang !== 'en') {
+    const signNames = (entries) => entries.map(s => `${animalName(s.tti)}띠`).join('·');
+    const currentSigns = signNames(thisY), nextSigns = signNames(nextY);
+    title = currentSigns === nextSigns
+      ? `${year}·${year + 1}년 ${c.title} | ${currentSigns}는 언제 끝날까?`
+      : `${year}년 ${c.title} ${currentSigns} | ${year + 1}년 ${nextSigns}`;
+  }
   const years = [];
   for (let y = ctx.today.y - 1; y <= ctx.today.y + 10; y++) years.push(y);
   const groups = [[8, 0, 4], [5, 9, 1], [2, 6, 10], [11, 3, 7]];
   const page = {
-    path: '/tti/samjae/', title: c.title, h1: c.h1, description: `${ctx.today.y}${siteText("년·")}${ctx.today.y + 1}${siteText("년 삼재 띠와 들삼재·눌삼재·날삼재를 한눈에 확인하세요. 띠별 삼재 연도표와 삼재의 뜻, 대처법을 정리했습니다.")}`,
+    path: '/tti/samjae/', title, h1: c.h1, description: `${ctx.today.y}${siteText("년·")}${ctx.today.y + 1}${siteText("년 삼재 띠와 들삼재·눌삼재·날삼재를 한눈에 확인하세요. 띠별 삼재 연도표와 삼재의 뜻, 대처법을 정리했습니다.")}`,
     crumbs: [[siteText('띠별 운세'), '/tti/'], [siteText('삼재'), '/tti/samjae/']], section: '/tti/', ogType: 'article',
   };
   page.ld = [article(ctx, page), faqLd(c.faq)];
-  const thisY = samjaeYear(ctx.today.y), nextY = samjaeYear(ctx.today.y + 1);
   page.body = `<article class="article">${hero(c.h1, c.lead)}
     ${factTable([[`${ctx.today.y}${siteText("년 삼재")}`, thisY.map((s) => `${animalName(s.tti)}${siteText("띠 ")}${siteValue(s.name)}`).join(', ')], [`${ctx.today.y + 1}${siteText("년 삼재")}`, nextY.map((s) => `${animalName(s.tti)}${siteText("띠 ")}${siteValue(s.name)}`).join(', ')]], siteText('올해와 내년 삼재'))}
     <section class="prose"><h2>${siteText("띠 그룹별 삼재 연도")}</h2><div class="table-wrap" tabindex="0" role="region" aria-label="${tr('띠 그룹별 삼재 연도', 'Samjae years by zodiac group')}"><table class="grid-table"><thead><tr><th scope="col">${siteText("띠")}</th><th scope="col">${siteText("삼재가 드는 해의 지지")}</th><th scope="col">${years[0]}~${years[years.length - 1]}${siteText("년 중 삼재 해")}</th></tr></thead><tbody>

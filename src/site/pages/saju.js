@@ -206,6 +206,9 @@ export function sipsinIndex(ctx) {
 export function sipsinPage(i, ctx) {
   const t = TG[i];
   const d = SIPSIN[t];
+  const title = !isEnglish() && t === '편재'
+    ? '사주 편재 뜻과 찾는 법 | 내 일간으로 보는 편재표'
+    : `${siteValue(t)}${siteText(" 뜻 — 많을 때·없을 때·운에서 올 때")}`;
   const rows = [...Array(10).keys()].map((dm) => {
     const st = [...Array(10).keys()].find((s) => tenGod(dm, s) === t);
     const brs = [...Array(12).keys()].filter((b) => tenGod(dm, BR_MAIN[b]) === t);
@@ -219,7 +222,7 @@ export function sipsinPage(i, ctx) {
   ];
   return articlePage(ctx, {
     path: `/saju/sipsin/${TG_SLUG[i]}/`, h1: `${siteValue(t)}(${TG_H[i]}${siteText(")의 뜻")}`, eyebrow: siteText('십신'),
-    title: `${siteValue(t)}${siteText(" 뜻 — 많을 때·없을 때·운에서 올 때")}`, description: `${isEnglish() ? `${d.summary} Learn how to identify ${siteValue(t)} and interpret its prominence, absence and cycle themes.` : `${d.summary} ${displayJosa(t, '이/가')}${siteText(" 많을 때와 없을 때, 운에서 들어올 때의 의미와 일간별 ")}${siteValue(t)}${siteText(" 찾는 법을 정리했습니다.")}`}`,
+    title, description: `${isEnglish() ? `${d.summary} Learn how to identify ${siteValue(t)} and interpret its prominence, absence and cycle themes.` : `${d.summary} ${displayJosa(t, '이/가')}${siteText(" 많을 때와 없을 때, 운에서 들어올 때의 의미와 일간별 ")}${siteValue(t)}${siteText(" 찾는 법을 정리했습니다.")}`}`,
     crumbs: [[siteText('사주 백과'), '/saju/'], [siteText('십신'), '/saju/sipsin/'], [siteValue(t), `/saju/sipsin/${TG_SLUG[i]}/`]],
     lead: d.summary,
     content: `${factTable([[siteText('정의'), d.formula], [siteText('육친 (남성)'), d.family.M], [siteText('육친 (여성)'), d.family.F], [siteText('키워드'), d.keywords.join(' · ')], [siteText('잘 맞는 분야'), d.career]], `${siteValue(t)}${siteText(" 핵심 정리")}`)}
