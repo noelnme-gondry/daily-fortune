@@ -25,7 +25,7 @@ for (const productId of ids) for (const colorScheme of ['light', 'dark']) test(`
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ colorScheme });
   await page.goto(productId === 'annual' ? `/year/${todayKST().y + 1}/premium/` : `/shop/${productId}/`);
-  await expect(page.locator('.shop-contents .reading-contents-cell')).toHaveCount(READING_CHAPTERS[productId].length);
+  await expect(page.locator('.shop-contents .reading-contents-cell')).toHaveCount(READING_CHAPTERS[productId === 'compatibility' ? productId : 'bundle'].length);
   await expect(page.locator('.shop-contents img')).toHaveCount(0);
   const orderId = await mockOrder(page, productId);
   await expect(page.locator('[data-purchase-result-status]')).toHaveText('구매가 완료되었습니다.');
@@ -113,4 +113,28 @@ test('기존 사주 구매: 숨겨졌던 연도별 근거가 실제 읽기 화�
   await expect(detail).toContainText('목록에 표시된 이유');
   await expect(detail.locator('.life-event-body')).toBeVisible();
   await expect(frame.locator('#reading-closing')).toContainText('신강·신약');
+});
+
+test('묶음 한 건에서 세 풀이를 바꾸고 각각 다운로드하며 구매 매출은 한 번만 기록한다', async ({ page }) => {
+  const id = 'fortune_00000000-0000-4000-8000-000000000066';
+  const result = createFortuneReport({ productId: 'bundle', people: [person], targetYear: 2027, privacyConsent: true }, today);
+  await page.route(`**/api/commerce/orders/${id}`, route => route.fulfill({ json: {
+    id, productId: 'bundle', title: result.title, targetYear: 2027, amount: 990, status: 'PAID', mode: 'live',
+  } }));
+  await page.route(`**/orders/${id}/report?*`, route => {
+    const part = new URL(route.request().url()).searchParams.get('reading');
+    return route.fulfill({ contentType: 'text/html', body: result.reports[part] });
+  });
+  await page.goto(`/shop/result/?orderId=${id}`);
+  for (const [part, label] of [['tojeong', '토정비결'], ['lifetime', '평생 사주'], ['annual', '2027년 신년운세']]) {
+    const nav = page.getByRole('navigation', { name: '구매한 풀이 선택' });
+    const link = nav.getByRole('link', { name: label, exact: true });
+    if (part !== 'tojeong') await link.click();
+    await expect(link).toHaveAttribute('aria-current', 'page');
+    await expect(page.frameLocator('[data-purchase-report]').locator('h1').first()).toContainText(part === 'annual' ? '2027년 신년운세' : label);
+    await expect(page.locator('[data-purchase-download]')).toHaveAttribute('href', `/api/commerce/orders/${id}/report?reading=${part}&download=1`);
+    const purchases = await page.evaluate(() => window.commerceEvents.filter(e => e[1] === 'purchase').map(e => e[2]));
+    if (part === 'tojeong') expect(purchases).toMatchObject([{ value: 990, currency: 'KRW', items: [{ item_id: 'bundle', quantity: 1 }] }]);
+    else expect(purchases).toEqual([]);
+  }
 });

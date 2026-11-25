@@ -92,7 +92,7 @@ export function animalYear(t, y, ctx) {
     </section>
     <section class="cohort-picker box card"><h2>${siteText("내 출생 연도로 보기")}</h2>${cohortTable}<label for="tti-birth-year">${siteText("출생 연도")}<select class="input" id="tti-birth-year" data-cohort data-tti="${siteValue(t)}" data-year="${y}"><option value="">${siteValue(r.animal)}${siteText("띠 공통 운세")}</option>${cohorts.map((c) => `<option value="${c.birthYear}">${c.birthYear}${siteText("년생 · ")}${c.pillarText}</option>`).join('')}</select></label><p data-cohort-text aria-live="polite">${siteText("출생 연도를 선택하면 해당 연생의 해석과 월별 점수만 보여드립니다.")}</p><p class="hint">${siteText("위 총운·분야별 해석은 띠 공통입니다. 띠는 입춘 기준이므로 1월~2월 초 출생은 앞 띠일 수 있습니다. 개인 원국 전체를 반영한 결과는 사주 운세에서 확인하세요.")}</p></section>
     <section class="box-sec"><h2>${y}${siteText("년 1~12월 운세")}</h2><p class="hint">${siteText("각 달 15일의 월운 65% + 연간 점수 35%에 출생 연도의 천간 관계를 반영합니다. 월별 점수는 이 사이트의 해석 규칙이며 통계적 예측값이 아닙니다.")}</p><div class="monthly-flow" data-monthly-flow>${ttiMonthCards(ttiMonths(t, y))}</div>${cohortData(t, y, r)}</section>
-    <p class="cta"><a class="btn" href="/year/${y}/">${siteText("내 사주로 ")}${y}${siteText("년 운세 보기")}</a></p>
+    <p class="cta"><a class="btn" href="${y > ctx.today.y ? '/shop/bundle/' : `/year/${y}/`}">${siteText("내 사주로 ")}${y}${siteText("년 운세 보기")}${y > ctx.today.y ? tr(' · 3종 묶음 990원', ' · bundle KRW 990') : ''}</a></p>
     ${faqBlock(faq)}
     <nav class="chips" aria-label="${siteText("다른 띠")}">${ANIMAL.map((n, i) => `<a class="chip${i === t ? ' on' : ''}" href="/tti/${y}/${ANIMAL_SLUG[i]}/">${animalIcon(i)}${siteValue(n)}${siteText("띠")}</a>`).join('')}</nav>
     <p class="updated">${siteText("최종 업데이트 ")}${ctx.buildDate} · <a href="/about/">${siteText("계산 방법")}</a></p></article>`;

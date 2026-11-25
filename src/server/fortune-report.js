@@ -5,7 +5,7 @@ import { yearView } from '../client/views.js';
 import { birthDateError } from '../domain/birth-input.js';
 import { resolveBirthTime } from '../domain/birth-time.js';
 import { birthTimesFor } from '../engine/chart.js';
-import { fortuneProduct } from '../domain/fortune-products.js';
+import { bundleReadings, fortuneProduct } from '../domain/fortune-products.js';
 import { tojeongPremium, lifetimePremium, compatibilityPremium, reportDocument } from './premium-report.js';
 import { withLanguage } from '../i18n/runtime.js';
 
@@ -44,6 +44,19 @@ export function createFortuneReport(input, today = todayKST()) {
     if (input.privacyConsent !== true) throw new PurchaseError('출생 정보 처리에 동의해 주세요.');
     if (!Array.isArray(input.people) || input.people.length !== product.people) throw new PurchaseError('상품에 필요한 출생 정보를 모두 입력해 주세요.');
     const people = input.people.map(p => person(p, product.id === 'tojeong', today));
+    if (product.id === 'bundle') {
+      const targetYear = input.targetYear;
+      if (targetYear !== today.y + 1) throw new PurchaseError('신년운세 연도가 바뀌었습니다. 상품 페이지를 새로 열어 주세요.', 409);
+      const tojeongYear = input.tojeongYear ?? targetYear;
+      const reports = {};
+      let summary;
+      for (const { id } of bundleReadings) {
+        const reading = createFortuneReport({ ...input, productId: id, targetYear: id === 'tojeong' ? tojeongYear : targetYear }, today);
+        reports[id] = reading.html;
+        if (id === 'tojeong') summary = reading.summary;
+      }
+      return { product, normalized: { productId: product.id, people, targetYear, tojeongYear }, title: `${people[0].name || '나'}의 운세 3종 묶음 · ${targetYear}년 신년운세 포함`, summary, reports };
+    }
     let targetYear = null, title, summary, body;
     if (product.id === 'tojeong') {
       targetYear = input.targetYear;

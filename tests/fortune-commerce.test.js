@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { todayKST } from '../src/engine/core.js';
 import assert from 'node:assert/strict';
 import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
@@ -12,7 +13,7 @@ import { FORTUNE_PRODUCTS } from '../src/domain/fortune-products.js';
 import { createSite } from '../src/site/render.js';
 
 const person = { name: '테스트', calendar: 'solar', y: 1990, m: 5, d: 17, gender: 'M', noTime: true, timeMode: 'exact' };
-const input = (productId = 'lifetime') => ({ productId, people: productId === 'compatibility' ? [person, { ...person, name: '상대', gender: 'F', y: 1991 }] : [person], targetYear: 2026, privacyConsent: true, purchaseConsent: true, amount: 1 });
+const input = (productId = 'bundle') => ({ productId, people: productId === 'compatibility' ? [person, { ...person, name: '상대', gender: 'F', y: 1991 }] : [person], targetYear: productId === 'bundle' ? todayKST().y + 1 : 2026, privacyConsent: true, purchaseConsent: true, amount: 1 });
 async function fixture(t) {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'fortune-commerce-test-'));
   t.after(() => rm(dir, { recursive: true, force: true }));
@@ -33,8 +34,8 @@ async function fixture(t) {
   return { config, store, service, order, auth, payment, payments, approvals: () => approvals, cancellations: () => cancellations, fail: (cancel = false) => { failApproval = true; failCancel = cancel; } };
 }
 
-test('네 상품은 각각 990원 KRW 단건 구매 단위를 갖는다', () => {
-  assert.deepEqual(FORTUNE_PRODUCTS.map(p => [p.id, p.price, p.people]), [['tojeong', 990, 1], ['lifetime', 990, 1], ['compatibility', 990, 2], ['annual', 990, 1]]);
+test('3종 묶음과 궁합은 각각 990원 KRW 단건 구매 단위를 갖는다', () => {
+  assert.deepEqual(FORTUNE_PRODUCTS.map(p => [p.id, p.price, p.people]), [['bundle', 990, 1], ['compatibility', 990, 2]]);
   for (const p of FORTUNE_PRODUCTS) assert.equal(p.currency, 'KRW');
 });
 for (const id of ['tojeong', 'lifetime', 'compatibility']) test(`${id}: 기존 엔진으로 상세 파일을 생성하고 모든 토정 월을 파일에 포함한다`, () => {
@@ -53,14 +54,14 @@ test('서버 가격을 사용하고 같은 대상의 반복 주문을 재사용�
   const duplicates = await Promise.all(Array.from({ length: 4 }, () => f.service.create(input(), 'owner-a')));
   assert.ok(duplicates.every(o => o.id === f.order.id));
   const restarted = createOrderStore(f.config.directory);
-  assert.equal((await restarted.get(f.order.id)).html, f.order.html);
+  assert.deepEqual((await restarted.get(f.order.id)).reports, f.order.reports);
 });
 test('미승인 주문·타인 주문으로 상세 풀이를 받지 못한다', async t => {
   const f = await fixture(t);
   await assert.rejects(f.service.get(f.order.id, 'owner-a', true), e => e.status === 402);
   await assert.rejects(f.service.get(f.order.id, 'owner-b', true), e => e.status === 404);
   assert.deepEqual(await f.service.list('owner-b'), []);
-  assert.equal((await f.service.list('owner-a'))[0].html, undefined);
+  assert.equal((await f.service.list('owner-a'))[0].reports, undefined);
 });
 test('금액·서명·상점·state 위변조를 승인 전에 차단한다', async t => {
   const f = await fixture(t);
@@ -104,7 +105,7 @@ test('정상 승인과 동시 콜백 재전송은 한 번만 청구하고 전체
   const f = await fixture(t);
   const ids = await Promise.all([f.service.callback(f.auth, f.order.state), f.service.callback(f.auth, f.order.state)]);
   assert.deepEqual(ids, [f.order.id, f.order.id]); assert.equal(f.approvals(), 1);
-  assert.equal((await f.service.get(f.order.id, 'owner-a', true)).html, f.order.html);
+  assert.deepEqual((await f.service.get(f.order.id, 'owner-a', true)).reports, f.order.reports);
 });
 test('재시작 후 승인 여부가 불확실한 기존 거래는 콜백으로 재청구하지 않는다', async t => {
   const f = await fixture(t);
@@ -212,7 +213,7 @@ test('실제 API: 설정 미완료는 503, 미리보기는 동의·동일 출처
   assert.equal((await request(app, '/orders', { method: 'POST', body: input() })).status, 503);
   assert.equal((await request(app, '/preview', { method: 'POST', body: input(), external: true })).status, 403);
   const preview = await request(app, '/preview', { method: 'POST', body: input() });
-  assert.equal(preview.status, 200); assert.ok(preview.json().summary); assert.equal(preview.json().html, undefined);
+  assert.equal(preview.status, 200); assert.ok(preview.json().summary); assert.equal(preview.json().reports, undefined); assert.equal(preview.json().html, undefined);
   assert.equal(preview.headers['cache-control'], 'no-store');
 });
 test('실제 API: 외부 POST 콜백은 구매자 쿠키를 바꾸지 않으며 승인 전·타인은 다운로드할 수 없다', async t => {
@@ -228,7 +229,18 @@ test('실제 API: 외부 POST 콜백은 구매자 쿠키를 바꾸지 않으며 
   const callback = await request(app, `/nicepay/return?state=${order.state}`, { method: 'POST', form: true, external: true, body: { ...f.auth, orderId: id } });
   assert.equal(callback.status, 303); assert.equal(callback.headers['set-cookie'], undefined); assert.equal(callback.headers.location, `/shop/result/?orderId=${id}`);
   const download = await request(app, `/orders/${id}/report?download=1`, { cookie });
-  assert.equal(download.status, 200); assert.match(download.headers['content-disposition'], /attachment; filename="fortune-lifetime-/); assert.match(download.text, /<!doctype html>/); assert.match(download.headers['content-security-policy'], /sandbox/);
+  assert.equal(download.status, 200); assert.match(download.headers['content-disposition'], /attachment; filename="fortune-tojeong-/); assert.match(download.text, /<!doctype html>/); assert.match(download.headers['content-security-policy'], /sandbox/);
+  for (const [part, marker] of [['tojeong', 'tj-month-12'], ['lifetime', 'reading-nature'], ['annual', 'reading-quarters']]) {
+    const file = await request(app, `/orders/${id}/report?reading=${part}&download=1`, { cookie });
+    assert.equal(file.status, 200);
+    assert.ok(file.text.includes(`id="${marker}"`));
+    assert.ok(file.headers['content-disposition'].includes(`fortune-${part}-`));
+    assert.equal((await request(app, `/orders/${id}/report?reading=${part}`)).status, 404);
+  }
+  assert.equal((await request(app, `/orders/${id}/report?reading=compatibility`, { cookie })).status, 404);
+  for (const retired of ['tojeong', 'lifetime', 'annual']) {
+    assert.equal((await request(app, '/orders', { method: 'POST', cookie, body: input(retired) })).status, 409);
+  }
   f.payments.set('TEST_TID', f.payment(order, 'cancelled'));
   assert.equal((await request(app, `/orders/${id}/report?download=1`, { cookie })).status, 402);
 });
@@ -315,26 +327,31 @@ test('한국 시간 새해에 상세판이 무료로 이동하고 지난 연도�
   const before = siteAt(clock), after = siteAt(next);
   for (const prefix of ['', '/en']) {
     assert.ok(before.has(prefix + '/year/2027/premium/'));
-    assert.match(before.render(prefix + '/shop/'), /href="(?:\/en)?\/year\/2027\/premium\/"/);
+    assert.match(before.render(prefix + '/shop/'), /href="(?:\/en)?\/shop\/bundle\/"/);
     assert.equal(after.redirect(prefix + '/year/2027/premium/'), prefix + '/year/2027/');
     assert.match(before.render(prefix + '/year/2026/'), /data-annual-tier="full"/);
-    assert.match(before.render(prefix + '/year/2027/'), /data-annual-tier="preview"/);
+    assert.equal(before.render(prefix + '/year/2027/'), null);
     assert.match(after.render(prefix + '/year/2027/'), /data-annual-tier="full"/);
-    assert.match(after.render(prefix + '/year/2028/'), /data-annual-tier="preview"/);
+    assert.equal(after.render(prefix + '/year/2028/'), null);
     assert.ok(after.has(prefix + '/year/2028/premium/'));
-    assert.match(after.render(prefix + '/shop/'), /href="(?:\/en)?\/year\/2028\/premium\/"/);
+    assert.match(after.render(prefix + '/shop/'), /href="(?:\/en)?\/shop\/bundle\/"/);
   }
   const { config, store } = await fixture(t);
   const service = createCommerceService({ config, store, now: () => clock });
-  const buy = { ...input('annual'), targetYear: 2027 };
+  const buy = { ...input('bundle'), targetYear: 2027 };
   const order = await service.create(buy, 'annual-buyer');
-  assert.match((await service.payment(order.id, 'annual-buyer')).goodsName, /2027년 프리미엄 운세/);
+  assert.match((await service.payment(order.id, 'annual-buyer')).goodsName, /내 운세 3종 묶음/);
+  const legacy = { ...order, id: 'fortune_00000000-0000-4000-8000-000000000005', productId: 'annual', owner: 'old-buyer', html: order.reports.annual };
+  delete legacy.reports;
+  await store.put(legacy);
   clock = next;
   assert.equal((await service.list('annual-buyer'))[0].canPay, false);
+  await assert.rejects(service.payment(order.id, 'annual-buyer'), /연도/);
+  assert.equal((await service.list('old-buyer'))[0].canPay, false);
   await assert.rejects(service.create(buy, 'annual-buyer'), /연도/);
-  await assert.rejects(service.payment(order.id, 'annual-buyer'), /무료/);
+  await assert.rejects(service.payment(legacy.id, 'old-buyer'), /무료/);
   const nextOrder = await service.create({ ...buy, targetYear: 2028 }, 'annual-buyer');
   assert.match(nextOrder.title, /2028년/);
   assert.notEqual(order.id, nextOrder.id);
-  assert.equal((await store.get(order.id)).html, order.html);
+  assert.deepEqual((await store.get(order.id)).reports, order.reports);
 });

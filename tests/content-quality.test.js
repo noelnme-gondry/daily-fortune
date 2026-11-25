@@ -8,7 +8,7 @@ const origin = 'https://fortune.example';
 const site = createSite({ site: origin, assets: {}, now: Date.parse('2026-10-24T12:00:00+09:00') });
 
 test('공개 계산 예시는 main 안에서 코드가 배치한 광고보다 먼저 읽힌다', () => {
-  for (const prefix of ['', '/en']) for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/lifetime/', '/compatibility/', '/life-story/', '/saju-ranking/', '/manseryeok/', '/year/2027/']) {
+  for (const prefix of ['', '/en']) for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/lifetime/', '/compatibility/', '/life-story/', '/saju-ranking/', '/manseryeok/', '/year/2026/']) {
     const html = site.render(`${prefix}${path}`);
     const example = html.indexOf('id="public-example"');
     assert.ok(example > html.indexOf('<main'), path);

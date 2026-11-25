@@ -39,7 +39,7 @@ export function navItems(ctx) {
 function footerGroups(ctx) {
   const y = ctx.today.y;
   return [
-    ['운세', [['/today/', '오늘의 운세'], ['/tomorrow/', '내일의 운세'], ['/week/', '이번 주 운세'], ['/month/', '이달의 운세'], [`/year/${y}/`, `${y}년 운세`], [`/year/${y + 1}/`, `${y + 1}년 운세`], ['/lifetime/', '평생 운세'], ['/shop/tojeong/', '토정비결 · 990원'], ['/compatibility/', '사주 궁합']]],
+    ['운세', [['/today/', '오늘의 운세'], ['/tomorrow/', '내일의 운세'], ['/week/', '이번 주 운세'], ['/month/', '이달의 운세'], [`/year/${y}/`, `${y}년 운세`], ['/lifetime/', '평생 운세'], ['/shop/bundle/', tr('내 운세 3종 묶음 · 990원', 'Three-reading bundle · KRW 990')], ['/compatibility/', '사주 궁합']]],
     ['재미로 보는 사주', [['/life-story/', '사주로 본 내 인생은?'], ['/saju-ranking/', '내 사주 랭킹'], ['/saju/ilju-ranking/', '60일주 랭킹']]],
     ['띠·만세력', [['/tti/', '띠별 운세'], ['/tti/today/', '띠별 오늘의 운세'], [`/tti/${y}/`, `${y}년 띠별 운세`], ['/tti/samjae/', '삼재 띠 계산'], ['/tti/compatibility/', '띠 궁합표'], ['/manseryeok/', '만세력 계산기'], [`/manseryeok/${y}/`, `${y}년 만세력`]]],
     ['사주 백과', [['/saju/ilju/', '60일주'], ['/saju/ilgan/', '일간 10가지'], ['/saju/sipsin/', '십신'], ['/saju/ohaeng/', '오행'], ['/saju/sinsal/', '신살'], ['/saju/12unseong/', '12운성'], ['/saju/glossary/', '사주 용어 사전'], ['/saju/guide/', '사주 보는 법']]],

@@ -5,21 +5,21 @@ import { NICEPAY_PAYMENT_METHODS } from '../domain/payment-methods.js';
 
 const sent = new Set();
 const item = product => ({ item_id: product.id, item_name: product.name, item_category: '프리미엄 운세', price: product.price, quantity: 1 });
-// 경로에 대응하는 독립 조회 이벤트. 언어·연도가 바뀌어도 상품별 시계열을 유지한다.
+// 실제 판매 화면의 상품을 기준으로 기존 상세 주소도 같은 묶음으로 집계한다.
 export function trackShopPage(path = location.pathname) {
   const base = path.replace(/^\/en(?=\/)/, '');
-  if (base === '/shop/') return track('view_shop');
-  const annual = /^\/year\/(\d{4})\/premium\/$/.exec(base);
-  if (annual) return track('view_annual', { reading_year: Number(annual[1]) });
-  const match = /^\/(?:shop\/)?(tojeong|compatibility|lifetime)\/$/.exec(base);
-  if (match) return track(`view_${match[1]}`);
+  if (base === '/shop/') return track('view_shop', { commerce_version: '5' });
+  const page = document.querySelector('[data-fortune-product], [data-sale-product]');
+  const id = page?.dataset.fortuneProduct || page?.dataset.saleProduct;
+  if (id !== 'bundle' && id !== 'compatibility') return;
+  const year = Number(page.dataset.readingYear);
+  return track(`view_${id}`, { commerce_version: '5', ...(year ? { reading_year: year } : {}) });
 }
-
 export function trackCommerceStep(event, productId, method) {
   const product = fortuneProduct(productId);
   const paymentType = NICEPAY_PAYMENT_METHODS.find(m => m.id === method)?.id;
   if (product && ['view_item', 'checkout_input_start', 'checkout_subject_confirm', 'begin_checkout', 'payment_attempt', 'add_payment_info'].includes(event)) track(event, {
-    commerce_version: '4', currency: product.currency, value: product.price, items: [item(product)], ...(paymentType ? { payment_type: paymentType } : {}),
+    commerce_version: '5', currency: product.currency, value: product.price, items: [item(product)], ...(paymentType ? { payment_type: paymentType } : {}),
   });
 }
 export function trackCheckoutError(productId, stage, errorCode) {
@@ -28,7 +28,7 @@ export function trackCheckoutError(productId, stage, errorCode) {
   const stages = ['configuration', 'input', 'preview', 'order_create', 'sdk_load', 'payment_prepare', 'payment_window', 'payment_return', 'report_load'];
   const codes = ['consent_required', 'invalid_input', 'http_4xx', 'http_5xx', 'request_failed', 'provider_error', 'provider_check_required'];
   if (stages.includes(stage) && codes.includes(errorCode)) track('purchase_error', {
-    commerce_version: '4', checkout_stage: stage, error_code: errorCode, ...(product ? { items: [item(product)] } : {}),
+    commerce_version: '5', checkout_stage: stage, error_code: errorCode, ...(product ? { items: [item(product)] } : {}),
   });
 }
 
@@ -37,7 +37,7 @@ const listViews = new Set();
 let stops = [], listening = false;
 function listParams(card) {
   const product = fortuneProduct(card.dataset.commerceItem), list = card.dataset.commerceList;
-  return product && listIds.includes(list) ? { commerce_version: '4', item_list_id: list, items: [{ ...item(product), item_list_id: list }] } : null;
+  return product && listIds.includes(list) ? { commerce_version: '5', item_list_id: list, items: [{ ...item(product), item_list_id: list }] } : null;
 }
 export function initCommerceLists() {
   stops.forEach(stop => stop?.());
@@ -49,7 +49,7 @@ export function initCommerceLists() {
   if (listening) return;
   listening = true;
   document.addEventListener('click', e => {
-    if (e.target.closest('[data-premium-menu]')) track('premium_menu_click', { commerce_version: '4' });
+    if (e.target.closest('[data-premium-menu]')) track('premium_menu_click', { commerce_version: '5' });
     const link = e.target.closest('[data-commerce-select]'), card = link?.closest('[data-commerce-item]');
     const params = card && listParams(card);
     if (params) track('select_item', params);
@@ -62,7 +62,8 @@ export function trackPurchase(order) {
   const key = `myod:purchase:${order.id}`;
   if (sent.has(key)) return false;
   try { if (localStorage.getItem(key) === 'sent') return false; } catch { /* GA4 transaction_id 중복 방지와 메모리 기록을 사용한다. */ }
-  if (!track('purchase', { commerce_version: '4', transaction_id: order.id, currency: product.currency, value: order.amount, items: [item(product)] })) return false;
+  const version = product.id === 'bundle' || product.id === 'compatibility' ? '5' : '4';
+  if (!track('purchase', { commerce_version: version, transaction_id: order.id, currency: product.currency, value: order.amount, items: [item(product)] })) return false;
   sent.add(key);
   // 매출과 통화는 표준 purchase 한 건에서만 집계한다.
   track(`purchase_${product.id}`, {

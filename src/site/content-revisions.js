@@ -2,6 +2,7 @@
 // 두 언어에 공통인 편집은 같은 경로로 조회하고 언어별 편집은 따로 기록한다.
 export const CONTENT_BASE_DATE = '2026-10-16';
 export const CONTENT_REVISIONS = Object.freeze([
+  { date: '2026-11-26', match: /^\/(?:$|shop\/|year\/|tojeong\/|lifetime\/$)/ },
   { date: '2026-11-24', lang: 'ko', match: /^\/(?:$|saju\/sipsin\/pyeonjae\/$|tti\/samjae\/$)/ },
   { date: '2026-11-19', match: /^\/(?:year\/\d{4}\/|tti\/\d{4}\/[^/]+\/)$/ },
   { date: '2026-11-18', match: /^\/(?:$|shop\/|year\/|privacy\/)/ },

@@ -17,7 +17,7 @@ for (const lang of ['ko', 'en']) {
   test(`${lang}: 홈은 전용 무료운세 메타와 기존 서비스 목록을 가이드보다 앞에 제공한다`, () => withLanguage(lang, () => {
     const html = site.render(`${prefix}/`), body = main(html);
     assert.ok(html.includes(`<title>${esc(HOME.title)}</title>`));
-    assert.ok(html.includes(`<meta name="description" content="${esc(HOME.description.replace('{year}', 2027))}">`));
+    assert.ok(html.includes(`<meta name="description" content="${esc(HOME.description.replace('{year}', 2026))}">`));
     assert.ok(body.includes(`<h1>${esc(HOME.h1)}</h1>`));
     assert.ok(body.includes(`<p class="lead">${esc(HOME.lead)}</p>`));
     assert.ok(body.includes(HOME_ACCESS.a));
@@ -29,7 +29,7 @@ for (const lang of ['ko', 'en']) {
     const paths = [...cards.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
     assert.equal(new Set(paths).size, paths.length);
     for (const path of paths) assert.ok(site.has(path), path);
-    for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/year/2026/', '/year/2027/', '/lifetime/', '/compatibility/', '/life-story/', '/saju-ranking/', '/tojeong/', '/manseryeok/']) assert.ok(paths.includes(`${prefix}${path}`));
+    for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/year/2026/', '/shop/bundle/', '/compatibility/', '/life-story/', '/saju-ranking/', '/manseryeok/']) assert.ok(paths.includes(`${prefix}${path}`));
     if (!prefix) assert.equal(HOME.title, `무료운세 | 오늘의 운세·사주·궁합 - ${BRAND.name}`);
     assert.equal(site.page(`${prefix}/today/`).title, TOOLS.today.title, '오늘 제목은 유지');
   }));
@@ -42,7 +42,7 @@ for (const lang of ['ko', 'en']) {
     for (const attribute of ['name="description"', 'property="og:description"', 'name="twitter:description"']) {
       const tags = [...html.matchAll(new RegExp(`<meta ${attribute} content="([^"]+)">`, 'g'))];
       assert.equal(tags.length, 1, attribute);
-      assert.equal(tags[0][1], esc(HOME.description.replace('{year}', 2027)), attribute);
+      assert.equal(tags[0][1], esc(HOME.description.replace('{year}', 2026)), attribute);
     }
     const graph = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1])['@graph'];
     assert.equal(graph.find(node => node['@type'] === 'WebPage').description, description);
@@ -109,9 +109,10 @@ test('한국어 홈과 삼재 검색 문구는 KST 연도가 바뀔 때 실제 �
   ]) {
     const current = createSite({ site: origin, assets: {}, now: Date.parse(instant) });
     const home = current.render('/');
-    assert.ok(home.includes(`${nextYear}년 신년운세의 총운과 월별 점수는 무료`));
-    assert.ok(home.includes(`href="/year/${nextYear}/">${nextYear}년 총운과 월별 점수`));
-    assert.ok(current.has(`/year/${nextYear}/`));
+    assert.ok(home.includes(`${nextYear - 1}년 신년운세는 무료`));
+    assert.ok(home.includes(`${nextYear}년 신년운세는 세 가지를 묶어 990원`));
+    assert.ok(!home.includes(`href="/year/${nextYear}/"`));
+    assert.equal(current.has(`/year/${nextYear}/`), false);
     assert.ok(current.render('/tti/samjae/').includes(`<title>${expectedTitle}</title>`));
     assert.equal(current.page('/en/tti/samjae/').title, 'Samjae — The Three-Year Zodiac Caution Cycle');
   }

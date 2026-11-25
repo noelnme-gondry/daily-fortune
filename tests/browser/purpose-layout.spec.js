@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { completeProfile, editProfile } from './helpers/profile.js';
 import { contrastRatios } from './helpers/contrast.js';
 
-const screens = ['/', '/today/', '/tomorrow/', '/week/', '/month/', '/year/2027/', '/lifetime/', '/manseryeok/', '/compatibility/', '/life-story/', '/saju-ranking/', '/tojeong/', '/tti/today/rat/', '/tti/2027/rat/', '/saju/ilju-ranking/', '/saju/glossary/', '/saju/ilgan/', '/saju/ohaeng/', '/guides/', '/about/'];
+const screens = ['/', '/today/', '/tomorrow/', '/week/', '/month/', '/year/2026/', '/lifetime/', '/manseryeok/', '/compatibility/', '/life-story/', '/saju-ranking/', '/tojeong/', '/tti/today/rat/', '/tti/2027/rat/', '/saju/ilju-ranking/', '/saju/glossary/', '/saju/ilgan/', '/saju/ohaeng/', '/guides/', '/about/'];
 
 test.beforeEach(async ({ context, page }) => {
   await context.route('https://**/*', route => route.abort());
@@ -28,7 +28,9 @@ for (const lang of ['ko', 'en']) for (const colorScheme of ['light', 'dark']) {
           await page.locator('#tool-form [type=submit]').click();
           await expect(page.locator('#result .chart-card, #result .report-head, #result .chapter-card').first()).toBeAttached();
           if (path === '/saju-ranking/') await page.locator('[data-rank-reveal]').click();
-          await expect(page.locator('#result details,#result [data-disclosure]')).toHaveCount(0);
+          const folds = page.locator('#result details,#result [data-disclosure]');
+          await expect(folds).toHaveCount(path === '/year/2026/' ? 1 : 0);
+          if (path === '/year/2026/') await expect(folds).toHaveClass('reading-fold');
           if (path === '/lifetime/') await expect(page.locator('#result .chart-svg')).toBeVisible();
           if (path === '/saju-ranking/') await expect(page.locator('.rank-distribution svg')).toBeVisible();
         }

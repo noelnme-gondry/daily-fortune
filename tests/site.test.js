@@ -30,16 +30,23 @@ test('내부 링크는 리디렉션되는 주소를 가리키지 않는다', () 
   }
 });
 
+const expectedCanonical = path => {
+  if (/\/shop\/(tojeong|lifetime)\/$|\/year\/\d{4}\/premium\/$/.test(path)) return path.startsWith('/en/') ? '/en/shop/bundle/' : '/shop/bundle/';
+  return site.ctx.cfg.paidReadings ? path.replace('/shop/compatibility/', '/compatibility/') : path;
+};
+
 test('제목·설명은 고유하고 canonical·OG가 대표 주소를 따른다', () => {
   const titles = new Set(), descs = new Set();
   for (const [path, html] of pages) {
     const t = head(html, /<title>(.*?)<\/title>/);
     const d = head(html, /<meta name="description" content="(.*?)">/);
     assert.ok(t && d, path);
-    assert.ok(!titles.has(t), `제목 중복: ${t}`);
-    assert.ok(!descs.has(d), `설명 중복: ${path}`);
-    titles.add(t); descs.add(d);
-    const canonical = site.ctx.cfg.paidReadings ? path.replace(/\/shop\/(lifetime|tojeong|compatibility)\//, '/$1/') : path;
+    if (expectedCanonical(path) === path) {
+      assert.ok(!titles.has(t), `제목 중복: ${t}`);
+      assert.ok(!descs.has(d), `설명 중복: ${path}`);
+      titles.add(t); descs.add(d);
+    }
+    const canonical = expectedCanonical(path);
     assert.equal(head(html, /<link rel="canonical" href="(.*?)">/), `${SITE}${canonical}`);
     assert.equal(head(html, /<meta property="og:url" content="(.*?)">/), `${SITE}${canonical}`);
     assert.equal((html.match(/<h1[\s>]/g) || []).length, 1, `${path}: h1은 하나`);
@@ -71,7 +78,7 @@ test('한국어와 영어 페이지는 같은 사이트와 발행자를 가리�
   const englishBrand = withLanguage('en', () => BRAND.name);
   for (const [path, html] of pages) {
     const nodes = JSON.parse(head(html, /<script type="application\/ld\+json">(.*?)<\/script>/s))['@graph'];
-    const canonical = site.ctx.cfg.paidReadings ? path.replace(/\/shop\/(lifetime|tojeong|compatibility)\//, '/$1/') : path;
+    const canonical = expectedCanonical(path);
     const webpage = nodes.find((node) => node['@id'] === `${SITE}${canonical}#webpage`);
     assert.equal(webpage.url, `${SITE}${canonical}`, path);
     assert.equal(webpage.inLanguage, path.startsWith('/en/') ? 'en' : 'ko-KR', path);
@@ -125,7 +132,7 @@ test('연도별 만세력 Dataset 설명은 Google 길이 기준을 충족하고
 
 test('sitemap·robots·rss·llms.txt', () => {
   const sm = site.sitemap();
-  assert.equal((sm.match(/<loc>/g) || []).length, site.routes.filter(r => !/\/shop\/(orders|result)\//.test(r.path) && !(site.ctx.cfg.paidReadings && /\/shop\/(lifetime|tojeong|compatibility)\//.test(r.path))).length);
+  assert.equal((sm.match(/<loc>/g) || []).length, site.routes.filter(r => !r.noindex && expectedCanonical(r.path) === r.path).length);
   assert.ok(site.robots().includes(`Sitemap: ${SITE}/sitemap.xml`));
   for (const bot of ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended', 'Yeti']) assert.ok(site.robots().includes(bot));
   assert.ok(site.rss().includes('<rss version="2.0"'));
@@ -138,7 +145,7 @@ test('날짜가 바뀌는 페이지는 기준 날짜를 반영한다', () => {
   assert.ok(site.render('/tomorrow/').includes('2026년 10월 15일'));
   assert.ok(site.render('/tti/today/').includes('10월 14일'));
   const next = createSite({ site: SITE, assets: { css: '/a.css', js: '/a.js' }, now: Date.UTC(2027, 0, 2, 3) });
-  assert.ok(next.has('/year/2028/'));
+  assert.ok(!next.has('/year/2028/'));
   assert.ok(next.has('/year/2026/'));
 });
 

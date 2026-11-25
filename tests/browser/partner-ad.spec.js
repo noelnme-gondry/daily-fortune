@@ -233,7 +233,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
   test(`${width}px 공개 예시·기능 안내는 광고 앞에 읽히고 광고와 본문이 잘리지 않는다`, async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-10-15T12:00:00+09:00'));
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ['/today/', '/manseryeok/', '/year/2027/', '/tojeong/2027/', '/tti/2027/', '/manseryeok/2027/']) {
+    for (const path of ['/today/', '/manseryeok/', '/year/2026/', '/tojeong/2027/', '/tti/2027/', '/manseryeok/2027/']) {
       await page.goto(path);
       const slot = page.locator('[data-partner-ad-slot]');
       await expect(slot).toHaveAttribute('data-ad-state', 'initialized');
@@ -255,7 +255,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
         expect(await paragraph.evaluate((el) => parseFloat(window.getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(15);
         expect(await paragraph.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
       }
-      if (width <= 390 && path === '/year/2027/') {
+      if (width <= 390 && path === '/year/2026/') {
         const cards = await page.locator('.year-option').all();
         expect(cards).toHaveLength(4);
         expect((await cards[1].boundingBox()).y).toBeGreaterThan((await cards[0].boundingBox()).y);
@@ -274,7 +274,7 @@ for (const variant of ['A', 'B']) {
   test(`360px 새 예시가 있는 계산기의 ${variant} 광고는 재계산·복원 때 한 개로 유지된다`, async ({ page }) => {
     await page.addInitScript(({ key, variant }) => localStorage.setItem(key, variant), { key: AD_POSITION_EXPERIMENT.storageKey, variant });
     await page.setViewportSize({ width: 360, height: 900 });
-    for (const path of ['/today/', '/tomorrow/', '/manseryeok/', '/year/2027/', '/tojeong/2027/']) {
+    for (const path of ['/today/', '/tomorrow/', '/manseryeok/', '/year/2026/', '/tojeong/2027/']) {
       await calculateResult(page, path, variant);
       const slot = page.locator('[data-partner-ad-slot]');
       await expect(slot).toHaveAttribute('data-ad-state', 'initialized');

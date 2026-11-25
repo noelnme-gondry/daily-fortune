@@ -22,7 +22,7 @@ async function preview(page, product = 'lifetime') {
     await page.locator(`#${who}-y`).fill('1990');
     await page.locator(`#${who}-m`).selectOption('5');
     await page.locator(`#${who}-d`).selectOption('17');
-    if (product !== 'tojeong') await page.locator(`[name="${who}-gender"][value="F"]`).check();
+    await page.locator(`[name="${who}-gender"][value="F"]`).check();
   }
   await page.getByRole('button', { name: '운세보기', exact: true }).click();
   await page.locator('[data-preview-options] summary').click();
@@ -32,12 +32,12 @@ async function preview(page, product = 'lifetime') {
 }
 for (const width of [320, 390, 768, 1440]) test(`${width}px: 콘텐츠의 목차 박스는 관련 상품으로 연결되고 노출·선택을 구분한다`, async ({ page }) => {
   await page.setViewportSize({ width, height: 800 });
-  for (const [path, product] of [['/tti/today/rat/', 'lifetime'], ['/tti/compatibility/', 'compatibility'], [`/tti/${todayKST().y}/rat/`, 'tojeong'], ['/en/saju/ilju/eulchuk/', 'lifetime']]) {
+  for (const [path, product] of [['/tti/today/rat/', 'bundle'], ['/tti/compatibility/', 'compatibility'], [`/tti/${todayKST().y}/rat/`, 'bundle'], ['/en/saju/ilju/eulchuk/', 'bundle']]) {
     await page.goto(path);
     const card = page.locator('.premium-entry'), link = card.locator('[data-commerce-select]');
     await expect(card).toHaveCount(1);
     await expect(card.locator('li')).toHaveCount(3);
-    await expect(link).toHaveAttribute('href', `${path.startsWith('/en/') ? '/en' : ''}/${product}/`);
+    await expect(link).toHaveAttribute('href', `${path.startsWith('/en/') ? '/en' : ''}/${product === 'bundle' ? 'shop/bundle' : product}/`);
     expect(await events(page, 'view_item_list')).toHaveLength(0);
     await link.scrollIntoViewIfNeeded();
     await expect.poll(() => events(page, 'view_item_list')).toHaveLength(1);
@@ -56,7 +56,8 @@ test('띠별 SPA 메뉴 이동에서도 추천 상품과 노출의 페이지 경
   await page.locator('.premium-entry [data-commerce-select]').scrollIntoViewIfNeeded();
   await expect.poll(() => events(page, 'view_item_list')).toHaveLength(1);
   await page.locator(`.tti-nav a[href="/tti/${todayKST().y}/"]`).click();
-  await expect(page.locator('.premium-entry')).toHaveAttribute('data-commerce-item', 'tojeong');
+  await expect(page).toHaveURL(url => url.pathname === `/tti/${todayKST().y}/`);
+  await expect(page.locator('.premium-entry')).toHaveAttribute('data-commerce-item', 'bundle');
   await page.locator('.premium-entry [data-commerce-select]').scrollIntoViewIfNeeded();
   await expect.poll(() => events(page, 'view_item_list')).toHaveLength(2);
   expect((await events(page, 'view_item_list'))[1].page_path).toBe(`/tti/${todayKST().y}/`);
@@ -100,13 +101,13 @@ for (const product of ['tojeong', 'lifetime', 'compatibility', 'annual']) test(`
   await page.route(`**/api/commerce/orders/${orderId}/payment`, route => route.fulfill({ json: { orderId, method: 'card', amount: 990 } }));
   await preview(page, product);
   expect(await events(page, 'view_item')).toHaveLength(1);
-  expect(await events(page, `view_${product}`)).toHaveLength(1);
+  expect(await events(page, `view_${product === 'compatibility' ? product : 'bundle'}`)).toHaveLength(1);
   expect(await events(page, 'begin_checkout')).toHaveLength(1);
   expect(await events(page, 'payment_attempt')).toHaveLength(0);
   expect(await events(page, 'add_payment_info')).toHaveLength(0);
   await page.locator('[data-purchase-pay]').click();
   await expect(page.locator('[data-purchase-error]')).toBeVisible();
-  expect(await events(page, 'payment_attempt')).toMatchObject([{ payment_type: 'card', items: [{ item_id: product }] }]);
+  expect(await events(page, 'payment_attempt')).toMatchObject([{ payment_type: 'card', items: [{ item_id: product === 'compatibility' ? product : 'bundle' }] }]);
   expect(await events(page, 'add_payment_info')).toHaveLength(1);
   expect(await events(page, 'purchase_error')).toMatchObject([{ checkout_stage: 'payment_window', error_code: 'provider_error' }]);
   expect(await events(page, 'purchase')).toHaveLength(0);
@@ -143,19 +144,17 @@ test('내부 계산 source를 획득 소스로 보내지 않고 정상 캠페인
   expect(await events(page, 'test_campaign')).toMatchObject([{ source: 'newsletter' }]);
 });
 
-test('상점 조회와 내년 무료 운세의 유료 진입은 각 경로에서 한 번만 기록한다', async ({ page }) => {
+test('상점과 기존 신년운세 구매 URL에서 묶음 조회를 한 번 기록한다', async ({ page }) => {
   const year = todayKST().y + 1;
   await page.goto('/shop/');
   await expect.poll(() => events(page, 'view_shop')).toHaveLength(1);
-  await page.goto(`/year/${year}/`);
-  expect(await events(page, 'view_annual')).toEqual([]);
-  await page.locator('.reading-entry a').filter({ hasText: '프리미엄' }).click();
-  await expect(page).toHaveURL(new RegExp(`/year/${year}/premium/$`));
-  await expect.poll(() => events(page, 'view_annual')).toMatchObject([{ reading_year: year }]);
+  expect((await page.goto(`/year/${year}/`)).status()).toBe(404);
+  await page.goto(`/year/${year}/premium/`);
+  await expect.poll(() => events(page, 'view_bundle')).toMatchObject([{ reading_year: year }]);
   expect(await events(page, 'view_shop')).toEqual([]);
 });
 
-for (const [width, product, saved] of [[375, 'tojeong', false], [1280, 'lifetime', true], [375, 'compatibility', true], [1280, 'compatibility', false]]) {
+for (const [width, product, saved] of [[375, 'bundle', false], [1280, 'bundle', true], [375, 'compatibility', true], [1280, 'compatibility', false]]) {
   test(`${width}px ${product} ${saved ? '저장' : '신규'}: 메뉴에서 미리보기 없이 정확한 대상으로 결제`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     let previewRequests = 0;
@@ -178,7 +177,7 @@ for (const [width, product, saved] of [[375, 'tojeong', false], [1280, 'lifetime
         await page.locator(`#${who}-y`).fill(String(1990 + i));
         await page.locator(`#${who}-m`).selectOption('5');
         await page.locator(`#${who}-d`).selectOption('17');
-        if (product !== 'tojeong') await page.locator(`[name="${who}-gender"][value="F"]`).check();
+        await page.locator(`[name="${who}-gender"][value="F"]`).check();
       }
       await expect(page.locator(`#${who}-y`)).toHaveValue(String(1990 + i));
     }
@@ -190,7 +189,7 @@ for (const [width, product, saved] of [[375, 'tojeong', false], [1280, 'lifetime
       const order = route.request().postDataJSON();
       expect(order.people.map(person => person.y)).toEqual(slots.map((_, i) => 1990 + i));
       if (saved) expect(order.people.map(person => person.name)).toEqual(slots.map((_, i) => String(1990 + i)));
-      expect(order).toMatchObject({ productId: product, purchaseConsent: true, privacyConsent: true });
+      expect(order).toMatchObject({ productId: product === 'compatibility' ? product : 'bundle', purchaseConsent: true, privacyConsent: true });
       return route.fulfill({ json: { id: orderId, status: 'PENDING' } });
     });
     await page.route(`**/orders/${orderId}/payment`, route => route.fulfill({ json: { orderId, method: 'card', amount: 990 } }));
@@ -223,7 +222,7 @@ test('상단 메뉴 클릭만 상품 목록 진입 이벤트로 구분한다', a
   const menu = page.locator('[data-premium-menu]');
   await menu.evaluate(el => el.addEventListener('click', event => event.preventDefault(), { once: true }));
   await menu.click();
-  expect(await events(page, 'premium_menu_click')).toMatchObject([{ commerce_version: '4' }]);
+  expect(await events(page, 'premium_menu_click')).toMatchObject([{ commerce_version: '5' }]);
 });
 
 test('토정비결은 최근 사람·확정한 연도를 표시하고 수정 후 동의한 값만 주문한다', async ({ page }) => {
