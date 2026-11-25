@@ -1,6 +1,7 @@
+import { bundleReadings } from '../domain/fortune-products.js';
 import { birthDateError } from '../domain/birth-input.js';
 import { readForm, fillForm, wireBirthForm, syncTime, check } from './birth-form.js';
-import { listPeople, profileLabel, sessionLoad, sessionSave, load, dateProfileSlots, withProfileReference } from './profile.js';
+import { listPeople, profileLabel, sessionLoad, sessionSave, load, withProfileReference } from './profile.js';
 import { esc } from '../site/util.js';
 import { NICEPAY_PAYMENT_METHODS } from '../domain/payment-methods.js';
 import { trackCommerceStep, trackPurchase, trackCheckoutError } from './purchase-analytics.js';
@@ -48,7 +49,7 @@ async function payOrder(id, method, productId) {
 }
 async function mountProduct(root) {
   const id = root.dataset.fortuneProduct;
-  const pair = id === 'compatibility', dateOnly = id === 'tojeong';
+  const pair = id === 'compatibility';
   const slots = pair ? ['a', 'b'] : ['a'];
   const form = $('#purchase-form'), review = $('[data-purchase-review]');
   const pay = $('[data-purchase-pay]'), preview = $('[data-preview-request]'), summary = $('[data-preview-summary]');
@@ -62,7 +63,7 @@ async function mountProduct(root) {
 
   function describe(p) {
     const parts = [p.name, p.calendar === 'lunar' ? (p.leap ? '음력 윤달' : '음력') : '양력', `${p.y}.${p.m}.${p.d}`];
-    if (!dateOnly) parts.push(p.gender === 'M' ? '남성' : '여성', p.noTime ? '시간 모름' : p.timeMode === 'branch' ? `시진 ${p.timeBranch}` : p.time);
+    parts.push(p.gender === 'M' ? '남성' : '여성', p.noTime ? '시간 모름' : p.timeMode === 'branch' ? `시진 ${p.timeBranch}` : p.time);
     return parts.filter(Boolean).join(' · ');
   }
   function populate(slot, p, collapse) {
@@ -99,12 +100,7 @@ async function mountProduct(root) {
     if (!started) trackCommerceStep('checkout_input_start', id);
     started = true;
   }
-  if (!dateOnly) wireBirthForm(form, slots);
-  else form.addEventListener('change', e => {
-    if (e.target.name !== 'a-cal') return;
-    $('#a-leap').disabled = e.target.value !== 'lunar';
-    if ($('#a-leap').disabled) $('#a-leap').checked = false;
-  });
+  wireBirthForm(form, slots);
   for (const slot of slots) {
     picker(slot).addEventListener('change', () => {
       const person = people.find(p => p.id === picker(slot).value);
@@ -132,8 +128,8 @@ async function mountProduct(root) {
     error('');
     const subjects = [];
     for (const slot of slots) {
-      const p = dateOnly ? { name: $('#a-name').value.trim(), y: +$('#a-y').value, m: +$('#a-m').value, d: +$('#a-d').value, calendar: form.querySelector('[name="a-cal"]:checked').value, leap: !$('#a-leap').disabled && $('#a-leap').checked } : readForm(form, slot);
-      const issue = dateOnly ? birthDateError(p) : check(p);
+      const p = readForm(form, slot);
+      const issue = check(p);
       if (issue) {
         error(pair ? slotName(slot) + ' · ' + issue : issue);
         trackCheckoutError(id, 'input', 'invalid_input');
@@ -143,17 +139,16 @@ async function mountProduct(root) {
       }
       subjects.push(p);
     }
-    const targetYear = dateOnly ? +$('#purchase-year').value : Number(root.dataset.readingYear) || undefined;
-    confirmed = { productId: id, people: subjects, targetYear };
+    const targetYear = Number(root.dataset.readingYear) || undefined;
+    confirmed = { productId: id, people: subjects, targetYear, ...(id === 'bundle' ? { tojeongYear: +$('#purchase-year').value } : {}) };
     subjects.forEach((p, i) => {
       const selected = people.find(person => person.id === picker(slots[i]).value);
       const ref = selected && { ...selected.profile, profileId: selected.id };
-      const matchesDate = ref && ['name', 'calendar', 'y', 'm', 'd'].every(key => ref[key] === p[key]) && !!ref.leap === !!p.leap;
-      const recent = dateOnly && matchesDate ? { ...p, profileId: ref.profileId } : withProfileReference(p, ref);
-      sessionSave(dateOnly ? 'tojeong' : slots[i], recent);
+      sessionSave(slots[i], withProfileReference(p, ref));
     });
     const rows = subjects.map((p, i) => [slotName(slots[i]), describe(p)]);
-    if (targetYear) rows.push(['풀이 연도', targetYear + '년']);
+    if (id === 'bundle') rows.push(['토정비결', confirmed.tojeongYear + '년'], ['신년운세', targetYear + '년']);
+    else if (targetYear) rows.push(['풀이 연도', targetYear + '년']);
     $('[data-purchase-details]').innerHTML = rows.map(([label, value]) => `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('');
     form.hidden = true; review.hidden = false;
     trackCommerceStep('checkout_subject_confirm', id);
@@ -175,7 +170,7 @@ async function mountProduct(root) {
     trackCommerceStep('payment_attempt', id, method.value);
     let orderCreated = false;
     try {
-      const order = await api('/orders', { ...confirmed, privacyConsent: true, purchaseConsent: true, consentVersion: '2026-11-23' });
+      const order = await api('/orders', { ...confirmed, privacyConsent: true, purchaseConsent: true, consentVersion: '2026-11-26' });
       orderCreated = true;
       if (order.status === 'PAID') { location.assign(`/shop/result/?orderId=${encodeURIComponent(order.id)}`); return; }
       await payOrder(order.id, method.value, id);
@@ -184,12 +179,10 @@ async function mountProduct(root) {
   });
   try { await refreshPeople(); } catch { /* 세션 입력은 저장소 없이도 사용할 수 있다. */ }
   for (const slot of slots) {
-    const keys = dateOnly ? dateProfileSlots() : [slot];
-    const usable = p => p && !(dateOnly ? birthDateError(p) : check(p));
-    const recent = keys.map(sessionLoad).find(usable)
-      || (await Promise.all(keys.map(key => load(key).catch(() => null)))).find(usable);
-    if (recent) populate(slot, recent, true);
-    else if (!dateOnly) syncTime(form, slot);
+    const session = sessionLoad(slot);
+    const recent = session && !check(session) ? session : await load(slot).catch(() => null);
+    if (recent && !check(recent)) populate(slot, recent, true);
+    else syncTime(form, slot);
   }
   form.inert = false;
   try {
@@ -229,7 +222,25 @@ async function mountResult() {
     }
     return;
   }
-  const url = `/api/commerce/orders/${encodeURIComponent(id)}/report`;
+  const base = `/api/commerce/orders/${encodeURIComponent(id)}/report`;
+  let url = base;
+  if (order.productId === 'bundle') {
+    const selected = new URLSearchParams(location.search).get('reading');
+    const reading = bundleReadings.find(r => r.id === selected) || bundleReadings[0];
+    const nav = document.createElement('nav');
+    nav.className = 'reading-entry';
+    nav.setAttribute('aria-label', '구매한 풀이 선택');
+    for (const part of bundleReadings) {
+      const link = document.createElement('a');
+      link.href = `?orderId=${encodeURIComponent(id)}&reading=${part.id}`;
+      link.textContent = part.id === 'annual' ? `${order.targetYear}년 신년운세` : part.title;
+      if (part === reading) link.setAttribute('aria-current', 'page');
+      nav.append(link);
+    }
+    $('[data-purchase-report]').before(nav);
+    url += `?reading=${reading.id}`;
+    $('[data-purchase-download]').textContent = `${reading.id === 'annual' ? order.targetYear + '년 신년운세' : reading.title} 다운로드`;
+  }
   // 승인 확인과 본문 응답까지 성공한 후에만 구매 완료·다운로드를 표시한다.
   let html;
   try {
@@ -267,7 +278,7 @@ async function mountResult() {
     window.addEventListener('pagehide', () => observer.disconnect(), { once: true });
   }, { once: true });
   frame.srcdoc = html; frame.hidden = false;
-  const download = $('[data-purchase-download]'); download.href = `${url}?download=1`; download.hidden = false;
+  const download = $('[data-purchase-download]'); download.href = `${url}${url.includes('?') ? '&' : '?'}download=1`; download.hidden = false;
   $('[data-purchase-result-status]').textContent = '구매가 완료되었습니다.';
   $('[data-purchase-result-note]').textContent = '목차에서 읽고 싶은 이야기를 골라보세요. 운세 파일을 저장하면 인터넷 없이도 이어 읽을 수 있습니다.';
 }

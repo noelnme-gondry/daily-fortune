@@ -35,7 +35,7 @@ for (const prefix of ['', '/en']) {
   });
 
   test(`${prefix || 'ko'}: 개인 풀이에서는 저장된 궁합 상대를 표시하지 않고 궁합에서는 두 사람을 유지한다`, async ({ page }) => {
-    for (const route of ['today', 'tomorrow', 'week', 'month', 'year/2026', 'year/2027', 'manseryeok', 'lifetime']) {
+    for (const route of ['today', 'tomorrow', 'week', 'month', 'year/2026', 'manseryeok', 'lifetime']) {
       await page.goto(`${prefix}/${route}/`);
       await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
       const summary = page.locator('.applied-profile p');

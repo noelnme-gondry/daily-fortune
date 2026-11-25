@@ -78,7 +78,7 @@ test('목록 관리에서 사람을 선택해도 기존 결과는 제출할 때�
   await expect(page.locator('.applied-profile')).toContainText(second.name);
 });
 test('날짜 입력의 연·월·일은 좁은 화면에서도 글자와 화살표가 겹치지 않는다', async ({ page }) => {
-  for (const width of [320, 390, 768, 1440]) for (const path of ['/year/2027/', '/shop/lifetime/', '/shop/compatibility/']) {
+  for (const width of [320, 390, 768, 1440]) for (const path of ['/year/2026/', '/shop/lifetime/', '/shop/compatibility/']) {
     await page.setViewportSize({ width, height: 900 }); await page.goto(path);
     await page.locator('#a-y').fill('1990');
     await page.locator('#a-m').selectOption('12'); await page.locator('#a-d').selectOption('31');
@@ -90,16 +90,16 @@ test('날짜 입력의 연·월·일은 좁은 화면에서도 글자와 화살�
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   }
 });
-test('전체 메뉴의 무료·프리미엄 분류와 기간 이름이 일관되고 세 유료 상품으로 연결된다', async ({ page }) => {
+test('전체 메뉴의 무료·프리미엄 분류와 기간 이름이 일관되고 묶음과 궁합으로 연결된다', async ({ page }) => {
   await page.goto('/'); await page.locator('[data-dialog="site-menu"]').click();
   const menu = page.locator('#site-menu');
   const premium = menu.locator('section').filter({ has: page.getByRole('heading', { name: '프리미엄 운세', exact: true }) });
   await expect(premium).toContainText('각 990원 · 단건 결제 · 다운로드 포함');
-  for (const [id, label] of [['tojeong', '토정비결'], ['lifetime', '평생 사주'], ['compatibility', '궁합']]) await expect(premium.locator(`a[href="/${id}/"]`)).toHaveText(`${label} · 990원`);
+  for (const [id, label] of [['shop/bundle', '내 운세 3종 묶음'], ['compatibility', '궁합']]) await expect(premium.locator(`a[href="/${id}/"]`)).toHaveText(`${label} · 990원`);
   const free = menu.locator('section').filter({ has: page.getByRole('heading', { name: '무료 운세', exact: true }) });
-  await expect(free.locator('a')).toHaveText(['오늘의 운세', '내일의 운세', '이번 주 운세', '이달의 운세', `${todayKST().y}년 운세`, `${todayKST().y + 1}년 운세`, '띠별 운세']);
+  await expect(free.locator('a')).toHaveText(['오늘의 운세', '내일의 운세', '이번 주 운세', '이달의 운세', `${todayKST().y}년 운세`, '띠별 운세']);
   await expect(menu).not.toContainText('무료 토정비결');
-  await premium.locator('a[href="/tojeong/"]').click();
+  await premium.locator('a[href="/shop/bundle/"]').click();
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
 });
 for (const width of [390, 1440]) test(`${width}px: 상단 프리미엄 운세는 상품 목록을 열고 각 상품에서 목록으로 돌아온다`, async ({ page }) => {
@@ -108,17 +108,17 @@ for (const width of [390, 1440]) test(`${width}px: 상단 프리미엄 운세는
   const premium = page.getByRole('navigation', { name: '주요 메뉴', exact: true }).getByRole('link', { name: /프리미엄 운세/ });
   await premium.click();
   await expect(page).toHaveURL(/\/shop\/$/);
-  await expect(page.locator('h1')).toHaveText('나를 위한운세 한 권');
+  await expect(page.locator('h1')).toHaveText('프리미엄 운세 상품');
   await expect(premium).toHaveAttribute('aria-current', 'page');
-  await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(4);
+  await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(2);
   await expect(page.locator('#purchase-form')).toHaveCount(0);
-  for (const [id, name] of [['tojeong', '토정비결'], ['lifetime', '평생 사주'], ['compatibility', '궁합']]) {
+  for (const [id, name] of [['shop/bundle', '내 운세 3종 묶음'], ['compatibility', '궁합']]) {
     await page.getByRole('link', { name: `${name} 선택`, exact: true }).click();
     await expect(page).toHaveURL(url => url.pathname === `/${id}/`);
     await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
     await premium.click();
     await expect(page).toHaveURL(/\/shop\/$/);
-    await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(4);
+    await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(2);
   }
 });
 test('영문 상단 프리미엄 메뉴도 상품 목록 안내를 거쳐 한국어 상품 선택으로 이어진다', async ({ page }) => {
@@ -127,11 +127,11 @@ test('영문 상단 프리미엄 메뉴도 상품 목록 안내를 거쳐 한국
   const premium = page.getByRole('navigation', { name: 'Main navigation', exact: true }).getByRole('link', { name: /Premium reports/ });
   await premium.click();
   await expect(page).toHaveURL(/\/en\/shop\/$/);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your fortune report');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Fortune bundle and compatibility');
   await expect(premium).toHaveAttribute('aria-current', 'page');
   await page.getByRole('link', { name: 'Continue in Korean', exact: true }).click();
   await expect(page).toHaveURL(/\/shop\/$/);
-  await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(4);
+  await expect(page.locator('.fortune-products .fortune-product')).toHaveCount(2);
 });
 for (const path of ['/tojeong/', '/lifetime/', '/compatibility/']) test(`${path}: 기존 주소에서도 무료 전체 풀이 대신 990원 미리보기·구매 화면을 연다`, async ({ page }) => {
   await page.goto(path);
@@ -139,7 +139,7 @@ for (const path of ['/tojeong/', '/lifetime/', '/compatibility/']) test(`${path}
   await expect(page.locator('#tool-form,#tojeong-form')).toHaveCount(0);
   await expect(page.locator('.shop-price')).toContainText('990');
   await page.locator('#a-y').fill('1990'); await page.locator('#a-m').selectOption('5'); await page.locator('#a-d').selectOption('17');
-  if (path !== '/tojeong/') await page.locator('[name="a-gender"][value="F"]').check();
+  await page.locator('[name="a-gender"][value="F"]').check();
   if (path === '/compatibility/') {
     await page.locator('#b-y').fill('1991'); await page.locator('#b-m').selectOption('8'); await page.locator('#b-d').selectOption('2');
     await page.locator('[name="b-gender"][value="M"]').check();

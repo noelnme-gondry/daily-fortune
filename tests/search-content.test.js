@@ -13,7 +13,7 @@ import { esc } from '../src/site/util.js';
 
 const origin = 'https://makeyourownday-fortune.com';
 const site = createSite({ site: origin, assets: { js: '/app.js', css: '/app.css' }, now: Date.UTC(2026, 9, 15, 3) });
-const core = ['/today/', '/manseryeok/', '/year/2027/', '/tojeong/2027/', '/about/'];
+const core = ['/today/', '/manseryeok/', '/year/2026/', '/tojeong/2027/', '/about/'];
 
 test('핵심 5개는 초기 HTML·자기 canonical·색인 허용·사이트맵과 일관된 브랜드를 제공한다', () => {
   assert.equal(site.routes.filter((r) => !r.lang).length, 212 + READING_GUIDES.length, '기존 한국어 경로와 가이드 목록의 모든 경로를 제공한다');
@@ -37,7 +37,7 @@ test('공개 가상 사례의 원국·연간·월별 값은 변경 전 엔진 �
   assert.equal(r.overall.score, 58);
   assert.deepEqual(r.cats.map((c) => c.score), [60, 57, 75, 39, 53, 64, 49]);
   assert.deepEqual(yearMonths(c, 2027).map((m) => m.score), [45, 66, 63, 42, 46, 39, 56, 57, 65, 51, 79, 75]);
-  const mhtml = site.render('/manseryeok/'), yhtml = site.render('/year/2027/');
+  const mhtml = site.render('/manseryeok/'), yhtml = createSite({ site: origin, assets: {}, now: Date.UTC(2027, 0, 2) }).render('/year/2027/');
   for (const p of c.cols) assert.ok(mhtml.includes(`<td>${pillarLabel(p)}</td>`));
   for (const m of yearMonths(c, 2027)) assert.ok(yhtml.includes(`<th scope="row">${m.m}월</th><td>${pillarLabel(m.pillar)}</td><td>${m.score}점</td>`));
   assert.ok(yhtml.includes(`<b data-example-overall>${r.overall.score}점</b>`));
@@ -73,10 +73,10 @@ test('만세력 경계 사례는 두 입력의 엔진값과 달라진 모든 기
   });
 });
 
-test('월별 비교의 점수·십신·강점·해설은 현재·다음 연도의 기존 월별 결과에서 나온다', () => {
+test('월별 비교의 점수·십신·강점·해설은 올해와 보존 연도의 기존 월별 결과에서 나온다', () => {
   for (const currentYear of [2026, 2027]) {
     const s = createSite({ site: origin, assets: {}, now: Date.UTC(currentYear, 9, 15, 3) });
-    for (const y of [currentYear, currentYear + 1]) for (const lang of ['ko', 'en']) withLanguage(lang, () => {
+    for (const y of s.ctx.years.filter(y => y <= currentYear)) for (const lang of ['ko', 'en']) withLanguage(lang, () => {
       const prefix = lang === 'en' ? '/en' : '', points = lang === 'en' ? ' points' : '점';
       const html = s.render(`${prefix}/year/${y}/`);
       const months = yearMonths(buildChart({ ...EXAMPLE_INPUT }), y).filter((m) => [5, 11].includes(m.m));
@@ -105,7 +105,7 @@ test('시간 미상은 시주를 제외하며 전체 점수가 달라짐을 설�
   assert.equal(c.cols.length, 3);
   assert.deepEqual(c.counts, [0, 3, 0, 2, 1]);
   assert.equal(year(c, 2027).overall.score, 62);
-  for (const path of ['/manseryeok/', '/year/2027/', '/about/']) {
+  for (const path of ['/manseryeok/', '/year/2026/', '/about/']) {
     assert.ok(site.render(path).includes(UNKNOWN_TIME.summary));
     assert.ok(site.render(path).includes(UNKNOWN_TIME.boundary));
   }
@@ -160,7 +160,7 @@ test('공개 예시와 설명 뒤에 수동 AdSense와 공통 배너를 배치�
     process.env.ADSENSE_SLOT_INLINE = 'inline-test';
     process.env.ADSENSE_SLOT_BOTTOM = 'bottom-test';
     const s = createSite({ site: origin, assets: {}, now: Date.UTC(2026, 9, 15, 3) });
-    for (const path of ['/manseryeok/', '/year/2027/']) {
+    for (const path of ['/manseryeok/', '/year/2026/']) {
       const html = s.render(path);
       const tool = html.indexOf('id="tool"'), inline = html.indexOf('class="ad ad-inline"');
       const info = html.indexOf('class="info-panels"'), bottom = html.indexOf('class="ad ad-bottom"');
@@ -174,9 +174,9 @@ test('공개 예시와 설명 뒤에 수동 AdSense와 공통 배너를 배치�
 
 test('연간 네 기능의 제목·설명은 다르고 비교표는 같은 연도의 실제 라우트를 연결한다', () => {
   for (const y of [2026, 2027]) {
-    const paths = [`/year/${y}/`, y === 2026 ? '/tojeong/' : `/tojeong/${y}/`, `/tti/${y}/`, `/manseryeok/${y}/`];
-    assert.equal(new Set(paths.map((p) => site.page(p).title)).size, 4);
-    assert.equal(new Set(paths.map((p) => site.page(p).description)).size, 4);
+    const paths = [...(y <= site.ctx.today.y ? [`/year/${y}/`] : []), y === 2026 ? '/tojeong/' : `/tojeong/${y}/`, `/tti/${y}/`, `/manseryeok/${y}/`];
+    assert.equal(new Set(paths.map((p) => site.page(p).title)).size, paths.length);
+    assert.equal(new Set(paths.map((p) => site.page(p).description)).size, paths.length);
     for (const path of paths) {
       const html = site.render(path);
       assert.match(html, /신년운세·토정비결·띠별 운세·만세력의 차이/);

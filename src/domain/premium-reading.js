@@ -2,6 +2,11 @@ import { periodPractice } from './period-practice.js';
 // 풀이의 해석과 생활 적용만 보강한다. 점수·사주·토정 괘는 기존 엔진의 값을 사용한다.
 const closingChapter = { id: 'closing', title: '풀이를 읽고 난 뒤', titleEn: 'Practical next steps', detail: '걱정될 때의 대처·실천·사주 읽기 도움말' };
 export const READING_CHAPTERS = Object.freeze({
+  bundle: [
+    { id: 'tojeong', title: '토정비결', titleEn: 'Tojeong', detail: '선택한 한 해의 총운과 음력 열두 달 풀이' },
+    { id: 'lifetime', title: '평생 사주', titleEn: 'Lifetime saju', detail: '타고난 성향, 오행과 대운, 앞으로의 주요 시기' },
+    { id: 'annual', title: '내년 신년운세', titleEn: 'Next year’s fortune', detail: '내년의 일곱 분야와 열두 달 상세 운세' },
+  ],
   annual: [
     { id: 'annual', title: '한 해의 총운', titleEn: 'Your year ahead', detail: '세운과 대운으로 읽는 종합·일곱 분야 풀이' },
     { id: 'months', title: '열두 달의 흐름', titleEn: 'Twelve monthly readings', detail: '월별 점수·강점과 주의할 분야' },

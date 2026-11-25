@@ -21,21 +21,21 @@ async function fillPerson(page, who, year = '1990') {
   const gender = page.locator(`[name="${who}-gender"][value="F"]`);
   if (await gender.count()) await gender.check();
 }
-test('홈 상품군은 네 개이고 각각 990원 단건 구매 경로로 연결된다', async ({ page }) => {
+test('홈 상품군은 두 개이고 각각 990원 단건 구매 경로로 연결된다', async ({ page }) => {
   await page.goto('/');
   const cards = page.locator('.home-purchases .fortune-product');
-  await expect(cards).toHaveCount(4);
-  for (const id of ['tojeong', 'lifetime', 'compatibility']) await expect(page.locator(`.home-purchases a[href="/shop/${id}/"]`)).toBeVisible();
-  await page.locator('.home-purchases a[href="/shop/lifetime/"]').click();
+  await expect(cards).toHaveCount(2);
+  for (const id of ['bundle', 'compatibility']) await expect(page.locator(`.home-purchases a[href="/shop/${id}/"]`)).toBeVisible();
+  await page.locator('.home-purchases a[href="/shop/bundle/"]').click();
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('.shop-price')).toContainText('990');
 });
-for (const product of ['tojeong', 'lifetime', 'compatibility']) test(`${product}: 정보 입력에서 서버 미리보기·주문 확인까지, 결제 미설정 시 구매 차단`, async ({ page }) => {
+for (const product of ['bundle', 'compatibility']) test(`${product}: 정보 입력에서 서버 미리보기·주문 확인까지, 결제 미설정 시 구매 차단`, async ({ page }) => {
   await page.goto(`/shop/${product}/`);
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
   await fillPerson(page, 'a');
   if (product === 'compatibility') await fillPerson(page, 'b', '1991');
-  if (product === 'tojeong') { await expect(page.locator('.field-gender')).toHaveCount(0); await expect(page.locator('.field-time')).toHaveCount(0); }
+  if (product === 'bundle') await expect(page.locator('#purchase-year')).toBeVisible();
   await page.getByRole('button', { name: '운세보기', exact: true }).click();
   await expect(page.locator('[data-purchase-review]')).toBeVisible();
   await page.locator('[data-preview-options] summary').click();

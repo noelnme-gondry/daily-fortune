@@ -2,6 +2,7 @@
 // 무료 복구 모드에서는 계산기와 상품의 내용이 다르므로 주소를 구분한다.
 export const annualPath = year => `/year/${year}/premium/`;
 export function productPath(id, paidReadings, targetYear) {
+  if (id === 'bundle') return '/shop/bundle/';
   if (id === 'annual') return annualPath(targetYear);
   return paidReadings ? `/${id}/` : `/shop/${id}/`;
 }

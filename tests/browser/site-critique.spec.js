@@ -82,7 +82,7 @@ test('성별은 명시적으로 선택하며 실패한 제출과 오류 필드�
 test('검색 유입 계산기는 모바일 첫 화면에서 입력을 시작하고 한 화면 안의 폼으로 제출한다', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   const rows = [];
-  for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/year/2027/', '/lifetime/', '/life-story/', '/saju-ranking/']) {
+  for (const path of ['/today/', '/tomorrow/', '/week/', '/month/', '/year/2026/', '/lifetime/', '/life-story/', '/saju-ranking/']) {
     await page.goto(path);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     const row = await page.locator('#tool-form').evaluate(form => ({ path: location.pathname, top: form.getBoundingClientRect().top, submit: form.querySelector('[type="submit"]').getBoundingClientRect().bottom }));

@@ -7,9 +7,9 @@ import { esc } from './util.js';
 export function premiumEntry(page, ctx) {
   if (page.section === '/shop/' || page.noindex || page.path === '/') return '';
   if (!page.tool && !['/tti/', '/saju/', '/guides/'].includes(page.section)) return '';
-  const id = page.path === `/year/${ctx.today.y + 1}/` ? 'annual' : /compatibility/.test(page.path) ? 'compatibility' : /(?:year|tojeong|tti\/\d{4})/.test(page.path) ? 'tojeong' : 'lifetime';
+  const id = /compatibility/.test(page.path) ? 'compatibility' : 'bundle';
   const p = productEdition(fortuneProduct(id), ctx.today.y + 1);
-  const chapters = [p.chapters[0], p.chapters[1], p.chapters.find(c => c.id === 'closing')].filter(Boolean);
+  const chapters = id === 'bundle' ? p.chapters : [p.chapters[0], p.chapters[1], p.chapters.find(c => c.id === 'closing')].filter(Boolean);
   const card = `<section class="premium-entry" aria-labelledby="premium-entry-title" data-commerce-list="reading_footer" data-commerce-item="${id}">
     <div><p class="eyebrow">${tr('프리미엄 운세', 'Premium report in Korean')}</p><h2 id="premium-entry-title">${tr('내 이야기로 더 깊이 읽어보세요', 'Continue with your own birth chart')}</h2><p>${tr(p.description, 'Explore a detailed Korean reading based on your birth details, with practical guidance and an offline copy.')}</p></div>
     <div class="premium-entry-contents"><h3>${esc(tr(p.name, p.nameEn))}</h3><ul>${chapters.map(c => `<li>${esc(tr(c.title, c.titleEn))}</li>`).join('')}</ul></div>

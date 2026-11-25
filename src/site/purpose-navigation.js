@@ -6,7 +6,7 @@ import { productPath } from './product-path.js';
 export function navigationGroups(today, paidReadings) {
   const link = (path, ko, en) => ({ path, name: tr(ko, en) });
   return [
-    { name: tr('무료 운세', 'Free fortunes'), note: tr('오늘부터 한 해까지 · 무료 풀이', 'From today to a whole year · free readings'), links: [link('/today/', '오늘의 운세', 'Today’s fortune'), link('/tomorrow/', '내일의 운세', 'Tomorrow’s fortune'), link('/week/', '이번 주 운세', 'This week’s fortune'), link('/month/', '이달의 운세', 'This month’s fortune'), ...[today.y, today.y + 1].map(y => link(`/year/${y}/`, `${y}년 운세`, `${y} fortune`)), link('/tti/today/', '띠별 운세', 'Zodiac fortunes')] },
+    { name: tr('무료 운세', 'Free fortunes'), note: tr('오늘부터 한 해까지 · 무료 풀이', 'From today to a whole year · free readings'), links: [link('/today/', '오늘의 운세', 'Today’s fortune'), link('/tomorrow/', '내일의 운세', 'Tomorrow’s fortune'), link('/week/', '이번 주 운세', 'This week’s fortune'), link('/month/', '이달의 운세', 'This month’s fortune'), link(`/year/${today.y}/`, `${today.y}년 운세`, `${today.y} fortune`), link('/tti/today/', '띠별 운세', 'Zodiac fortunes')] },
     { name: tr('프리미엄 운세', 'Premium reports'), path: '/shop/', note: tr('각 990원 · 단건 결제 · 다운로드 포함', 'KRW 990 each · one-time payment · download included'), links: [...FORTUNE_PRODUCTS.map(product => {
       const p = productEdition(product, today.y + 1);
       return link(productPath(p.id, paidReadings, today.y + 1), `${p.name} · ${p.price}원`, `${p.nameEn} · KRW ${p.price}`);

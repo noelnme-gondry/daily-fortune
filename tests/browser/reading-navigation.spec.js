@@ -26,7 +26,7 @@ for (const prefix of ['', '/en']) {
     await page.locator('[data-reading-area][href="#reading-money"]').click();
     const cases = [
       ['tomorrow', day(c, addDays(date, 1), 'tomorrow')], ['week', week(c, date)],
-      ['month', month(c, 2026, 11)], ['year/2027', year(c, 2027, 'next')],
+      ['month', month(c, 2026, 11)], ['year/2026', year(c, 2026)],
     ];
     for (const [route, report] of cases) {
       const link = page.locator(`[data-period-link][href="${prefix}/${route}/#reading-money"]`);

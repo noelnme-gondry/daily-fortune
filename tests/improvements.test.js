@@ -113,10 +113,10 @@ test('KST 새해 직전·직후: 경로·메뉴·메타·사이트맵·띠 출�
   const site = (now) => createSite({ site: siteUrl({}), assets: { css: '/a.css', js: '/a.js' }, now });
   const old = site(Date.UTC(2026, 11, 31, 14, 59));
   const next = site(Date.UTC(2026, 11, 31, 15, 0));
-  assert.ok(old.has('/year/2026/')); assert.ok(old.has('/year/2027/'));
-  assert.ok(next.has('/year/2026/')); assert.ok(next.has('/year/2028/'));
+  assert.ok(old.has('/year/2026/')); assert.ok(!old.has('/year/2027/'));
+  assert.ok(next.has('/year/2026/')); assert.ok(!next.has('/year/2028/'));
   assert.match(next.render('/tti/2028/rat/'), /2028년 1~12월 운세/);
-  assert.match(next.render('/'), /2028년 운세/);
+  assert.match(next.render('/'), /2028년 신년운세/);
   assert.match(next.sitemap(), /\/tti\/2028\/rat\//);
   assert.match(next.sitemap(), /\/year\/2026\//);
   assert.ok(next.has('/tti/today/rat/'));

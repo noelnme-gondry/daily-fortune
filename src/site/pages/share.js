@@ -102,6 +102,7 @@ const OG = { story: '/og-story.png', rank: '/og-rank.png', compat: '/og-compat.p
 
 export function sharePage(q, ctx) {
   const card = q ? parseShare(q) : null;
+  if (card?.kind === 'year' && !ctx.paths.has(card.tool)) card.tool = '/year/';
   const generic = !card;
   const c = card || { kind: 'today', tool: '/', label: BRAND.name, kicker: siteText('친구가 보낸 운세 결과'), big: BRAND.name, title: siteText('생년월일시로 보는 나의 사주 운세'), lines: [] };
   const title = generic ? siteText('공유된 운세 결과') : `${c.kicker} — ${c.big}`;

@@ -37,8 +37,12 @@ function routeTable(ctx) {
   const add = (path, fn, o = {}) => R.push({ path, fn, priority: o.p ?? 0.6, changefreq: o.cf ?? 'monthly', daily: !!o.daily, feed: !!o.feed, canonicalPath: o.canonicalPath || path, noindex: !!o.noindex });
   add('/', tools.home, { p: 1, cf: 'daily', daily: true });
   add('/shop/', shopPage, { p: 0.8 });
-  for (const id of ['tojeong', 'lifetime', 'compatibility']) add(`/shop/${id}/`, c => productPage(id, c), { p: 0.8, canonicalPath: productPath(id, ctx.cfg.paidReadings) });
-  add(annualPath(y + 1), c => productPage('annual', c, y + 1), { p: 0.9 });
+  add('/shop/bundle/', c => productPage('bundle', c), { p: 0.9 });
+  for (const id of ['tojeong', 'lifetime', 'compatibility']) {
+    const saleId = id === 'compatibility' ? id : 'bundle';
+    add(`/shop/${id}/`, c => productPage(saleId, c), { p: 0.8, canonicalPath: productPath(saleId, ctx.cfg.paidReadings) });
+  }
+  add(annualPath(y + 1), c => productPage('bundle', c, y + 1), { p: 0.9, canonicalPath: '/shop/bundle/' });
   add('/shop/orders/', ordersPage, { p: 0, noindex: true });
   add('/shop/result/', resultPage, { p: 0, noindex: true });
   add('/today/', tools.today, { p: 0.9, cf: 'daily', daily: true });
@@ -46,14 +50,14 @@ function routeTable(ctx) {
   add('/week/', tools.week, { p: 0.8, cf: 'weekly', daily: true });
   add('/month/', tools.month, { p: 0.8, cf: 'monthly', daily: true });
   add('/year/', tools.yearHub, { p: 0.7 });
-  for (const yr of years) add(`/year/${yr}/`, (c) => tools.yearPage(yr, c), { p: 0.9 });
+  for (const yr of years.filter(year => year <= y)) add(`/year/${yr}/`, (c) => tools.yearPage(yr, c), { p: 0.9 });
   const paidPage = (id, year = y) => c => {
-    const product = productPage(id, c, year);
+    const product = productPage(id === 'compatibility' ? id : 'bundle', c, year);
     const name = { tojeong: tr(`${year}년 토정비결`, `${year} Tojeong`), lifetime: tr('평생 사주', 'Lifetime saju'), compatibility: tr('사주 궁합', 'Saju compatibility') }[id];
     return {
       ...product, path: c.path,
-      title: tr(`${name} 미리보기 · 상세 풀이 990원`, `${name} preview and premium report`),
-      description: tr(`${name}의 일부 풀이를 미리 확인하세요. 개인별 상세 해설과 HTML 운세 파일은 990원 단건 결제로 제공합니다.`, `Preview your ${name} report. Detailed Korean readings and an HTML download cost KRW 990 as a one-time purchase.`),
+      title: id === 'compatibility' ? tr('두 사람의 사주 궁합 · 990원', 'Two-person saju compatibility · KRW 990') : tr(`${name} | 내 운세 3종 묶음 990원`, `${name} | Three-reading fortune bundle`),
+      description: tr(`${name}의 풀이 예시와 구매 방법을 확인하세요. ${id === 'compatibility' ? '두 사람의 상세 궁합은 990원입니다.' : '토정비결·평생 사주·내년 신년운세 세 가지를 990원에 엽니다.'}`, `Explore ${name} and its Korean reading. ${id === 'compatibility' ? 'A two-person reading costs KRW 990.' : 'One KRW 990 bundle includes Tojeong, lifetime saju and next year’s fortune.'}`),
       supplement: id === 'tojeong' ? yearGuide(year, c, c.path) : '',
       body: product.body + (id === 'lifetime' ? lifetimeExample(c.today, 'report-start') : id === 'compatibility' ? compatibilityExample(c.today, 'report-start') : tojeongYearReference(year)),
     };
@@ -199,7 +203,7 @@ ${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일�
 주요 사실:
 - 영어판 K-Fortune: ${site}/en/ — 동일한 기능·계산으로 영어 화면과 결과 해설을 제공합니다. 브라우저 기본 언어가 한국어가 아니면 영어판으로 연결되며, 직접 선택한 언어를 우선합니다.
 - 이용 요금: ${FREE_ACCESS.description}
-- 토정비결 상품은 990원 단건 결제로 총운·음력 12개월 상세 풀이와 다운로드를 제공합니다. 생시·성별을 사용하지 않으며 사주 신년운세와 별도 계산입니다. ${site}/shop/tojeong/
+- 내 운세 3종 묶음은 990원 단건 결제로 한 사람의 토정비결·평생 사주·내년 신년운세를 모두 제공합니다. 궁합은 두 사람의 별도 상품입니다. ${site}/shop/bundle/
 - 년주는 입춘, 월주는 절기 절입 시각으로 바뀝니다. 시주는 동경 127.5° 평균태양시로 정하며, 현행 한국 표준시(UTC+9)·서머타임 미적용 기준으로 30분을 뺍니다. 이 기준에서 밤 11시 30분부터 다음 날 자시이며, 과거 표준시·서머타임 기간에는 경계가 달라집니다. 출생지별 진태양시는 계산하지 않습니다.
 - 시간 미상 처리와 한계: ${site}/about/#unknown-time . 시주를 제외하면 전체 오행·용신·운세 점수가 달라질 수 있으며 예측 정확도를 보장하지 않습니다.
 - 시진만 아는 경우 출생일의 표준시·서머타임에 맞춘 시계 기준 구간(평시 자시 23:30~01:30, 축시 01:30~03:30 …)에서 고르며, 구간 가운데 시각으로 같은 보정을 거쳐 계산합니다.
@@ -207,7 +211,7 @@ ${SITE.name}는 한국어 사주명리 운세 사이트입니다. 생년월일�
 - ${y}년은 ${pillarLabel(yearPillar(y))}년, ${y + 1}년은 ${pillarLabel(yearPillar(y + 1))}년입니다.
 
 ## 운세 계산기
-${pick((p) => ['/today/', '/tomorrow/', '/week/', '/month/', `/year/${y}/`, `/year/${y + 1}/`, '/tojeong/', `/tojeong/${y + 1}/`, '/lifetime/', '/compatibility/', '/manseryeok/'].includes(p))}
+${pick((p) => ['/today/', '/tomorrow/', '/week/', '/month/', `/year/${y}/`, '/shop/bundle/', '/tojeong/', `/tojeong/${y + 1}/`, '/lifetime/', '/compatibility/', '/manseryeok/'].includes(p))}
 
 ## 운세 이용 가이드
 ${pick((p) => /^\/guides\//.test(p))}
@@ -239,7 +243,7 @@ function llmsFull(ctx) {
   const out = [`# ${SITE.name} 전체 요약`, '', `> ${SITE.description}`, '', `출처: ${site}/ · 최종 업데이트 ${CONTENT_UPDATED}`, ''];
   out.push('## 계산 방법', '', ABOUT.lead, '');
   for (const s of ABOUT.sections) { out.push(`### ${s.h}`, ...s.items.map((i) => `- ${i}`), ''); }
-  out.push('## 토정비결 상품', '', '선택한 한 해·한 사람의 상세 풀이와 운세 다운로드를 990원 단건 결제로 제공합니다.', TOJEONG.convention, TOJEONG.readingNote, TOJEONG.editionNote, `이용: ${site}/shop/tojeong/`, `해설 출처 (MIT): ${TOJEONG.source}`, '');
+  out.push('## 내 운세 3종 묶음', '', '990원 단건 결제로 한 사람의 토정비결·평생 사주·내년 신년운세와 각 풀이 다운로드를 제공합니다.', TOJEONG.convention, TOJEONG.readingNote, TOJEONG.editionNote, `이용: ${site}/shop/bundle/`, `해설 출처 (MIT): ${TOJEONG.source}`, '');
   for (const f of TOJEONG.faq) out.push(`### ${f.q}`, f.a, '');
   out.push('## 사주 용어 사전', '');
   for (const g of GLOSSARY) out.push(`- **${g.term}(${g.hanja})**: ${g.def}`);

@@ -83,18 +83,18 @@ test('토정비결: MIT 원본 144괘와 1,728개 월별 해설이 손실 없이
 
 test('토정비결: 공개 진입은 미리보기·990원 구매이며 과거 작괘 자료는 보존된다', () => {
   const site = createSite({ site: 'https://unse.example', assets: {}, now: Date.UTC(2026, 9, 14) });
-  assert.match(site.render('/'), /href="\/tojeong\/"/);
+  assert.match(site.render('/'), /href="\/shop\/bundle\/"/);
   assert.doesNotMatch(site.render('/'), />무료 토정비결<\/a>/);
   assert.equal(site.has('/tojeong/2026/'), false);
   assert.equal(site.redirect('/tojeong/2026/'), '/tojeong/');
   for (const [path, y, ganji] of [['/tojeong/', 2026, '병오(丙午)년'], ['/tojeong/2027/', 2027, '정미(丁未)년']]) {
     const html = site.render(path);
-    assert.match(html, /data-fortune-product="tojeong"/);
+    assert.match(html, /data-fortune-product="bundle"/);
     assert.doesNotMatch(html, /id="tojeong-tool"/);
     assert.ok(html.includes(ganji));
     assert.ok(html.includes(`<option value="${y}" selected>`));
     assert.ok(site.sitemap().includes(`https://unse.example${path}`));
-    assert.ok(!html.includes('id="a-time"'));
+    assert.ok(html.includes('id="a-time"'));
   }
   assert.ok(!site.llms().includes('/tojeong/2026/'));
   assert.match(site.llmsFull(), /990원 단건 결제/);

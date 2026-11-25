@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { todayKST } from '../src/engine/core.js';
 import assert from 'node:assert/strict';
 import { PGlite } from '@electric-sql/pglite';
 import { createPostgresOrderStore } from '../src/server/postgres-orders.js';
@@ -33,7 +34,7 @@ function embeddedPool(db) {
   return pool;
 }
 const config = { enabled: true, mode: 'sandbox', clientId: 'S2_postgres_test', secretKey: 'test-secret', origin: 'https://fortune.example' };
-const input = { productId: 'lifetime', people: [{ name: 'DB 검증', gender: 'F', calendar: 'solar', y: 1990, m: 5, d: 17, timeMode: 'exact', noTime: true }], privacyConsent: true, purchaseConsent: true };
+const input = { productId: 'bundle', targetYear: todayKST().y + 1, people: [{ name: 'DB 검증', gender: 'F', calendar: 'solar', y: 1990, m: 5, d: 17, timeMode: 'exact', noTime: true }], privacyConsent: true, purchaseConsent: true };
 
 test('Postgres 전환: 실제 SQL 엔진에서 주문·승인·권한·재시작·기존 데이터 보존', async t => {
   const db = new PGlite(), pool = embeddedPool(db);
@@ -56,7 +57,7 @@ test('Postgres 전환: 실제 SQL 엔진에서 주문·승인·권한·재시작
   await t.test('두 서비스의 중복 주문과 JSONB 운세 파일 보존', async () => {
     const orders = await Promise.all([one.create(input, 'owner-db'), two.create(input, 'owner-db')]);
     order = orders[0]; assert.equal(orders[0].id, orders[1].id);
-    const loaded = await second.get(order.id); assert.deepEqual(loaded, order); assert.match(loaded.html, /DB 검증/);
+    const loaded = await second.get(order.id); assert.deepEqual(loaded, order); assert.match(loaded.reports.lifetime, /DB 검증/);
     assert.deepEqual(await second.own('someone-else'), []);
   });
   await t.test('승인 이전·타인 접근 차단과 재전송 승인 멱등성', async () => {
@@ -66,7 +67,7 @@ test('Postgres 전환: 실제 SQL 엔진에서 주문·승인·권한·재시작
     const auth = { orderId: order.id, tid: 'PG_TEST_TID', amount: '990', clientId: config.clientId, authToken: 'test-auth', authResultCode: '0000' };
     auth.signature = sha256(`${auth.authToken}${auth.clientId}${auth.amount}${config.secretKey}`);
     await Promise.all([one.callback(auth, order.state), two.callback(auth, order.state)]);
-    assert.equal(approvals, 1); assert.equal((await two.get(order.id, 'owner-db', true)).html, order.html);
+    assert.equal(approvals, 1); assert.equal((await two.get(order.id, 'owner-db', true)).reports.lifetime, order.reports.lifetime);
   });
   await t.test('소유자·보고서 원문 변경 및 같은 상점의 거래번호 중복을 거절한다', async () => {
     const paid = await store.get(order.id);

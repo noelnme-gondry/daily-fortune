@@ -6,7 +6,7 @@ import { esc } from './util.js';
 export function toolNavigation(today) {
   return [
     ...['today', 'tomorrow', 'week', 'month'].map(key => ({ key, group: 'period', ...TOOLS[key] })),
-    ...[today.y, today.y + 1].map(y => ({ key: `year${y}`, group: 'period', ...yearTool(y) })),
+    { key: `year${today.y}`, group: 'period', ...yearTool(today.y) },
     ...['lifetime', 'story', 'rank', 'compatibility', 'manseryeok'].map(key => ({ key, group: 'chart', ...TOOLS[key] })),
   ];
 }

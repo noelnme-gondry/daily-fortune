@@ -192,7 +192,7 @@ test('주요 세 메뉴는 읽기 쉬운 크기를 유지하고 전체 메뉴에
   await expect(page.locator('.menu-panel a[href="/saju/"]')).toHaveAttribute('aria-current', 'page');
 });
 
-test('모바일에서 펼쳐진 메뉴를 바로 터치해 토정비결까지 이동한다', async ({ browser }) => {
+test('모바일에서 펼쳐진 메뉴를 바로 터치해 운세 묶음까지 이동한다', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'ko-KR', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 });
   await context.route('https://**/*', (route) => route.abort());
   const page = await context.newPage();
@@ -201,8 +201,8 @@ test('모바일에서 펼쳐진 메뉴를 바로 터치해 토정비결까지 �
   const menu = page.getByRole('navigation', { name: '전체 메뉴', exact: true });
   await expect(menu.locator('section')).toHaveCount(5);
   await expect(menu.getByRole('link', { name: '풀이 이용 안내', exact: true })).toBeVisible();
-  await menu.getByRole('link', { name: '토정비결 · 990원', exact: true }).tap();
-  await expect(page).toHaveURL(/\/shop\/tojeong\/$/);
+  await menu.getByRole('link', { name: '내 운세 3종 묶음 · 990원', exact: true }).tap();
+  await expect(page).toHaveURL(/\/shop\/bundle\/$/);
   await expect(page.locator('[data-fortune-product]')).toHaveAttribute('data-ready', 'true');
   await expect(page.getByRole('button', { name: /예시/ })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);

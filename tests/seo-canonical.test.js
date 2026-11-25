@@ -12,18 +12,19 @@ test('판매 모드에서만 상품 중복 주소를 기존 운세 URL로 통합
       const sitemap = site.sitemap();
       for (const prefix of ['', '/en']) for (const id of ['lifetime', 'compatibility', 'tojeong']) {
         const path = `${prefix}/shop/${id}/`;
-        const canonical = `${prefix}${paid ? `/${id}/` : `/shop/${id}/`}`;
+        const target = id === 'compatibility' ? (paid ? `/${id}/` : `/shop/${id}/`) : '/shop/bundle/';
+        const canonical = prefix + target;
         const html = site.render(path);
         assert.ok(html.includes(`<link rel="canonical" href="${origin}${canonical}">`), `${paid}: ${path}`);
         assert.ok(html.includes(`<meta property="og:url" content="${origin}${canonical}">`));
         assert.ok(html.includes(`"url":"${origin}${canonical}"`));
-        assert.ok(html.includes(`hreflang="en" href="${origin}/en${paid ? `/${id}/` : `/shop/${id}/`}"`));
-        assert.equal(sitemap.includes(`<loc>${origin}${path}</loc>`), !paid);
+        assert.ok(html.includes(`hreflang="en" href="${origin}/en${target}"`));
+        assert.equal(sitemap.includes(`<loc>${origin}${path}</loc>`), canonical === path);
         assert.ok(sitemap.includes(`<loc>${origin}${prefix}/${id}/</loc>`));
         assert.doesNotMatch(html, /name="robots" content="noindex/);
         assert.equal(site.redirect(path), null);
         if (!prefix) assert.ok(html.includes('id="purchase-form"'));
-        if (paid) assert.ok(site.render(`${prefix}/`).includes(`href="${prefix}/${id}/"`));
+        if (paid) assert.ok(site.render(`${prefix}/`).includes(`href="${canonical}"`));
       }
       for (const prefix of ['', '/en']) {
         const nextYear = `${prefix}/tojeong/2027/`;

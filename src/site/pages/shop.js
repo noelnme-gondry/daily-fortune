@@ -8,8 +8,8 @@ import { productPath } from '../product-path.js';
 function contentsBoard(product, compact = false) {
   return `<div class="reading-contents${compact ? ' is-compact' : ''}" aria-label="${product.name} 제공 내용">${product.chapters.map(c => `<div class="reading-contents-cell${c.id === 'closing' ? ' reading-contents-closing' : ''}"><strong>${c.title}</strong>${compact ? '' : `<span>${c.detail}</span>`}</div>`).join('')}<div class="reading-contents-file"><span>전체 상세 풀이</span><span>HTML 파일 보관</span></div></div>`;
 }
-function englishShop(path, title) {
-  return { path, title, description: `${title}: Korean fortune reports at KRW 990 each, including a detailed reading and an HTML download.`, section: '/shop/', noAds: true, crumbs: [['Fortune reports', '/shop/'], ...(path === '/shop/' ? [] : [[title, path]])], body: `<section class="shop-guide" id="report-start"><h1>${title}</h1><p class="lead">Fortune products are currently provided in Korean. Each report is a one-time purchase of KRW 990, with a detailed reading and an offline HTML download.</p><p>Payments are handled by NICEPAY. There is no subscription or automatic renewal.</p><p><a class="btn" data-set-language="ko" href="${path}">Continue in Korean</a></p><p>Purchased reports are linked to this browser. Save a copy before clearing cookies or changing devices.</p></section>` };
+function englishShop(path, title, product, year) {
+  return { path, title, description: `${title}: Korean fortune reports at KRW 990 each, including a detailed reading and an HTML download.`, section: '/shop/', noAds: true, crumbs: [['Fortune reports', '/shop/'], ...(path === '/shop/' ? [] : [[title, path]])], body: `<section class="shop-guide" id="report-start"${product ? ` data-sale-product="${product.id}"` : ''}${year ? ` data-reading-year="${year}"` : ''}><h1>${title}</h1><p class="lead">Fortune products are currently provided in Korean. A one-time purchase of KRW 990 includes one person’s Tojeong, lifetime saju and next year’s annual reading together. A two-person compatibility reading costs KRW 990 separately. Each reading includes an HTML download.</p><p>Payments are handled by NICEPAY. There is no subscription or automatic renewal.</p><p><a class="btn" data-set-language="ko" href="${path}">Continue in Korean</a></p><p>Purchased reports are linked to this browser. Save a copy before clearing cookies or changing devices.</p></section>` };
 }
 
 export function productCards(ctx, listId = 'home_reports') {
@@ -21,19 +21,21 @@ export function productCards(ctx, listId = 'home_reports') {
 const shell = (path, title, body) => ({ path, title, description: `${title}. 상품별 990원 단건 결제로 상세 풀이와 HTML 운세 다운로드를 제공합니다.`, section: '/shop/', noAds: true, crumbs: [['운세 상품', '/shop/'], ...(path === '/shop/' ? [] : [[title, path]])], body: `<div class="fortune-shop" lang="ko"><nav class="shop-nav" aria-label="운세 구매 메뉴"><a href="/shop/">운세 상품</a><a href="/shop/orders/">구매 보관함</a></nav>${body}</div>` });
 
 export function shopPage(ctx) {
-  if (isEnglish()) return englishShop('/shop/', 'Your fortune report');
-  return shell('/shop/', '나를 위한 운세 한 권', `<header class="shop-hero"><h1>나를 위한<br>운세 한 권</h1><div><p class="lead">궁금한 이야기 하나를 골라보세요.<br>상세 풀이를 읽고, 내 운세를 파일로 간직하세요.</p><p class="shop-promise">상품별 990원 · 단건 결제 · 운세 다운로드 포함</p></div></header>${productCards(ctx, 'shop_catalog')}<section class="shop-guide"><h2>구매는 이렇게 이어져요</h2><ol><li>상품을 고르고 출생 정보를 입력해요. 무료 미리보기도 볼 수 있어요.</li><li>나이스페이에서 990원을 결제해요.</li><li>상세 풀이를 읽고 운세 파일을 다운로드해요.</li></ol><p>구독이나 자동 갱신은 없습니다. 프리미엄 신년운세와 토정비결은 한 해·한 사람, 평생 사주는 한 사람, 궁합은 두 사람 한 쌍의 풀이입니다.</p><p>운세 파일은 HTML 형식입니다. 저장한 파일을 브라우저에서 열거나 인쇄 메뉴에서 PDF로 보관할 수 있습니다.</p></section>`);
+  if (isEnglish()) return englishShop('/shop/', 'Fortune bundle and compatibility');
+  return shell('/shop/', '프리미엄 운세 상품', `<header class="shop-hero"><h1>프리미엄 운세 상품</h1><div><p class="lead">내 운세 세 가지를 한 번에 읽거나, 두 사람의 궁합을 따로 볼 수 있어요.</p><p class="shop-promise">상품별 990원 · 단건 결제 · 운세 다운로드 포함</p></div></header>${productCards(ctx, 'shop_catalog')}<section class="shop-guide"><h2>구매는 이렇게 이어져요</h2><ol><li>상품을 고르고 출생 정보를 입력해요. 무료 미리보기도 볼 수 있어요.</li><li>나이스페이에서 990원을 결제해요.</li><li>상세 풀이를 읽고 운세 파일을 다운로드해요.</li></ol><p>구독이나 자동 갱신은 없습니다. 묶음 한 건은 한 사람의 토정비결·평생 사주·내년 신년운세를 모두 엽니다. 궁합 한 건은 두 사람 한 쌍의 풀이입니다.</p><p>운세 파일은 HTML 형식입니다. 저장한 파일을 브라우저에서 열거나 인쇄 메뉴에서 PDF로 보관할 수 있습니다.</p></section>`);
 }
 export function productPage(id, ctx, year) {
   const p = productEdition(fortuneProduct(id), year);
-  const pagePath = id === 'annual' ? productPath(id, ctx.cfg.paidReadings, year) : `/shop/${id}/`;
-  if (isEnglish()) return englishShop(pagePath, `${p.nameEn} report`);
-  const yearField = p.id === 'tojeong' ? `<div class="field"><label for="purchase-year">풀이를 볼 해</label><select class="input" id="purchase-year">${[ctx.today.y, ctx.today.y + 1].map(y => `<option value="${y}"${y === year ? ' selected' : ''}>${y}년</option>`).join('')}</select></div><p class="hint">태어난 시간과 성별은 필요하지 않습니다. 월별 풀이는 음력 기준입니다.</p>` : '';
+  const bundle = id === 'bundle';
+  const annualYear = ctx.today.y + 1;
+  const pagePath = `/shop/${id}/`;
+  if (isEnglish()) return englishShop(pagePath, p.nameEn, p, bundle ? annualYear : null);
+  const yearField = bundle ? `<div class="field"><label for="purchase-year">토정비결을 볼 해</label><select class="input" id="purchase-year">${[ctx.today.y, ctx.today.y + 1].map(y => `<option value="${y}"${y === (year ?? annualYear) ? ' selected' : ''}>${y}년</option>`).join('')}</select></div><p class="hint">토정비결은 선택한 해의 음력 열두 달을 풀이합니다. 신년운세는 ${annualYear}년 기준입니다.</p>` : '';
   const people = Array.from({ length: p.people }, (_, i) => {
     const slot = i ? 'b' : 'a';
     const label = p.people === 2 ? (i ? '상대' : '나') : '운세 볼 사람';
     return `<details open data-purchase-person="${slot}"><summary><strong>${label}</strong> <span data-person-caption></span></summary>
-      ${personFields(slot, p.people === 2 ? label : null, { dateOnly: p.id === 'tojeong' })}</details>`;
+      ${personFields(slot, p.people === 2 ? label : null)}</details>`;
   }).join('');
   const checkout = `<div class="shop-purchase-grid" id="report-start"><section>
     <form class="pform card" id="purchase-form" novalidate inert>
@@ -54,7 +56,7 @@ export function productPage(id, ctx, year) {
       </details>
     </section>
     <p role="status" class="purchase-status" data-purchase-status></p><p role="alert" class="form-error" data-purchase-error hidden></p></section>`;
-  return shell(pagePath, `${p.name} 990원`, `<div data-fortune-product="${p.id}"${id === 'annual' ? ` data-reading-year="${year}"` : ''}><header class="shop-product-head"><div><a href="/shop/">운세 상품</a><h1>${p.name}</h1><p class="lead">${p.description}</p>${id === 'annual' ? `<p>${year}년 1월 1일(한국 시간)부터 이 상세 풀이는 무료로 열립니다.</p>` : ''}<p>출생 정보를 입력하면 바로 결제하거나 무료로 한 줄을 미리 읽을 수 있습니다. 아래 목차의 전체 풀이와 파일은 결제 후 제공됩니다. 구독·자동 갱신은 없습니다.</p></div><div class="shop-price"><strong>990<span>원</span></strong><p>단건 결제 · 다운로드 포함</p></div></header><details class="shop-contents"><summary>전체 풀이 목차 보기</summary>${contentsBoard(p)}</details>${checkout}<aside class="shop-order-summary card box"><h2>이 상품에 담긴 이야기</h2><ul>${p.includes.map(s => `<li>${esc(s)}</li>`).join('')}</ul><p><b>990원</b> / ${p.people === 2 ? '두 사람 한 쌍' : '한 사람'}${p.id === 'tojeong' ? ' · 선택한 한 해' : ''}</p><p>상세 풀이와 운세 다운로드를 함께 제공합니다.</p><p class="hint">구매 보관함은 같은 브라우저에서 이용합니다. 쿠키를 지우거나 기기를 바꾸면 주문을 불러올 수 없으니 운세 파일도 저장해 주세요.</p><p class="hint">운세는 전통 해석을 참고하는 콘텐츠이며 미래의 사건이나 결과를 보장하지 않습니다.</p></aside></div></div>`);
+  return shell(pagePath, `${p.name} 990원`, `<div data-fortune-product="${p.id}"${bundle ? ` data-reading-year="${annualYear}"` : ''}><header class="shop-product-head"><div><a href="/shop/">운세 상품</a><h1>${p.name}</h1><p class="lead">${p.description}</p>${bundle ? `<p>${annualYear}년 신년운세는 한국 시간으로 ${annualYear}년 1월 1일부터 무료로 볼 수 있습니다.</p>` : ''}<p>출생 정보를 입력하면 바로 결제하거나 무료로 한 줄을 미리 읽을 수 있습니다. 아래 목차의 전체 풀이와 파일은 결제 후 제공됩니다. 구독·자동 갱신은 없습니다.</p></div><div class="shop-price"><strong>990<span>원</span></strong><p>단건 결제 · 다운로드 포함</p></div></header><details class="shop-contents"><summary>전체 풀이 목차 보기</summary>${contentsBoard(p)}</details>${checkout}<aside class="shop-order-summary card box"><h2>이 상품에 담긴 이야기</h2><ul>${p.includes.map(s => `<li>${esc(s)}</li>`).join('')}</ul><p><b>990원</b> / ${p.people === 2 ? '두 사람 한 쌍' : '한 사람'}${bundle ? ' · 풀이 3종' : ''}</p><p>상세 풀이와 운세 다운로드를 함께 제공합니다.</p><p class="hint">구매 보관함은 같은 브라우저에서 이용합니다. 쿠키를 지우거나 기기를 바꾸면 주문을 불러올 수 없으니 운세 파일도 저장해 주세요.</p><p class="hint">운세는 전통 해석을 참고하는 콘텐츠이며 미래의 사건이나 결과를 보장하지 않습니다.</p></aside></div></div>`);
 }
 export function ordersPage() {
   if (isEnglish()) return englishShop('/shop/orders/', 'Purchased reports');

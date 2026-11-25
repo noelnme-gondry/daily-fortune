@@ -104,7 +104,7 @@ test('KR/EN 월별 비교는 JS 없이 모바일에서 읽고 실제 백과로 �
   await context.route('https://**/*', (route) => route.abort());
   const page = await context.newPage();
   try {
-    for (const prefix of ['', '/en']) for (const y of [2026, 2027]) {
+    for (const prefix of ['', '/en']) for (const y of [todayKST().y]) {
       await page.goto(`http://127.0.0.1:4176${prefix}/year/${y}/`);
       await expect(page.locator('[data-example-month]')).toHaveCount(2);
       for (const m of [5, 11]) {
@@ -127,7 +127,7 @@ test('KR/EN 월별 비교는 JS 없이 모바일에서 읽고 실제 백과로 �
 
 test('KR/EN 월별 공개 해설은 직접 계산·재계산·저장 복원 결과와 같다', async ({ page }) => {
   const currentYear = todayKST().y;
-  for (const prefix of ['', '/en']) for (const y of [currentYear, currentYear + 1]) {
+  for (const prefix of ['', '/en']) for (const y of [...new Set([2026, currentYear])]) {
     const lang = prefix ? 'en' : 'ko', points = prefix ? ' points' : '점';
     const months = withLanguage(lang, () => yearMonths(buildChart({ ...EXAMPLE_INPUT }), y));
     await page.goto(`${prefix}/year/${y}/`);
@@ -168,7 +168,7 @@ test('자바스크립트 없이 가상 예시와 연간 기능 이동을 읽고 
   await context.route('https://**/*', (route) => route.abort());
   const page = await context.newPage();
   try {
-    for (const path of ['/today/', '/tomorrow/', '/manseryeok/', '/year/2027/']) {
+    for (const path of ['/today/', '/tomorrow/', '/manseryeok/', '/year/2026/']) {
       await page.goto(`http://127.0.0.1:4176${path}`);
       if (['/today/', '/tomorrow/'].includes(path)) {
         await page.getByRole('link', { name: '결과 예시와 읽는 법', exact: true }).click();
@@ -179,8 +179,8 @@ test('자바스크립트 없이 가상 예시와 연간 기능 이동을 읽고 
       await page.getByRole('link', { name: '내 정보로 직접 이용하기' }).click();
       await expect(page).toHaveURL(/#tool$/);
     }
-    await page.locator('section[aria-labelledby="year-guide-title"] a[href="/tojeong/2027/"]').click();
-    await expect(page.getByRole('heading', { name: '2027년 토정비결', exact: true })).toBeVisible();
+    await page.locator('section[aria-labelledby="year-guide-title"] a[href="/tojeong/"]').click();
+    await expect(page.getByRole('heading', { name: /토정비결/, level: 1 })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   } finally { await context.close(); }
 });
@@ -215,24 +215,24 @@ test('오늘·내일 공개 예시에서 직접 계산하면 같은 점수가 �
   }
 });
 
-test('공개 예시 → 직접 입력 → 2027년 결과 → 다음 기능에서 복원, 시간 미상 재계산', async ({ page }) => {
-  await page.goto('/year/2027/');
+test('공개 예시 → 직접 입력 → 2026년 결과 → 다음 기능에서 복원, 시간 미상 재계산', async ({ page }) => {
+  await page.goto('/year/2026/');
   const c = buildChart({ ...EXAMPLE_INPUT });
-  await expect(page.locator('[data-example-overall]')).toHaveText(`${year(c, 2027).overall.score}점`);
+  await expect(page.locator('[data-example-overall]')).toHaveText(`${year(c, 2026).overall.score}점`);
   expect((await events(page)).filter((e) => e[1] === 'calc_result')).toHaveLength(0);
   await page.getByRole('link', { name: '내 정보로 직접 이용하기' }).click();
   await enter(page);
   await completeProfile(page);
   await page.locator('#tool-form button[type="submit"]').click();
-  await expect(page.locator('#result .ring')).toHaveAttribute('aria-label', '종합 58점');
-  await expect(page.locator('#result .mcard-top .num')).toHaveText(yearMonths(c, 2027).map((m) => String(m.score)));
+  await expect(page.locator('#result .ring')).toHaveAttribute('aria-label', `종합 ${year(c, 2026).overall.score}점`);
+  await expect(page.locator('#result .mcard-top .num')).toHaveText(yearMonths(c, 2026).map((m) => String(m.score)));
   await editProfile(page);
   await page.locator('#a-notime').check();
   await completeProfile(page);
   await page.locator('#tool-form button[type="submit"]').click();
-  await expect(page.locator('#result .ring')).toHaveAttribute('aria-label', '종합 62점');
+  await expect(page.locator('#result .ring')).toHaveAttribute('aria-label', `종합 ${year(buildChart({ ...EXAMPLE_INPUT, time: null }), 2026).overall.score}점`);
   await expect(page.locator('#result .pillar-table')).toContainText('시간 모름');
-  await expect(page.locator('[data-example-overall]')).toHaveText('58점');
+  await expect(page.locator('[data-example-overall]')).toHaveText(`${year(c, 2026).overall.score}점`);
   const first = await events(page);
   expect(first.filter((e) => e[1] === 'calc_start')).toHaveLength(1);
   expect(first.filter((e) => e[1] === 'calc_result').map((e) => e[2].calc_origin)).toEqual(['form', 'form']);
@@ -298,7 +298,7 @@ test('캐릭터·랭킹·궁합의 기존 결과 이벤트는 개인 결과 값 
 });
 
 test('결과 공유는 개인 URL을 자동 이탈 클릭 측정용 링크에 남기지 않는다', async ({ page }) => {
-  await page.goto('/year/2027/');
+  await page.goto('/year/2026/');
   await enter(page);
   await completeProfile(page);
   await page.locator('#tool-form button[type="submit"]').click();

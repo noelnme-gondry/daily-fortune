@@ -13,7 +13,7 @@ const chart = buildChart(input);
 const periods = [
   ['/today/', () => day(chart, date)], ['/tomorrow/', () => day(chart, addDays(date, 1))],
   ['/week/', () => week(chart, date)], ['/month/', () => month(chart, 2026, 10)],
-  ['/year/2026/', () => year(chart, 2026)], ['/year/2027/', () => year(chart, 2027)],
+  ['/year/2026/', () => year(chart, 2026)],
 ];
 // 광고 실적을 발생시키지 않고 실제 발급 설정과 iframe 삽입을 검증한다.
 const sdkStub = `window.partnerCalls = []; window.PartnersCoupang = { G: function(options) {

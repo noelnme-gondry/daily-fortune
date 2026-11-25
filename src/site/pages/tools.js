@@ -1,5 +1,4 @@
 import { groupedLinks } from '../purpose-navigation.js';
-import { annualPath } from '../product-path.js';
 import { productCards } from './shop.js';
 import { elementName, animalName } from '../../i18n/terms.js';
 import { tr } from '../../i18n/runtime.js';
@@ -100,7 +99,7 @@ function toolPage(key, ctx, opts = {}) {
     tomorrow: tr('내일의 흐름을 오늘 미리 살펴보세요.', 'Look ahead to tomorrow’s reading.'),
     week: tr('월요일부터 일요일까지, 한 주의 흐름을 읽어요.', 'Explore your week, Monday through Sunday.'),
     month: tr('한 달의 흐름과 날짜별 기운을 함께 살펴봐요.', 'See the month’s rhythm and daily scores.'),
-    year: opts.year === ctx.today.y + 1 ? tr('총운과 일곱 분야 풀이, 열두 달의 점수를 무료로 읽어보세요.', 'Read your annual overview, seven life areas and twelve monthly scores for free.') : tr(`${opts.year}년의 큰 흐름과 열두 달의 변화를 읽어요.`, `Explore ${opts.year} and its twelve monthly readings.`),
+    year: tr(`${opts.year}년의 큰 흐름과 열두 달의 변화를 읽어요.`, `Explore ${opts.year} and its twelve monthly readings.`),
     lifetime: tr('타고난 성향과 10년마다 바뀌는 흐름을 살펴봐요.', 'Explore natal traits and ten-year cycles.'),
     compatibility: tr('두 사람의 닮은 점과 다른 점을 읽어보세요.', 'Discover your similarities and differences.'),
     story: tr('내 사주를 아홉 장면의 캐릭터로 만나보세요.', 'Meet the nine characters of your life story.'),
@@ -114,7 +113,7 @@ function toolPage(key, ctx, opts = {}) {
     path: t.path, title: t.title, description: t.desc, crumbs: opts.crumbs || [[t.nav, t.path]], section: t.path,
     tool: true, share: false, ld: [webApp(t, ctx), faqLd(faq)],
     supplement: `${opts.example || ''}${opts.guide || ''}${guideLinks()}${adSlot(ctx, 'inline')}`,
-    body: `<div class="calculator-intro">${hero(t.h1, intro)}</div>${mode === 'year' && opts.year === ctx.today.y + 1 ? `<nav class="reading-entry" aria-label="${tr('신년운세 선택', 'Annual reading options')}"><a href="#tool">${tr('무료 운세 보기', 'Read free overview')}</a><a href="${annualPath(opts.year)}">${tr(`${opts.year}년 프리미엄 운세 · 990원`, `${opts.year} premium reading · KRW 990`)}</a></nav>` : ''}${dailyEntry}${toolBlock(mode, ctx, opts)}${top}${opts.zodiacPreview || ''}${opts.example ? `<p class="note"><a href="#public-example">${tr('결과 예시와 읽는 법', 'See a worked example and reading guide')}</a></p>` : ''}<div class="info-panels">${disclosure('tool-method', siteText('계산 방법과 점수 기준'), `<p>${esc(t.lead)}</p>${howBlock(mode === 'year' ? 'year' : mode)}`)}${extraAfter ? disclosure('tool-more', siteText('관련 운세와 더 알아보기'), extraAfter) : ''}${disclosure('tool-faq', siteText('자주 묻는 질문'), faqBlock(faq, null), 'help')}${disclosure('tool-related', siteText('다른 운세 둘러보기'), relatedFor(t.path, ctx))}</div>`,
+    body: `<div class="calculator-intro">${hero(t.h1, intro)}</div>${dailyEntry}${toolBlock(mode, ctx, opts)}${top}${opts.zodiacPreview || ''}${opts.example ? `<p class="note"><a href="#public-example">${tr('결과 예시와 읽는 법', 'See a worked example and reading guide')}</a></p>` : ''}<div class="info-panels">${disclosure('tool-method', siteText('계산 방법과 점수 기준'), `<p>${esc(t.lead)}</p>${howBlock(mode === 'year' ? 'year' : mode)}`)}${extraAfter ? disclosure('tool-more', siteText('관련 운세와 더 알아보기'), extraAfter) : ''}${disclosure('tool-faq', siteText('자주 묻는 질문'), faqBlock(faq, null), 'help')}${disclosure('tool-related', siteText('다른 운세 둘러보기'), relatedFor(t.path, ctx))}</div>`,
   };
 }
 
@@ -156,9 +155,8 @@ export const manseryeok = (ctx) => toolPage('manseryeok', ctx, {
 });
 
 export function yearPage(y, ctx) {
-  const rel = y === ctx.today.y ? siteText('올해') : y === ctx.today.y + 1 ? siteText('내년') : '';
+  const rel = y === ctx.today.y ? siteText('올해') : '';
   const t = yearTool(y, rel);
-  if (y === ctx.today.y + 1) t.desc = tr(`${y}년 개인 총운과 분야별 풀이, 열두 달 점수를 무료로 확인하세요. 월별 상세 해설과 분기별 계획은 990원이며 ${y}년 1월 1일부터 무료로 열립니다.`, `Read your free ${y} overview and monthly scores. The detailed Korean reading is KRW 990 until it becomes free on January 1, ${y} (KST).`);
   const yp = yearPillar(y);
   const sj = samjaeYear(y);
   const top = `<section class="daybox card" aria-label="${y}${siteText("년 세운")}"><div class="daybox-main"><span class="daybox-k">${y}${siteText("년")}${rel ? ` · ${rel}` : ''}</span><b class="daybox-d">${pillarLabel(yp)}${siteText("년")}</b><span class="muted">${STEM_EL[yp.s] === BR_EL[yp.b] ? `${siteText("천간과 지지가 모두 ")}${elementName(STEM_EL[yp.s])}(${EL_H[STEM_EL[yp.s]]})` : `${siteText("천간 ")}${elementName(STEM_EL[yp.s])}(${EL_H[STEM_EL[yp.s]]}${siteText(") · 지지 ")}${elementName(BR_EL[yp.b])}(${EL_H[BR_EL[yp.b]]})`}${siteText("의 해, ")}${animalName(yp.b)}${siteText("띠 해")}</span></div>
@@ -166,9 +164,9 @@ export function yearPage(y, ctx) {
   return toolPage('year', ctx, { tool: t, mode: 'year', year: y, top, example: yearExample(y, ctx), guide: yearGuide(y, ctx, t.path), crumbs: [[siteText('신년운세'), '/year/'], [`${y}${siteText("년 운세")}`, t.path]] });
 }
 export function yearHub(ctx) {
-  const ys = [ctx.today.y, ctx.today.y + 1, ...ctx.years.filter(y => y < ctx.today.y).reverse()];
+  const ys = ctx.years.filter(y => y <= ctx.today.y).reverse();
   return {
-    path: '/year/', title: siteText('[무료] 신년운세 — 올해·내년 사주 총운과 월별 운세'), description: `${siteText('회원가입 없이 무료로 보는 ')}${ys.join(siteText('년·'))}${siteText("년 신년운세. 내 사주와 세운·대운으로 계산한 연간 총운과 분야별 점수, 1~12월 월별 운세를 연도별로 확인하세요. 토정비결과의 차이도 안내합니다.")}`,
+    path: '/year/', title: tr('[무료] 신년운세 — 올해 사주 총운과 월별 운세', 'Free annual fortune — this year’s overview and monthly readings'), description: `${siteText('회원가입 없이 무료로 보는 ')}${ys.join(siteText('년·'))}${siteText("년 신년운세. 내 사주와 세운·대운으로 계산한 연간 총운과 분야별 점수, 1~12월 월별 운세를 연도별로 확인하세요. 토정비결과의 차이도 안내합니다.")}`,
     crumbs: [[siteText('신년운세'), '/year/']], section: '/year/',
     body: `${hero(siteText('무료 신년운세'), siteText('신년운세는 그 해의 간지(세운)가 내 사주 원국과 맺는 관계로 한 해의 흐름을 봅니다. 연도를 골라 총운과 1~12월 월별 운세를 확인하세요.'), FREE_ACCESS.summary)}<div class="cards">${ys.map((y) => `<a class="card link-card" href="/year/${y}/"><b>${y}${siteText("년 운세")}</b><span>${pillarLabel(yearPillar(y))}${siteText("년 · ")}${animalName(yearPillar(y).b)}${siteText("띠 해")}</span></a>`).join('')}</div><p class="note">${siteText("이곳의 신년운세는 사주 방식으로 계산합니다. 144괘로 한 해를 읽으려면 ")}<a href="/tojeong/">${tr('토정비결 · 990원', 'Tojeong · KRW 990')}</a>${siteText("을 이용하세요. ")}<a href="/about/#tojeong">${siteText("두 방식의 차이")}</a>${siteText("도 확인할 수 있습니다.")}</p>`,
   };
@@ -185,7 +183,6 @@ export function home(ctx) {
     [TOOLS.tomorrow.path, TOOLS.tomorrow.nav, siteText('내일의 일진으로 미리 보는 하루')],
     [TOOLS.week.path, TOOLS.week.nav, siteText('요일별 점수와 분야별 최고의 요일')],
     [TOOLS.month.path, TOOLS.month.nav, siteText('월운과 날짜별 길일 달력')],
-    [yearTool(y + 1).path, yearTool(y + 1).nav, siteText('내년 총운과 월별 운세')],
     ['/tojeong/', tr('토정비결 · 990원', 'Tojeong · KRW 990'), siteText('144괘로 보는 총운과 음력 열두 달의 풀이')],
     [TOOLS.manseryeok.path, TOOLS.manseryeok.nav, siteText('사주팔자 원국과 대운 바로 계산')],
   ];
@@ -202,13 +199,13 @@ export function home(ctx) {
       ${homeReadingPreview(o)}
     </section>
     <section class="home-discovery box-sec" aria-labelledby="home-discovery-title"><h2 id="home-discovery-title">${siteText('재미로 보는 사주')}</h2>${features}<p class="note">${tr('사주는 전통 해석을 참고하는 도구입니다. 점수는 사건의 확률이나 사람의 가치를 뜻하지 않습니다.', 'Saju offers traditional interpretations for reflection. Scores are not event probabilities or a measure of anyone’s worth.')}</p></section>
-    ${ctx.lang === 'en' ? '<section class="box-sec home-purchases"><div class="sec-head"><h2>Premium fortune reports</h2><a href="/shop/">View all reports</a></div><p>Korean fortune reports: KRW 990 each as a one-time purchase, including a detailed reading and download.</p>' + productCards(ctx) + '</section>' : `<section class="box-sec home-purchases" aria-labelledby="home-purchases-title" lang="ko"><div class="sec-head"><h2 id="home-purchases-title">프리미엄 운세</h2><a href="/shop/">상품 전체 보기</a></div><p><a href="/year/${y + 1}/">${y + 1}년 총운과 월별 점수는 무료로 볼 수 있습니다.</a> 월별 상세 해설과 다운로드가 담긴 프리미엄 운세는 990원입니다.</p>${productCards(ctx)}</section>`}
+    ${ctx.lang === 'en' ? '<section class="box-sec home-purchases"><div class="sec-head"><h2>Premium fortune reports</h2><a href="/shop/">View all reports</a></div><p>Read Tojeong, lifetime saju and next year’s fortune together for KRW 990. Two-person compatibility is a separate KRW 990 purchase.</p>' + productCards(ctx) + '</section>' : `<section class="box-sec home-purchases" aria-labelledby="home-purchases-title" lang="ko"><div class="sec-head"><h2 id="home-purchases-title">프리미엄 운세</h2><a href="/shop/">상품 전체 보기</a></div><p>토정비결·평생 사주·${y + 1}년 신년운세는 세 가지를 묶어 990원입니다. 두 사람의 궁합은 별도로 구매할 수 있습니다.</p>${productCards(ctx)}</section>`}
     <section class="box-sec home-services" aria-labelledby="home-services-title"><div class="sec-head"><h2 id="home-services-title">${tr('지금, 무엇이 궁금한가요?', 'What are you curious about?')}</h2></div><p class="note">${esc(HOME_ACCESS.a)}</p>${groupedLinks(o, '', 'purpose-groups home-purpose-groups', ctx.cfg.paidReadings)}</section>
     <nav class="reading-guides" aria-label="${tr('처음 읽는 분을 위한 안내', 'Guides for your first reading')}"><a href="/saju/guide/"><b>${tr('처음 보는 사주, 어디부터 읽을까요?', 'New to saju? Start here.')}</b><span>${tr('일간·오행·대운을 쉬운 말로 알아보세요.', 'Learn about Day Masters, elements and cycles.')}</span></a><a href="/about/"><b>${tr('결과는 어떻게 계산하나요?', 'How is a reading calculated?')}</b><span>${tr('계산 기준과 해석의 범위를 확인하세요.', 'Explore the method and its limits.')}</span></a></nav>
     ${guideLinks()}
     ${faqBlock(HOME.faq)}`;
   return {
-    path: '/', title: HOME.title, description: HOME.description.replace('{year}', y + 1), section: '/', tool: true, crumbs: [],
+    path: '/', title: HOME.title, description: HOME.description.replace('{year}', y), section: '/', tool: true, crumbs: [],
     ld: [faqLd(HOME.faq), { '@type': 'ItemList', name: `${SITE.name}${siteText(" 운세 종류")}`, itemListElement: cards.map(([h, t], i) => ({ '@type': 'ListItem', position: i + 1, name: t, url: `${ctx.site}${h}` })) }],
     body,
   };

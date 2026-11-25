@@ -16,7 +16,7 @@ const person = { name: '가나다', calendar: 'solar', y: 1990, m: 5, d: 17, gen
 const partner = { ...person, name: '라마바', gender: 'F', y: 1991 };
 const input = id => ({ productId: id, people: id === 'compatibility' ? [person, partner] : [person], targetYear: id === 'annual' ? 2027 : 2026, privacyConsent: true });
 const readings = JSON.parse(readFileSync(new URL('../src/content/tojeong-144.json', import.meta.url), 'utf8'));
-for (const id of Object.keys(READING_CHAPTERS)) test(`${id}: 판매 목차 모두 실제 해설로 제공하고 도움말·오프라인 펼침을 포함한다`, () => {
+for (const id of ['annual', 'tojeong', 'lifetime', 'compatibility']) test(`${id}: 판매 목차 모두 실제 해설로 제공하고 도움말·오프라인 펼침을 포함한다`, () => {
   const { html } = createFortuneReport(input(id), today);
   for (const chapter of READING_CHAPTERS[id]) assert.equal(html.split(`id="reading-${chapter.id}"`).length - 1, 1);
   assert.match(html, /좋지 않은 풀이가 마음에 남을 때/);
