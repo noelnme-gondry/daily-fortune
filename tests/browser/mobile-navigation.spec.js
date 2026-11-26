@@ -24,8 +24,11 @@ test('상단 메뉴를 가로·세로로 이동해 내일 운세를 열고 키�
   await tomorrow.click();
   await expect(page).toHaveURL(/\/tomorrow\/$/);
   await page.mouse.move(0, 0);
+  await expect(toggle).toBeVisible();
   await toggle.focus();
+  await expect(toggle).toBeFocused();
   await page.keyboard.press('Enter');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Tab');
   await expect(menu.locator('.nav-links a').first()).toBeFocused();
   await page.keyboard.press('Escape');
