@@ -55,6 +55,6 @@ export function editorial(ctx) {
 export function notFound() {
   return {
     path: '/404/', title: siteText('페이지를 찾을 수 없습니다'), description: siteText('요청한 페이지가 없거나 주소가 바뀌었습니다.'), noindex: true, crumbs: [],
-    body: `${hero(siteText('페이지를 찾을 수 없습니다'), siteText('주소가 바뀌었거나 없는 페이지입니다. 아래에서 원하는 운세를 찾아보세요.'))}<div class="cards"><a class="card link-card" href="/today/"><b>${siteText("오늘의 운세")}</b><span>${siteText("내 사주로 보는 오늘")}</span></a><a class="card link-card" href="/tti/today/"><b>${siteText("띠별 오늘의 운세")}</b><span>${siteText("12띠 오늘 점수")}</span></a><a class="card link-card" href="/saju/"><b>${siteText("사주 백과")}</b><span>${siteText("일주·십신·오행·신살")}</span></a></div>`,
+    body: `${hero(siteText('페이지를 찾을 수 없습니다'), siteText('주소가 바뀌었거나 없는 페이지입니다. 아래에서 원하는 운세를 찾아보세요.'))}<div class="cards"><a class="card link-card" href="/today/"><b>${siteText("오늘의 운세")}</b><span>${siteText("내 사주로 보는 오늘")}</span></a><a class="card link-card" href="/tti/"><b>${siteText("띠별 운세")}</b><span>${tr("오늘·내일 12띠 풀이", "Daily readings for the 12 signs")}</span></a><a class="card link-card" href="/saju/"><b>${siteText("사주 백과")}</b><span>${siteText("일주·십신·오행·신살")}</span></a></div>`,
   };
 }

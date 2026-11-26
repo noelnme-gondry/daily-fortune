@@ -138,9 +138,9 @@ button, input, select { font: inherit; color: inherit; }
 .brand-name small { font-size: 12px; color: var(--ink-2); }
 .gnav-row { display: flex; align-items: stretch; position: relative; gap: 12px; }
 .gnav { display: flex; flex: 1; max-width: 640px; }
-.gnav a { display: flex; align-items: center; justify-content: center; flex: 1; min-height: 48px; padding: 8px 10px; color: var(--ink-2); text-decoration: none; font-size: 14px; line-height: 1.4; border-bottom: 2px solid transparent; text-align: center; }
-.gnav a:hover { color: var(--ink); }
-.gnav a[aria-current="page"] { color: var(--accent); font-weight: 600; border-bottom-color: var(--accent); }
+.gnav .nav-main { display: flex; align-items: center; justify-content: center; flex: 1; min-height: 48px; padding: 8px 10px; color: var(--ink-2); text-decoration: none; font-size: 14px; line-height: 1.4; border-bottom: 2px solid transparent; text-align: center; }
+.gnav .nav-main:hover { color: var(--ink); }
+.gnav .nav-main[aria-current] { color: var(--accent); font-weight: 600; border-bottom-color: var(--accent); }
 .gnav .profiles-tab { flex: 1; min-height: 48px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--ink-2); font: 500 14px/1.4 var(--f-body); padding: 8px; cursor: pointer; white-space: nowrap; }
 .gnav .profiles-tab:hover { color: var(--accent); background: var(--accent-soft); }
 @media (max-width: 900px) {
@@ -268,7 +268,6 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 
 /* 띠별 목록 */
 .tti-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0 24px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding-inline: 18px; }
-.tti-list.short { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 .tti-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 4px 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .tti-row p { grid-column: 1 / -1; font-size: 14.5px; }
 .tti-name { color: var(--ink); text-decoration: none; font-weight: 600; display: flex; gap: 8px; align-items: baseline; }
@@ -339,12 +338,6 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: v
 .reading-guides b { font-size: 15px; }
 .reading-guides span { font-size: 13px; color: var(--ink-2); }
 .home-services > .note { margin-bottom: 14px; }
-.reading-entry { display: flex; flex-wrap: wrap; gap: 8px 20px; }
-.reading-entry a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
-.reading-entry a:hover { border-color: var(--accent); }
-.reading-entry b { font-size: 15px; }
-.reading-entry span { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
-@media (max-width: 560px) { .reading-entry { grid-template-columns: minmax(0, 1fr); } }
 
 /* 계산기 */
 .tool { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: start; }
@@ -442,7 +435,7 @@ body:has(.tool.has-result) #public-example { display: none; }
 .manse-basis > p { margin: 12px 0 18px; }
 .manse-basis li p { margin: 6px 0; }
 @media (max-width: 420px) {
-  .gnav .profiles-tab, .gnav a { padding-inline: 5px; font-size: 14px; }
+  .gnav .profiles-tab, .gnav .nav-main { padding-inline: 5px; font-size: 14px; }
   .gnav-row { gap: 6px; }
   .profile-manager { padding: 18px; }
 }
@@ -978,7 +971,7 @@ p, li { text-wrap: pretty; }
 .zodiac-hero > .page-hero { min-width: 0; }
 .chips .animal-icon { width: 32px; height: 32px; }
 .tti-name { align-items: center; }
-.tti-nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.tti-nav { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
 .tti-nav .link-card { padding: 14px; }
 .tti-nav .link-card[aria-current] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
 .tti-content { display: grid; gap: 24px; min-width: 0; }
@@ -1216,9 +1209,7 @@ body:has(dialog[open]) { overflow: hidden; }
 .comparison b { font-size: 28px; color: var(--accent); }
 @media (max-width: 900px) {
   .zodiac-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .tti-nav { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .tti-nav > a { grid-column: span 2; }
-  .tti-nav > a:nth-last-child(-n+2) { grid-column: span 3; }
+  .tti-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
   .zodiac-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1278,10 +1269,24 @@ body:has(dialog[open]) { overflow: hidden; }
 /* 목적별 구조: 읽을 본문은 펼치고, 계산 상세는 맥락을 담은 별도 창으로 제공한다. */
 .gnav-row { display: block; }
 .gnav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)) auto; max-width: none; min-width: 0; }
-.gnav a { display: grid; align-content: center; justify-content: start; text-align: left; padding: 16px 10px; gap: 2px; color: var(--ink); }
-.gnav a b { font: 700 15px/1.5 var(--f-display); }
-.gnav a small { font-size: 12px; color: var(--ink-2); }
-.gnav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); background: var(--accent-soft); }
+.gnav .nav-main { display: grid; align-content: center; justify-content: start; text-align: left; padding: 16px 10px; gap: 2px; color: var(--ink); }
+.gnav .nav-main b { font: 700 15px/1.5 var(--f-display); }
+.gnav .nav-main small { font-size: 12px; color: var(--ink-2); }
+.gnav .nav-main[aria-current] { color: var(--ink); border-bottom-color: var(--accent); background: var(--accent-soft); }
+/* Keep the pointer inside the same group all the way from its label to its links. */
+.nav-group { position: relative; display: flex; min-width: 0; }
+.gnav .nav-main { min-width: 0; overflow-wrap: anywhere; }
+.nav-toggle { flex: 0 0 28px; padding: 0; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; }
+.nav-toggle::after { content: ''; display: inline-block; width: 7px; height: 7px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+.nav-toggle[aria-expanded="true"]::after { transform: rotate(225deg); }
+.nav-group:has(.nav-main[aria-current]), .nav-group:has(.nav-toggle[aria-expanded="true"]) { background: var(--accent-soft); }
+.nav-links { position: absolute; z-index: 22; inset: 100% auto auto 0; width: max(100%, 182px); max-height: min(55dvh, 22rem); overflow-y: auto; overscroll-behavior: contain; margin: 0; padding: 4px; list-style: none; background: var(--paper); border: 1px solid var(--line); border-radius: 0 0 8px 8px; box-shadow: 0 8px 16px #21170f1a; }
+.nav-links a { display: block; padding: 10px; color: var(--ink); line-height: 1.5; text-decoration: none; overflow-wrap: anywhere; }
+.nav-links a:is(:hover, :focus-visible, [aria-current]) { background: var(--accent-soft); }
+@media (prefers-reduced-motion: no-preference) {
+  .nav-links:not([hidden]) { animation: nav-reveal 150ms ease-out; }
+  @keyframes nav-reveal { from { opacity: 0; clip-path: inset(0 0 16%); } to { opacity: 1; clip-path: inset(0); } }
+}
 .head-row > .profiles-tab { margin-left: auto; min-height: 44px; white-space: nowrap; color: var(--ink); }
 .head-row .language-switch { margin-left: 0; }
 .all-menu-button { color: var(--ink); white-space: nowrap; }
@@ -1371,12 +1376,16 @@ body:has(dialog[open]) { overflow: hidden; }
 :where(h1,h2,h3,h4,.purpose-links a,.sbtn) { color: var(--ink); }
 .sbtn, .result-next a { color: var(--ink); }
 .btn, .sbtn.primary { color: var(--on-accent); }
-@media (max-width: 1000px) { .gnav a small { display: none; } .gnav a b { font-size: 14px; } .evidence-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1000px) { .gnav .nav-main small { display: none; } .gnav .nav-main b { font-size: 14px; } .evidence-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 760px) {
   .gnav-row { display: block; }
   .gnav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
-  .gnav a { min-height: 44px; padding: 8px 4px; justify-content: center; text-align: center; }
-  .gnav a b { font: 500 13px/1.45 var(--f-body); }
+  .gnav .nav-main { min-height: 44px; padding: 8px 4px; justify-content: center; text-align: center; }
+  .gnav .nav-main b { font: 500 13px/1.45 var(--f-body); }
+  .nav-links { width: max(100%, min(182px, 65vw)); }
+  .nav-group:nth-child(3n + 2) .nav-links { left: 50%; transform: translateX(-50%); }
+  .nav-group:nth-child(3n) .nav-links { left: auto; right: 0; }
+  .nav-toggle { flex-basis: 26px; }
   .gnav-row .all-menu-button { padding: 8px 4px; border: 0; background: transparent; font-size: 13px; }
   .head-row { gap: 6px; padding-block: 6px 2px; flex-wrap: nowrap; }
   .head-row .brand { flex: none; min-width: max-content; gap: 6px; }
@@ -1405,6 +1414,13 @@ body:has(dialog[open]) { overflow: hidden; }
   .site-menu { padding: 16px; }
 }
 
+.reading-contents.is-bundle { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.reading-contents.is-bundle .reading-contents-cell { grid-column: auto; background: var(--paper); }
+.reading-contents.is-bundle.is-compact { flex: 0 0 auto; }
+.fortune-product:has(.is-bundle) .fortune-product-bottom { margin-top: auto; }
+@media (max-width: 760px) {
+  .reading-contents.is-bundle { grid-template-columns: minmax(0, 1fr); }
+}
 /* 휴대폰에서는 풀이 본문을 먼저 읽고, 상품 선택은 넓은 버튼으로 이어간다. */
 @media (max-width: 760px) {
   main { font-size: 17px; line-height: 1.85; }

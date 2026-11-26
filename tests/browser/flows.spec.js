@@ -666,38 +666,40 @@ test('12띠 생성형 심볼이 띠 메뉴·일별 상세·연간 운세에 로�
   }
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto('/');
-  const zodiac = page.locator('.home-purpose-groups a[href="/tti/today/"]');
+  const zodiac = page.locator('.home-purpose-groups a[href="/tti/"]');
   await zodiac.scrollIntoViewIfNeeded();
   await expect(zodiac).toBeVisible();
   await zodiac.click();
+  await expect(page.locator('[data-zodiac-guide]')).toBeVisible();
+  await page.locator('.tti-nav a[href="/tti/today/"]').click();
   await expect(page.locator('main .tti-row')).toHaveCount(12);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 });
 
-test('띠 안내 허브에서 오늘로 진입 · 쥐띠 라이트박스 · 다섯 메뉴 및 뒤로가기', async ({ page }) => {
+test('띠 안내 허브에서 오늘로 진입 · 쥐띠 라이트박스 · 날짜 메뉴 및 뒤로가기', async ({ page }) => {
   await page.goto('/tti/');
   await expect(page.locator('[data-zodiac-guide]')).toBeVisible();
   await page.locator('main a[href="/tti/today/"]').first().click();
   await expect(page.locator('h1')).toContainText('오늘');
-  await expect(page.locator('.tti-nav > a')).toHaveCount(5);
+  await expect(page.locator('.tti-nav a[href="/tti/tomorrow/"]')).toBeVisible();
   await page.locator('.tti-name').first().click();
   await expect(page.locator('dialog[open]')).toContainText('쥐띠의 오늘');
   await expect(page).toHaveURL(/\/tti\/today\/$/);
   await page.keyboard.press('Escape');
   await page.evaluate(() => { window._navIdentity = document.querySelector('.tti-nav'); });
-  const yearLink = page.locator('.tti-nav > a').nth(1);
+  const yearLink = page.locator(`.tti-nav a[href="/tti/${todayKST().y}/"]`);
   await yearLink.click();
   await expect(page.locator('h1')).toContainText('년 띠별 운세');
   expect(await page.evaluate(() => window._navIdentity === document.querySelector('.tti-nav'))).toBe(true);
   await expect(page.locator('[data-share-page]')).toHaveAttribute('data-url', /\/tti\/\d{4}\/$/);
   await page.goBack();
   await expect(page.locator('h1')).toContainText('오늘');
-  await expect(page.locator('.tti-nav > a')).toHaveCount(5);
+  await expect(page.locator('.tti-nav a[href="/tti/tomorrow/"]')).toBeVisible();
 });
 
 test('연간 띠 운세: 출생 연도 선택 후 12개월과 내 해석만 갱신', async ({ page }) => {
   await page.goto('/tti/');
-  const yearHref = await page.locator('.tti-nav > a').nth(1).getAttribute('href');
+  const yearHref = await page.locator(`.tti-nav a[href="/tti/${todayKST().y}/"]`).getAttribute('href');
   await page.goto(`${yearHref}rat/`);
   await expect(page.locator('[data-monthly-flow] article')).toHaveCount(12);
   await page.locator('[data-cohort]').selectOption('1996');
