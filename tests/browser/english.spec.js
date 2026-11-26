@@ -114,7 +114,7 @@ test('English home input, result sharing and locale switch preserve the selected
 
 test('English zodiac soft navigation updates language links, metadata and cohort readings', async ({ page }) => {
   await page.goto('/en/tti/');
-  await page.locator('.tti-nav > a').nth(1).click();
+  await page.locator(`.tti-nav a[href="/en/tti/${todayKST().y}/"]`).click();
   await expect(page).toHaveURL(new RegExp(`/en/tti/${todayKST().y}/`));
   await expect(page.locator('[data-set-language="ko"]')).toHaveAttribute('href', `/tti/${todayKST().y}/`);
   await expect(page.locator('link[hreflang="en"]')).toHaveAttribute('href', new RegExp(`/en/tti/${todayKST().y}/$`));
@@ -167,7 +167,9 @@ test('legacy language links canonicalize in one hop and keep campaign parameters
 test('tomorrow zodiac previews lead to the full reading and back in both languages', async ({ page, context }) => {
   for (const [language, prefix] of [['ko', ''], ['en', '/en']]) {
     await context.addCookies([{ name: 'fortune-language', value: language, url: 'http://127.0.0.1:4176' }]);
-    await page.goto(`${prefix}/tomorrow/`);
+    await page.goto(`${prefix}/tti/`);
+    await page.locator(`.tti-nav a[href="${prefix}/tti/tomorrow/"]`).click();
+    await expect(page.locator('main .tti-row')).toHaveCount(12);
     const detail = `${prefix}/tti/tomorrow/monkey/`;
     await page.locator(`a[data-dialog][href="${detail}"]`).click();
     const dialog = page.getByRole('dialog');
@@ -175,7 +177,9 @@ test('tomorrow zodiac previews lead to the full reading and back in both languag
     await dialog.locator(`a[href="${detail}"]`).click();
     await expect(page).toHaveURL(new RegExp(detail + '$'));
     await expect(page.locator('main h1')).toContainText(language === 'ko' ? '원숭이띠' : 'Monkey');
-    await page.locator(`a[href="${prefix}/tomorrow/#zodiac-preview"]`).click();
-    await expect(page.locator('#zodiac-preview')).toBeInViewport();
+    await page.locator(`[data-tti-content] > a[href="${prefix}/tti/tomorrow/"]`).click();
+    await expect(page).toHaveURL(new RegExp(`${prefix}/tti/tomorrow/$`));
+    await page.goto(`${prefix}/tomorrow/?utm_source=bookmark#zodiac-preview`);
+    await expect(page).toHaveURL(new RegExp(`${prefix}/tti/tomorrow/\\?utm_source=bookmark$`));
   }
 });

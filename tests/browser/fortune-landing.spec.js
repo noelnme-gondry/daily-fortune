@@ -21,6 +21,8 @@ for (const lang of ['ko', 'en']) {
     const entry = page.locator('.home-intro [data-ga-cta="home_zodiac_entry"]');
     await expect(entry).toBeInViewport();
     await entry.click();
+    await expect(page).toHaveURL(new RegExp(`${prefix}/tti/$`));
+    await page.locator(`.tti-nav a[href="${prefix}/tti/today/"]`).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/tti/today/$`));
     // The server also provides a working detail link before the dialog module loads.
     // This scenario exercises the enhanced dialog, so wait for the destination document.
@@ -76,14 +78,11 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('#result .daily-cat')).toHaveCount(7);
     await page.goto(`${prefix}/today/`);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
-    const entry = page.locator('.reading-entry');
-    await entry.locator('a[href="#tool"]').focus();
-    await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/#tool$/);
-    await entry.locator(`a[href="${prefix}/tti/today/"]`).focus();
-    await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(new RegExp(`${prefix}/tti/today/$`));
-    await expect(page.locator('main .tti-row')).toHaveCount(12);
+    for (const period of ['today', 'tomorrow']) {
+      await page.goto(`${prefix}/${period}/`);
+      await expect(page.locator('#tool')).toHaveAttribute('data-tool', period);
+      await expect(page.locator('main .tti-row, main [data-zodiac-period], main .reading-entry')).toHaveCount(0);
+    }
     for (const width of [320, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       for (const path of ['/', '/today/']) {
@@ -119,7 +118,7 @@ for (const lang of ['ko', 'en']) {
     await expect(page.locator('.home-services')).toBeVisible();
     await page.goto(`${prefix}/guides/`);
     await page.locator(`.guide-tool-nav a[href="${prefix}/today/"]`).click();
-    await expect(page.locator('.reading-entry')).toBeVisible();
+    await expect(page.locator('#tool-form')).toBeVisible();
     await page.goto(`${prefix}/guides/fortune-scores/`);
     await page.locator(`#comparison a[href="${prefix}/today/"]`).click();
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
@@ -127,7 +126,8 @@ for (const lang of ['ko', 'en']) {
     await page.locator(`#section-1 a[href="${prefix}/today/"]`).click();
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     await page.goto(`${prefix}/guides/zodiac-samjae/`);
-    await page.locator(`#section-1 a[href="${prefix}/tti/today/"]`).click();
+    await page.locator(`#section-1 a[href="${prefix}/tti/"]`).click();
+    await page.locator(`.tti-nav a[href="${prefix}/tti/today/"]`).click();
     await expect(page.locator('main .tti-row')).toHaveCount(12);
   });
 }

@@ -1,5 +1,5 @@
 // 공통 HTML 뼈대: 메타 태그, Open Graph, JSON-LD(@graph), 헤더 내비게이션, 이동 경로, 푸터
-import { navigationGroups, groupedLinks } from './purpose-navigation.js';
+import { navigationGroups, groupedLinks, headerGroups } from './purpose-navigation.js';
 import { SITE } from '../content/pages.js';
 import { BRAND } from '../content/brand.js';
 import { esc, attr, abs } from './util.js';
@@ -174,7 +174,7 @@ ${cfg.gaId ? gaSnippet(cfg.gaId, page) : ''}${ads ? `<meta name="google-adsense-
     <nav class="language-switch" aria-label="${tr('언어 선택', 'Language')}"><a data-set-language="ko" href="${attr(languagePath(page.path, 'ko'))}" hreflang="ko" lang="ko"${ctx.lang !== 'en' ? ' aria-current="true"' : ''}>한국어</a><a data-set-language="en" href="${attr(languagePath(page.path, 'en'))}" hreflang="en" lang="en"${ctx.lang === 'en' ? ' aria-current="true"' : ''}>English</a></nav>
   </div>
   <div class="wrap gnav-row">
-    <nav class="gnav" aria-label="${tr('주요 메뉴', 'Main navigation')}">${groups.map(g => `<a${g.path === '/shop/' ? ' data-premium-menu' : ''} href="${g.path || g.links[0].path}"${g.path === page.path || g.links.some(l => l.path === page.path) || (g === groups[0] && page.path === '/') ? ' aria-current="page"' : ''}><b>${esc([tr('무료 운세', 'Free fortunes'), tr('프리미엄 운세', 'Premium reports'), tr('무료 도구', 'Free tools'), tr('캐릭터·랭킹', 'Characters & ranks'), tr('사주 읽는 법', 'Reading guide')][groups.indexOf(g)])}</b><small>${esc(g.note)}</small></a>`).join('')}
+    <nav class="gnav" aria-label="${tr('주요 메뉴', 'Main navigation')}">${headerGroups(groups, page.path)}
     <button type="button" class="all-menu-button sbtn" data-dialog="site-menu" aria-haspopup="dialog" aria-controls="site-menu">${tr('전체 메뉴', 'All menus')}</button></nav>
   </div>
 </header>

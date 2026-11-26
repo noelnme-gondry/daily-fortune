@@ -4,6 +4,11 @@ import { updateLanguageLinks } from './language.js';
 import { initCommerceLists } from './purchase-analytics.js';
 let pending;
 export function initTtiNavigation() {
+  // Older shared links opened the zodiac list inside the personal reading.
+  if (location.hash === '#zodiac-preview' && /^\/(en\/)?tomorrow\/$/.test(location.pathname)) {
+    location.replace(location.pathname.replace('tomorrow/', 'tti/tomorrow/') + location.search);
+    return;
+  }
   if (!document.querySelector('.tti-nav')) return;
   async function navigate(url, push) {
     pending?.abort();

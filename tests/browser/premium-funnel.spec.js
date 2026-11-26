@@ -2,6 +2,26 @@ import { test, expect } from '@playwright/test';
 import { todayKST } from '../../src/engine/core.js';
 
 const orderId = 'fortune_00000000-0000-4000-8000-000000000011';
+
+test('3종 묶음 목차는 넓은 화면에서 한 행, 좁은 화면에서 세 행으로 정렬된다', async ({ page }) => {
+  for (const path of ['/shop/', '/shop/bundle/']) {
+    await page.goto(path);
+    if (path === '/shop/bundle/') await page.locator('.shop-contents summary').click();
+    const board = page.locator('.reading-contents.is-bundle');
+    for (const width of [1440, 768, 390, 320]) {
+      await page.setViewportSize({ width, height: 900 });
+      const cells = await board.locator('.reading-contents-cell').evaluateAll(els => els.map(el => {
+        const { x, y, width, height } = el.getBoundingClientRect();
+        return { x, y, width, height };
+      }));
+      expect(cells).toHaveLength(3);
+      expect(new Set(cells.map(c => c.y)).size).toBe(width > 760 ? 1 : 3);
+      expect(new Set(cells.map(c => c.x)).size).toBe(width > 760 ? 3 : 1);
+      expect(Math.max(...cells.map(c => c.width)) - Math.min(...cells.map(c => c.width))).toBeLessThan(1);
+      if (width > 760) expect(new Set(cells.map(c => c.height)).size).toBe(1);
+    }
+  }
+});
 const events = (page, name) => page.evaluate(name => window.funnelEvents.filter(e => e[1] === name).map(e => e[2]), name);
 test.beforeEach(async ({ context, page }) => {
   await context.route('https://**/*', route => route.abort());

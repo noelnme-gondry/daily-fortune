@@ -74,7 +74,9 @@ function routeTable(ctx) {
     for (let m = 1; m <= 12; m++) add(`/manseryeok/${yr}/${m}/`, (c) => manse.manseMonth(yr, m, c), { p: 0.5 });
   }
   add('/tti/', tti.hub, { p: 0.8, cf: 'daily', daily: true });
-  add('/tti/today/', tti.today, { p: 0.8, cf: 'daily', daily: true });
+  for (const period of ['today', 'tomorrow']) {
+    add(`/tti/${period}/`, c => tti.dailyList(c, period), { p: 0.8, cf: 'daily', daily: true });
+  }
   for (let t = 0; t < 12; t++) {
     add(`/tti/today/${ANIMAL_SLUG[t]}/`, (c) => tti.animalDay(t, c), { p: 0.7, cf: 'daily', daily: true });
     add(`/tti/tomorrow/${ANIMAL_SLUG[t]}/`, (c) => tti.animalDay(t, c, true), { p: 0.5, cf: 'daily', daily: true });
@@ -222,7 +224,7 @@ ${pick((p) => /^\/guides\//.test(p))}
 ${pick((p) => ['/life-story/', '/saju-ranking/', '/saju/ilju-ranking/'].includes(p))}
 
 ## 띠별 운세
-${pick((p) => p === '/tti/' || p === '/tti/today/' || p === `/tti/${y}/` || p === `/tti/${y + 1}/` || p === '/tti/samjae/' || p === '/tti/compatibility/')}
+${pick((p) => p === '/tti/' || p === '/tti/today/' || p === '/tti/tomorrow/' || p === `/tti/${y}/` || p === `/tti/${y + 1}/` || p === '/tti/samjae/' || p === '/tti/compatibility/')}
 
 ## 사주 백과
 ${pick((p) => /^\/saju\/[a-z0-9-]*\/?$/.test(p) && p.split('/').length <= 4)}

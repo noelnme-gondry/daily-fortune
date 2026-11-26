@@ -211,7 +211,7 @@ export const INTERPRETATION_GUIDES = [
       { title: 'Verify the actual year and content', paragraphs: ['Check the year’s pair and explanations rather than the title alone. An archived year is a record for that year, not a current forecast.', 'A higher month score does not establish a probability of employment, a contract or marriage. Prepare important dates from the real participants and institutions involved.'] },
     ], checklist: ['Check target year, month and reference date.', 'Distinguish annual month panels from monthly calculations.', 'Do not read scores as success probabilities.'],
   }),
-  { ...guide('zodiac-samjae', 'cycles', ['ipchun-boundary', 'major-cycles', 'special-stars'], ['/today/', '/tti/today/', '/tti/', '/tti/samjae/'], '', {
+  { ...guide('zodiac-samjae', 'cycles', ['ipchun-boundary', 'major-cycles', 'special-stars'], ['/today/', '/tti/', '/tti/samjae/'], '', {
     title: '띠별 운세와 삼재: 개인 사주 운세와 무엇이 다른가요?',
     description: '띠별 공통 해설과 개인 원국의 차이, 들삼재·눌삼재·날삼재·복삼재의 해석 범위와 입춘 경계 확인법을 설명합니다.',
     lead: '같은 띠의 사람에게 같은 운세가 보이는데 개인 사주 점수는 다를 수 있습니다. 두 화면은 쓰는 출생 정보의 범위가 다릅니다.',

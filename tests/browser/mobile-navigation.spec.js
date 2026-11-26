@@ -5,6 +5,50 @@ test.beforeEach(async ({ context }) => {
   await context.route('https://**/*', (route) => route.abort());
 });
 
+test('상단 메뉴를 가로·세로로 이동해 내일 운세를 열고 키보드로 닫는다', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const groups = page.locator('.nav-group');
+  const menu = groups.first();
+  const toggle = menu.locator('.nav-toggle');
+  await expect(toggle).toBeVisible();
+  for (const group of await groups.all()) {
+    await group.locator('.nav-main').hover();
+    await expect(group.locator('.nav-toggle')).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('.nav-links:visible')).toHaveCount(1);
+  }
+  await menu.locator('.nav-main').hover();
+  const tomorrow = menu.getByRole('link', { name: '내일의 운세', exact: true });
+  const box = await tomorrow.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 12 });
+  await tomorrow.click();
+  await expect(page).toHaveURL(/\/tomorrow\/$/);
+  await page.mouse.move(0, 0);
+  await expect(toggle).toBeVisible();
+  await toggle.focus();
+  await expect(toggle).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('Tab');
+  await expect(menu.locator('.nav-links a').first()).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(toggle).toBeFocused();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+});
+
+test.describe('터치 메뉴', () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 320, height: 760 } });
+  test('영문 하위 링크가 화면 안에 열리고 탭으로 이동한다', async ({ page }) => {
+    await page.goto('/en/today/');
+    const group = page.locator('.nav-group').nth(2);
+    await group.locator('.nav-toggle').tap();
+    const link = group.locator('.nav-links a').last();
+    await expect(link).toBeInViewport({ ratio: 1 });
+    await link.tap();
+    await expect(page).toHaveURL(/\/en\/tti\/compatibility\/$/);
+  });
+});
+
 test('모바일 결과의 중복 운세 메뉴를 숨기고 상단 메뉴로 이동한다', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/today/');

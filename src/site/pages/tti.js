@@ -6,7 +6,7 @@ import { TTI_COPY } from '../../content/pages.js';
 import TT from '../../content/tti.js';
 import { ANIMAL, ANIMAL_SLUG, BR_H, pillarLabel, yearPillar, ttiYear, ttiDay, ttiCompat, ttiMatches, samjaeYear, samjaeBranches, fmtDate, fmtShort, dow, ttiMonths, addDays } from '../../engine/index.js';
 import { esc, faqBlock, faqLd, factTable } from '../util.js';
-import { hero, bandChip, dayBox, ttiDayList } from './tools.js';
+import { hero, bandChip, dayBox } from './tools.js';
 import { animalIcon, uiIcon } from '../icons.js';
 import { ttiDailyDetail } from '../tti-detail.js';
 import { ttiMonthCards } from '../tti-months.js';
@@ -17,7 +17,8 @@ const article = (ctx, page) => ({ '@type': 'Article', headline: page.h1 || page.
 export function hub(ctx) {
   const y = ctx.today.y;
   const choices = [
-    ['/tti/today/', tr('오늘의 12띠 운세', 'Today’s twelve zodiac readings'), tr('오늘 점수와 해석을 비교하고 내 띠의 7일 흐름으로 이동합니다.', 'Compare today’s readings and open the seven-day view for your sign.')],
+    ['/tti/today/', tr('띠별 오늘의 운세', 'Today’s twelve zodiac readings'), tr('오늘 점수와 해석을 비교하고 내 띠의 7일 흐름으로 이동합니다.', 'Compare today’s readings and open the seven-day view for your sign.')],
+    ['/tti/tomorrow/', tr('띠별 내일의 운세', 'Tomorrow’s zodiac readings'), tr('내 띠의 내일 점수와 풀이를 확인합니다.', 'Find tomorrow’s score and reading for your sign.')],
     [`/tti/${y}/`, tr(`${y}년 띠별 운세`, `${y} zodiac readings`), tr('출생 연도를 선택해 월별 흐름을 확인합니다. 띠 공통 해석과 연생별 표시를 구분하세요.', 'Choose a birth year to inspect monthly readings, distinguishing sign-wide text from birth-year details.')],
     [`/tti/${y + 1}/`, tr(`${y + 1}년 띠별 운세`, `${y + 1} zodiac readings`), tr('다음 해의 간지와 월별 해석을 봅니다. 미래 사건의 예측 확률은 아닙니다.', 'Explore next year’s calendar relationships and monthly readings, not probabilities of future events.')],
     ['/tti/samjae/', tr('삼재 연도 확인', 'Check Samjae years'), tr('띠 그룹별 들삼재·눌삼재·날삼재를 표로 확인합니다.', 'Look up the traditional three-year Samjae cycle by zodiac group.')],
@@ -25,8 +26,8 @@ export function hub(ctx) {
   ];
   return {
     path: '/tti/', section: '/tti/',
-    title: tr('띠별 운세 안내 — 오늘·신년·삼재·궁합 고르기', 'Zodiac reading guide — daily, annual, Samjae and compatibility'),
-    description: tr('띠별 오늘 운세, 연간 운세, 삼재와 궁합의 차이를 확인하고 필요한 자료를 고르세요. 출생 연도와 입춘 기준, 개인 사주와 띠별 해석의 차이도 설명합니다.', 'Choose between daily and annual zodiac readings, Samjae and compatibility. Learn about birth-year boundaries, Ipchun and the difference from a full birth chart.'),
+    title: tr('띠별 운세 안내 — 오늘·내일·신년·삼재·궁합 고르기', 'Zodiac reading guide — daily, annual, Samjae and compatibility'),
+    description: tr('띠별 오늘·내일 운세, 연간 운세, 삼재와 궁합의 차이를 확인하고 필요한 자료를 고르세요. 출생 연도와 입춘 기준, 개인 사주와 띠별 해석의 차이도 설명합니다.', 'Choose between daily and annual zodiac readings, Samjae and compatibility. Learn about birth-year boundaries, Ipchun and the difference from a full birth chart.'),
     crumbs: [[siteText('띠별 운세'), '/tti/']],
     body: `<article class="article" data-zodiac-guide>${hero(tr('어떤 띠별 운세를 찾으세요?', 'Which zodiac reading do you need?'), tr('하루의 해석, 한 해의 월별 흐름, 삼재 연도와 궁합 관계표는 서로 다른 질문에 답합니다. 필요한 자료를 고른 뒤 해석이 적용되는 범위를 함께 확인하세요.', 'Daily readings, annual monthly views, Samjae years and compatibility answer different questions. Choose a resource and check what its interpretation covers.'))}
       <div class="cards">${choices.map(([href, title, text]) => `<a class="card link-card" href="${href}"><b>${esc(title)}</b><span>${esc(text)}</span></a>`).join('')}</div>
@@ -148,14 +149,31 @@ export function compat(ctx) {
   return page;
 }
 
-export function today(ctx) {
-  const o = ctx.today;
-  const c = TTI_COPY.today;
+function ttiDayList(o, period) {
+  const detailPath = t => `/tti/${period}/${ANIMAL_SLUG[t]}/`;
+  const rows = [...Array(12).keys()].map((t) => ttiDay(t, o));
+  const items = rows.map((r) => `<li class="tti-row"><a href="${detailPath(r.tti)}" class="tti-name" data-dialog="tti-day-${r.tti}" aria-haspopup="dialog" aria-controls="tti-day-${r.tti}">${animalIcon(r.tti)}${siteValue(r.animal)}${siteText("띠")}</a><span class="num tti-score">${r.score}</span>${bandChip(r.score)}<p><strong class="tti-reading-headline">${esc(r.headline)}</strong><br>${esc(r.text)} <span class="muted">${siteText("행운의 색 ")}${r.color}${siteText(" · 숫자 ")}${r.number}</span></p></li>`).join('');
+  return `<ol class="tti-list">${items}</ol>${rows.map((r) => `<dialog class="character-dialog tti-dialog" data-zodiac-period="${period}" id="tti-day-${r.tti}" aria-labelledby="tti-detail-title-${ANIMAL_SLUG[r.tti]}"><div class="dialog-bar"><span>${siteValue(r.animal)}${siteText("띠 일별 운세")}</span><button class="sbtn" type="button" data-close-dialog autofocus>${siteText("닫기 ×")}</button></div><div class="box"><a class="btn ghost" data-ga-cta="zodiac_week_detail" href="${detailPath(r.tti)}">${tr(`${r.animal}띠 7일 흐름과 상세 풀이`, `${siteValue(r.animal)} seven-day outlook and full reading`)}</a>${ttiDailyDetail(r.tti, o, period)}</div></dialog>`).join('')}`;
+}
+
+export function dailyList(ctx, period) {
+  const tomorrow = period === 'tomorrow';
+  const date = tomorrow ? addDays(ctx.today, 1) : ctx.today;
+  const day = tomorrow ? siteText('내일') : siteText('오늘');
+  const heading = tomorrow ? tr('띠별 내일의 운세', 'Tomorrow’s Zodiac Fortune') : TTI_COPY.today.h1;
+  const lead = tomorrow
+    ? tr('내 띠를 선택해 내일의 운세와 앞으로 7일의 흐름을 확인하세요.', 'Choose your sign to read tomorrow’s outlook and the next seven days.')
+    : TTI_COPY.today.lead;
+  const path = `/tti/${period}/`;
   return {
-    path: '/tti/today/', title: `${siteText("[무료] 띠별 오늘의 운세 (")}${o.m}${siteText("월 ")}${o.d}${siteText("일) — 12띠 오늘 운세")}`, h1: c.h1, section: '/tti/',
-    description: `${fmtDate(o)}${siteText(" 띠별 오늘의 운세. 쥐띠·소띠·호랑이띠·토끼띠·용띠·뱀띠·말띠·양띠·원숭이띠·닭띠·개띠·돼지띠의 오늘 점수와 해설, 행운의 색과 숫자를 확인하세요.")}`,
-    crumbs: [[siteText('띠별 운세'), '/tti/'], [siteText('오늘의 운세'), '/tti/today/']], daily: true,
-    body: `${hero(`${c.h1} · ${o.m}${siteText("월 ")}${o.d}${siteText("일")}`, c.lead)}${dayBox(o, siteText('오늘'))}${ttiDayList(o)}<p class="cta"><a class="btn" href="/today/">${siteText("내 사주로 오늘의 운세 보기")}</a></p>`,
+    path,
+    title: tomorrow ? tr(`[무료] 띠별 내일의 운세 (${date.m}월 ${date.d}일) — 12띠 내일 운세`, `${heading} (${date.m}/${date.d}) — All 12 Signs`)
+      : `${siteText("[무료] 띠별 오늘의 운세 (")}${date.m}${siteText("월 ")}${date.d}${siteText("일) — 12띠 오늘 운세")}`,
+    h1: heading, section: '/tti/', daily: true,
+    description: tomorrow ? tr(`${fmtDate(date)} 띠별 내일의 운세. 열두 띠의 내일 점수와 풀이, 행운의 색과 숫자를 확인하세요.`, `${fmtDate(date)} zodiac readings for tomorrow. See each sign’s score, interpretation, lucky color and number.`)
+      : `${fmtDate(date)}${siteText(" 띠별 오늘의 운세. 쥐띠·소띠·호랑이띠·토끼띠·용띠·뱀띠·말띠·양띠·원숭이띠·닭띠·개띠·돼지띠의 오늘 점수와 해설, 행운의 색과 숫자를 확인하세요.")}`,
+    crumbs: [[siteText('띠별 운세'), '/tti/'], [heading, path]],
+    body: `${hero(`${heading} · ${date.m}${siteText("월 ")}${date.d}${siteText("일")}`, lead)}${dayBox(date, day)}${ttiDayList(date, period)}<p class="cta"><a class="btn" href="/${period}/">${tomorrow ? tr('내 사주로 내일의 운세 보기', 'Read my personal fortune for tomorrow') : siteText("내 사주로 오늘의 운세 보기")}</a></p>`,
   };
 }
 
@@ -180,7 +198,7 @@ export function animalDay(t, ctx, tomorrow = false) {
     path: `/tti/${period}/${slug}/`, section: '/tti/',
     title: tr(`${animal}띠 ${word}의 운세 — ${date.m}월 ${date.d}일 ${r.score}점`, `${dailyTitle} — ${date.m}/${date.d} · ${r.score} points`),
     description: `${fmtDate(date)} ${animal}${siteText("띠 ")}${word}${siteText("의 운세 ")}${r.score}${siteText("점. ")}${first}${siteText(" 12띠 중 ")}${rank}${siteText("위이며, 앞으로 7일 흐름과 행운의 색·숫자, 잘 맞는 띠를 함께 확인하세요.")}`,
-    crumbs: [[siteText('띠별 운세'), '/tti/'], [`${animal}${siteText("띠 ")}${word}${siteText(" 운세")}`, `/tti/${period}/${slug}/`]],
+    crumbs: [[siteText('띠별 운세'), '/tti/'], [tomorrow ? tr('띠별 내일의 운세', 'Tomorrow’s Zodiac Fortune') : TTI_COPY.today.h1, `/tti/${period}/`], [`${animal}${siteText("띠 ")}${word}${siteText(" 운세")}`, `/tti/${period}/${slug}/`]],
     body: `${hero(dailyTitle, `${fmtDate(date)} ${animal}${siteText("띠는 12띠 가운데 ")}${rank}${siteText("위(")}${r.score}${siteText("점)입니다. ")}${top.score > r.score ? `${word}${siteText(" 가장 운이 좋은 띠는 ")}${siteValue(top.animal)}${siteText("띠(")}${top.score}${siteText("점)입니다.")}` : `${word}${siteText("은 ")}${animal}${siteText("띠가 가장 운이 좋은 띠입니다.")}`}`)}
       <article class="box card">${ttiDailyDetail(t, date, period)}</article>
       <p class="cta"><a class="btn ghost" data-ga-cta="zodiac_other_day" href="/tti/${tomorrow ? 'today' : 'tomorrow'}/${slug}/">${tomorrow
@@ -197,6 +215,6 @@ export function animalDay(t, ctx, tomorrow = false) {
         [`${y}${siteText("년 · ")}${y + 1}${siteText("년 운세")}`, `<a href="/tti/${y}/${slug}/">${y}${siteText("년 ")}${animal}${siteText("띠 운세")}</a> · <a href="/tti/${y + 1}/${slug}/">${y + 1}${siteText("년 ")}${animal}${siteText("띠 운세")}</a>`],
       ], `${animal}${siteText("띠 한눈에 보기")}`)}
       <nav class="chips" aria-label="${siteText("다른 띠 ")}${word}${siteText(" 운세")}">${ANIMAL.map((n, i) => `<a class="chip${i === t ? ' on' : ''}" href="/tti/${period}/${ANIMAL_SLUG[i]}/">${animalIcon(i)}${siteValue(n)}${siteText("띠")}</a>`).join('')}</nav>
-      <a class="btn ghost" href="${tomorrow ? '/tomorrow/#zodiac-preview' : '/tti/today/'}">${tomorrow ? tr('내일의 12띠 운세로 돌아가기', 'Back to tomorrow’s twelve signs') : siteText("12띠 오늘의 운세로 돌아가기")}</a>`,
+      <a class="btn ghost" href="/tti/${period}/">${tomorrow ? tr('내일의 12띠 운세로 돌아가기', 'Back to tomorrow’s twelve signs') : siteText("12띠 오늘의 운세로 돌아가기")}</a>`,
   };
 }

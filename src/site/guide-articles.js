@@ -86,7 +86,7 @@ function toolLabel(href) {
     '/today/': ['오늘 운세 계산하기', 'Calculate a daily reading'], '/month/': ['월간 운세', 'Monthly reading'],
     '/week/': ['주간 운세', 'Weekly reading'], '/year/': ['연간 운세', 'Annual readings'],
     '/compatibility/': ['두 사람의 궁합', 'Compatibility for two charts'], '/life-story/': ['인생 캐릭터', 'Life character'],
-    '/tti/': ['띠별 운세', 'Zodiac readings'], '/tti/today/': ['입력 없이 띠별 오늘의 운세 보기', 'Today’s zodiac readings without entering details'], '/tti/samjae/': ['삼재 연도표', 'Samjae year table'],
+    '/tti/': ['띠별 운세', 'Zodiac readings'], '/tti/samjae/': ['삼재 연도표', 'Samjae year table'],
     '/saju/guide/': ['사주 보는 법 7단계', 'Seven steps to read a chart'], '/saju/ilgan/': ['일간 10가지 백과', 'Ten Day Masters'],
     '/saju/ilju/': ['60일주 백과', 'Sixty day pillars'], '/saju/glossary/': ['사주 용어 사전', 'Saju glossary'],
     '/saju/ohaeng/': ['오행 백과', 'Five Elements'], '/saju/sipsin/': ['십신 10가지 백과', 'Ten Gods'],
