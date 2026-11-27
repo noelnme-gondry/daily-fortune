@@ -2,6 +2,37 @@ import { initPageShare } from './share.js';
 import { initAdSlotTracking } from './partner-ad.js';
 import { updateLanguageLinks } from './language.js';
 import { initCommerceLists } from './purchase-analytics.js';
+import { observeView } from './view-tracking.js';
+const viewed = new Set();
+let stopViews = [];
+function observePersonalLinks() {
+  stopViews.forEach(stop => stop?.());
+  stopViews = Array.from(document.querySelectorAll('[data-zodiac-handoff]'), link => {
+    const area = link.dataset.zodiacHandoff, date = link.dataset.readingDateIso;
+    const target = link.dataset.readingTarget;
+    return observeView(link, 'zodiac_personal_offer_view', viewed, { area, reading_date: date, reading_target: target, tool: link.dataset.readingPeriod }, [location.pathname, area, date, target].join(':'));
+  });
+}
+function syncPersonalArea() {
+  const nav = document.querySelector('.tti-personal-next');
+  if (!nav) return;
+  const choices = [...document.querySelectorAll('[data-zodiac-area]')];
+  const chosen = choices.find(link => link.hash === location.hash)
+    || choices.find(link => link.dataset.zodiacArea === nav.dataset.defaultArea);
+  if (!chosen) return;
+  const key = chosen.dataset.zodiacArea;
+  for (const link of nav.querySelectorAll('[data-zodiac-handoff]')) {
+    const url = new URL(link.href);
+    url.searchParams.set('zodiac_area', key);
+    if (link.dataset.readingTarget === 'area') {
+      link.textContent = chosen.dataset.personalLabel;
+      url.hash = 'reading-' + key;
+    }
+    link.href = url.href;
+    link.dataset.zodiacHandoff = key;
+  }
+}
+
 let pending;
 export function initTtiNavigation() {
   // Older shared links opened the zodiac list inside the personal reading.
@@ -10,6 +41,9 @@ export function initTtiNavigation() {
     return;
   }
   if (!document.querySelector('.tti-nav')) return;
+  let renderedPage = location.pathname + location.search;
+  syncPersonalArea();
+  observePersonalLinks();
   async function navigate(url, push) {
     pending?.abort();
     const controller = new AbortController(); pending = controller;
@@ -43,7 +77,10 @@ export function initTtiNavigation() {
       });
       document.body.dataset.page = new URL(url, location.origin).pathname;
       if (push) history.pushState(null, '', url);
+      renderedPage = location.pathname + location.search;
       updateLanguageLinks();
+      syncPersonalArea();
+      observePersonalLinks();
       initAdSlotTracking();
       initCommerceLists();
       if (content.querySelector('[data-cohort]')) import('./tti-client.js').then((m) => m.mountTti()).catch(() => {});
@@ -58,5 +95,12 @@ export function initTtiNavigation() {
     if (!a || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault(); navigate(a.href, true);
   });
-  window.addEventListener('popstate', () => navigate(location.href, false));
+  window.addEventListener('popstate', () => {
+    if (location.pathname + location.search !== renderedPage) navigate(location.href, false);
+  });
+  window.addEventListener('hashchange', () => {
+    if (location.pathname + location.search !== renderedPage) return;
+    syncPersonalArea();
+    observePersonalLinks();
+  });
 }

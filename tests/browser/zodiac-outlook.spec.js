@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { zodiacDayDetail } from '../../src/domain/zodiac-day-detail.js';
 import { ttiDay, ttiYear, ttiMonths, todayKST, addDays } from '../../src/engine/index.js';
 import { withLanguage } from '../../src/i18n/runtime.js';
 
@@ -27,9 +28,11 @@ for (const lang of ['ko', 'en']) {
 
     const tomorrow = withLanguage(lang, () => ttiDay(0, addDays(today, 1)));
     await page.goto(`${prefix}/tti/tomorrow/rat/`);
-    await expect(page.locator('.tti-outlook')).toHaveText(tomorrow.outlook);
-    await expect(page.locator('.tti-advice')).toContainText(tomorrow.advice);
-    await expect(page.locator('.tti-caution')).toContainText(tomorrow.caution);
+    const detail = withLanguage(lang, () => zodiacDayDetail(tomorrow));
+    await expect(page.locator('.tti-story')).toHaveText(detail.story);
+    await expect(page.locator('.tti-daily-field p')).toHaveText(detail.areas.map(area => area.text));
+    await page.locator('.tti-daily-fields nav a[href="#zodiac-rat-love"]').click();
+    await expect(page.locator('#zodiac-rat-love')).toBeInViewport();
     const dailyBasis = page.locator('main .tti-reading-basis');
     await expect(dailyBasis.locator('.tti-factors')).toBeVisible();
     await expect(dailyBasis.locator('.tti-factors')).toBeVisible();

@@ -50,6 +50,9 @@ export function initAutoEvents() {
     const faq = e.target.closest('.faq-button');
     if (faq?.getAttribute('aria-expanded') === 'false') track('faq_open', { question: faq.textContent.slice(0, 90) });
     const a = e.target.closest('a');
+    if (a?.hasAttribute('data-zodiac-handoff')) {
+      track('zodiac_personal_click', { area: a.dataset.zodiacHandoff, reading_date: a.dataset.readingDateIso, reading_target: a.dataset.readingTarget, tool: a.dataset.readingPeriod });
+    }
     if (a) {
       // 공유 링크 등에 포함된 이름·결과 쿼리와 fragment를 보내지 않는다.
       const href = (a.getAttribute('href') || '').split(/[?#]/)[0];

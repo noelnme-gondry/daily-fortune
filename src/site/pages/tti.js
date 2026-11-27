@@ -8,7 +8,7 @@ import { ANIMAL, ANIMAL_SLUG, BR_H, pillarLabel, yearPillar, ttiYear, ttiDay, tt
 import { esc, faqBlock, faqLd, factTable } from '../util.js';
 import { hero, bandChip, dayBox } from './tools.js';
 import { animalIcon, uiIcon } from '../icons.js';
-import { ttiDailyDetail } from '../tti-detail.js';
+import { ttiDailyDetail, zodiacPersonalLinks } from '../tti-detail.js';
 import { ttiMonthCards } from '../tti-months.js';
 import { yearGuide } from '../year-guide.js';
 
@@ -152,8 +152,13 @@ export function compat(ctx) {
 function ttiDayList(o, period) {
   const detailPath = t => `/tti/${period}/${ANIMAL_SLUG[t]}/`;
   const rows = [...Array(12).keys()].map((t) => ttiDay(t, o));
-  const items = rows.map((r) => `<li class="tti-row"><a href="${detailPath(r.tti)}" class="tti-name" data-dialog="tti-day-${r.tti}" aria-haspopup="dialog" aria-controls="tti-day-${r.tti}">${animalIcon(r.tti)}${siteValue(r.animal)}${siteText("띠")}</a><span class="num tti-score">${r.score}</span>${bandChip(r.score)}<p><strong class="tti-reading-headline">${esc(r.headline)}</strong><br>${esc(r.text)} <span class="muted">${siteText("행운의 색 ")}${r.color}${siteText(" · 숫자 ")}${r.number}</span></p></li>`).join('');
-  return `<ol class="tti-list">${items}</ol>${rows.map((r) => `<dialog class="character-dialog tti-dialog" data-zodiac-period="${period}" id="tti-day-${r.tti}" aria-labelledby="tti-detail-title-${ANIMAL_SLUG[r.tti]}"><div class="dialog-bar"><span>${siteValue(r.animal)}${siteText("띠 일별 운세")}</span><button class="sbtn" type="button" data-close-dialog autofocus>${siteText("닫기 ×")}</button></div><div class="box"><a class="btn ghost" data-ga-cta="zodiac_week_detail" href="${detailPath(r.tti)}">${tr(`${r.animal}띠 7일 흐름과 상세 풀이`, `${siteValue(r.animal)} seven-day outlook and full reading`)}</a>${ttiDailyDetail(r.tti, o, period)}</div></dialog>`).join('')}`;
+  const signAttributes = t => period === 'tomorrow'
+    ? 'data-ga-cta="zodiac_week_detail"'
+    : `data-dialog="tti-day-${t}" aria-haspopup="dialog" aria-controls="tti-day-${t}"`;
+  const items = rows.map((r) => `<li class="tti-row"><a href="${detailPath(r.tti)}" class="tti-name" ${signAttributes(r.tti)}>${animalIcon(r.tti)}${siteValue(r.animal)}${siteText("띠")}</a><span class="num tti-score">${r.score}</span>${bandChip(r.score)}<p><strong class="tti-reading-headline">${esc(r.headline)}</strong><br>${esc(r.outlook)}</p></li>`).join('');
+  const list = `<ol class="tti-list">${items}</ol>`;
+  if (period === 'tomorrow') return list;
+  return `${list}${rows.map((r) => `<dialog class="character-dialog tti-dialog" data-zodiac-period="${period}" id="tti-day-${r.tti}" aria-labelledby="tti-detail-title-${ANIMAL_SLUG[r.tti]}"><div class="dialog-bar"><span>${siteValue(r.animal)}${siteText("띠 일별 운세")}</span><button class="sbtn" type="button" data-close-dialog autofocus>${siteText("닫기 ×")}</button></div><div class="box"><a class="btn ghost" data-ga-cta="zodiac_week_detail" href="${detailPath(r.tti)}">${tr(`${r.animal}띠 분야별 상세 풀이와 7일 흐름`, `${siteValue(r.animal)} seven-day outlook and full reading`)}</a>${ttiDailyDetail(r.tti, o, period, { preview: true })}</div></dialog>`).join('')}`;
 }
 
 export function dailyList(ctx, period) {
@@ -162,7 +167,7 @@ export function dailyList(ctx, period) {
   const day = tomorrow ? siteText('내일') : siteText('오늘');
   const heading = tomorrow ? tr('띠별 내일의 운세', 'Tomorrow’s Zodiac Fortune') : TTI_COPY.today.h1;
   const lead = tomorrow
-    ? tr('내 띠를 선택해 내일의 운세와 앞으로 7일의 흐름을 확인하세요.', 'Choose your sign to read tomorrow’s outlook and the next seven days.')
+    ? tr('내 띠를 누르면 내일의 금전운·직장운·연애운 등 일곱 분야와 앞으로 7일의 흐름을 볼 수 있어요.', 'Choose your sign for seven readings, including money, work and love, and the outlook for the next seven days.')
     : TTI_COPY.today.lead;
   const path = `/tti/${period}/`;
   return {
@@ -186,7 +191,6 @@ export function animalDay(t, ctx, tomorrow = false) {
   const r = ttiDay(t, date);
   const all = [...Array(12).keys()].map((i) => ttiDay(i, date));
   const rank = 1 + all.filter((x) => x.score > r.score).length;
-  const top = all.filter((x) => x.tti !== t).sort((a, b) => b.score - a.score)[0];
   const week = [...Array(7).keys()].map((i) => { const d = addDays(date, i); return { d, score: ttiDay(t, d).score }; });
   const high = Math.max(...week.map(w => w.score));
   const best = week.filter(w => w.score === high).map(w => fmtShort(w.d) + ' (' + weekdayName(dow(w.d)) + ')').join(tr(' · ', ', '));
@@ -199,7 +203,7 @@ export function animalDay(t, ctx, tomorrow = false) {
     title: tr(`${animal}띠 ${word}의 운세 — ${date.m}월 ${date.d}일 ${r.score}점`, `${dailyTitle} — ${date.m}/${date.d} · ${r.score} points`),
     description: `${fmtDate(date)} ${animal}${siteText("띠 ")}${word}${siteText("의 운세 ")}${r.score}${siteText("점. ")}${first}${siteText(" 12띠 중 ")}${rank}${siteText("위이며, 앞으로 7일 흐름과 행운의 색·숫자, 잘 맞는 띠를 함께 확인하세요.")}`,
     crumbs: [[siteText('띠별 운세'), '/tti/'], [tomorrow ? tr('띠별 내일의 운세', 'Tomorrow’s Zodiac Fortune') : TTI_COPY.today.h1, `/tti/${period}/`], [`${animal}${siteText("띠 ")}${word}${siteText(" 운세")}`, `/tti/${period}/${slug}/`]],
-    body: `${hero(dailyTitle, `${fmtDate(date)} ${animal}${siteText("띠는 12띠 가운데 ")}${rank}${siteText("위(")}${r.score}${siteText("점)입니다. ")}${top.score > r.score ? `${word}${siteText(" 가장 운이 좋은 띠는 ")}${siteValue(top.animal)}${siteText("띠(")}${top.score}${siteText("점)입니다.")}` : `${word}${siteText("은 ")}${animal}${siteText("띠가 가장 운이 좋은 띠입니다.")}`}`)}
+    body: `${hero(dailyTitle, tr(`${fmtDate(date)} · ${r.score}점 · 12띠 중 ${rank}위`, `${fmtDate(date)} · ${r.score} points · Ranked ${rank} of 12`))}
       <article class="box card">${ttiDailyDetail(t, date, period)}</article>
       <p class="cta"><a class="btn ghost" data-ga-cta="zodiac_other_day" href="/tti/${tomorrow ? 'today' : 'tomorrow'}/${slug}/">${tomorrow
         ? tr(`${animal}띠의 오늘 풀이 보기`, `Read today’s ${animal} outlook`)
@@ -208,6 +212,7 @@ export function animalDay(t, ctx, tomorrow = false) {
         <ol class="tti-week-list">${week.map((w, i) => `<li${i === 0 ? ' class="is-today"' : ''}><span>${weekdayName(dow(w.d))} ${fmtShort(w.d)}</span><i style="--s:${w.score}" aria-hidden="true"></i><b class="num">${w.score}</b>${bandChip(w.score)}</li>`).join('')}</ol>
         <p class="hint">${tr(`이번 7일의 최고점은 ${high}점입니다. 해당 날짜는 ${best}입니다.`, `The highest score in these seven days is ${high}. Dates at that score: ${best}.`)}</p>
       </section>
+      ${zodiacPersonalLinks(r, date, period)}
       ${factTable([
         [siteText('출생 연도'), `${births.map((b) => `${b}`).join(' · ')}${siteText("년생 ")}<small>${siteText("(1월~2월 초 출생은 입춘 전이라 앞 띠일 수 있습니다)")}</small>`],
         [siteText('잘 맞는 띠'), m.good.map((g) => `${animalName(g.tti)}${siteText("띠(")}${siteValue(g.rel)})`).join(', ')],

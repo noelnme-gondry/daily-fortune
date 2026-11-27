@@ -20,6 +20,8 @@ import { readingNavigation, nextToolsHtml } from '../site/tool-navigation.js';
 import { wireReadingNavigation, syncReadingNavigation } from './reading-navigation.js';
 import { esc } from '../site/util.js';
 import { refreshPeriodContext } from './period-context.js';
+import { zodiacHandoff } from './zodiac-handoff.js';
+import { observeView } from './view-tracking.js';
 import { wireReadingExplorer } from './reading-explorer.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -86,6 +88,17 @@ export async function mount(root) {
   wireReadingPreferences(out);
   wireReadingNavigation(out);
   rankTool?.wireRankReveal(out);
+  const daily = mode === 'today' || mode === 'tomorrow';
+  const handoff = daily ? zodiacHandoff(location.search, location.hash) : null;
+  if (handoff) {
+    const notice = document.createElement('p');
+    notice.className = 'reading-handoff-note';
+    notice.textContent = handoff.notice;
+    form.before(notice);
+    form.querySelector('[type="submit"]').textContent = handoff.buttonLabel;
+  }
+  const seenHandoffs = new Set();
+  let stopHandoffView;
   let today = todayKST();
   const pair = mode === 'compatibility';
   const yr = +(root.dataset.year || today.y);
@@ -105,7 +118,8 @@ export async function mount(root) {
   wireBirthForm(form, pair ? ['a', 'b'] : ['a']);
 
   function focusResult() {
-    const summary = $('#reading-summary', out) || out;
+    const area = handoff && /^#reading-[a-z]+$/.test(location.hash) && out.querySelector(location.hash);
+    const summary = area || (handoff && out.querySelector('#reading-' + handoff.key)) || $('#reading-summary', out) || out;
     summary.tabIndex = -1;
     summary.focus({ preventScroll: true });
     // 페이지 이동 직후에는 스타일과 글꼴이 적용되면서 결과의 위치가 바뀐다.
@@ -175,8 +189,13 @@ export async function mount(root) {
     let html = `<section class="applied-profile" aria-label="${tr('이 풀이에 적용한 출생 정보', 'Birth details used for this reading')}"><div><strong>${tr('이 풀이의 출생 정보', 'Details used for this reading')}</strong><p>${esc(details(a))}${b ? `<br>${esc(details(b))}` : ''}</p></div><button type="button" class="sbtn result-edit-top" data-edit-profile aria-controls="tool-form" aria-expanded="false">${tr('출생 정보 수정', 'Edit birth details')}</button></section>` + readingNavigation(tabMode, today) + readingControls();
     let res;
     let leaderRank;
-    if (mode === 'today') { res = day(ca, today, 'today'); html += dayView(res, { scope: 'reading' }); }
-    else if (mode === 'tomorrow') { res = day(ca, addDays(today, 1), 'tomorrow'); html += dayView(res, { scope: 'reading' }); }
+    if (daily) {
+      const tomorrow = addDays(today, 1);
+      const target = handoff?.date || (mode === 'today' ? today : tomorrow);
+      const dayType = isoDate(target) === isoDate(tomorrow) ? 'tomorrow' : isoDate(target) === isoDate(today) ? 'today' : 'dated';
+      res = day(ca, target, dayType);
+      html += dayView(res, { scope: 'reading' });
+    }
     else if (mode === 'week') { res = week(ca, today); html += weekView(res, today); }
     else if (mode === 'month') { res = month(ca, today.y, today.m); html += monthView(res, today); }
     else if (mode === 'year') { res = year(ca, yr); html += yearView(res, yearMonths(ca, yr), today, { detailed: root.dataset.annualTier === 'full' }); }
@@ -210,6 +229,13 @@ export async function mount(root) {
       out.append(banner);
     }
     applyReadingPreferences(out);
+    if (handoff) {
+      stopHandoffView?.();
+      const body = out.querySelector('#reading-' + handoff.key + ' .daily-outlook');
+      if (body) stopHandoffView = observeView(body, 'personal_area_view', seenHandoffs, {
+        area: handoff.key, reading_date: readingDate, tool: mode, entry_point: 'zodiac', handoff_match: true,
+      }, readingDate + ':' + handoff.key);
+    }
     syncReadingNavigation(out);
     currentInputs = { a, b };
     currentChart = ca;
