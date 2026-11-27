@@ -127,14 +127,14 @@ const signPractices = practiceCalendar(cycle => {
 
 export function ttiDay(tti, o) {
   const cycle = readingCycle(o);
-  const { rel, score, focus, selection } = dailySignScenes(dayPillar(o), monthPillar(o), cycle)[tti];
+  const { rel, e, es, score, focus, selection } = dailySignScenes(dayPillar(o), monthPillar(o), cycle)[tti];
   const practice = signPractices(cycle)[tti];
   const key = `ttid${tti}|${o.y}-${o.m}-${o.d}`;
   const a = animalName(tti);
   const band = bandOf(score);
   const { text, headline, outlook, advice, caution } = zodiacDayReading(focus, score, selection, practice);
   const E = T.element[(BR_EL[tti] + 4) % 5];
-  return { tti, animal: a, score, band, rel, headline, outlook, advice, behavior: practice[2], caution, text, color: pick(E.color, key + 'c'), number: pick(E.number, key + 'n') };
+  return { tti, animal: a, score, band, rel, focus, detailContext: { theme: selection.scene[6], branch: e, stem: es, cycle }, headline, outlook, advice, behavior: practice[2], caution, text, color: pick(E.color, key + 'c'), number: pick(E.number, key + 'n') };
 }
 
 // 일별 총점과 같은 요인을 상세 화면에 그대로 공개한다.

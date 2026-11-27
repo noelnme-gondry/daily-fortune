@@ -164,18 +164,23 @@ test('legacy language links canonicalize in one hop and keep campaign parameters
   expect(alias.headers().location).toBe('/en/tojeong/');
 });
 
-test('tomorrow zodiac previews lead to the full reading and back in both languages', async ({ page, context }) => {
+test('tomorrow zodiac signs link directly to the full reading and back in both languages', async ({ page, context }) => {
   for (const [language, prefix] of [['ko', ''], ['en', '/en']]) {
     await context.addCookies([{ name: 'fortune-language', value: language, url: 'http://127.0.0.1:4176' }]);
     await page.goto(`${prefix}/tti/`);
     await page.locator(`.tti-nav a[href="${prefix}/tti/tomorrow/"]`).click();
     await expect(page.locator('main .tti-row')).toHaveCount(12);
     const detail = `${prefix}/tti/tomorrow/monkey/`;
-    await page.locator(`a[data-dialog][href="${detail}"]`).click();
-    const dialog = page.getByRole('dialog');
-    await expect(dialog.locator(`a[href="${prefix}/tomorrow/"]`)).toBeVisible();
-    await dialog.locator(`a[href="${detail}"]`).click();
+    await page.locator(`.tti-name[href="${detail}"]`).click();
     await expect(page).toHaveURL(new RegExp(detail + '$'));
+    await expect(page.locator('dialog[open]')).toHaveCount(0);
+    const personal = page.locator('a[data-reading-target="area"]');
+    await expect(personal).toBeVisible();
+    const personalUrl = new URL(await personal.getAttribute('href'), page.url());
+    expect(personalUrl.pathname).toBe(prefix + '/tomorrow/');
+    expect(personalUrl.hash).toBe('#reading-' + personalUrl.searchParams.get('zodiac_area'));
+    expect(personalUrl.searchParams.get('zodiac_date')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    await expect(page.locator('[data-reading-target="overview"]')).toHaveAttribute('href', /#reading-summary$/);
     await expect(page.locator('main h1')).toContainText(language === 'ko' ? '원숭이띠' : 'Monkey');
     await page.locator(`[data-tti-content] > a[href="${prefix}/tti/tomorrow/"]`).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/tti/tomorrow/$`));

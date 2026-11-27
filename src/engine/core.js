@@ -89,6 +89,11 @@ export const fmtDate = (o) => tr(`${o.y}년 ${o.m}월 ${o.d}일 (${DOW_K[dow(o)]
 export const fmtShort = (o) => `${o.m}/${o.d}`;
 export const isoDate = (o) => `${o.y}-${String(o.m).padStart(2, '0')}-${String(o.d).padStart(2, '0')}`;
 export const parseISO = (s) => { const [y, m, d] = String(s).split('-').map(Number); return { y, m, d }; };
+export function parseReadingDate(stamp) {
+  if (!/^(19|20)\d{2}-\d{2}-\d{2}$/.test(stamp)) return null;
+  const date = parseISO(stamp);
+  return date.m >= 1 && date.m <= 12 && date.d >= 1 && date.d <= daysIn(date.y, date.m) ? date : null;
+}
 // 한국 시각 기준 오늘 (서버·빌드 환경의 시간대와 무관)
 export function todayKST(now = Date.now()) { return fromUTC(now + 9 * 3600000); }
 

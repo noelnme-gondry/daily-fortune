@@ -281,7 +281,7 @@ function dayComb(c, o) {
 export function day(c, o, which = 'today') {
   const { dEv, comb } = dayComb(c, o);
   const previous = scoresOf(dayComb(c, addDays(o, -1)).comb, 'day');
-  const word = which === 'tomorrow' ? tr('내일', 'Tomorrow') : tr('오늘', 'Today');
+  const word = which === 'dated' ? fmtDate(o) : which === 'tomorrow' ? tr('내일', 'Tomorrow') : tr('오늘', 'Today');
   const r = buildReport(c, comb, 'day', {
     key: `d${o.y}-${o.m}-${o.d}`, P: tr(`${word}은`, word), unit: tr('날', 'Day'), label: fmtDate(o),
     which, cycle: readingCycle(o), practices: dailyPractices(c, o), dayFactors: dEv.acc, previous,

@@ -6,6 +6,7 @@ import { esc } from './util.js';
 // 무료 본문을 읽은 뒤 이어 볼 한 권. 상품 가격·목차는 판매 화면과 같은 기준을 쓴다.
 export function premiumEntry(page, ctx) {
   if (page.section === '/shop/' || page.noindex || page.path === '/') return '';
+  if (page.path.startsWith('/tti/tomorrow/')) return '';
   if (!page.tool && !['/tti/', '/saju/', '/guides/'].includes(page.section)) return '';
   const id = /compatibility/.test(page.path) ? 'compatibility' : 'bundle';
   const p = productEdition(fortuneProduct(id), ctx.today.y + 1);
